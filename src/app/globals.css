@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  /* Core */
+  --primary: #0D9488;
+  --primary-light: #14B8A6;
+  --primary-dark: #0F766E;
+  --accent: #F59E0B;
+  --accent-light: #FBBF24;
+
+  /* Ikigai Circles */
+  --ikigai-love: #F5E642;
+  --ikigai-skills: #A8DB5A;
+  --ikigai-needs: #F4A79D;
+  --ikigai-money: #6DD5D0;
+
+  /* Ikigai Intersections */
+  --ikigai-passion: #C8E86A;
+  --ikigai-mission: #F7C89B;
+  --ikigai-profession: #8FCF8F;
+  --ikigai-vocation: #C5B99A;
+
+  /* Ikigai Center */
+  --ikigai-center-outer: #8B9E6A;
+  --ikigai-center-inner: #4A6741;
+
+  /* Text */
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+
+  /* Backgrounds */
+  --bg: #FFFFFF;
+  --bg-subtle: #F9FAFB;
+  --bg-muted: #F3F4F6;
+
+  /* Borders */
+  --border: #E5E7EB;
+  --border-strong: #D1D5DB;
+
+  /* Semantic */
+  --success: #059669;
+  --warning: #D97706;
+  --error: #DC2626;
+  --info: #3B82F6;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  --font-display: 'Satoshi', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus indicators for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
