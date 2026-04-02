@@ -28,7 +28,9 @@
       "Bash(npm run:*)",
       "Bash(npx vitest:*)",
       "Bash(npx supabase:*)",
-      "Bash(export SUPABASE_ACCESS_TOKEN=\"sbp_8ea613047131c82898d5461dca6087edc3ccce4c\")"
+      "Bash(export SUPABASE_ACCESS_TOKEN=\"sbp_8ea613047131c82898d5461dca6087edc3ccce4c\")",
+      "Bash(cat /Users/ajrogers/Adaptable/src/app/\\\\\\(app\\\\\\)/lessons/pricing-strategy-research.json)",
+      "Bash(npx tsx:*)"
     ]
   }
 }

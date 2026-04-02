@@ -55,6 +55,32 @@ export async function POST(request: Request) {
     ? `The student's business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer}. Revenue model: ${profile.business_idea.revenue_model}.`
     : "The student hasn't created a business idea yet.";
 
+  // Retrieve relevant knowledge base content
+  let knowledgeContext = "";
+  try {
+    const { data: kbResults } = await supabase
+      .from("knowledge_base")
+      .select("title, key_principles, concrete_examples, quotes, student_friendly_summary")
+      .limit(2);
+
+    if (kbResults && kbResults.length > 0) {
+      knowledgeContext = "\n\nREFERENCE KNOWLEDGE (use these real examples and principles in your answers):\n" +
+        kbResults.map((kb) => {
+          const principles = (kb.key_principles as { principle: string; explanation: string }[])
+            .slice(0, 3)
+            .map((p) => `- ${p.principle}: ${p.explanation}`)
+            .join("\n");
+          const examples = (kb.concrete_examples as { example: string; lesson: string }[])
+            .slice(0, 2)
+            .map((e) => `- ${e.example}: ${e.lesson}`)
+            .join("\n");
+          return `## ${kb.title}\n${principles}\n${examples}`;
+        }).join("\n\n");
+    }
+  } catch {
+    // Knowledge base not available, continue without it
+  }
+
   // Get conversation history
   let messages: { role: "user" | "assistant"; content: string }[] = [];
 
@@ -73,11 +99,13 @@ export async function POST(request: Request) {
 
   messages.push({ role: "user", content: message });
 
-  const systemPrompt = `You are an AI guide helping a student build their business. Be encouraging, specific, and practical. Keep responses concise (2-3 paragraphs max). Reference their specific business when relevant.
+  const systemPrompt = `You are an AI guide helping a student build their business. You have access to a curated knowledge base of real business education from Harvard, Y Combinator, and successful entrepreneurs. Use these real examples and frameworks in your answers instead of giving generic advice.
+
+Be encouraging, specific, and practical. Keep responses concise (2-3 paragraphs max). Reference their specific business when relevant. When giving advice, cite real examples: "Warby Parker did X" or "Paul Graham says Y" — not "some businesses do X."
 
 ${businessContext}
 
-The student's name is ${profile?.full_name || "there"}.`;
+The student's name is ${profile?.full_name || "there"}.${knowledgeContext}`;
 
   try {
     const stream = await streamMessage({
