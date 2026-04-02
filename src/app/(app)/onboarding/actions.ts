@@ -109,7 +109,22 @@ export async function synthesizeBusinessIdea(draft: IkigaiDraft): Promise<{
     const result = await sendMessage({
       feature: "ikigai",
       systemPrompt:
-        `You help teenagers discover their business niche. Based on their Ikigai answers, synthesize a specific, concrete business idea. Do NOT generate generic ideas like 'Art Studio' or 'Tech Services'. Be specific to what the student actually said. Return a JSON object with exactly these fields: niche (string, specific description of the business area, e.g. 'Custom Watercolor Pet Portraits' not just 'Art'), name (string, use the format "${studentName}'s {specific niche descriptor}" as a personal placeholder, e.g. "${studentName}'s Pet Portrait Studio"), target_customer (string, specific description of who would pay, e.g. 'Pet owners who want custom artwork of their animals for gifts and home decor'), revenue_model (string, brief summary of how they make money, e.g. 'Sell custom portraits through Instagram commissions and local art fairs, with prints as a lower-cost option'). IMPORTANT: Use proper Title Case for name and niche. The revenue_model should be a sentence, not a price.`,
+        `You help teenagers discover their business niche based on their Ikigai answers.
+
+CRITICAL RULES:
+1. IDENTIFY DISTINCT THEMES FIRST. Look at the student's answers across all four circles. If their interests point to 2-3 separate directions (e.g., "nails" and "music" are two different paths), DO NOT mash them into one hybrid idea. Treat them as separate viable directions.
+2. Pick the SINGLE STRONGEST direction — the one where their passions, skills, needs, and monetization align most naturally. Generate ONE concrete, specific idea for that direction.
+3. If two directions are equally strong, pick the one that is more actionable for a teenager.
+4. NEVER combine unrelated interests into a forced hybrid (e.g., "music-themed nail salon" or "nail art with beats"). If interests are unrelated, choose one.
+5. Be hyper-specific. "Mobile Nail Technician Specializing in Prom and Event Nails" is good. "Nail Services" is bad. "Music Production Lessons for Beginners" is good. "Music Business" is bad.
+
+Return a JSON object with exactly these fields:
+- niche: specific description of the business area
+- name: use the format "${studentName}'s {specific niche descriptor}" as a personal placeholder
+- target_customer: specific description of who would pay
+- revenue_model: brief sentence describing how they make money (not a price)
+
+Use proper Title Case for name and niche.`,
       messages: [
         {
           role: "user",
@@ -119,7 +134,7 @@ export async function synthesizeBusinessIdea(draft: IkigaiDraft): Promise<{
 - What the WORLD NEEDS: ${(draft.needs ?? []).join(", ")}
 - How to get PAID: ${draft.monetization ?? "not specified"}
 
-Synthesize a specific, actionable business idea. Return ONLY a JSON object.`,
+First, identify the distinct themes in their answers. If their interests span multiple unrelated areas (e.g., nails AND music), pick the single strongest direction where passions, skills, and needs align best. Do NOT combine unrelated interests into a forced hybrid. Generate ONE specific, concrete, actionable business idea. Return ONLY a JSON object.`,
         },
       ],
     });
