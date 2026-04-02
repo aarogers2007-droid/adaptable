@@ -12,7 +12,8 @@ export function renderLesson(template: string, profile: Profile): string {
     .replace(/\{\{niche\}\}/g, idea.niche)
     .replace(/\{\{business_name\}\}/g, idea.name)
     .replace(/\{\{target_customer\}\}/g, idea.target_customer)
-    .replace(/\{\{pricing\}\}/g, idea.pricing);
+    .replace(/\{\{pricing\}\}/g, idea.revenue_model)
+    .replace(/\{\{revenue_model\}\}/g, idea.revenue_model);
 }
 
 /**

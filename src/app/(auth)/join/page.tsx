@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { validateInviteCode, completeClassEnrollment } from "./actions";
 
 export default function JoinClassPage() {
   const [code, setCode] = useState("");
@@ -22,40 +23,18 @@ export default function JoinClassPage() {
     setError(null);
     setLoading(true);
 
-    const trimmed = code.trim().toUpperCase();
+    const result = await validateInviteCode(code);
 
-    // Look up invite code
-    const { data: invite, error: inviteError } = await supabase
-      .from("invite_codes")
-      .select("id, class_id, expires_at, max_uses, current_uses, classes(name, org_id)")
-      .eq("code", trimmed)
-      .single();
-
-    if (inviteError || !invite) {
-      setError("Invalid invite code. Check with your instructor.");
+    if (result.error) {
+      setError(result.error);
       setLoading(false);
       return;
     }
 
-    // Check expiry
-    if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
-      setError("This invite code has expired. Ask your instructor for a new one.");
-      setLoading(false);
-      return;
-    }
-
-    // Check usage limit
-    if (invite.max_uses && invite.current_uses >= invite.max_uses) {
-      setError("This invite code has reached its limit. Ask your instructor for a new one.");
-      setLoading(false);
-      return;
-    }
-
-    const classData = invite.classes as unknown as { name: string; org_id: string };
     setClassInfo({
-      className: classData.name,
-      classId: invite.class_id,
-      orgId: classData.org_id,
+      className: result.className!,
+      classId: result.classId!,
+      orgId: result.orgId!,
     });
     setLoading(false);
   }
@@ -71,57 +50,27 @@ export default function JoinClassPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      // Store class info in sessionStorage, redirect to signup
+      // Store class info, redirect to signup
       sessionStorage.setItem("pendingClassJoin", JSON.stringify(classInfo));
       sessionStorage.setItem("pendingInviteCode", code.trim().toUpperCase());
       router.push("/signup");
       return;
     }
 
-    // Enroll in class
-    const enrollResult = await enrollInClass(user.id, classInfo.classId, classInfo.orgId);
-    if (!enrollResult.success) {
-      setError(enrollResult.error ?? "Failed to join class");
+    // Enroll via server action
+    const result = await completeClassEnrollment(
+      classInfo.classId,
+      classInfo.orgId,
+      code
+    );
+
+    if (result.error) {
+      setError(result.error);
       setLoading(false);
       return;
     }
 
     router.push("/onboarding");
-  }
-
-  async function enrollInClass(userId: string, classId: string, orgId: string) {
-    // Check if already enrolled
-    const { data: existing } = await supabase
-      .from("class_enrollments")
-      .select("id")
-      .eq("class_id", classId)
-      .eq("student_id", userId)
-      .single();
-
-    if (existing) {
-      return { success: true };
-    }
-
-    // Enroll
-    const { error: enrollError } = await supabase
-      .from("class_enrollments")
-      .insert({ class_id: classId, student_id: userId });
-
-    if (enrollError) {
-      return { success: false, error: "Couldn't join the class. Try again." };
-    }
-
-    // Update profile with org_id
-    await supabase
-      .from("profiles")
-      .update({ org_id: orgId })
-      .eq("id", userId);
-
-    // Increment invite code usage
-    const trimmed = code.trim().toUpperCase();
-    await supabase.rpc("increment_invite_usage", { invite_code: trimmed });
-
-    return { success: true };
   }
 
   return (

@@ -2,11 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  // Skip auth when Supabase isn't configured (local preview)
+  // Skip auth when Supabase isn't configured (local dev only)
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {
+    if (process.env.NODE_ENV === "production") {
+      // Fail closed in production: missing config = block all
+      return new NextResponse("Server configuration error", { status: 500 });
+    }
     return NextResponse.next({ request });
   }
 

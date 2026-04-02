@@ -33,7 +33,7 @@ export interface BusinessIdea {
   niche: string;
   name: string;
   target_customer: string;
-  pricing: string;
+  revenue_model: string;
 }
 
 export interface IkigaiResult {

@@ -98,7 +98,7 @@ export default function IkigaiDiagram({
           width: showReveal ? 320 : 70,
           height: showReveal ? 320 : 70,
           left: "50%",
-          top: "50%",
+          top: "52.5%",
           transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, var(--ikigai-center-inner) 40%, var(--ikigai-center-outer) 100%)",
           boxShadow: showReveal

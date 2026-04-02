@@ -52,14 +52,14 @@ insert into lessons (module_name, module_sequence, lesson_sequence, title, conte
 (
   'Know Your Customer', 2, 3,
   'Set Your Price',
-  E'# Set Your Price\n\nThis is the moment. How much will **{{business_name}}** charge?\n\nPricing is not math. It''s psychology. Your price tells customers what kind of business you are. Too low = "probably not very good." Too high = "not for me." Just right = "this feels like a fair deal."\n\nYour current thinking: **{{pricing}}**\n\n## Your Exercise\n\nResearch and decide:\n- What do competitors charge for similar services?\n- What would make your target customer ({{target_customer}}) feel like they got a great deal?\n- Set your launch price. You can always change it later.',
+  E'# Set Your Price\n\nThis is the moment. How much will **{{business_name}}** charge?\n\nPricing is not math. It''s psychology. Your price tells customers what kind of business you are. Too low = "probably not very good." Too high = "not for me." Just right = "this feels like a fair deal."\n\nYour current thinking: **{{revenue_model}}**\n\n## Your Exercise\n\nResearch and decide:\n- What do competitors charge for similar services?\n- What would make your target customer ({{target_customer}}) feel like they got a great deal?\n- Set your launch price. You can always change it later.',
   '{"example_prompt": "For a {{niche}} business targeting {{target_customer}}, provide pricing research: what do 3 similar businesses charge? What pricing model works best (hourly, per session, monthly, per project)? Recommend a launch price for a teenager just starting out."}',
   'https://www.youtube.com/embed/placeholder-pricing'
 ),
 (
   'Know Your Customer', 2, 4,
   'Your First 3 Customers',
-  E'# Your First 3 Customers\n\nYou have a business idea (**{{business_name}}**), a target customer (**{{target_customer}}**), and a price (**{{pricing}}**). Now you need customers.\n\nNot 100 customers. Not 1,000. Three.\n\nThree real customers who pay you real money. That''s the goal of this lesson.\n\n## Your Exercise\n\nWrite a plan to get your first 3 paying customers:\n- **Where are they?** (Online? Local? School? Community?)\n- **How will you reach them?** (Post? DM? Flyer? Word of mouth?)\n- **What will you say?** (Write the actual message or pitch)\n- **When will you do it?** (Set a date this week)',
-  '{"example_prompt": "For a {{niche}} business called {{business_name}} at {{pricing}}, suggest 3 concrete strategies to find the first 3 paying customers. Target audience: {{target_customer}}. Strategies should be realistic for a teenager with no marketing budget."}',
+  E'# Your First 3 Customers\n\nYou have a business idea (**{{business_name}}**), a target customer (**{{target_customer}}**), and a price (**{{revenue_model}}**). Now you need customers.\n\nNot 100 customers. Not 1,000. Three.\n\nThree real customers who pay you real money. That''s the goal of this lesson.\n\n## Your Exercise\n\nWrite a plan to get your first 3 paying customers:\n- **Where are they?** (Online? Local? School? Community?)\n- **How will you reach them?** (Post? DM? Flyer? Word of mouth?)\n- **What will you say?** (Write the actual message or pitch)\n- **When will you do it?** (Set a date this week)',
+  '{"example_prompt": "For a {{niche}} business called {{business_name}} at {{revenue_model}}, suggest 3 concrete strategies to find the first 3 paying customers. Target audience: {{target_customer}}. Strategies should be realistic for a teenager with no marketing budget."}',
   null
 );

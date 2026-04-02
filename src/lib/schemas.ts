@@ -10,7 +10,7 @@ export const businessIdeaSchema = z.object({
   niche: z.string().min(1),
   name: z.string().min(1),
   target_customer: z.string().min(1),
-  pricing: z.string().min(1),
+  revenue_model: z.string().min(1),
 });
 
 export const ikigaiResultSchema = z.object({

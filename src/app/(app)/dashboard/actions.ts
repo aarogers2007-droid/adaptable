@@ -45,7 +45,7 @@ export async function generateCheckin() {
     systemPrompt: "You are a supportive AI mentor for a student entrepreneur. Give a brief, encouraging weekly check-in. Reference their specific business. Suggest one concrete next step. Keep it to 2-3 sentences.",
     messages: [{
       role: "user",
-      content: `Student: ${profile.full_name || "Student"}. Business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer} at ${profile.business_idea.pricing}. Progress: ${completedCount} lessons completed, ${inProgressCount} in progress. Generate a weekly check-in.`,
+      content: `Student: ${profile.full_name || "Student"}. Business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer}. Revenue model: ${profile.business_idea.revenue_model}. Progress: ${completedCount} lessons completed, ${inProgressCount} in progress. Generate a weekly check-in.`,
     }],
   });
 

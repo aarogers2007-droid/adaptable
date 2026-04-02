@@ -90,7 +90,7 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
           </div>
         )}
 
-        {/* Lesson content (rendered markdown) */}
+        {/* Lesson content (rendered markdown with HTML escaping) */}
         <div
           className="prose prose-gray max-w-none
             [&_h1]:font-[family-name:var(--font-display)] [&_h1]:text-3xl [&_h1]:font-bold
@@ -102,13 +102,16 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
             __html: content
               .split("\n")
               .map((line) => {
-                if (line.startsWith("# ")) return `<h1>${line.slice(2)}</h1>`;
-                if (line.startsWith("## ")) return `<h2>${line.slice(3)}</h2>`;
-                if (line.startsWith("- ")) return `<li>${line.slice(2)}</li>`;
-                if (line.match(/^\d+\. /)) return `<li>${line.replace(/^\d+\. /, "")}</li>`;
-                if (line.startsWith("**") && line.endsWith("**")) return `<p><strong>${line.slice(2, -2)}</strong></p>`;
-                if (line.trim() === "") return "<br/>";
-                return `<p>${line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`;
+                // Escape HTML entities in the line first to prevent XSS
+                const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+                const escaped = esc(line);
+                if (escaped.startsWith("# ")) return `<h1>${escaped.slice(2)}</h1>`;
+                if (escaped.startsWith("## ")) return `<h2>${escaped.slice(3)}</h2>`;
+                if (escaped.startsWith("- ")) return `<li>${escaped.slice(2)}</li>`;
+                if (escaped.match(/^\d+\. /)) return `<li>${escaped.replace(/^\d+\. /, "")}</li>`;
+                if (escaped.startsWith("**") && escaped.endsWith("**")) return `<p><strong>${escaped.slice(2, -2)}</strong></p>`;
+                if (escaped.trim() === "") return "<br/>";
+                return `<p>${escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`;
               })
               .join("\n"),
           }}

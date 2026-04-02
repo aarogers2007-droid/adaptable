@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   const progress = (progressRes.data ?? []) as unknown as StudentProgress[];
   const latestCheckin = (checkinRes.data?.[0] ?? null) as unknown as MentorCheckin | null;
 
-  const { niche, name, target_customer, pricing } = profile.business_idea;
+  const { niche, name, target_customer, revenue_model } = profile.business_idea;
   const nextLesson = getNextLesson(lessons, progress);
   const completedCount = progress.filter((p) => p.status === "completed").length;
   const { percentage, completed, total } = calculateProgress(profile, lessons.length, completedCount);
@@ -71,9 +71,9 @@ export default async function DashboardPage() {
               <p className="mt-1 text-[var(--text-secondary)]">
                 {niche} for {target_customer}
               </p>
-              <span className="mt-3 inline-block rounded-full bg-[var(--bg-muted)] px-3 py-1 text-sm font-semibold text-[var(--primary)]">
-                {pricing}
-              </span>
+              <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                {revenue_model}
+              </p>
             </div>
             <Link
               href="/onboarding"

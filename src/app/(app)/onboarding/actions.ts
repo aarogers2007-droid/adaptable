@@ -20,6 +20,11 @@ export async function generateSuggestions(
   draft: IkigaiDraft
 ): Promise<{ suggestions: string[]; error?: string }> {
   try {
+    // Auth check before AI call to prevent unauthenticated API usage
+    const supabaseAuth = await createClient();
+    const { data: { user: authUser } } = await supabaseAuth.auth.getUser();
+    if (!authUser) return { suggestions: [], error: "Not authenticated" };
+
     const promptFn = STEP_PROMPTS[step];
     if (!promptFn) return { suggestions: [], error: "Invalid step" };
 
@@ -86,14 +91,29 @@ export async function synthesizeBusinessIdea(draft: IkigaiDraft): Promise<{
   error?: string;
 }> {
   try {
+    // Get student name for the personal business name
+    const supabaseForName = await createClient();
+    const { data: { user: currentUser } } = await supabaseForName.auth.getUser();
+    let studentName = "Student";
+    if (currentUser) {
+      const { data: nameData } = await supabaseForName
+        .from("profiles")
+        .select("full_name")
+        .eq("id", currentUser.id)
+        .single();
+      if (nameData?.full_name) {
+        studentName = (nameData.full_name as string).split(" ")[0]; // First name only
+      }
+    }
+
     const result = await sendMessage({
       feature: "ikigai",
       systemPrompt:
-        "You help teenagers discover their business niche. Based on their Ikigai answers, synthesize a concrete business idea. Return a JSON object with exactly these fields: niche (string), name (string, creative business name), target_customer (string, specific description), pricing (string, e.g. '$25/session'). Be creative with the name but practical with everything else.",
+        `You help teenagers discover their business niche. Based on their Ikigai answers, synthesize a specific, concrete business idea. Do NOT generate generic ideas like 'Art Studio' or 'Tech Services'. Be specific to what the student actually said. Return a JSON object with exactly these fields: niche (string, specific description of the business area, e.g. 'Custom Watercolor Pet Portraits' not just 'Art'), name (string, use the format "${studentName}'s {specific niche descriptor}" as a personal placeholder, e.g. "${studentName}'s Pet Portrait Studio"), target_customer (string, specific description of who would pay, e.g. 'Pet owners who want custom artwork of their animals for gifts and home decor'), revenue_model (string, brief summary of how they make money, e.g. 'Sell custom portraits through Instagram commissions and local art fairs, with prints as a lower-cost option'). IMPORTANT: Use proper Title Case for name and niche. The revenue_model should be a sentence, not a price.`,
       messages: [
         {
           role: "user",
-          content: `Based on this student's Ikigai:
+          content: `The student's name is ${studentName}. Based on their Ikigai:
 - What they LOVE: ${(draft.passions ?? []).join(", ")}
 - What they're GOOD AT: ${(draft.skills ?? []).join(", ")}
 - What the WORLD NEEDS: ${(draft.needs ?? []).join(", ")}
@@ -124,8 +144,16 @@ Synthesize a specific, actionable business idea. Return ONLY a JSON object.`,
     }
 
     const parsed = JSON.parse(result.text);
-    if (parsed.niche && parsed.name && parsed.target_customer && parsed.pricing) {
-      return { idea: parsed as BusinessIdea };
+    if (parsed.niche && parsed.name && parsed.target_customer && parsed.revenue_model) {
+      const titleCase = (s: string) =>
+        s.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1));
+      const idea: BusinessIdea = {
+        niche: titleCase(parsed.niche),
+        name: titleCase(parsed.name),
+        target_customer: parsed.target_customer,
+        revenue_model: parsed.revenue_model,
+      };
+      return { idea };
     }
 
     return { idea: null, error: "Incomplete business idea generated" };
@@ -146,10 +174,18 @@ export async function confirmBusinessIdea(
 
   if (!user) return { error: "Not authenticated" };
 
+  // Validate input to prevent arbitrary data injection
+  const { businessIdeaSchema } = await import("@/lib/schemas");
+  const validation = businessIdeaSchema.safeParse(idea);
+  if (!validation.success) return { error: "Invalid business idea data" };
+
+  // Only pass validated fields to prevent extra field injection
+  const validatedIdea = validation.data;
+
   const { error } = await supabase
     .from("profiles")
     .update({
-      business_idea: idea,
+      business_idea: validatedIdea,
       ikigai_result: {
         passions: ikigaiResult.passions ?? [],
         skills: ikigaiResult.skills ?? [],

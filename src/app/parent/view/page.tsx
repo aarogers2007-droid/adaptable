@@ -24,7 +24,7 @@ export default async function ParentViewPage({
   // Look up student by access token
   const { data: student } = await supabase
     .from("profiles")
-    .select("id, full_name, business_idea, parent_access_pin, parent_access_token")
+    .select("id, full_name, business_idea")
     .eq("parent_access_token", token)
     .single();
 
@@ -39,11 +39,14 @@ export default async function ParentViewPage({
   const typedStudent = student as unknown as Profile;
 
   // If not yet verified with PIN, show PIN form
-  if (verified !== "true") {
+  // PIN verification is checked server-side via a signed cookie, not a query param
+  const cookieStore = await (await import("next/headers")).cookies();
+  const verifiedCookie = cookieStore.get(`parent_verified_${token}`);
+  if (!verifiedCookie || verifiedCookie.value !== "true") {
     return <ParentPinForm token={token} studentName={typedStudent.full_name ?? "Your student"} />;
   }
 
-  // Verified: show progress
+  // Verified via server-side cookie: show progress
   const { data: progressData } = await supabase
     .from("student_progress")
     .select("status")
@@ -84,9 +87,9 @@ export default async function ParentViewPage({
             <p className="mt-1 text-sm text-[var(--text-secondary)]">
               {typedStudent.business_idea.niche}
             </p>
-            <span className="mt-2 inline-block rounded-full bg-[var(--primary)]/10 px-3 py-1 text-sm font-semibold text-[var(--primary)]">
-              {typedStudent.business_idea.pricing}
-            </span>
+            <p className="mt-3 text-sm text-[var(--text-secondary)]">
+              {typedStudent.business_idea.revenue_model}
+            </p>
 
             <div className="mt-6">
               <div className="h-3 rounded-full bg-[var(--bg-muted)]">

@@ -1,5 +1,19 @@
 # TODOS
 
+## P0 — Security (next session)
+
+### TOCTOU Race on Daily Message Cap
+The chat endpoint checks message count then proceeds, but concurrent requests can all pass
+the check simultaneously. Fix: use atomic counter (UPDATE ... RETURNING or Redis INCR)
+checked and incremented in a single operation before starting the stream.
+File: src/app/api/chat/route.ts
+
+### Race Condition on Invite Code Max Uses
+Multiple students redeeming the same invite code concurrently can all pass validation and
+exceed max_uses. Fix: add WHERE current_uses < max_uses to the increment_invite_usage
+function and check row count to detect failure.
+File: supabase/migrations/00004_functions.sql, src/app/(auth)/join/actions.ts
+
 ## P1 — High priority (v1.1)
 
 ### Clever/ClassLink SSO
@@ -75,3 +89,23 @@ Effort: S
 ### Accessibility Audit (WCAG 2.1 AA)
 Full accessibility audit and remediation. May be a procurement requirement for US schools.
 Effort: M
+
+## P3 — Low priority (security hardening)
+
+### Lesson Progress Insert Race Condition
+If a student opens the same lesson in two tabs, both try to insert a progress record.
+The unique constraint catches it but the error isn't handled, causing a 500.
+Fix: use Supabase upsert with onConflict instead of insert.
+File: src/app/(app)/lessons/[id]/page.tsx
+
+### CSRF Protection on Chat Route Handler
+The /api/chat Route Handler doesn't have CSRF protection (Server Actions get it
+automatically). A malicious site could POST to /api/chat with the user's cookies.
+Fix: check Origin/Referer header, or add CSRF token validation.
+File: src/app/api/chat/route.ts
+
+### increment_invite_usage Security Definer Abuse
+The RPC function runs as security definer (superuser privileges), bypassing RLS.
+Any authenticated user can call it to exhaust any invite code's usage limit.
+Fix: add caller validation inside the function or restrict to specific roles.
+File: supabase/migrations/00004_functions.sql

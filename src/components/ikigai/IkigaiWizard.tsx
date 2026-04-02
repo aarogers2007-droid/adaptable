@@ -41,16 +41,19 @@ function getMockSuggestions(step: number, regen: number): string[] {
   return pool[regen % pool.length];
 }
 
+function titleCase(str: string): string {
+  return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+}
+
 function generateMockBusinessIdea(draft: IkigaiDraft): BusinessIdea {
-  const passion = (draft.passions ?? [])[0] ?? "creativity";
-  const skill = (draft.skills ?? [])[0] ?? "problem solving";
-  const need = (draft.needs ?? [])[0] ?? "helping others";
-  const names = [`${passion} Studio`, `The ${skill} Lab`, `${passion} & Co`, `${need.split(" ")[0]} Works`];
+  const passion = titleCase((draft.passions ?? [])[0] ?? "Creativity");
+  const need = titleCase((draft.needs ?? [])[0] ?? "Helping Others");
+  const monetization = (draft.monetization ?? "per-session service fee").toLowerCase();
   return {
-    niche: `${passion.toLowerCase()} services`,
-    name: names[Math.floor(Math.random() * names.length)],
+    niche: titleCase(`${passion} for ${need}`),
+    name: `Your ${titleCase(passion)} Business`,
     target_customer: `People who need help with ${need.toLowerCase()}`,
-    pricing: "$25/session",
+    revenue_model: `Earn money through ${monetization}, building a client base in your community and online`,
   };
 }
 
@@ -316,13 +319,16 @@ export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
                 <p className="mt-1 text-[var(--text-secondary)]">
                   {businessIdea.niche}
                 </p>
-                <div className="mt-3 flex flex-wrap justify-center gap-2">
-                  <span className="rounded-full bg-[var(--bg-muted)] px-3 py-1 text-sm">
-                    {businessIdea.target_customer}
-                  </span>
-                  <span className="rounded-full bg-[var(--primary)]/10 px-3 py-1 text-sm font-semibold text-[var(--primary)]">
-                    {businessIdea.pricing}
-                  </span>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  For {businessIdea.target_customer.toLowerCase()}
+                </p>
+                <div className="mt-4 rounded-lg bg-[var(--bg-muted)] px-4 py-3 text-left">
+                  <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">
+                    How you'll make money
+                  </p>
+                  <p className="text-sm text-[var(--text-primary)]">
+                    {businessIdea.revenue_model}
+                  </p>
                 </div>
                 <div className="mt-6 flex gap-3 justify-center">
                   <button

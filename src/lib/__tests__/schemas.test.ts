@@ -9,9 +9,9 @@ describe("businessIdeaSchema", () => {
   it("validates a complete business idea", () => {
     const result = businessIdeaSchema.safeParse({
       niche: "pet grooming",
-      name: "Paws & Claws",
+      name: "AJ's Pet Grooming Studio",
       target_customer: "busy pet owners",
-      pricing: "$45/session",
+      revenue_model: "Charge per grooming session, with premium add-ons for nail trimming and teeth cleaning",
     });
     expect(result.success).toBe(true);
   });

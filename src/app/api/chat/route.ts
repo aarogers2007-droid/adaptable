@@ -16,8 +16,13 @@ export async function POST(request: Request) {
 
   const { message, conversationId } = await request.json();
 
-  if (!message || typeof message !== "string") {
-    return new Response("Missing message", { status: 400 });
+  if (!message || typeof message !== "string" || message.length > 5000) {
+    return new Response("Missing or invalid message (max 5000 characters)", { status: 400 });
+  }
+
+  // Validate conversationId format if provided
+  if (conversationId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(conversationId)) {
+    return new Response("Invalid conversation ID", { status: 400 });
   }
 
   // Check daily cap (20 messages)
@@ -47,7 +52,7 @@ export async function POST(request: Request) {
 
   // Build context
   const businessContext = profile?.business_idea
-    ? `The student's business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer} at ${profile.business_idea.pricing}.`
+    ? `The student's business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer}. Revenue model: ${profile.business_idea.revenue_model}.`
     : "The student hasn't created a business idea yet.";
 
   // Get conversation history
@@ -106,7 +111,8 @@ The student's name is ${profile?.full_name || "there"}.`;
                 messages: allMessages,
                 message_count: allMessages.length,
               })
-              .eq("id", conversationId);
+              .eq("id", conversationId)
+              .eq("student_id", user.id); // ownership check
           } else {
             const { data: newConvo } = await supabase
               .from("ai_conversations")

@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone:*)",
+      "Read(//Users/ajrogers/.claude/skills/gstack/**)",
+      "Bash(./setup)",
+      "Bash(export BUN_INSTALL=\"$HOME/.bun\")",
+      "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
+      "Bash(source:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote:*)",
+      "Bash(~/.claude/skills/gstack/bin/gstack-config set:*)",
+      "WebSearch",
+      "Bash(~/.claude/skills/gstack/bin/gstack-review-read)",
+      "Skill(plan-eng-review)",
+      "Skill(plan-design-review)",
+      "Skill(design-consultation)",
+      "Bash(open:*)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
+      "Bash(npx create-next-app@latest adaptable --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
+      "Bash(shopt -s dotglob)",
+      "Bash(cp -r /tmp/adaptable/* /Users/ajrogers/Adaptable/)",
+      "Bash(cp -r /tmp/adaptable/.eslintrc* /tmp/adaptable/.gitignore /Users/ajrogers/Adaptable/)",
+      "Bash(cp:*)",
+      "Bash(npx create-next-app@latest adaptable-tmp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx supabase:*)",
+      "Bash(export SUPABASE_ACCESS_TOKEN=\"sbp_8ea613047131c82898d5461dca6087edc3ccce4c\")"
+    ]
+  }
+}
