@@ -76,6 +76,8 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const existingConversation = (artifacts.conversation ?? []) as { role: "user" | "assistant"; content: string }[];
   const checkpointsReached = (artifacts.checkpoints_reached ?? []) as string[];
 
+  const objective = plan?.objective ?? `Complete the "${lesson.title}" lesson`;
+
   return (
     <LessonConversation
       lessonId={lesson.id}
@@ -90,6 +92,8 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       initialCheckpoints={checkpointsReached.length}
       totalCheckpoints={plan?.checkpoints.length ?? 3}
       opener={opener}
+      objective={objective}
+      isAdmin={isAdmin}
     />
   );
 }

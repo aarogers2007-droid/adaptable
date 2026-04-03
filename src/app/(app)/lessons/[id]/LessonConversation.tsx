@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -22,6 +22,8 @@ interface LessonConversationProps {
   initialCheckpoints: number;
   totalCheckpoints: number;
   opener: string;
+  objective: string;
+  isAdmin: boolean;
 }
 
 export default function LessonConversation({
@@ -36,6 +38,8 @@ export default function LessonConversation({
   initialCheckpoints,
   totalCheckpoints,
   opener,
+  objective,
+  isAdmin: initialIsAdmin,
 }: LessonConversationProps) {
   const [messages, setMessages] = useState<Message[]>(() =>
     initialMessages.length > 0
@@ -46,6 +50,10 @@ export default function LessonConversation({
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(initialCompleted);
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
+  const [adminMode, setAdminMode] = useState(initialIsAdmin);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
@@ -54,12 +62,96 @@ export default function LessonConversation({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Generate suggested responses based on last AI message
+  const generateSuggestions = useCallback(() => {
+    const lastAiMessage = [...messages].reverse().find((m) => m.role === "assistant");
+    if (!lastAiMessage || loading || completed) return;
+
+    const content = lastAiMessage.content.toLowerCase();
+
+    // Context-aware suggestions based on what the AI asked
+    if (content.includes("who specifically") || content.includes("who do you think")) {
+      setSuggestions([
+        "Mostly people my age at school",
+        "Adults in my neighborhood who need help with this",
+        "I'm not sure yet, that's what I'm trying to figure out",
+      ]);
+    } else if (content.includes("what price") || content.includes("what should") && content.includes("charge")) {
+      setSuggestions([
+        "I was thinking around $20-30",
+        "I honestly have no idea where to start",
+        "I looked at competitors and they charge around...",
+      ]);
+    } else if (content.includes("why should someone trust") || content.includes("what skill")) {
+      setSuggestions([
+        "I've been doing this as a hobby for a while",
+        "I'm still learning but I'm passionate about it",
+        "People always ask me for help with this",
+      ]);
+    } else if (content.includes("what could") && content.includes("different")) {
+      setSuggestions([
+        "I could focus on a specific niche they're ignoring",
+        "I'd offer better customer service since I'm small",
+        "I'm not sure how to stand out yet",
+      ]);
+    } else if (content.includes("?")) {
+      // Generic suggestions for any question
+      setSuggestions([
+        "I haven't thought about that yet",
+        "Let me think... I'd say",
+        "Can you give me an example?",
+      ]);
+    } else {
+      setSuggestions([]);
+    }
+  }, [messages, loading, completed]);
+
+  // 15-second idle timer for showing suggestions
+  const resetIdleTimer = useCallback(() => {
+    setShowSuggestions(false);
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+
+    if (!loading && !completed && messages.length > 0) {
+      idleTimerRef.current = setTimeout(() => {
+        generateSuggestions();
+        setShowSuggestions(true);
+      }, 15000);
+    }
+  }, [loading, completed, messages.length, generateSuggestions]);
+
+  // Reset timer when messages change (new AI response)
+  useEffect(() => {
+    resetIdleTimer();
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [messages.length, resetIdleTimer]);
+
+  // Reset timer on typing
+  function handleInputChange(value: string) {
+    setInput(value);
+    if (value.trim()) {
+      setShowSuggestions(false);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    } else {
+      resetIdleTimer();
+    }
+  }
+
+  function useSuggestion(text: string) {
+    setInput(text);
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  }
+
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || loading) return;
 
     setInput("");
+    setShowSuggestions(false);
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
     setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
     setLoading(true);
 
@@ -105,7 +197,6 @@ export default function LessonConversation({
             const parsed = JSON.parse(data);
             if (parsed.text) {
               assistantMsg += parsed.text;
-              // Clean hidden tags from display
               const clean = assistantMsg
                 .replace(/\[CHECKPOINT:\S+\]/g, "")
                 .replace(/\[LESSON_COMPLETE\]/g, "")
@@ -159,16 +250,35 @@ export default function LessonConversation({
           <Link href="/dashboard" className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
             Adaptable
           </Link>
-          <Link href="/lessons" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            ← Lessons
+          <Link href={adminMode ? "/admin" : "/lessons"} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+            ← {adminMode ? "Admin" : "Lessons"}
           </Link>
-          <span className="ml-auto text-xs text-[var(--text-muted)]">
+
+          {/* Admin/Student toggle */}
+          {initialIsAdmin && (
+            <button
+              onClick={() => setAdminMode(!adminMode)}
+              className={`ml-auto rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                adminMode
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-[var(--bg-muted)] text-[var(--text-secondary)]"
+              }`}
+            >
+              {adminMode ? "Admin View" : "Student View"}
+            </button>
+          )}
+
+          <span className={`${initialIsAdmin ? "" : "ml-auto"} text-xs text-[var(--text-muted)]`}>
             {moduleName} · Lesson {lessonSequence}
           </span>
         </div>
 
-        {/* Progress bar */}
-        <div className="mx-auto max-w-[800px] px-6 pb-2">
+        {/* Goal summary + Progress bar */}
+        <div className="mx-auto max-w-[800px] px-6 pb-3">
+          <div className="rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-2.5 mb-2">
+            <p className="text-xs font-medium text-[var(--primary)]">Goal</p>
+            <p className="text-sm text-[var(--text-secondary)]">{objective}</p>
+          </div>
           <div className="flex items-center gap-3">
             <p className="text-xs font-medium text-[var(--text-primary)]">{lessonTitle}</p>
             <div className="flex-1 h-1.5 rounded-full bg-[var(--bg-muted)]">
@@ -239,27 +349,45 @@ export default function LessonConversation({
       {/* Input */}
       {!completed && (
         <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
-          <form onSubmit={handleSend} className="mx-auto max-w-[700px] px-6 py-4">
-            <div className="flex gap-3">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type your response..."
-                rows={1}
-                autoFocus
-                className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || loading}
-                className="rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-40 transition-colors"
-              >
-                Send
-              </button>
-            </div>
-          </form>
+          <div className="mx-auto max-w-[700px] px-6 pt-4 pb-2">
+            {/* Suggested responses (appear after 15s idle) */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                <span className="text-xs text-[var(--text-muted)] self-center mr-1">Stuck?</span>
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => useSuggestion(s)}
+                    className="rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <form onSubmit={handleSend}>
+              <div className="flex gap-3">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type your response..."
+                  rows={1}
+                  autoFocus
+                  className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || loading}
+                  className="rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-40 transition-colors"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
