@@ -93,14 +93,14 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
               .split("\n")
               .map((line) => {
                 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+                const fmt = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/\*(.*?)\*/g, "<em>$1</em>");
                 const escaped = esc(line);
-                if (escaped.startsWith("# ")) return `<h1>${escaped.slice(2)}</h1>`;
-                if (escaped.startsWith("## ")) return `<h2>${escaped.slice(3)}</h2>`;
-                if (escaped.startsWith("- ")) return `<li>${escaped.slice(2)}</li>`;
-                if (escaped.match(/^\d+\. /)) return `<li>${escaped.replace(/^\d+\. /, "")}</li>`;
-                if (escaped.startsWith("**") && escaped.endsWith("**")) return `<p><strong>${escaped.slice(2, -2)}</strong></p>`;
+                if (escaped.startsWith("# ")) return `<h1>${fmt(escaped.slice(2))}</h1>`;
+                if (escaped.startsWith("## ")) return `<h2>${fmt(escaped.slice(3))}</h2>`;
+                if (escaped.startsWith("- ")) return `<li>${fmt(escaped.slice(2))}</li>`;
+                if (escaped.match(/^\d+\. /)) return `<li>${fmt(escaped.replace(/^\d+\. /, ""))}</li>`;
                 if (escaped.trim() === "") return "<br/>";
-                return `<p>${escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`;
+                return `<p>${fmt(escaped)}</p>`;
               })
               .join("\n"),
           }}
