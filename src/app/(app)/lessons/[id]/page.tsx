@@ -1,9 +1,9 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { renderLesson, isLessonUnlocked } from "@/lib/lessons";
+import { isLessonUnlocked } from "@/lib/lessons";
+import { getLessonPlan } from "@/lib/lesson-plans";
 import type { Profile, Lesson, StudentProgress } from "@/lib/types";
-import Link from "next/link";
-import LessonExercise from "./LessonExercise";
+import LessonConversation from "./LessonConversation";
 
 export default async function LessonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,8 +47,6 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       .eq("id", progress.id);
   }
 
-  const content = renderLesson(lesson.content_template, profile);
-
   // Find next lesson
   const sorted = [...allLessons].sort((a, b) => {
     if (a.module_sequence !== b.module_sequence) return a.module_sequence - b.module_sequence;
@@ -58,67 +56,38 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const nextLesson = currentIdx < sorted.length - 1 ? sorted[currentIdx + 1] : null;
   const isCompleted = progress?.status === "completed";
 
-  // Extract exercise section from content (everything after "## Your Exercise")
-  const exerciseSplit = content.split(/## Your Exercise/i);
-  const lessonContent = exerciseSplit[0];
-  const exercisePrompt = exerciseSplit[1]?.trim() ?? "";
+  // Get lesson plan for conversational flow
+  const plan = getLessonPlan(lesson.module_sequence, lesson.lesson_sequence);
+
+  // Personalize the opener
+  const studentName = profile.full_name?.split(" ")[0] ?? "there";
+  const opener = plan
+    ? plan.opener
+        .replace(/\{\{name\}\}/g, studentName)
+        .replace(/\{\{niche\}\}/g, profile.business_idea.niche)
+        .replace(/\{\{business_name\}\}/g, profile.business_idea.name)
+        .replace(/\{\{target_customer\}\}/g, profile.business_idea.target_customer)
+    : `Hey ${studentName}! Let's work through "${lesson.title}" together. This is all about ${profile.business_idea.name}. Ready to start?`;
+
+  // Get existing conversation from artifacts
+  const artifacts = (progress?.artifacts ?? {}) as Record<string, unknown>;
+  const existingConversation = (artifacts.conversation ?? []) as { role: "user" | "assistant"; content: string }[];
+  const checkpointsReached = (artifacts.checkpoints_reached ?? []) as string[];
 
   return (
-    <main className="min-h-screen bg-[var(--bg)]">
-      <nav className="border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="mx-auto flex max-w-[800px] items-center gap-4 px-6 py-3">
-          <Link href="/dashboard" className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
-            Adaptable
-          </Link>
-          <Link href="/lessons" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            ← All Lessons
-          </Link>
-          <span className="ml-auto text-xs text-[var(--text-muted)]">
-            {lesson.module_name} · Lesson {lesson.lesson_sequence}
-          </span>
-        </div>
-      </nav>
-
-      <article className="mx-auto max-w-[700px] px-6 py-10">
-        {/* Lesson content */}
-        <div
-          className="prose prose-gray max-w-none
-            [&_h1]:font-[family-name:var(--font-display)] [&_h1]:text-3xl [&_h1]:font-bold
-            [&_h2]:font-[family-name:var(--font-display)] [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8
-            [&_p]:text-[var(--text-secondary)] [&_p]:leading-relaxed
-            [&_li]:text-[var(--text-secondary)]
-            [&_strong]:text-[var(--text-primary)]"
-          dangerouslySetInnerHTML={{
-            __html: lessonContent
-              .split("\n")
-              .map((line) => {
-                const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-                const fmt = (s: string) => s.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>").replace(/\*(.*?)\*/g, "<em>$1</em>");
-                const escaped = esc(line);
-                if (escaped.startsWith("# ")) return `<h1>${fmt(escaped.slice(2))}</h1>`;
-                if (escaped.startsWith("## ")) return `<h2>${fmt(escaped.slice(3))}</h2>`;
-                if (escaped.startsWith("- ")) return `<li>${fmt(escaped.slice(2))}</li>`;
-                if (escaped.match(/^\d+\. /)) return `<li>${fmt(escaped.replace(/^\d+\. /, ""))}</li>`;
-                if (escaped.trim() === "") return "<br/>";
-                return `<p>${fmt(escaped)}</p>`;
-              })
-              .join("\n"),
-          }}
-        />
-
-        {/* Exercise */}
-        <LessonExercise
-          lessonId={lesson.id}
-          lessonTitle={lesson.title}
-          progressId={progress?.id ?? ""}
-          exercisePrompt={exercisePrompt}
-          isCompleted={isCompleted}
-          nextLessonId={nextLesson?.id ?? null}
-          previousResponse={(progress?.artifacts as { response?: string })?.response ?? ""}
-          businessName={profile.business_idea.name}
-          niche={profile.business_idea.niche}
-        />
-      </article>
-    </main>
+    <LessonConversation
+      lessonId={lesson.id}
+      lessonTitle={lesson.title}
+      moduleName={lesson.module_name}
+      lessonSequence={lesson.lesson_sequence}
+      moduleSequence={lesson.module_sequence}
+      progressId={progress?.id ?? ""}
+      isCompleted={isCompleted}
+      nextLessonId={nextLesson?.id ?? null}
+      initialMessages={existingConversation}
+      initialCheckpoints={checkpointsReached.length}
+      totalCheckpoints={plan?.checkpoints.length ?? 3}
+      opener={opener}
+    />
   );
 }
