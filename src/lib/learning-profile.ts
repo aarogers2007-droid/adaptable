@@ -3,13 +3,17 @@
  *
  * Accumulates over time from lesson conversations.
  * The AI reads this to adapt its tone, pace, and teaching style.
+ *
+ * All dimensions are detected behaviorally from actual responses,
+ * not self-reported. Updates after every AI message.
  */
 
 export interface LearningProfile {
   style: "direct" | "exploratory" | "cautious" | "unknown";
   pace: "fast" | "moderate" | "slow" | "unknown";
   detail_preference: "concise" | "detailed" | "unknown";
-  engagement_notes: string[]; // AI observations like "responds well to examples"
+  motivation: "validation" | "challenge" | "unknown";
+  engagement_notes: string[];
   updated_at: string;
 }
 
@@ -17,16 +21,21 @@ export const DEFAULT_LEARNING_PROFILE: LearningProfile = {
   style: "unknown",
   pace: "unknown",
   detail_preference: "unknown",
+  motivation: "unknown",
   engagement_notes: [],
   updated_at: new Date().toISOString(),
 };
 
 /**
  * Build a system prompt fragment describing the student's learning style.
- * Returns empty string if profile is unknown.
+ * Returns empty string if profile is all unknown.
  */
 export function learningProfilePrompt(profile: LearningProfile): string {
-  if (profile.style === "unknown" && profile.pace === "unknown") {
+  if (
+    profile.style === "unknown" &&
+    profile.pace === "unknown" &&
+    profile.motivation === "unknown"
+  ) {
     return "";
   }
 
@@ -56,6 +65,14 @@ export function learningProfilePrompt(profile: LearningProfile): string {
       detailed: "They like thorough explanations with examples and context.",
     };
     parts.push(detailMap[profile.detail_preference]);
+  }
+
+  if (profile.motivation !== "unknown") {
+    const motivationMap = {
+      validation: "This student responds well to encouragement and affirmation. Acknowledge their good thinking before pushing further. Lead with what they got right.",
+      challenge: "This student is motivated by being pushed. They respect directness and tough questions. Don't sugarcoat — challenge their assumptions and they'll rise to it.",
+    };
+    parts.push(motivationMap[profile.motivation]);
   }
 
   if (profile.engagement_notes.length > 0) {

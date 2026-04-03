@@ -54,7 +54,7 @@ export default function LessonConversation({
   const [completed, setCompleted] = useState(initialCompleted);
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
-  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting..." });
+  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting..." });
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -234,11 +234,13 @@ export default function LessonConversation({
               const styleMatch = assistantMsg.match(/\[STYLE:(\w+)\]/);
               const paceMatch = assistantMsg.match(/\[PACE:(\w+)\]/);
               const detailMatch = assistantMsg.match(/\[DETAIL:(\w+)\]/);
-              if (styleMatch || paceMatch || detailMatch) {
+              const motivationMatch = assistantMsg.match(/\[MOTIVATION:(\w+)\]/);
+              if (styleMatch || paceMatch || detailMatch || motivationMatch) {
                 setLearningStyle((prev) => ({
                   style: styleMatch?.[1] ?? prev.style,
                   pace: paceMatch?.[1] ?? prev.pace,
                   detail: detailMatch?.[1] ?? prev.detail,
+                  motivation: motivationMatch?.[1] ?? prev.motivation,
                 }));
               }
 
@@ -248,6 +250,7 @@ export default function LessonConversation({
                 .replace(/\[STYLE:\w+\]/g, "")
                 .replace(/\[PACE:\w+\]/g, "")
                 .replace(/\[DETAIL:\w+\]/g, "")
+                .replace(/\[MOTIVATION:\w+\]/g, "")
                 .trim();
               setMessages((prev) => {
                 const updated = [...prev];
@@ -328,6 +331,9 @@ export default function LessonConversation({
                 </span>
                 <span className="text-amber-600">
                   Detail: <strong>{learningStyle.detail}</strong>
+                </span>
+                <span className="text-amber-600">
+                  Motivation: <strong>{learningStyle.motivation}</strong>
                 </span>
                 <span className="text-amber-600">
                   Checkpoints: <strong>{checkpointsReached}/{totalCheckpoints}</strong>

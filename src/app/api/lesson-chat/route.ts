@@ -175,9 +175,11 @@ RULES:
 - Adapt your tone based on how they respond. If they're brief and direct, be brief. If they're curious and exploratory, explore with them.
 
 LEARNING STYLE ANALYSIS:
-After each response, analyze the student's communication style and include a hidden tag:
-[STYLE:direct|exploratory|cautious] [PACE:fast|moderate|slow] [DETAIL:concise|detailed]
+After each response, analyze the student's communication style and include hidden tags:
+[STYLE:direct|exploratory|cautious] [PACE:fast|moderate|slow] [DETAIL:concise|detailed] [MOTIVATION:validation|challenge]
 Base this on their actual responses in this conversation, not assumptions.
+- MOTIVATION:validation = student lights up when praised, builds on encouragement, hesitates after criticism
+- MOTIVATION:challenge = student engages more when pushed back on, gives better answers after being challenged, seems bored by easy agreement
 ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
 
   try {
@@ -215,12 +217,14 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
           const styleMatch = fullResponse.match(/\[STYLE:(\w+)\]/);
           const paceMatch = fullResponse.match(/\[PACE:(\w+)\]/);
           const detailMatch = fullResponse.match(/\[DETAIL:(\w+)\]/);
+          const motivationMatch = fullResponse.match(/\[MOTIVATION:(\w+)\]/);
 
           const updatedProfile: LearningProfile = {
             ...learningProfile,
             style: (styleMatch?.[1] as LearningProfile["style"]) ?? learningProfile.style,
             pace: (paceMatch?.[1] as LearningProfile["pace"]) ?? learningProfile.pace,
             detail_preference: (detailMatch?.[1] as LearningProfile["detail_preference"]) ?? learningProfile.detail_preference,
+            motivation: (motivationMatch?.[1] as LearningProfile["motivation"]) ?? learningProfile.motivation,
             updated_at: new Date().toISOString(),
           };
 
@@ -231,6 +235,7 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
             .replace(/\[STYLE:\w+\]/g, "")
             .replace(/\[PACE:\w+\]/g, "")
             .replace(/\[DETAIL:\w+\]/g, "")
+            .replace(/\[MOTIVATION:\w+\]/g, "")
             .trim();
 
           // Save conversation + checkpoint progress

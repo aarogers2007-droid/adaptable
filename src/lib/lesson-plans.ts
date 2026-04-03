@@ -153,7 +153,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     lesson_id: 1,
     module_id: 2,
     title: "The Customer Interview",
-    objective: "Student has prepared real interview questions and understands how to talk to potential customers",
+    objective: "Student understands The Mom Test, practices behavior-based questions with AI customers, and learns to distinguish real data from polite noise",
     opener: "{{name}}, you think you know what {{target_customer}} wants. But do you really? There's this book called The Mom Test that says if you ask people 'do you like my idea?', they'll always say yes to be nice. Even your mom. So how do you actually find out the truth? You ask about THEIR life, not your idea. Let me show you what I mean.",
     checkpoints: [
       {
@@ -169,36 +169,43 @@ export const LESSON_PLANS: LessonPlan[] = [
         mastery_signal: "Student writes questions about past behavior ('when was the last time you...') not opinions ('would you use...')",
       },
       {
-        id: "interview-3",
-        concept: "Planning real outreach",
-        question: "Good questions. Now the real part. Who are you actually going to ask? Give me 3 specific people you could talk to this week. Real names or descriptions, not 'random people'.",
-        mastery_signal: "Student identifies 3 specific, reachable people they could actually talk to",
+        id: "interview-sandbox",
+        concept: "Practicing interviews with AI customers",
+        question: "Great questions. Now let's practice. I've set up 4 potential customers for you to interview. They'll respond just like real people would. Some are genuinely interested, some aren't, and some are just being polite. Your job: figure out which is which using the questions you just learned. Interview at least 2 of them.",
+        mastery_signal: "Student has completed the Interview Sandbox and reviewed the debrief. Automatically marked when sandbox is complete.",
       },
     ],
-    completion_criteria: "Student has crafted behavior-based interview questions (not opinion-based) and identified specific people they could actually interview.",
+    completion_criteria: "Student understands The Mom Test framework, has crafted behavior-based questions, and has practiced interviewing AI customers in the sandbox, experiencing firsthand how question quality affects response quality.",
     personalization_hooks: ["niche", "name", "target_customer"],
+    // Special flag: this lesson triggers the Interview Sandbox after checkpoint 2
   },
   {
     lesson_id: 2,
     module_id: 2,
     title: "What Did You Learn?",
-    objective: "Student can extract insights from customer conversations",
-    opener: "Okay {{name}}, time for the debrief. You've talked to real people about {{niche}}. What surprised you? And I mean genuinely surprised, not just confirmed what you already believed.",
+    objective: "Student can extract insights from customer interviews and translate them into business decisions",
+    opener: "Okay {{name}}, you just interviewed some potential customers for {{business_name}}. Let's debrief. Not all of those people were real prospects. Some were genuinely interested, some were just being polite, and some were never going to buy. Could you tell the difference? What stood out to you?",
     checkpoints: [
       {
         id: "learn-1",
-        concept: "Identifying surprising insights",
-        question: "Tell me one thing someone said that you didn't expect. Something that made you go 'huh, I didn't think about that.'",
-        mastery_signal: "Student shares a genuine surprise, not a confirmation of existing beliefs",
+        concept: "Distinguishing real data from polite noise",
+        question: "Which of the people you talked to gave you the most useful information? And which one was just being nice? How could you tell?",
+        mastery_signal: "Student can identify that vague enthusiastic responses are less valuable than specific behavioral responses, even if the enthusiastic ones felt better",
       },
       {
         id: "learn-2",
+        concept: "Identifying surprising insights",
+        question: "Tell me one thing that surprised you from those conversations. Something that made you think differently about {{business_name}}.",
+        mastery_signal: "Student shares a genuine surprise or unexpected insight, not a confirmation of what they already believed",
+      },
+      {
+        id: "learn-3",
         concept: "Translating insights into action",
         question: "Based on what you learned, is there anything about {{business_name}} you'd change? Maybe the way you describe it, who you target, or what you offer?",
         mastery_signal: "Student connects interview insights to a specific change in their business approach",
       },
     ],
-    completion_criteria: "Student has reflected on customer conversations with at least one genuine surprise and connected it to a potential change in their business approach.",
+    completion_criteria: "Student can distinguish genuine interest from polite noise, has identified a surprising insight, and connected it to a concrete change in their business approach.",
     personalization_hooks: ["niche", "name"],
   },
   {
