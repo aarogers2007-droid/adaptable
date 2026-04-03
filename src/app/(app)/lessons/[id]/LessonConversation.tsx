@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import AppNav from "@/components/ui/AppNav";
 
 interface Message {
   role: "user" | "assistant";
@@ -24,6 +25,7 @@ interface LessonConversationProps {
   opener: string;
   objective: string;
   isAdmin: boolean;
+  studentName: string;
 }
 
 export default function LessonConversation({
@@ -40,6 +42,7 @@ export default function LessonConversation({
   opener,
   objective,
   isAdmin: initialIsAdmin,
+  studentName,
 }: LessonConversationProps) {
   const [messages, setMessages] = useState<Message[]>(() =>
     initialMessages.length > 0
@@ -51,6 +54,7 @@ export default function LessonConversation({
   const [completed, setCompleted] = useState(initialCompleted);
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
+  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting..." });
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -225,6 +229,19 @@ export default function LessonConversation({
             const parsed = JSON.parse(data);
             if (parsed.text) {
               assistantMsg += parsed.text;
+
+              // Extract learning style before cleaning
+              const styleMatch = assistantMsg.match(/\[STYLE:(\w+)\]/);
+              const paceMatch = assistantMsg.match(/\[PACE:(\w+)\]/);
+              const detailMatch = assistantMsg.match(/\[DETAIL:(\w+)\]/);
+              if (styleMatch || paceMatch || detailMatch) {
+                setLearningStyle((prev) => ({
+                  style: styleMatch?.[1] ?? prev.style,
+                  pace: paceMatch?.[1] ?? prev.pace,
+                  detail: detailMatch?.[1] ?? prev.detail,
+                }));
+              }
+
               const clean = assistantMsg
                 .replace(/\[CHECKPOINT:\S+\]/g, "")
                 .replace(/\[LESSON_COMPLETE\]/g, "")
@@ -273,36 +290,12 @@ export default function LessonConversation({
   return (
     <div className="flex flex-col h-screen bg-[var(--bg)]">
       {/* Header */}
-      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="mx-auto flex max-w-[800px] items-center gap-4 px-6 py-3">
-          <Link href="/dashboard" className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
-            Adaptable
-          </Link>
-          <Link href={adminMode ? "/admin" : "/lessons"} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            ← {adminMode ? "Admin" : "Lessons"}
-          </Link>
-
-          {/* Admin/Student toggle */}
-          {initialIsAdmin && (
-            <button
-              onClick={() => setAdminMode(!adminMode)}
-              className={`ml-auto rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                adminMode
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-[var(--bg-muted)] text-[var(--text-secondary)]"
-              }`}
-            >
-              {adminMode ? "Admin View" : "Student View"}
-            </button>
-          )}
-
-          <span className={`${initialIsAdmin ? "" : "ml-auto"} text-xs text-[var(--text-muted)]`}>
-            {moduleName} · Lesson {lessonSequence}
-          </span>
-        </div>
+      <div className="shrink-0">
+        <AppNav isAdmin={initialIsAdmin} studentName={studentName} />
+        <div className="border-b border-[var(--border)] bg-[var(--bg)]">
 
         {/* Goal summary + Progress bar */}
-        <div className="mx-auto max-w-[800px] px-6 pb-3">
+        <div className="mx-auto max-w-[800px] px-6 py-3">
           <div className="rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-2.5 mb-2">
             <p className="text-xs font-medium text-[var(--primary)]">Goal</p>
             <p className="text-sm text-[var(--text-secondary)]">{objective}</p>
@@ -319,6 +312,30 @@ export default function LessonConversation({
               {completed ? "Complete ✓" : `${checkpointsReached}/${totalCheckpoints}`}
             </p>
           </div>
+        </div>
+
+        {/* Admin: Learning Profile Debug Panel */}
+        {adminMode && (
+          <div className="mx-auto max-w-[800px] px-6 pb-3">
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5">
+              <p className="text-xs font-medium text-amber-700 mb-1">AI Learning Profile (admin only)</p>
+              <div className="flex flex-wrap gap-3 text-xs">
+                <span className="text-amber-600">
+                  Style: <strong>{learningStyle.style}</strong>
+                </span>
+                <span className="text-amber-600">
+                  Pace: <strong>{learningStyle.pace}</strong>
+                </span>
+                <span className="text-amber-600">
+                  Detail: <strong>{learningStyle.detail}</strong>
+                </span>
+                <span className="text-amber-600">
+                  Checkpoints: <strong>{checkpointsReached}/{totalCheckpoints}</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
 

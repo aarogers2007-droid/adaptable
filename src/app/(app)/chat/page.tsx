@@ -10,7 +10,7 @@ export default async function ChatPage() {
 
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name")
+    .select("business_idea, full_name, role")
     .eq("id", user.id)
     .single();
 
@@ -32,6 +32,7 @@ export default async function ChatPage() {
       studentName={profile.full_name ?? ""}
       initialConversationId={convoData?.id ?? null}
       initialMessages={(convoData?.messages as { role: "user" | "assistant"; content: string }[]) ?? []}
+      isAdmin={(profileData as Record<string, unknown>)?.role === "org_admin"}
     />
   );
 }

@@ -94,6 +94,7 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       opener={opener}
       objective={objective}
       isAdmin={isAdmin}
+      studentName={profile.full_name ?? ""}
     />
   );
 }

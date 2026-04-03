@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isLessonUnlocked } from "@/lib/lessons";
 import type { Profile, Lesson, StudentProgress } from "@/lib/types";
 import Link from "next/link";
+import AppNav from "@/components/ui/AppNav";
 
 export default async function LessonsListPage() {
   const supabase = await createClient();
@@ -10,7 +11,7 @@ export default async function LessonsListPage() {
   if (!user) redirect("/login");
 
   const [profileRes, lessonsRes, progressRes] = await Promise.all([
-    supabase.from("profiles").select("business_idea").eq("id", user.id).single(),
+    supabase.from("profiles").select("business_idea, full_name, role").eq("id", user.id).single(),
     supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
   ]);
@@ -38,22 +39,7 @@ export default async function LessonsListPage() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      <nav className="border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="mx-auto flex max-w-[1200px] items-center gap-6 px-6 py-3">
-          <Link href="/dashboard" className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
-            Adaptable
-          </Link>
-          <Link href="/dashboard" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            My Business
-          </Link>
-          <Link href="/lessons" className="text-sm font-medium text-[var(--text-primary)]">
-            Lessons
-          </Link>
-          <Link href="/chat" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            AI Guide
-          </Link>
-        </div>
-      </nav>
+      <AppNav isAdmin={profile.role === "org_admin"} studentName={profile.full_name || undefined} />
 
       <div className="mx-auto max-w-[800px] px-6 py-8">
         <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold">Your Lessons</h1>

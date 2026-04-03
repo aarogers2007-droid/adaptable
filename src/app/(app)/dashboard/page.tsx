@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getNextLesson, calculateProgress } from "@/lib/lessons";
 import type { Profile, Lesson, StudentProgress, MentorCheckin } from "@/lib/types";
 import Link from "next/link";
+import AppNav from "@/components/ui/AppNav";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -34,31 +35,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      {/* Nav */}
-      <nav className="border-b border-[var(--border)] bg-[var(--bg)]">
-        <div className="mx-auto flex max-w-[1200px] items-center gap-6 px-6 py-3">
-          <span className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
-            Adaptable
-          </span>
-          <Link href="/dashboard" className="text-sm font-medium text-[var(--text-primary)]">
-            My Business
-          </Link>
-          <Link href="/lessons" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            Lessons
-          </Link>
-          <Link href="/chat" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            AI Guide
-          </Link>
-          <div className="ml-auto flex items-center gap-4">
-            <span className="text-sm text-[var(--text-muted)]">{profile.full_name || profile.email}</span>
-            <form action="/auth/signout" method="POST">
-              <button className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">
-                Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-      </nav>
+      <AppNav isAdmin={profile.role === "org_admin"} studentName={profile.full_name || profile.email || undefined} />
 
       <div className="mx-auto max-w-[1200px] px-6 py-8">
         {/* Business Hero */}

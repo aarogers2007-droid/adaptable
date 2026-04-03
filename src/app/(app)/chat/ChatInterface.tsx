@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import AppNav from "@/components/ui/AppNav";
 
 interface Message {
   role: "user" | "assistant";
@@ -13,6 +14,7 @@ interface ChatInterfaceProps {
   studentName: string;
   initialConversationId: string | null;
   initialMessages: Message[];
+  isAdmin: boolean;
 }
 
 export default function ChatInterface({
@@ -20,6 +22,7 @@ export default function ChatInterface({
   studentName,
   initialConversationId,
   initialMessages,
+  isAdmin,
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
@@ -119,21 +122,9 @@ export default function ChatInterface({
 
   return (
     <div className="flex flex-col h-screen bg-[var(--bg)]">
-      {/* Nav */}
-      <nav className="border-b border-[var(--border)] bg-[var(--bg)] shrink-0">
-        <div className="mx-auto flex max-w-[800px] items-center gap-4 px-6 py-3">
-          <Link href="/dashboard" className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
-            Adaptable
-          </Link>
-          <Link href="/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            My Business
-          </Link>
-          <Link href="/lessons" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            Lessons
-          </Link>
-          <span className="text-sm font-medium text-[var(--text-primary)]">AI Guide</span>
-        </div>
-      </nav>
+      <div className="shrink-0">
+        <AppNav isAdmin={isAdmin} studentName={studentName} />
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto">
