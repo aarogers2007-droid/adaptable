@@ -45,13 +45,13 @@ function titleCase(str: string): string {
   return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
 }
 
-function generateMockBusinessIdea(draft: IkigaiDraft): BusinessIdea {
+function generateMockBusinessIdea(draft: IkigaiDraft, name: string): BusinessIdea {
   const passion = titleCase((draft.passions ?? [])[0] ?? "Creativity");
   const need = titleCase((draft.needs ?? [])[0] ?? "Helping Others");
   const monetization = (draft.monetization ?? "per-session service fee").toLowerCase();
   return {
     niche: titleCase(`${passion} for ${need}`),
-    name: `Your ${titleCase(passion)} Business`,
+    name: `${name}'s ${titleCase(passion)} Business`,
     target_customer: `People who need help with ${need.toLowerCase()}`,
     revenue_model: `Earn money through ${monetization}, building a client base in your community and online`,
   };
@@ -59,11 +59,14 @@ function generateMockBusinessIdea(draft: IkigaiDraft): BusinessIdea {
 
 interface IkigaiWizardProps {
   initialDraft: IkigaiDraft | null;
+  initialName?: string;
 }
 
-export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
+export default function IkigaiWizard({ initialDraft, initialName }: IkigaiWizardProps) {
   const router = useRouter();
 
+  const [studentName, setStudentName] = useState(initialName ?? "");
+  const [nameConfirmed, setNameConfirmed] = useState(!!initialName);
   const [activeStep, setActiveStep] = useState<IkigaiStep | null>(null);
   const [draft, setDraft] = useState<IkigaiDraft>(initialDraft ?? { step: 1 });
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(() => {
@@ -163,7 +166,7 @@ export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
 
       if (!idea) {
         await new Promise((r) => setTimeout(r, 1200));
-        idea = generateMockBusinessIdea(newDraft);
+        idea = generateMockBusinessIdea(newDraft, studentName);
       }
 
       setSynthesizing(false);
@@ -221,7 +224,7 @@ export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
 
     if (!idea) {
       await new Promise((r) => setTimeout(r, 1200));
-      idea = generateMockBusinessIdea(draft);
+      idea = generateMockBusinessIdea(draft, studentName);
     }
 
     setSynthesizing(false);
@@ -247,10 +250,59 @@ export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
 
   const activeStepConfig = activeStep ? STEPS.find((s) => s.id === activeStep) : null;
 
+  // Save name to profile when confirmed
+  async function handleNameConfirm() {
+    if (!studentName.trim()) return;
+    setNameConfirmed(true);
+    try {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({ full_name: studentName.trim() })
+          .eq("id", user.id);
+      }
+    } catch {
+      // Preview mode, no-op
+    }
+  }
+
   return (
     <>
+      {/* NAME INPUT — shown before the diagram */}
+      {!nameConfirmed && (
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+          <div className="max-w-md w-full text-center">
+            <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
+              What's your name?
+            </h1>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              We'll use this to personalize your business idea.
+            </p>
+            <input
+              type="text"
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && studentName.trim() && handleNameConfirm()}
+              placeholder="Your first name"
+              autoFocus
+              className="mt-6 w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-center text-lg outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-[family-name:var(--font-display)]"
+            />
+            <button
+              onClick={handleNameConfirm}
+              disabled={!studentName.trim()}
+              className="mt-4 w-full rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-50 transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* FULL-SCREEN STEP VIEW */}
-      {activeStep && activeStepConfig && (
+      {nameConfirmed && activeStep && activeStepConfig && (
         <StepContent
           step={activeStepConfig}
           suggestions={suggestions[activeStep] ?? []}
@@ -267,7 +319,7 @@ export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
       )}
 
       {/* DIAGRAM VIEW */}
-      {!activeStep && (
+      {nameConfirmed && !activeStep && (
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
           <div className="mb-6 text-center">
             <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
@@ -362,6 +414,20 @@ export default function IkigaiWizard({ initialDraft }: IkigaiWizardProps) {
                 Dismiss
               </button>
             </div>
+          )}
+
+          {/* Reset button */}
+          {(completedSteps.size > 0 || showReveal) && (
+            <button
+              onClick={() => {
+                if (confirm("This will clear all your answers and start over. Are you sure?")) {
+                  window.location.href = "/onboarding?reset=true";
+                }
+              }}
+              className="mt-8 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] underline"
+            >
+              Reset and start over
+            </button>
           )}
         </div>
       )}

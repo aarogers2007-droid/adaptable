@@ -2,7 +2,13 @@ import { redirect } from "next/navigation";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { IkigaiDraft } from "@/lib/types";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reset?: string }>;
+}) {
+  const { reset } = await searchParams;
+
   // Skip auth check when Supabase isn't configured (local preview)
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -22,10 +28,20 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
-  // Check if already completed Ikigai
+  // If reset requested, clear business idea and draft
+  if (reset === "true") {
+    await supabase
+      .from("profiles")
+      .update({ business_idea: null, ikigai_result: null, ikigai_draft: null, niche_recommendations: null })
+      .eq("id", user.id);
+
+    redirect("/onboarding");
+  }
+
+  // Check if already completed Ikigai — redirect to dashboard unless resetting
   const { data: profile } = await supabase
     .from("profiles")
-    .select("business_idea, ikigai_draft")
+    .select("business_idea, ikigai_draft, full_name")
     .eq("id", user.id)
     .single();
 
@@ -34,6 +50,7 @@ export default async function OnboardingPage() {
   }
 
   const draft = (profile?.ikigai_draft as IkigaiDraft) ?? null;
+  const name = (profile?.full_name as string) ?? "";
 
-  return <IkigaiWizard initialDraft={draft} />;
+  return <IkigaiWizard initialDraft={draft} initialName={name} />;
 }

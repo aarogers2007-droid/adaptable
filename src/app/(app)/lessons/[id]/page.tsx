@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { renderLesson, isLessonUnlocked } from "@/lib/lessons";
 import type { Profile, Lesson, StudentProgress } from "@/lib/types";
 import Link from "next/link";
-import LessonActions from "./LessonActions";
+import LessonExercise from "./LessonExercise";
 
 export default async function LessonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -27,7 +27,6 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const allLessons = (allLessonsRes.data ?? []) as unknown as Lesson[];
   const allProgress = (allProgressRes.data ?? []) as unknown as StudentProgress[];
 
-  // Check if unlocked
   if (!isLessonUnlocked(lesson, allLessons, allProgress)) {
     redirect("/lessons");
   }
@@ -48,7 +47,6 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       .eq("id", progress.id);
   }
 
-  // Render personalized content
   const content = renderLesson(lesson.content_template, profile);
 
   // Find next lesson
@@ -59,6 +57,11 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const currentIdx = sorted.findIndex((l) => l.id === lesson.id);
   const nextLesson = currentIdx < sorted.length - 1 ? sorted[currentIdx + 1] : null;
   const isCompleted = progress?.status === "completed";
+
+  // Extract exercise section from content (everything after "## Your Exercise")
+  const exerciseSplit = content.split(/## Your Exercise/i);
+  const lessonContent = exerciseSplit[0];
+  const exercisePrompt = exerciseSplit[1]?.trim() ?? "";
 
   return (
     <main className="min-h-screen bg-[var(--bg)]">
@@ -71,26 +74,13 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
             ← All Lessons
           </Link>
           <span className="ml-auto text-xs text-[var(--text-muted)]">
-            {lesson.module_name} &middot; Lesson {lesson.lesson_sequence}
+            {lesson.module_name} · Lesson {lesson.lesson_sequence}
           </span>
         </div>
       </nav>
 
       <article className="mx-auto max-w-[700px] px-6 py-10">
-        {/* Video embed */}
-        {lesson.video_url && (
-          <div className="mb-8 aspect-video rounded-xl overflow-hidden bg-[var(--bg-muted)]">
-            <iframe
-              src={lesson.video_url}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title={`Video: ${lesson.title}`}
-            />
-          </div>
-        )}
-
-        {/* Lesson content (rendered markdown with HTML escaping) */}
+        {/* Lesson content */}
         <div
           className="prose prose-gray max-w-none
             [&_h1]:font-[family-name:var(--font-display)] [&_h1]:text-3xl [&_h1]:font-bold
@@ -99,10 +89,9 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
             [&_li]:text-[var(--text-secondary)]
             [&_strong]:text-[var(--text-primary)]"
           dangerouslySetInnerHTML={{
-            __html: content
+            __html: lessonContent
               .split("\n")
               .map((line) => {
-                // Escape HTML entities in the line first to prevent XSS
                 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
                 const escaped = esc(line);
                 if (escaped.startsWith("# ")) return `<h1>${escaped.slice(2)}</h1>`;
@@ -117,12 +106,17 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
           }}
         />
 
-        {/* Lesson actions */}
-        <LessonActions
+        {/* Exercise */}
+        <LessonExercise
           lessonId={lesson.id}
+          lessonTitle={lesson.title}
           progressId={progress?.id ?? ""}
+          exercisePrompt={exercisePrompt}
           isCompleted={isCompleted}
           nextLessonId={nextLesson?.id ?? null}
+          previousResponse={(progress?.artifacts as { response?: string })?.response ?? ""}
+          businessName={profile.business_idea.name}
+          niche={profile.business_idea.niche}
         />
       </article>
     </main>
