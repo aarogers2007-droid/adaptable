@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AppNav from "@/components/ui/AppNav";
+import InterviewSandbox from "@/components/interview/InterviewSandbox";
+import { generatePersonas } from "@/lib/customer-personas";
 
 interface Message {
   role: "user" | "assistant";
@@ -26,6 +28,11 @@ interface LessonConversationProps {
   objective: string;
   isAdmin: boolean;
   studentName: string;
+  isModuleTransition: boolean;
+  nextModuleName: string;
+  currentModuleName: string;
+  niche: string;
+  targetCustomer: string;
 }
 
 export default function LessonConversation({
@@ -43,6 +50,11 @@ export default function LessonConversation({
   objective,
   isAdmin: initialIsAdmin,
   studentName,
+  isModuleTransition,
+  nextModuleName,
+  currentModuleName,
+  niche,
+  targetCustomer,
 }: LessonConversationProps) {
   const [messages, setMessages] = useState<Message[]>(() =>
     initialMessages.length > 0
@@ -55,6 +67,7 @@ export default function LessonConversation({
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
   const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting..." });
+  const [showSandbox, setShowSandbox] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -259,7 +272,12 @@ export default function LessonConversation({
               });
             }
             if (parsed.meta) {
-              setCheckpointsReached(parsed.meta.checkpoints_reached?.length ?? checkpointsReached);
+              const reached = parsed.meta.checkpoints_reached ?? [];
+              setCheckpointsReached(reached.length ?? checkpointsReached);
+              // Trigger Interview Sandbox when that checkpoint is reached
+              if (reached.includes("interview-sandbox") && !showSandbox) {
+                setTimeout(() => setShowSandbox(true), 1000);
+              }
               if (parsed.meta.lesson_complete) {
                 setCompleted(true);
                 router.refresh();
@@ -345,9 +363,48 @@ export default function LessonConversation({
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Interview Sandbox (takes over when triggered) */}
+      {showSandbox && (
+        <InterviewSandbox
+          personas={generatePersonas(niche, targetCustomer).map(({ id, name, age, bio }) => ({ id, name, age, bio }))}
+          niche={niche}
+          onComplete={(interviews) => {
+            setShowSandbox(false);
+            // Mark the sandbox checkpoint as reached and auto-complete the lesson
+            setCheckpointsReached((prev) => prev + 1);
+            setCompleted(true);
+            router.refresh();
+          }}
+        />
+      )}
+
+      {/* Messages (hidden when sandbox is active) */}
+      {!showSandbox && (
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-[700px] px-6 py-6 space-y-4">
+          {/* Completed lesson review header */}
+          {completed && initialMessages.length > 0 && (
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-5 mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[var(--success)]">✓</span>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{lessonTitle}</p>
+                <span className="text-xs text-[var(--text-muted)] ml-auto">Completed</span>
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mb-2">Your key responses:</p>
+              <div className="space-y-1.5">
+                {initialMessages
+                  .filter((m) => m.role === "user" && m.content.length > 30)
+                  .slice(-3)
+                  .map((m, i) => (
+                    <p key={i} className="text-xs text-[var(--text-secondary)] pl-3 border-l-2 border-[var(--primary)]/30">
+                      {m.content.length > 150 ? m.content.slice(0, 150) + "..." : m.content}
+                    </p>
+                  ))}
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mt-3">Full conversation below</p>
+            </div>
+          )}
+
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
@@ -372,33 +429,55 @@ export default function LessonConversation({
           <div ref={messagesEndRef} />
         </div>
       </div>
+      )}
 
       {/* Completed banner */}
-      {completed && (
+      {completed && !showSandbox && (
         <div className="shrink-0 border-t border-emerald-200 bg-emerald-50 px-6 py-4">
-          <div className="mx-auto max-w-[700px] flex items-center justify-between">
-            <p className="text-sm font-medium text-[var(--success)]">✓ Lesson complete! Nice work.</p>
-            {nextLessonId ? (
-              <Link
-                href={`/lessons/${nextLessonId}`}
-                className="rounded-lg bg-[var(--primary)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
-              >
-                Next Lesson →
-              </Link>
+          <div className="mx-auto max-w-[700px]">
+            {isModuleTransition ? (
+              /* Module transition celebration */
+              <div className="text-center py-2">
+                <p className="text-sm font-semibold text-[var(--success)]">
+                  {currentModuleName} complete ✓
+                </p>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                  Now let's find out if people actually want what you're designing.
+                </p>
+                <Link
+                  href={`/lessons/${nextLessonId}`}
+                  className="mt-3 inline-block rounded-lg bg-[var(--primary)] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+                >
+                  Start {nextModuleName} →
+                </Link>
+              </div>
             ) : (
-              <Link
-                href="/completion"
-                className="rounded-lg bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--text-primary)] hover:brightness-110 transition-all"
-              >
-                See What You Built ✨
-              </Link>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-[var(--success)]">✓ Lesson complete! Nice work.</p>
+                {nextLessonId ? (
+                  <Link
+                    href={`/lessons/${nextLessonId}`}
+                    className="rounded-lg bg-[var(--primary)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+                  >
+                    Next Lesson →
+                  </Link>
+                ) : (
+                  <Link
+                    href="/completion"
+                    className="rounded-lg bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--text-primary)] hover:brightness-110 transition-all"
+                  >
+                    See What You Built ✨
+                  </Link>
+                )}
+              </div>
             )}
           </div>
         </div>
       )}
 
+
       {/* Input */}
-      {!completed && (
+      {!completed && !showSandbox && (
         <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
           <div className="mx-auto max-w-[700px] px-6 pt-4 pb-2">
             {/* Low-effort nudge */}

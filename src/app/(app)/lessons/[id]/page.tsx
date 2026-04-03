@@ -57,6 +57,8 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const currentIdx = sorted.findIndex((l) => l.id === lesson.id);
   const nextLesson = currentIdx < sorted.length - 1 ? sorted[currentIdx + 1] : null;
   const isCompleted = progress?.status === "completed";
+  const isModuleTransition = nextLesson ? nextLesson.module_sequence !== lesson.module_sequence : false;
+  const nextModuleName = nextLesson?.module_name ?? "";
 
   // Get lesson plan for conversational flow
   const plan = getLessonPlan(lesson.module_sequence, lesson.lesson_sequence);
@@ -95,6 +97,11 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       objective={objective}
       isAdmin={isAdmin}
       studentName={profile.full_name ?? ""}
+      isModuleTransition={isModuleTransition}
+      nextModuleName={nextModuleName}
+      currentModuleName={lesson.module_name}
+      niche={profile.business_idea.niche}
+      targetCustomer={profile.business_idea.target_customer}
     />
   );
 }

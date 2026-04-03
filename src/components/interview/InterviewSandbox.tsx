@@ -192,7 +192,7 @@ export default function InterviewSandbox({ personas, onComplete, niche }: Interv
           )}
           className="mt-8 w-full rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
         >
-          Continue to next lesson →
+          Back to your co-founder →
         </button>
       </div>
     );

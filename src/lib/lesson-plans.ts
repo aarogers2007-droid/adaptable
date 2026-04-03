@@ -37,7 +37,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     module_id: 1,
     title: "Welcome to Adaptable",
     objective: "Student understands the venture studio concept, connects their Ikigai to their WHY, and feels excited to start",
-    opener: "Hey {{name}}! Welcome to your venture studio. Before we get into the business stuff, I want to talk about something Simon Sinek calls your 'WHY.' You already found yours, actually. That Ikigai you just completed? The center of those four circles, where what you love, what you're good at, what the world needs, and what you can be paid for all overlap? That's your WHY. Every great business starts there. Apple doesn't lead with computer specs. They lead with 'Think Different.' The Wright Brothers didn't have funding or degrees, but they had a WHY so strong they beat a Harvard professor with a $50K government grant. Your Ikigai center is that same thing. So tell me, {{name}}, in your own words... why does {{niche}} matter to you?",
+    opener: "Hey {{name}}! Welcome to your venture studio. So you just finished your Ikigai... that center where everything overlaps? That's actually your WHY. It's the reason behind your business, not just what you sell. Every great company starts there. So tell me... why does {{niche}} matter to you? Not the business part. The personal part.",
     checkpoints: [
       {
         id: "welcome-1",
