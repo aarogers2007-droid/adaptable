@@ -173,7 +173,13 @@ export default function ChatInterface({
                     : "bg-[var(--bg-muted)] text-[var(--text-primary)]"
                 }`}
               >
-                {msg.content || (
+                {msg.content ? (
+                  <div className="space-y-2">
+                    {msg.content.split(/\n\n+/).map((para, j) => (
+                      <p key={j}>{para}</p>
+                    ))}
+                  </div>
+                ) : (
                   <span className="inline-block w-4 h-4 border-2 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin" />
                 )}
               </div>
