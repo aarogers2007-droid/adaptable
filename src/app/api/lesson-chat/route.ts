@@ -15,6 +15,59 @@ export async function POST(request: Request) {
     return new Response("Invalid message", { status: 400 });
   }
 
+  if (!progressId || typeof progressId !== "string") {
+    return new Response("Missing progressId", { status: 400 });
+  }
+
+  // Validate progressId belongs to this user and matches the requested lesson
+  const { data: progressCheck } = await supabase
+    .from("student_progress")
+    .select("id, lesson_id, lessons(module_sequence, lesson_sequence)")
+    .eq("id", progressId)
+    .eq("student_id", user.id)
+    .single();
+
+  if (!progressCheck) {
+    return new Response("Invalid progress record", { status: 403 });
+  }
+
+  const linkedLesson = progressCheck.lessons as unknown as { module_sequence: number; lesson_sequence: number } | null;
+  if (linkedLesson && (linkedLesson.module_sequence !== moduleSequence || linkedLesson.lesson_sequence !== lessonSequence)) {
+    return new Response("Progress record does not match lesson", { status: 403 });
+  }
+
+  // Combined daily cap (shared across guide + lesson chat): 40 messages/day, 10/hour
+  const today = new Date().toISOString().split("T")[0];
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+  const [{ count: dailyCount }, { count: hourlyCount }] = await Promise.all([
+    supabase
+      .from("ai_usage_log")
+      .select("*", { count: "exact", head: true })
+      .eq("student_id", user.id)
+      .in("feature", ["guide", "guide"])
+      .gte("created_at", `${today}T00:00:00Z`),
+    supabase
+      .from("ai_usage_log")
+      .select("*", { count: "exact", head: true })
+      .eq("student_id", user.id)
+      .gte("created_at", oneHourAgo),
+  ]);
+
+  if ((dailyCount ?? 0) >= 40) {
+    return Response.json(
+      { error: "You've hit today's limit. Great work! Come back tomorrow to keep going." },
+      { status: 429 }
+    );
+  }
+
+  if ((hourlyCount ?? 0) >= 10) {
+    return Response.json(
+      { error: "Take a breather! You can continue in a few minutes." },
+      { status: 429 }
+    );
+  }
+
   // Get profile + learning profile
   const { data: profileData } = await supabase
     .from("profiles")

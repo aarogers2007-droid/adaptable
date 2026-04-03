@@ -204,9 +204,9 @@ export default function IkigaiWizard({ initialDraft, initialName }: IkigaiWizard
     try {
       const { confirmBusinessIdea } = await import("@/app/(app)/onboarding/actions");
       const result = await confirmBusinessIdea(businessIdea, draft);
-      if (result.success) { router.push("/dashboard"); return; }
+      if (result.success) { router.push("/onboarding/ready"); return; }
     } catch { /* preview mode */ }
-    alert(`Business confirmed: ${businessIdea.name}! In production this redirects to your dashboard.`);
+    router.push("/onboarding/ready");
   }
 
   async function handleResynthesize() {

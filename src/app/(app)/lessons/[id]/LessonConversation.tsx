@@ -144,10 +144,38 @@ export default function LessonConversation({
     inputRef.current?.focus();
   }
 
+  const [nudge, setNudge] = useState<string | null>(null);
+
+  function checkLowEffort(text: string): string | null {
+    const lower = text.toLowerCase().trim();
+    const fillerWords = new Set(["idk", "idc", "nothing", "fine", "ok", "okay", "yes", "no", "sure", "maybe", "nah", "nope", "yep", "yeah", "lol", "bruh", "whatever", "i guess", "dunno", "no idea"]);
+
+    if (text.length < 20) {
+      const words = lower.split(/\s+/);
+      if (words.every((w) => fillerWords.has(w) || w.length <= 2)) {
+        return "I want to hear your real thoughts! Can you expand on that a bit? Even a sentence or two helps me help you better.";
+      }
+      if (words.length <= 2 && !lower.includes("?")) {
+        return "Give me a little more to work with! What are you thinking? A couple sentences goes a long way.";
+      }
+    }
+    return null;
+  }
+
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || loading) return;
+
+    // Low-effort check (nudge once, then let them through)
+    if (!nudge) {
+      const lowEffortMsg = checkLowEffort(trimmed);
+      if (lowEffortMsg) {
+        setNudge(lowEffortMsg);
+        return;
+      }
+    }
+    setNudge(null);
 
     setInput("");
     setShowSuggestions(false);
@@ -336,10 +364,10 @@ export default function LessonConversation({
               </Link>
             ) : (
               <Link
-                href="/dashboard"
-                className="rounded-lg bg-[var(--primary)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+                href="/completion"
+                className="rounded-lg bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--text-primary)] hover:brightness-110 transition-all"
               >
-                Back to Dashboard
+                See What You Built ✨
               </Link>
             )}
           </div>
@@ -350,8 +378,15 @@ export default function LessonConversation({
       {!completed && (
         <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
           <div className="mx-auto max-w-[700px] px-6 pt-4 pb-2">
+            {/* Low-effort nudge */}
+            {nudge && (
+              <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-700">
+                {nudge}
+              </div>
+            )}
+
             {/* Suggested responses (appear after 15s idle) */}
-            {showSuggestions && suggestions.length > 0 && (
+            {showSuggestions && suggestions.length > 0 && !nudge && (
               <div className="mb-3 flex flex-wrap gap-2">
                 <span className="text-xs text-[var(--text-muted)] self-center mr-1">Stuck?</span>
                 {suggestions.map((s, i) => (

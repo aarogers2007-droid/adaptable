@@ -95,6 +95,24 @@ export default async function DashboardPage() {
           </div>
         </section>
 
+        {/* All lessons complete */}
+        {!nextLesson && completedCount === lessons.length && lessons.length > 0 && (
+          <Link
+            href="/completion"
+            className="mt-4 block rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-6 hover:bg-[var(--primary)]/10 transition-colors text-center"
+          >
+            <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider">
+              Program Complete
+            </p>
+            <h2 className="mt-1 font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--text-primary)]">
+              You finished all {lessons.length} lessons!
+            </h2>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              See what you built →
+            </p>
+          </Link>
+        )}
+
         {/* Current Lesson CTA */}
         {nextLesson && (
           <Link

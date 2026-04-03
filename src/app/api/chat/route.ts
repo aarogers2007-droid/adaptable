@@ -25,18 +25,33 @@ export async function POST(request: Request) {
     return new Response("Invalid conversation ID", { status: 400 });
   }
 
-  // Check daily cap (20 messages)
+  // Combined daily cap (shared across guide + lesson chat): 40/day, 10/hour
   const today = new Date().toISOString().split("T")[0];
-  const { count } = await supabase
-    .from("ai_usage_log")
-    .select("*", { count: "exact", head: true })
-    .eq("student_id", user.id)
-    .eq("feature", "guide")
-    .gte("created_at", `${today}T00:00:00Z`);
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
-  if ((count ?? 0) >= 20) {
+  const [{ count }, { count: hourlyCount }] = await Promise.all([
+    supabase
+      .from("ai_usage_log")
+      .select("*", { count: "exact", head: true })
+      .eq("student_id", user.id)
+      .gte("created_at", `${today}T00:00:00Z`),
+    supabase
+      .from("ai_usage_log")
+      .select("*", { count: "exact", head: true })
+      .eq("student_id", user.id)
+      .gte("created_at", oneHourAgo),
+  ]);
+
+  if ((hourlyCount ?? 0) >= 10) {
     return Response.json(
-      { error: "You've reached today's limit of 20 messages. Come back tomorrow!" },
+      { error: "Take a breather! You can continue in a few minutes." },
+      { status: 429 }
+    );
+  }
+
+  if ((count ?? 0) >= 40) {
+    return Response.json(
+      { error: "You've hit today's limit. Great work! Come back tomorrow." },
       { status: 429 }
     );
   }
