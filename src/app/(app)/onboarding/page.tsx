@@ -28,12 +28,17 @@ export default async function OnboardingPage({
     redirect("/login");
   }
 
-  // If reset requested, clear business idea and draft
+  // If reset requested, wipe EVERYTHING — full factory reset
   if (reset === "true") {
-    await supabase
-      .from("profiles")
-      .update({ business_idea: null, ikigai_result: null, ikigai_draft: null, niche_recommendations: null })
-      .eq("id", user.id);
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .update({ business_idea: null, ikigai_result: null, ikigai_draft: null, niche_recommendations: null, full_name: null })
+        .eq("id", user.id),
+      supabase.from("student_progress").delete().eq("student_id", user.id),
+      supabase.from("ai_conversations").delete().eq("student_id", user.id),
+      supabase.from("mentor_checkins").delete().eq("student_id", user.id),
+    ]);
 
     redirect("/onboarding");
   }
