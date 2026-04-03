@@ -27,7 +27,9 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const allLessons = (allLessonsRes.data ?? []) as unknown as Lesson[];
   const allProgress = (allProgressRes.data ?? []) as unknown as StudentProgress[];
 
-  if (!isLessonUnlocked(lesson, allLessons, allProgress)) {
+  // Admins bypass lesson gating
+  const isAdmin = profile.role === "org_admin";
+  if (!isAdmin && !isLessonUnlocked(lesson, allLessons, allProgress)) {
     redirect("/lessons");
   }
 
