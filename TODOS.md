@@ -168,6 +168,48 @@ school years. Add a student portfolio view that shows their full entrepreneurshi
 journey from first login forward.
 Effort: M (human: ~1 week / CC: ~30 min)
 
+## Investor & Launchpad Vision
+
+> The venture studio model means students design and plan, then launch when ready.
+> The investor view creates a pipeline from student ventures to real funding and mentorship.
+> Each tier increases real-world connection while managing legal risk for minors.
+
+### Tier 1 — Anonymous Venture Gallery (P2, safe to build soon)
+Product Hunt for teen entrepreneurs. Investors browse student ventures by niche,
+industry, and quality score. No student names or contact info visible. VentureLab
+controls access. Ventures displayed as anonymous portfolio cards with: business concept,
+niche, target customer, revenue model, and a quality indicator from the AI evaluation.
+This gives VentureLab a demo asset ("look at what our students are designing") and
+gives investors visibility into the pipeline without any direct contact with minors.
+Effort: M (human: ~1 week / CC: ~30 min)
+
+### Tier 2 — Investor Requests Introduction (P3, needs legal framework)
+An investor sees an anonymous venture they like and clicks "Request Introduction."
+VentureLab acts as the intermediary. The request goes to VentureLab staff, who
+review it, then contact the student's school and parent/guardian for approval.
+Only after school + parent consent does VentureLab facilitate a supervised introduction.
+All communication is logged and monitored by VentureLab. No direct investor-to-minor
+contact without institutional approval.
+Depends on: Tier 1 gallery, legal review, parental consent framework.
+Effort: L (human: ~3 weeks / CC: ~2 hours, plus legal)
+
+### Tier 3 — Mentorship Matching (far future)
+Direct mentorship matching between verified investors/mentors and students. Requires:
+full legal framework, background checks on all mentors, parental consent per interaction,
+school administrator approval, VentureLab oversight and moderation of all conversations.
+Think Big Brothers Big Sisters level of safeguarding applied to entrepreneurship mentorship.
+Depends on: Tier 2, legal infrastructure, safeguarding policies.
+Effort: XL
+
+### "Go Live" Launchpad (P2)
+For students who complete the program and want to actually launch: a structured pathway
+with proper scaffolding. Includes: parental consent flow, one-click starter tools
+(booking page, payment link, portfolio site), and ongoing AI co-founder support.
+This is the bridge from simulation to reality. Optional, not default. The venture studio
+is the product, the launchpad is the graduation gift.
+Depends on: Completion of core venture studio experience.
+Effort: L (human: ~2 weeks / CC: ~1 hour)
+
 ## P3 — Low priority (security hardening)
 
 ### Lesson Progress Insert Race Condition

@@ -57,7 +57,7 @@ export default function SignupPage() {
           Create your account
         </h1>
         <p className="mt-2 text-center text-sm text-[var(--text-secondary)]">
-          Start building your business today.
+          Design your venture. Launch when you're ready.
         </p>
 
         <div className="mt-8">

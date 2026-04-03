@@ -8,7 +8,7 @@ export default function Home() {
           Adaptable
         </h1>
         <p className="mt-4 text-xl text-[var(--text-secondary)]">
-          Build your business. Learn by doing.
+          Design your venture. Learn by doing.
         </p>
         <div className="mt-8 flex gap-4 justify-center">
           <Link

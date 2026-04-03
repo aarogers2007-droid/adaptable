@@ -43,7 +43,7 @@ export default async function CompletionPage() {
             You did it, {studentName}!
           </h1>
           <p className="mt-3 text-lg text-[var(--text-secondary)]">
-            You didn't just learn about entrepreneurship. You built a real business.
+            You didn't just learn about entrepreneurship. You designed a real venture.
           </p>
         </div>
 
@@ -79,9 +79,9 @@ export default async function CompletionPage() {
             What's next?
           </h3>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            The lessons gave you the foundation. Now it's time to go build for real.
-            Use the AI Guide anytime you need help, and keep tracking your progress
-            on your dashboard.
+            Your venture plan is complete. You've made every decision a real founder makes,
+            from niche to pricing to your first customers. Your portfolio is your launchpad.
+            When you're ready to go live, everything is here. Use the AI Guide anytime.
           </p>
         </div>
 

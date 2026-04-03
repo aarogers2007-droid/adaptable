@@ -15,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Adaptable — Build Your Business",
+  title: "Adaptable — Design Your Venture",
   description:
-    "An AI-native entrepreneurship learning platform where students build real, personalized businesses.",
+    "An AI-native venture studio where students design, plan, and prepare to launch real businesses.",
 };
 
 export default function RootLayout({

@@ -26,7 +26,7 @@ export async function submitExercise(
   try {
     const result = await sendMessage({
       feature: "guide",
-      systemPrompt: `You are an entrepreneurship instructor evaluating a student's exercise response. The student is building a real business called "${businessName}" in the "${niche}" space.
+      systemPrompt: `You are a venture studio mentor evaluating a student's exercise response. The student is designing a venture called "${businessName}" in the "${niche}" space.
 
 Your job is to evaluate whether their response meets the exercise requirements. Be encouraging but honest. A teenager wrote this, so calibrate your expectations for their age, but still require genuine effort and specificity.
 

@@ -1,6 +1,6 @@
 # Adaptable
 
-Intelligent entrepreneurship learning platform for VentureLab.
+AI-native venture studio where students design, plan, and prepare to launch real businesses. Built for VentureLab.
 
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.

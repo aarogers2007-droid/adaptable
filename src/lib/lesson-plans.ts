@@ -37,22 +37,22 @@ export const LESSON_PLANS: LessonPlan[] = [
     module_id: 1,
     title: "Welcome to Adaptable",
     objective: "Student understands what this program is and feels excited to start",
-    opener: "Hey {{name}}! You're about to build a real business. Not a fake one for a grade. A real one that solves a real problem for real people. Before we dive in, I'm curious... have you ever had a moment where you thought 'I could make money doing this'? What was it?",
+    opener: "Hey {{name}}! Welcome to your venture studio. This is where you'll design a real business from scratch, plan every detail, and build a launch-ready portfolio. Think of it like a flight simulator for entrepreneurs... you'll make every decision a real founder makes, and when you're ready, you'll have everything you need to launch for real. Before we dive in, I'm curious... have you ever had a moment where you thought 'I could make money doing this'? What was it?",
     checkpoints: [
       {
         id: "welcome-1",
-        concept: "Understanding that this is about building something real",
-        question: "What excites you most about building something of your own?",
+        concept: "Understanding that this is a venture studio",
+        question: "What excites you most about designing something of your own?",
         mastery_signal: "Student expresses genuine interest or shares a specific idea/moment",
       },
       {
         id: "welcome-2",
         concept: "Understanding how the program works",
-        question: "Everything in this program will be personalized to YOUR business idea. The lessons, the examples, the exercises. It all connects to what you're building. What kind of business are you most curious about right now?",
+        question: "Everything in this program will be personalized to YOUR venture. The lessons, the examples, the exercises. It all connects to what you're designing. By the end, you'll have a complete plan ready to launch. What kind of business are you most curious about right now?",
         mastery_signal: "Student engages with the concept of personalization and shares a direction",
       },
     ],
-    completion_criteria: "Student has expressed genuine interest in building a business and understands that the program is personalized to their idea",
+    completion_criteria: "Student has expressed genuine interest and understands that the program is their venture studio for designing a launch-ready business",
     personalization_hooks: [],
   },
   {

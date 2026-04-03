@@ -61,7 +61,7 @@ export default async function ReadyPage() {
           <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-md mx-auto">
             You'll work through 8 lessons that teach you how to turn {name} into a real,
             paying business. Every lesson is a conversation tailored to your niche.
-            No lectures, no busywork. Just real steps for your real business.
+            No lectures, no busywork. Just real decisions for your venture. By the end, you'll have a complete plan ready to launch.
           </p>
         </div>
 
