@@ -90,6 +90,84 @@ Effort: S
 Full accessibility audit and remediation. May be a procurement requirement for US schools.
 Effort: M
 
+## Institutional Value — Teachers & Schools
+
+> Note: Teacher experience items should be designed in collaboration with the first
+> pilot teacher based on what they actually ask for. Build the scaffolding now, but
+> validate priorities with real teacher feedback before polishing.
+
+### P1 — Teacher Experience
+
+#### Proactive Instructor Alerts
+The instructor dashboard should surface actionable insights automatically without
+the teacher having to dig. Flag students who haven't logged in for 5+ days, students
+stuck on the same lesson for 3+ days, and module-level struggle patterns where more
+than 30% of the class is stalling in the same place. Surface these as a notification
+panel at the top of the instructor dashboard, not buried in a table.
+Effort: M (human: ~1 week / CC: ~30 min)
+
+#### Teacher Agency Tools
+Add the ability for instructors to send a direct nudge message to a specific student
+from the dashboard, leave a comment on a student's business plan artifact that the
+student can see, and flag a student for personal follow-up. These actions should be
+logged so the teacher has a record of their interventions.
+Effort: M (human: ~1 week / CC: ~30 min)
+
+#### Classroom Mode
+A teacher-facing view designed to be projected on a classroom screen. Shows the class
+working in real time, allows the teacher to spotlight a specific student's business
+idea or artifact for group discussion, and can display a live leaderboard of progress.
+Students see a simplified focused view when classroom mode is active.
+Effort: L (human: ~2 weeks / CC: ~1 hour)
+
+#### Teacher Onboarding Flow
+A dedicated onboarding experience for instructors separate from the student flow.
+Walks them through setting up their class, previewing the full student experience,
+understanding what each module covers, and knowing what to do when a student gets
+stuck. Should take under 15 minutes to complete and leave the teacher feeling confident.
+Effort: M (human: ~1 week / CC: ~30 min)
+
+### P1 — School & Administrator Value (pilot-ready)
+
+#### School Onboarding UI
+Replace manual database manipulation for adding new schools with a proper admin
+interface. An org_admin should be able to create classes, generate invite codes,
+manage enrollments, and view school-wide analytics without any developer involvement.
+Effort: L (human: ~2 weeks / CC: ~1 hour)
+Priority: P1 — blocks every new school onboarding
+
+#### COPPA Compliance and Data Management
+Build a data retention and deletion system. Students and administrators must be able
+to request full data deletion. Implement automatic data purging for inactive accounts
+after a configurable retention period. Document the full data handling story clearly
+in a privacy policy page within the platform. This is required before any public
+school can sign a contract.
+Effort: L (human: ~2 weeks / CC: ~1 hour)
+Priority: P1 — legal requirement for public school contracts
+
+### P2 — School & Administrator Value (post-pilot)
+
+#### Aggregate Reporting
+A monthly report generated automatically for each organization showing: total active
+students, average completion rate, average session time, number of business ideas
+generated, module-level completion rates, and top performing students. Exportable as
+PDF. Designed to be shown to a principal or superintendent without any explanation needed.
+Effort: M (human: ~1 week / CC: ~30 min)
+
+#### Curriculum Alignment Documentation
+Create a static page within the platform that maps each Adaptable module to relevant
+educational standards including entrepreneurship education standards, business education
+standards, and financial literacy standards. This removes a key procurement objection
+for school administrators.
+Effort: S (human: ~2 days / CC: ~15 min)
+
+#### Longitudinal Student Data
+Design the data model to support multi-year student journeys. A student's business
+idea, decisions, artifacts, and progress should persist and be accessible across
+school years. Add a student portfolio view that shows their full entrepreneurship
+journey from first login forward.
+Effort: M (human: ~1 week / CC: ~30 min)
+
 ## P3 — Low priority (security hardening)
 
 ### Lesson Progress Insert Race Condition
