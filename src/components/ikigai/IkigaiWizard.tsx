@@ -60,13 +60,18 @@ function generateMockBusinessIdea(draft: IkigaiDraft, name: string): BusinessIde
 interface IkigaiWizardProps {
   initialDraft: IkigaiDraft | null;
   initialName?: string;
+  isAdmin?: boolean;
 }
 
-export default function IkigaiWizard({ initialDraft, initialName }: IkigaiWizardProps) {
+export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: IkigaiWizardProps) {
   const router = useRouter();
 
   const [studentName, setStudentName] = useState(initialName ?? "");
   const [nameConfirmed, setNameConfirmed] = useState(!!initialName);
+  const [showSkipForm, setShowSkipForm] = useState(false);
+  const [skipIdea, setSkipIdea] = useState("");
+  const [skipValidating, setSkipValidating] = useState(false);
+  const [skipError, setSkipError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<IkigaiStep | null>(null);
   const [draft, setDraft] = useState<IkigaiDraft>(initialDraft ?? { step: 1 });
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(() => {
@@ -250,6 +255,28 @@ export default function IkigaiWizard({ initialDraft, initialName }: IkigaiWizard
 
   const activeStepConfig = activeStep ? STEPS.find((s) => s.id === activeStep) : null;
 
+  // Validate and submit a pre-existing business idea
+  async function handleSkipSubmit() {
+    if (!skipIdea.trim() || skipValidating) return;
+    setSkipError(null);
+    setSkipValidating(true);
+
+    try {
+      const { validateAndCreateBusinessIdea } = await import("@/app/(app)/onboarding/skip-actions");
+      const result = await validateAndCreateBusinessIdea(skipIdea.trim());
+
+      if (result.idea) {
+        router.push("/onboarding/ready");
+      } else {
+        setSkipError(result.error ?? "That doesn't seem like a real business idea.");
+      }
+    } catch {
+      setSkipError("Couldn't validate your idea right now. Try the Ikigai wizard instead.");
+    }
+
+    setSkipValidating(false);
+  }
+
   // Save name to profile when confirmed
   async function handleNameConfirm() {
     if (!studentName.trim()) return;
@@ -428,6 +455,57 @@ export default function IkigaiWizard({ initialDraft, initialName }: IkigaiWizard
             >
               Reset and start over
             </button>
+          )}
+
+          {/* Already have a business idea? */}
+          {!showReveal && !synthesizing && completedSteps.size === 0 && (
+            <div className="mt-8">
+              {!showSkipForm ? (
+                <button
+                  onClick={() => setShowSkipForm(true)}
+                  className="text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] underline"
+                >
+                  Already have a business idea?
+                </button>
+              ) : (
+                <div className="max-w-md w-full mx-auto rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                  <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
+                    What's your business idea?
+                  </h3>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    Describe what you'd sell or offer. We'll set up your venture studio around it.
+                  </p>
+                  <textarea
+                    value={skipIdea}
+                    onChange={(e) => { setSkipIdea(e.target.value); setSkipError(null); }}
+                    placeholder="e.g., I want to open a nail salon that specializes in custom nail art for prom and special events"
+                    rows={3}
+                    className="mt-3 w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 resize-none"
+                    autoFocus
+                  />
+                  {skipError && (
+                    <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+                      {skipError}
+                    </div>
+                  )}
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      onClick={handleSkipSubmit}
+                      disabled={skipIdea.trim().length < 10 || skipValidating}
+                      className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-50 transition-colors"
+                    >
+                      {skipValidating ? "Checking..." : "Set up my venture"}
+                    </button>
+                    <button
+                      onClick={() => { setShowSkipForm(false); setSkipIdea(""); setSkipError(null); }}
+                      className="rounded-lg border border-[var(--border-strong)] px-4 py-2.5 text-sm font-medium hover:bg-[var(--bg-muted)] transition-colors"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

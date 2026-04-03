@@ -41,7 +41,7 @@ export default async function OnboardingPage({
   // Check if already completed Ikigai — redirect to dashboard unless resetting
   const { data: profile } = await supabase
     .from("profiles")
-    .select("business_idea, ikigai_draft, full_name")
+    .select("business_idea, ikigai_draft, full_name, role")
     .eq("id", user.id)
     .single();
 
@@ -52,5 +52,7 @@ export default async function OnboardingPage({
   const draft = (profile?.ikigai_draft as IkigaiDraft) ?? null;
   const name = (profile?.full_name as string) ?? "";
 
-  return <IkigaiWizard initialDraft={draft} initialName={name} />;
+  const isAdmin = profile?.role === "org_admin";
+
+  return <IkigaiWizard initialDraft={draft} initialName={name} isAdmin={isAdmin} />;
 }

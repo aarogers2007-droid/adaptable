@@ -64,18 +64,30 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
         )}
 
         <div className="ml-auto flex items-center gap-3">
-          {/* Admin/Student toggle */}
+          {/* Admin controls */}
           {isAdmin && (
-            <button
-              onClick={() => setAdminMode(!adminMode)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                adminMode
-                  ? "bg-amber-100 text-amber-700 border border-amber-200"
-                  : "bg-[var(--bg-muted)] text-[var(--text-muted)] border border-[var(--border)]"
-              }`}
-            >
-              {adminMode ? "Admin View" : "Student View"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setAdminMode(!adminMode)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  adminMode
+                    ? "bg-amber-100 text-amber-700 border border-amber-200"
+                    : "bg-[var(--bg-muted)] text-[var(--text-muted)] border border-[var(--border)]"
+                }`}
+              >
+                {adminMode ? "Admin View" : "Student View"}
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm("Reset everything and start from the very beginning?")) {
+                    window.location.href = "/onboarding?reset=true";
+                  }
+                }}
+                className="rounded-full px-3 py-1 text-xs font-medium bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
+              >
+                Fresh Start
+              </button>
+            </div>
           )}
 
           {studentName && (
