@@ -36,6 +36,7 @@ export default function StepContent({
   maxRegens,
 }: StepContentProps) {
   const [customInput, setCustomInput] = useState("");
+  const [showNudge, setShowNudge] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -82,6 +83,9 @@ export default function StepContent({
         </h2>
         <p className="mt-3 text-base text-[var(--text-primary)]/70 max-w-lg mx-auto">
           {step.question}
+        </p>
+        <p className="mt-2 text-sm text-[var(--text-primary)]/40">
+          Pick 2-3 that feel most like you, or type your own
         </p>
       </div>
 
@@ -183,13 +187,27 @@ export default function StepContent({
         {/* Spacer */}
         <div className="flex-1 min-h-8" />
 
+        {/* Minimum input nudge */}
+        {showNudge && (
+          <p className="mb-3 text-sm text-[var(--text-primary)]/60 bg-white/40 rounded-lg px-4 py-2 text-center">
+            Just one? That's fine, but adding 1-2 more helps create a better business idea for you.
+          </p>
+        )}
+
         {/* Done button */}
         <button
-          onClick={onDone}
+          onClick={() => {
+            if (selectedItems.length === 1 && !showNudge) {
+              setShowNudge(true);
+              return;
+            }
+            setShowNudge(false);
+            onDone();
+          }}
           disabled={selectedItems.length === 0}
           className="rounded-xl bg-[var(--text-primary)] px-10 py-3.5 text-base font-semibold text-white hover:opacity-90 disabled:opacity-30 transition-all shadow-lg"
         >
-          Done →
+          {showNudge ? "Continue with 1 →" : "Done →"}
         </button>
       </div>
     </div>

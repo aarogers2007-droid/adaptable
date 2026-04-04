@@ -35,6 +35,7 @@ export interface BusinessIdea {
   name: string;
   target_customer: string;
   revenue_model: string;
+  why_this_fits?: string;
 }
 
 export interface IkigaiResult {

@@ -31,8 +31,8 @@ const MOCK_SUGGESTIONS: Record<number, string[][]> = {
     ["After-school activities", "Small business websites", "Community gardens", "Homework help", "Fitness coaching", "Event planning"],
   ],
   4: [
-    ["Per-session service fee", "Monthly subscription", "Per-project pricing", "Commission-based", "Freemium model", "Hourly rate"],
-    ["Selling digital products", "Teaching workshops", "Affiliate marketing", "Sponsorships", "Tips & donations", "Rental/lending"],
+    ["Charge per visit", "Charge by the hour", "Sell each item", "Monthly package", "Sell downloads", "Take a cut of each sale"],
+    ["Teach classes or workshops", "Earn from ads or sponsors", "Offer free + paid premium", "Sell custom orders", "Subscription box", "Tips and donations"],
   ],
 };
 
@@ -363,6 +363,16 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
                 ? `${completedSteps.size}/4 complete. Click a circle to continue.`
                 : "All done!"}
             </p>
+
+            {/* Skip path — elevated to a proper button */}
+            {completedSteps.size === 0 && !showReveal && !synthesizing && !showSkipForm && (
+              <button
+                onClick={() => setShowSkipForm(true)}
+                className="mt-3 rounded-full border border-[var(--border-strong)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] transition-colors"
+              >
+                I already know what I want to build →
+              </button>
+            )}
           </div>
 
           <div className="relative">
@@ -401,7 +411,19 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
                 <p className="mt-2 text-sm text-[var(--text-secondary)]">
                   For {businessIdea.target_customer.toLowerCase()}
                 </p>
-                <div className="mt-4 rounded-lg bg-[var(--bg-muted)] px-4 py-3 text-left">
+                {/* Why this fits — the discovery moment */}
+                {businessIdea.why_this_fits && (
+                  <div className="mt-4 rounded-lg bg-[var(--primary)]/5 border border-[var(--primary)]/10 px-4 py-3 text-left">
+                    <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider mb-1">
+                      Why this works for you
+                    </p>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                      {businessIdea.why_this_fits}
+                    </p>
+                  </div>
+                )}
+
+                <div className="mt-3 rounded-lg bg-[var(--bg-muted)] px-4 py-3 text-left">
                   <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">
                     How you'll make money
                   </p>
@@ -457,17 +479,9 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
             </button>
           )}
 
-          {/* Already have a business idea? */}
-          {!showReveal && !synthesizing && completedSteps.size === 0 && (
-            <div className="mt-8">
-              {!showSkipForm ? (
-                <button
-                  onClick={() => setShowSkipForm(true)}
-                  className="text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] underline"
-                >
-                  Already have a business idea?
-                </button>
-              ) : (
+          {/* Skip form — already have a business idea */}
+          {showSkipForm && !showReveal && !synthesizing && (
+            <div className="mt-6">{(
                 <div className="max-w-md w-full mx-auto rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
                     What's your business idea?
