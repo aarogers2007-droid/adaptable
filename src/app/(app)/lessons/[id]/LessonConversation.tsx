@@ -66,7 +66,7 @@ export default function LessonConversation({
   const [completed, setCompleted] = useState(initialCompleted);
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
-  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting..." });
+  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -248,12 +248,14 @@ export default function LessonConversation({
               const paceMatch = assistantMsg.match(/\[PACE:(\w+)\]/);
               const detailMatch = assistantMsg.match(/\[DETAIL:(\w+)\]/);
               const motivationMatch = assistantMsg.match(/\[MOTIVATION:(\w+)\]/);
-              if (styleMatch || paceMatch || detailMatch || motivationMatch) {
+              const registerMatch = assistantMsg.match(/\[REGISTER:(\w+)\]/);
+              if (styleMatch || paceMatch || detailMatch || motivationMatch || registerMatch) {
                 setLearningStyle((prev) => ({
                   style: styleMatch?.[1] ?? prev.style,
                   pace: paceMatch?.[1] ?? prev.pace,
                   detail: detailMatch?.[1] ?? prev.detail,
                   motivation: motivationMatch?.[1] ?? prev.motivation,
+                  register: registerMatch?.[1] ?? prev.register,
                 }));
               }
 
@@ -264,6 +266,7 @@ export default function LessonConversation({
                 .replace(/\[PACE:\w+\]/g, "")
                 .replace(/\[DETAIL:\w+\]/g, "")
                 .replace(/\[MOTIVATION:\w+\]/g, "")
+                .replace(/\[REGISTER:\w+\]/g, "")
                 .trim();
               setMessages((prev) => {
                 const updated = [...prev];
@@ -352,6 +355,9 @@ export default function LessonConversation({
                 </span>
                 <span className="text-amber-600">
                   Motivation: <strong>{learningStyle.motivation}</strong>
+                </span>
+                <span className="text-amber-600">
+                  Register: <strong>{learningStyle.register}</strong>
                 </span>
                 <span className="text-amber-600">
                   Checkpoints: <strong>{checkpointsReached}/{totalCheckpoints}</strong>

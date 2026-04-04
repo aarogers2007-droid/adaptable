@@ -13,6 +13,7 @@ export interface LearningProfile {
   pace: "fast" | "moderate" | "slow" | "unknown";
   detail_preference: "concise" | "detailed" | "unknown";
   motivation: "validation" | "challenge" | "unknown";
+  register: "formal" | "casual" | "slang" | "academic" | "bilingual" | "minimal" | "unknown";
   engagement_notes: string[];
   updated_at: string;
 }
@@ -22,6 +23,7 @@ export const DEFAULT_LEARNING_PROFILE: LearningProfile = {
   pace: "unknown",
   detail_preference: "unknown",
   motivation: "unknown",
+  register: "unknown",
   engagement_notes: [],
   updated_at: new Date().toISOString(),
 };
@@ -73,6 +75,18 @@ export function learningProfilePrompt(profile: LearningProfile): string {
       challenge: "This student is motivated by being pushed. They respect directness and tough questions. Don't sugarcoat — challenge their assumptions and they'll rise to it.",
     };
     parts.push(motivationMap[profile.motivation]);
+  }
+
+  if (profile.register !== "unknown") {
+    const registerMap = {
+      formal: "This student writes formally. Match their precision. Don't be overly casual or use slang.",
+      casual: "This student is casual. Match their energy. Relaxed tone works well.",
+      slang: "This student uses heavy slang and abbreviations. Keep it relaxed. Don't correct their language. Match their vibe.",
+      academic: "This student thinks analytically. Match their depth. Skip basic explanations. They may know more than the default curriculum assumes.",
+      bilingual: "This student code-switches between languages. Acknowledge both languages warmly. Never translate their non-English words back to English.",
+      minimal: "This student communicates in very few words. Do NOT treat brevity as vagueness. Ask tight yes/no or choice questions instead of open-ended prompts. Match their brevity. 1-2 sentences max from you.",
+    };
+    parts.push(registerMap[profile.register]);
   }
 
   if (profile.engagement_notes.length > 0) {
