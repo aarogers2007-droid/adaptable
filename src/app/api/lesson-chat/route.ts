@@ -19,33 +19,28 @@ export async function POST(request: Request) {
     return new Response("Missing progressId", { status: 400 });
   }
 
-  // Validate progressId belongs to this user and matches the requested lesson
-  const { data: progressCheck } = await supabase
+  // Validate progressId belongs to this user
+  const { data: progressCheck, error: progressError } = await supabase
     .from("student_progress")
-    .select("id, lesson_id, lessons(module_sequence, lesson_sequence)")
+    .select("id, lesson_id")
     .eq("id", progressId)
     .eq("student_id", user.id)
     .single();
 
-  if (!progressCheck) {
+  if (progressError || !progressCheck) {
+    console.error("Progress validation failed:", progressError);
     return new Response("Invalid progress record", { status: 403 });
-  }
-
-  const linkedLesson = progressCheck.lessons as unknown as { module_sequence: number; lesson_sequence: number } | null;
-  if (linkedLesson && (linkedLesson.module_sequence !== moduleSequence || linkedLesson.lesson_sequence !== lessonSequence)) {
-    return new Response("Progress record does not match lesson", { status: 403 });
   }
 
   // Combined daily cap (shared across guide + lesson chat): 40 messages/day, 10/hour
   const today = new Date().toISOString().split("T")[0];
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
-  const [{ count: dailyCount }, { count: hourlyCount }] = await Promise.all([
+  const [dailyRes, hourlyRes] = await Promise.all([
     supabase
       .from("ai_usage_log")
       .select("*", { count: "exact", head: true })
       .eq("student_id", user.id)
-      .in("feature", ["guide", "guide"])
       .gte("created_at", `${today}T00:00:00Z`),
     supabase
       .from("ai_usage_log")
@@ -53,6 +48,8 @@ export async function POST(request: Request) {
       .eq("student_id", user.id)
       .gte("created_at", oneHourAgo),
   ]);
+  const dailyCount = dailyRes.count ?? 0;
+  const hourlyCount = hourlyRes.count ?? 0;
 
   if ((dailyCount ?? 0) >= 40) {
     return Response.json(
@@ -95,33 +92,35 @@ export async function POST(request: Request) {
 
   // CROSS-LESSON MEMORY: pull key decisions from all completed lessons
   let priorContext = "";
-  const { data: allProgress } = await supabase
-    .from("student_progress")
-    .select("artifacts, lessons(title, lesson_sequence, module_sequence)")
-    .eq("student_id", user.id)
-    .eq("status", "completed")
-    .neq("id", progressId);
+  try {
+    const { data: allProgress } = await supabase
+      .from("student_progress")
+      .select("artifacts")
+      .eq("student_id", user.id)
+      .eq("status", "completed")
+      .neq("id", progressId);
 
-  if (allProgress && allProgress.length > 0) {
-    const decisions = allProgress
-      .filter((p) => p.artifacts && (p.artifacts as Record<string, unknown>).conversation)
-      .map((p) => {
-        const conv = (p.artifacts as Record<string, unknown>).conversation as { role: string; content: string }[];
-        const lessonInfo = p.lessons as unknown as { title: string } | null;
-        // Extract the student's longest 2 responses as key decisions
-        const studentResponses = conv
-          .filter((m) => m.role === "user" && m.content.length > 30)
-          .sort((a, b) => b.content.length - a.content.length)
-          .slice(0, 2)
-          .map((m) => m.content.slice(0, 200));
-        if (studentResponses.length === 0) return null;
-        return `${lessonInfo?.title ?? "Previous lesson"}: ${studentResponses.join(" | ")}`;
-      })
-      .filter(Boolean);
+    if (allProgress && allProgress.length > 0) {
+      const decisions = allProgress
+        .filter((p) => p.artifacts && (p.artifacts as Record<string, unknown>).conversation)
+        .map((p) => {
+          const conv = (p.artifacts as Record<string, unknown>).conversation as { role: string; content: string }[];
+          const studentResponses = conv
+            .filter((m) => m.role === "user" && m.content.length > 30)
+            .sort((a, b) => b.content.length - a.content.length)
+            .slice(0, 2)
+            .map((m) => m.content.slice(0, 200));
+          if (studentResponses.length === 0) return null;
+          return studentResponses.join(" | ");
+        })
+        .filter(Boolean);
 
-    if (decisions.length > 0) {
-      priorContext = `\n\nPRIOR DECISIONS (from earlier lessons — reference these, catch contradictions):\n${decisions.join("\n")}`;
+      if (decisions.length > 0) {
+        priorContext = `\n\nPRIOR DECISIONS (from earlier lessons — reference these, catch contradictions):\n${decisions.join("\n")}`;
+      }
     }
+  } catch {
+    // Cross-lesson memory is optional, don't block the lesson
   }
   const conversationHistory = (artifacts.conversation ?? []) as { role: string; content: string }[];
   const checkpointsReached = (artifacts.checkpoints_reached ?? []) as string[];
