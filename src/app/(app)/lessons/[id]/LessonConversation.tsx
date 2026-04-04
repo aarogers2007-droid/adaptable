@@ -68,6 +68,7 @@ export default function LessonConversation({
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
   const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
+  const [viewIndex, setViewIndex] = useState(initialMessages.length > 0 ? initialMessages.length - 1 : 0);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -75,9 +76,10 @@ export default function LessonConversation({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
+  // Auto-advance to latest message
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    setViewIndex(messages.length - 1);
+  }, [messages.length]);
 
   // Generate suggested responses based on last AI message
   const generateSuggestions = useCallback(() => {
@@ -384,56 +386,76 @@ export default function LessonConversation({
         />
       )}
 
-      {/* Messages (hidden when sandbox is active) */}
-      {!showSandbox && (
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-[700px] px-6 py-6 space-y-4">
-          {/* Completed lesson review header */}
-          {completed && initialMessages.length > 0 && (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-5 mb-4">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[var(--success)]">✓</span>
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{lessonTitle}</p>
-                <span className="text-xs text-[var(--text-muted)] ml-auto">Completed</span>
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mb-2">Your key responses:</p>
-              <div className="space-y-1.5">
-                {initialMessages
-                  .filter((m) => m.role === "user" && m.content.length > 30)
-                  .slice(-3)
-                  .map((m, i) => (
-                    <p key={i} className="text-xs text-[var(--text-secondary)] pl-3 border-l-2 border-[var(--primary)]/30">
-                      {m.content.length > 150 ? m.content.slice(0, 150) + "..." : m.content}
-                    </p>
-                  ))}
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mt-3">Full conversation below</p>
-            </div>
-          )}
+      {/* Messages — card/slide view (hidden when sandbox is active) */}
+      {!showSandbox && messages.length > 0 && (
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-[640px]">
+          {/* Current message card */}
+          {(() => {
+            const currentMsg = messages[viewIndex];
+            if (!currentMsg) return null;
+            const isUser = currentMsg.role === "user";
+            const isLatest = viewIndex === messages.length - 1;
+            const isStreaming = isLatest && loading && !currentMsg.content;
 
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            return (
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                  msg.role === "user"
+                className={`rounded-2xl px-8 py-8 min-h-[120px] flex items-center transition-all duration-200 ${
+                  isUser
                     ? "bg-[var(--primary)] text-white"
                     : "bg-[var(--bg-muted)] text-[var(--text-primary)]"
                 }`}
               >
-                {msg.content ? (
-                  <div className="space-y-2">
-                    {msg.content.split(/\n\n+/).map((para, j) => (
-                      <p key={j}>{para}</p>
+                {isStreaming ? (
+                  <div className="flex items-center gap-3">
+                    <span className="inline-block w-5 h-5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                    <span className="text-base opacity-60">Thinking...</span>
+                  </div>
+                ) : currentMsg.content ? (
+                  <div className="space-y-4 w-full">
+                    {currentMsg.content.split(/\n\n+/).map((para, j) => (
+                      <p key={j} className="text-lg leading-relaxed">{para}</p>
                     ))}
                   </div>
-                ) : (
-                  <span className="inline-block w-4 h-4 border-2 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin" />
-                )}
+                ) : null}
               </div>
+            );
+          })()}
+
+          {/* Navigation arrows + message counter */}
+          <div className="flex items-center justify-between mt-4">
+            <button
+              onClick={() => setViewIndex((v) => Math.max(0, v - 1))}
+              disabled={viewIndex === 0}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] disabled:opacity-20 transition-colors"
+            >
+              ← Back
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {messages.map((m, i) => (
+                <button
+                  key={i}
+                  onClick={() => setViewIndex(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === viewIndex
+                      ? m.role === "user" ? "bg-[var(--primary)] w-4" : "bg-[var(--text-primary)] w-4"
+                      : "bg-[var(--border-strong)]"
+                  }`}
+                />
+              ))}
             </div>
-          ))}
-          <div ref={messagesEndRef} />
+
+            <button
+              onClick={() => setViewIndex((v) => Math.min(messages.length - 1, v + 1))}
+              disabled={viewIndex >= messages.length - 1}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] disabled:opacity-20 transition-colors"
+            >
+              Next →
+            </button>
+          </div>
         </div>
+        <div ref={messagesEndRef} />
       </div>
       )}
 
