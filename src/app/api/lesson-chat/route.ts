@@ -28,41 +28,52 @@ export async function POST(request: Request) {
     .single();
 
   if (progressError || !progressCheck) {
-    console.error("Progress validation failed:", progressError);
-    return new Response("Invalid progress record", { status: 403 });
+    console.error("[lesson-chat] Progress validation failed. progressId:", progressId, "userId:", user.id, "error:", progressError);
+    return Response.json({ error: "Invalid progress record", debug: { progressId, userId: user.id, dbError: progressError?.message } }, { status: 403 });
   }
 
-  // Combined daily cap (shared across guide + lesson chat): 40 messages/day, 10/hour
-  const today = new Date().toISOString().split("T")[0];
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  // Check if admin (admins bypass rate limits)
+  const { data: roleCheck } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = roleCheck?.role === "org_admin";
 
-  const [dailyRes, hourlyRes] = await Promise.all([
-    supabase
-      .from("ai_usage_log")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", user.id)
-      .gte("created_at", `${today}T00:00:00Z`),
-    supabase
-      .from("ai_usage_log")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", user.id)
-      .gte("created_at", oneHourAgo),
-  ]);
-  const dailyCount = dailyRes.count ?? 0;
-  const hourlyCount = hourlyRes.count ?? 0;
+  // Combined daily cap (shared across guide + lesson chat): 100 messages/day, 30/hour
+  // Admins bypass entirely for testing
+  if (!isAdmin) {
+    const today = new Date().toISOString().split("T")[0];
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
-  if ((dailyCount ?? 0) >= 40) {
-    return Response.json(
-      { error: "You've hit today's limit. Great work! Come back tomorrow to keep going." },
-      { status: 429 }
-    );
-  }
+    const [dailyRes, hourlyRes] = await Promise.all([
+      supabase
+        .from("ai_usage_log")
+        .select("*", { count: "exact", head: true })
+        .eq("student_id", user.id)
+        .gte("created_at", `${today}T00:00:00Z`),
+      supabase
+        .from("ai_usage_log")
+        .select("*", { count: "exact", head: true })
+        .eq("student_id", user.id)
+        .gte("created_at", oneHourAgo),
+    ]);
+    const dailyCount = dailyRes.count ?? 0;
+    const hourlyCount = hourlyRes.count ?? 0;
 
-  if ((hourlyCount ?? 0) >= 10) {
-    return Response.json(
-      { error: "Take a breather! You can continue in a few minutes." },
-      { status: 429 }
-    );
+    if (dailyCount >= 100) {
+      return Response.json(
+        { error: "You've hit today's limit. Great work! Come back tomorrow to keep going." },
+        { status: 429 }
+      );
+    }
+
+    if (hourlyCount >= 30) {
+      return Response.json(
+        { error: "Take a breather! You can continue in a few minutes." },
+        { status: 429 }
+      );
+    }
   }
 
   // Get profile + learning profile
@@ -236,6 +247,7 @@ Base this on their actual responses in this conversation, not assumptions.
 ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
 
   try {
+    console.log("[lesson-chat] Starting stream, system prompt length:", systemPrompt.length, "messages:", messages.length);
     const stream = await streamMessage({
       feature: "guide",
       systemPrompt,
@@ -344,7 +356,8 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
 
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
-        } catch {
+        } catch (streamErr) {
+          console.error("[lesson-chat] Stream error:", streamErr);
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ error: "Something went wrong. Try again." })}\n\n`)
           );
@@ -360,7 +373,8 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
         Connection: "keep-alive",
       },
     });
-  } catch {
+  } catch (outerErr) {
+    console.error("[lesson-chat] Outer error:", outerErr);
     return Response.json({ error: "AI mentor unavailable right now." }, { status: 503 });
   }
 }

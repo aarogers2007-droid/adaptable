@@ -215,9 +215,17 @@ export default function LessonConversation({
       });
 
       if (!res.ok) {
+        let errMsg = "Something went wrong. Try sending that again.";
+        try {
+          const errData = await res.json();
+          errMsg = errData.error ?? errMsg;
+          console.error("[lesson-chat] Error response:", res.status, errData);
+        } catch {
+          console.error("[lesson-chat] Non-JSON error:", res.status, res.statusText);
+        }
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: "Something went wrong. Try sending that again." },
+          { role: "assistant", content: errMsg },
         ]);
         setLoading(false);
         return;

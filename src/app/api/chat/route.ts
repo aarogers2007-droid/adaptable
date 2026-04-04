@@ -25,35 +25,45 @@ export async function POST(request: Request) {
     return new Response("Invalid conversation ID", { status: 400 });
   }
 
-  // Combined daily cap (shared across guide + lesson chat): 40/day, 10/hour
-  const today = new Date().toISOString().split("T")[0];
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  // Check if admin (admins bypass rate limits)
+  const { data: roleCheck } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdminUser = roleCheck?.role === "org_admin";
 
-  const [{ count }, { count: hourlyCount }] = await Promise.all([
-    supabase
-      .from("ai_usage_log")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", user.id)
-      .gte("created_at", `${today}T00:00:00Z`),
-    supabase
-      .from("ai_usage_log")
-      .select("*", { count: "exact", head: true })
-      .eq("student_id", user.id)
-      .gte("created_at", oneHourAgo),
-  ]);
+  // Combined daily cap: 100/day, 30/hour. Admins bypass.
+  if (!isAdminUser) {
+    const today = new Date().toISOString().split("T")[0];
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
-  if ((hourlyCount ?? 0) >= 10) {
-    return Response.json(
-      { error: "Take a breather! You can continue in a few minutes." },
-      { status: 429 }
-    );
-  }
+    const [dailyRes, hourlyRes] = await Promise.all([
+      supabase
+        .from("ai_usage_log")
+        .select("*", { count: "exact", head: true })
+        .eq("student_id", user.id)
+        .gte("created_at", `${today}T00:00:00Z`),
+      supabase
+        .from("ai_usage_log")
+        .select("*", { count: "exact", head: true })
+        .eq("student_id", user.id)
+        .gte("created_at", oneHourAgo),
+    ]);
 
-  if ((count ?? 0) >= 40) {
+    if ((hourlyRes.count ?? 0) >= 30) {
+      return Response.json(
+        { error: "Take a breather! You can continue in a few minutes." },
+        { status: 429 }
+      );
+    }
+
+    if ((dailyRes.count ?? 0) >= 100) {
     return Response.json(
       { error: "You've hit today's limit. Great work! Come back tomorrow." },
       { status: 429 }
     );
+    }
   }
 
   // Get profile for context
