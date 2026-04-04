@@ -66,7 +66,7 @@ export default function LessonConversation({
   const [completed, setCompleted] = useState(initialCompleted);
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
-  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting..." });
+  const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting...", emotion: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
   const [aiParaIndices, setAiParaIndices] = useState<Record<number, number>>({});
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -259,13 +259,15 @@ export default function LessonConversation({
               const detailMatch = assistantMsg.match(/\[DETAIL:(\w+)\]/);
               const motivationMatch = assistantMsg.match(/\[MOTIVATION:(\w+)\]/);
               const registerMatch = assistantMsg.match(/\[REGISTER:(\w+)\]/);
-              if (styleMatch || paceMatch || detailMatch || motivationMatch || registerMatch) {
+              const emotionMatch = assistantMsg.match(/\[EMOTION:(\w+)\]/);
+              if (styleMatch || paceMatch || detailMatch || motivationMatch || registerMatch || emotionMatch) {
                 setLearningStyle((prev) => ({
                   style: styleMatch?.[1] ?? prev.style,
                   pace: paceMatch?.[1] ?? prev.pace,
                   detail: detailMatch?.[1] ?? prev.detail,
                   motivation: motivationMatch?.[1] ?? prev.motivation,
                   register: registerMatch?.[1] ?? prev.register,
+                  emotion: emotionMatch?.[1] ?? prev.emotion,
                 }));
               }
 
@@ -277,6 +279,7 @@ export default function LessonConversation({
                 .replace(/\[DETAIL:\w+\]/g, "")
                 .replace(/\[MOTIVATION:\w+\]/g, "")
                 .replace(/\[REGISTER:\w+\]/g, "")
+                .replace(/\[EMOTION:\w+\]/g, "")
                 .trim();
               setMessages((prev) => {
                 const updated = [...prev];
@@ -368,6 +371,9 @@ export default function LessonConversation({
                 </span>
                 <span className="text-amber-600">
                   Register: <strong>{learningStyle.register}</strong>
+                </span>
+                <span className={`${learningStyle.emotion === "frustrated" || learningStyle.emotion === "deflated" || learningStyle.emotion === "anxious" ? "text-red-600 font-bold" : "text-amber-600"}`}>
+                  Emotion: <strong>{learningStyle.emotion}</strong>
                 </span>
                 <span className="text-amber-600">
                   Checkpoints: <strong>{checkpointsReached}/{totalCheckpoints}</strong>
