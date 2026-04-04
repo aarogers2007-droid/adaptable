@@ -68,7 +68,7 @@ export default function LessonConversation({
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
   const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
-  const [viewIndex, setViewIndex] = useState(initialMessages.length > 0 ? initialMessages.length - 1 : 0);
+  const [aiParaIndices, setAiParaIndices] = useState<Record<number, number>>({});
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,10 +76,10 @@ export default function LessonConversation({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
-  // Auto-advance to latest message
+  // Auto-scroll to latest message
   useEffect(() => {
-    setViewIndex(messages.length - 1);
-  }, [messages.length]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Generate suggested responses based on last AI message
   const generateSuggestions = useCallback(() => {
@@ -386,76 +386,75 @@ export default function LessonConversation({
         />
       )}
 
-      {/* Messages — card/slide view (hidden when sandbox is active) */}
-      {!showSandbox && messages.length > 0 && (
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="w-full max-w-[640px]">
-          {/* Current message card */}
-          {(() => {
-            const currentMsg = messages[viewIndex];
-            if (!currentMsg) return null;
-            const isUser = currentMsg.role === "user";
-            const isLatest = viewIndex === messages.length - 1;
-            const isStreaming = isLatest && loading && !currentMsg.content;
+      {/* Messages — chat layout with paginated AI messages */}
+      {!showSandbox && (
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-[700px] px-6 py-6 space-y-4">
+          {messages.map((msg, i) => {
+            if (msg.role === "user") {
+              // Student messages: right-aligned, always fully visible
+              return (
+                <div key={i} className="flex justify-end">
+                  <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
+                    <p className="text-base leading-relaxed">{msg.content}</p>
+                  </div>
+                </div>
+              );
+            }
+
+            // AI messages: left-aligned, split into paragraphs with arrows
+            const paragraphs = msg.content
+              ? msg.content.split(/\n\n+/).filter((p) => p.trim())
+              : [];
+            const isStreaming = i === messages.length - 1 && loading;
+            const paraIndex = aiParaIndices[i] ?? 0;
+            const currentPara = paragraphs[paraIndex];
+            const totalParas = paragraphs.length;
 
             return (
-              <div
-                className={`rounded-2xl px-8 py-8 min-h-[120px] flex items-center transition-all duration-200 ${
-                  isUser
-                    ? "bg-[var(--primary)] text-white"
-                    : "bg-[var(--bg-muted)] text-[var(--text-primary)]"
-                }`}
-              >
-                {isStreaming ? (
-                  <div className="flex items-center gap-3">
-                    <span className="inline-block w-5 h-5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                    <span className="text-base opacity-60">Thinking...</span>
+              <div key={i} className="flex justify-start">
+                <div className="max-w-[85%]">
+                  <div className="rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px]">
+                    {isStreaming && !msg.content ? (
+                      <div className="flex items-center gap-3">
+                        <span className="inline-block w-5 h-5 border-2 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin" />
+                        <span className="text-base opacity-60">Thinking...</span>
+                      </div>
+                    ) : currentPara ? (
+                      <p className="text-base leading-relaxed">{currentPara}</p>
+                    ) : paragraphs[0] ? (
+                      <p className="text-base leading-relaxed">{paragraphs[0]}</p>
+                    ) : null}
                   </div>
-                ) : currentMsg.content ? (
-                  <div className="space-y-4 w-full">
-                    {currentMsg.content.split(/\n\n+/).map((para, j) => (
-                      <p key={j} className="text-lg leading-relaxed">{para}</p>
-                    ))}
-                  </div>
-                ) : null}
+
+                  {/* Arrows — only show when AI message has multiple paragraphs */}
+                  {totalParas > 1 && (
+                    <div className="flex items-center gap-2 mt-1.5 px-2">
+                      <button
+                        onClick={() => setAiParaIndices((prev) => ({ ...prev, [i]: Math.max(0, paraIndex - 1) }))}
+                        disabled={paraIndex === 0}
+                        className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] disabled:opacity-20"
+                      >
+                        ←
+                      </button>
+                      <span className="text-xs text-[var(--text-muted)]">
+                        {paraIndex + 1} / {totalParas}
+                      </span>
+                      <button
+                        onClick={() => setAiParaIndices((prev) => ({ ...prev, [i]: Math.min(totalParas - 1, paraIndex + 1) }))}
+                        disabled={paraIndex >= totalParas - 1}
+                        className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] disabled:opacity-20"
+                      >
+                        →
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             );
-          })()}
-
-          {/* Navigation arrows + message counter */}
-          <div className="flex items-center justify-between mt-4">
-            <button
-              onClick={() => setViewIndex((v) => Math.max(0, v - 1))}
-              disabled={viewIndex === 0}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] disabled:opacity-20 transition-colors"
-            >
-              ← Back
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {messages.map((m, i) => (
-                <button
-                  key={i}
-                  onClick={() => setViewIndex(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === viewIndex
-                      ? m.role === "user" ? "bg-[var(--primary)] w-4" : "bg-[var(--text-primary)] w-4"
-                      : "bg-[var(--border-strong)]"
-                  }`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={() => setViewIndex((v) => Math.min(messages.length - 1, v + 1))}
-              disabled={viewIndex >= messages.length - 1}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] disabled:opacity-20 transition-colors"
-            >
-              Next →
-            </button>
-          </div>
+          })}
+          <div ref={messagesEndRef} />
         </div>
-        <div ref={messagesEndRef} />
       </div>
       )}
 
