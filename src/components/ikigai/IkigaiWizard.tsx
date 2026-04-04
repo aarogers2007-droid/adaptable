@@ -277,9 +277,20 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     setSkipValidating(false);
   }
 
+  const [nameError, setNameError] = useState<string | null>(null);
+
   // Save name to profile when confirmed
   async function handleNameConfirm() {
     if (!studentName.trim()) return;
+
+    // Moderate name
+    const { moderateName } = await import("@/lib/content-moderation");
+    const nameCheck = moderateName(studentName);
+    if (!nameCheck.safe) {
+      setNameError(nameCheck.reason ?? "Please enter a valid name.");
+      return;
+    }
+    setNameError(null);
     setNameConfirmed(true);
     try {
       const { createClient } = await import("@/lib/supabase/client");
@@ -314,9 +325,13 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
               onChange={(e) => setStudentName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && studentName.trim() && handleNameConfirm()}
               placeholder="Your first name"
+              maxLength={50}
               autoFocus
               className="mt-6 w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-center text-lg outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-[family-name:var(--font-display)]"
             />
+            {nameError && (
+              <p className="mt-2 text-sm text-[var(--error)]">{nameError}</p>
+            )}
             <button
               onClick={handleNameConfirm}
               disabled={!studentName.trim()}

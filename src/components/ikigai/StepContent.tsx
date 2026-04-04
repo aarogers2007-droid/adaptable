@@ -52,13 +52,24 @@ export default function StepContent({
     }
   }
 
+  const [inputError, setInputError] = useState<string | null>(null);
+
   function handleCustomSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = customInput.trim();
-    if (trimmed && !selectedItems.includes(trimmed)) {
+    if (!trimmed || selectedItems.includes(trimmed)) return;
+
+    // Content moderation
+    import("@/lib/content-moderation").then(({ moderateContent }) => {
+      const check = moderateContent(trimmed);
+      if (!check.safe) {
+        setInputError(check.reason ?? "That content isn't appropriate.");
+        return;
+      }
+      setInputError(null);
       onCustomAdd(trimmed);
       setCustomInput("");
-    }
+    });
   }
 
   return (
@@ -132,7 +143,7 @@ export default function StepContent({
                 ref={inputRef}
                 type="text"
                 value={customInput}
-                onChange={(e) => setCustomInput(e.target.value)}
+                onChange={(e) => { setCustomInput(e.target.value); setInputError(null); }}
                 placeholder="Type your own..."
                 className="flex-1 rounded-lg bg-white/70 px-4 py-3 text-sm outline-none placeholder:text-[var(--text-muted)] focus:bg-white focus:shadow-md transition-all"
               />
@@ -144,6 +155,9 @@ export default function StepContent({
                 Add
               </button>
             </div>
+            {inputError && (
+              <p className="mt-2 text-center text-sm text-red-700 bg-red-50 rounded-lg px-3 py-1.5">{inputError}</p>
+            )}
           </form>
 
           {/* Selected items */}

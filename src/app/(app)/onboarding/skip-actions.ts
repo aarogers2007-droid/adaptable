@@ -11,6 +11,11 @@ export async function validateAndCreateBusinessIdea(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  // Content moderation
+  const { moderateContent } = await import("@/lib/content-moderation");
+  const check = moderateContent(ideaDescription);
+  if (!check.safe) return { error: check.reason ?? "That content isn't appropriate." };
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name")
