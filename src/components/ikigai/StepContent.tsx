@@ -95,11 +95,11 @@ export default function StepContent({
         <div className="w-full max-w-xl">
           {loading ? (
             <div className="flex gap-2 flex-wrap justify-center">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
+              {[95, 110, 85, 120, 100, 90].map((w, i) => (
                 <div
                   key={i}
                   className="h-10 rounded-full bg-white/30 animate-pulse"
-                  style={{ width: 90 + Math.random() * 50 }}
+                  style={{ width: w }}
                 />
               ))}
             </div>
