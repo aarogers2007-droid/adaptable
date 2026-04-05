@@ -19,16 +19,27 @@ export interface CustomerPersona {
   systemPrompt: string;
 }
 
+// Pick age ranges that make sense for the student's target customer
+function getPersonaAge(targetCustomer: string, base: number): number {
+  const tc = targetCustomer.toLowerCase();
+  if (tc.includes("kid") || tc.includes("child") || tc.includes("elementary")) return base - 10;
+  if (tc.includes("teen") || tc.includes("student") || tc.includes("high school")) return 14 + Math.floor(base / 8);
+  if (tc.includes("college") || tc.includes("young adult")) return 19 + Math.floor(base / 5);
+  if (tc.includes("parent") || tc.includes("mom") || tc.includes("dad")) return 32 + Math.floor(base / 5);
+  if (tc.includes("senior") || tc.includes("elderly") || tc.includes("retired")) return 62 + Math.floor(base / 5);
+  return base; // default
+}
+
 /**
- * Generate personas tailored to a student's niche.
+ * Generate personas tailored to a student's niche and target customer.
  */
 export function generatePersonas(niche: string, targetCustomer: string): CustomerPersona[] {
   return [
     {
       id: "interested",
       name: "Alex",
-      age: 28,
-      bio: `Works in a related field and has been looking for something like this. Genuinely needs what you're offering.`,
+      age: getPersonaAge(targetCustomer, 28),
+      bio: `Someone in your target market who has been looking for something like this. Genuinely needs what you're offering.`,
       disposition: "genuinely_interested",
       systemPrompt: `You are Alex, age 28. You are a realistic potential customer for a ${niche} business. You GENUINELY need this service/product and have been looking for something like it.
 
@@ -43,7 +54,7 @@ BEHAVIOR RULES:
     {
       id: "skeptical",
       name: "Jordan",
-      age: 35,
+      age: getPersonaAge(targetCustomer, 35),
       bio: `Has tried similar services before and been disappointed. Open-minded but needs convincing.`,
       disposition: "skeptical",
       systemPrompt: `You are Jordan, age 35. You are a SKEPTICAL potential customer for a ${niche} business. You've tried similar things before and been disappointed.
@@ -58,7 +69,7 @@ BEHAVIOR RULES:
     {
       id: "polite",
       name: "Sam",
-      age: 42,
+      age: getPersonaAge(targetCustomer, 42),
       bio: `Nice person who lives nearby. Not actually in the market for what you're offering, but too polite to say so directly.`,
       disposition: "polite_not_customer",
       systemPrompt: `You are Sam, age 42. You are NOT a real customer for a ${niche} business. You don't need this service/product. But you are very polite and don't want to hurt a teenager's feelings.
@@ -73,7 +84,7 @@ BEHAVIOR RULES:
     {
       id: "enthusiast",
       name: "Riley",
-      age: 19,
+      age: getPersonaAge(targetCustomer, 19),
       bio: `College student, super enthusiastic about everything, says yes to every idea. The friend who hypes you up but never actually follows through.`,
       disposition: "says_yes_to_everything",
       systemPrompt: `You are Riley, age 19, a college student. You say YES to literally everything. You are the hype friend. Every idea is "amazing" and "genius" and you would "totally buy that."

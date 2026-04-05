@@ -30,7 +30,18 @@
       "Bash(npx supabase:*)",
       "Bash(export SUPABASE_ACCESS_TOKEN=\"sbp_8ea613047131c82898d5461dca6087edc3ccce4c\")",
       "Bash(cat /Users/ajrogers/Adaptable/src/app/\\\\\\(app\\\\\\)/lessons/pricing-strategy-research.json)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(find:*)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Bash(done)",
+      "Bash(npx next:*)",
+      "Bash(gstack --version)",
+      "Skill(browse)",
+      "Skill(plan-ceo-review)",
+      "Bash(npx tsc:*)",
+      "Bash(vercel --version)",
+      "Bash(git status:*)"
     ]
   }
 }

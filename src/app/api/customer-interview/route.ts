@@ -1,17 +1,53 @@
 import { createClient } from "@/lib/supabase/server";
 import { streamMessage } from "@/lib/ai";
 import { generatePersonas } from "@/lib/customer-personas";
+import { moderateContent } from "@/lib/content-moderation";
+import { moderateOutput, OUTPUT_FALLBACK_MESSAGE } from "@/lib/output-moderation";
 import type { Profile } from "@/lib/types";
 
 export async function POST(request: Request) {
+  // CSRF protection
+  const { validateOrigin } = await import("@/lib/csrf");
+  if (!validateOrigin(request)) {
+    return new Response("Forbidden", { status: 403 });
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  const { message, personaId, conversationHistory } = await request.json();
+  // Rate limiting
+  const { data: profile2 } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const isAdmin = (profile2 as { role: string } | null)?.role === "org_admin";
+  if (!isAdmin) {
+    const { data: allowed } = await supabase.rpc("reserve_ai_usage", {
+      p_student_id: user.id,
+      p_feature: "guide",
+    });
+    if (!allowed) {
+      return Response.json(
+        { error: "You've reached your message limit. Take a break and come back later!" },
+        { status: 429 }
+      );
+    }
+  }
 
-  if (!message || typeof message !== "string" || message.length > 2000) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response("Invalid JSON", { status: 400 });
+  }
+  const { message, personaId, conversationHistory } = body;
+
+  if (!message || typeof message !== "string" || message.trim().length === 0 || message.length > 2000) {
     return new Response("Invalid message", { status: 400 });
+  }
+
+  // Content moderation
+  const modResult = moderateContent(message);
+  if (!modResult.safe) {
+    return Response.json({ error: modResult.reason }, { status: 400 });
   }
 
   if (!personaId || typeof personaId !== "string") {
@@ -62,6 +98,13 @@ export async function POST(request: Request) {
               fullResponse += event.delta.text;
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`));
             }
+          }
+
+          // Output moderation
+          const outputCheck = moderateOutput(fullResponse);
+          if (!outputCheck.safe) {
+            // Stream was already sent — log the flag for teacher review
+            console.warn("[customer-interview] Output flagged:", outputCheck.reason);
           }
 
           // Log usage

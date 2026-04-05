@@ -1,11 +1,69 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+
+/**
+ * Typewriter hook: reveals text character by character at a fixed speed.
+ * When source text grows (streaming), the display catches up smoothly.
+ * When source text is final (not streaming), display matches instantly.
+ */
+/**
+ * TypewriterText: reveals text character by character like a video game.
+ * When streaming, characters appear at a steady pace regardless of chunk size.
+ * When not streaming, shows full text immediately.
+ */
+function TypewriterText({ text, streaming }: { text: string; streaming: boolean }) {
+  const [displayed, setDisplayed] = useState("");
+  const indexRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const lastTimeRef = useRef(0);
+
+  useEffect(() => {
+    if (!streaming) {
+      setDisplayed(text);
+      indexRef.current = text.length;
+      return;
+    }
+
+    const INTERVAL = 16; // ~60fps
+    const CHARS_PER_TICK = 2;
+
+    function tick(now: number) {
+      if (now - lastTimeRef.current >= INTERVAL) {
+        lastTimeRef.current = now;
+        if (indexRef.current < text.length) {
+          const next = Math.min(indexRef.current + CHARS_PER_TICK, text.length);
+          indexRef.current = next;
+          setDisplayed(text.slice(0, next));
+        }
+      }
+      if (indexRef.current < text.length) {
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [text, streaming]);
+
+  const paragraphs = displayed ? displayed.split(/\n\n+/).filter((p) => p.trim()) : [];
+
+  return (
+    <>
+      {paragraphs.map((para, j) => (
+        <p key={j} className="text-base leading-relaxed">{para}</p>
+      ))}
+    </>
+  );
+}
 import Link from "next/link";
 import AppNav from "@/components/ui/AppNav";
 import InterviewSandbox from "@/components/interview/InterviewSandbox";
+import DecisionJournal from "@/components/lessons/DecisionJournal";
+import BusinessPitch from "@/components/lessons/BusinessPitch";
 import { generatePersonas } from "@/lib/customer-personas";
+import { saveInterviewData } from "./interview-actions";
 
 interface Message {
   role: "user" | "assistant";
@@ -33,9 +91,11 @@ interface LessonConversationProps {
   currentModuleName: string;
   niche: string;
   targetCustomer: string;
+  isLastInModule: boolean;
 }
 
 export default function LessonConversation({
+  lessonId,
   lessonTitle,
   moduleName,
   lessonSequence,
@@ -55,6 +115,7 @@ export default function LessonConversation({
   currentModuleName,
   niche,
   targetCustomer,
+  isLastInModule,
 }: LessonConversationProps) {
   const [messages, setMessages] = useState<Message[]>(() =>
     initialMessages.length > 0
@@ -68,6 +129,9 @@ export default function LessonConversation({
   const [adminMode, setAdminMode] = useState(initialIsAdmin);
   const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting...", emotion: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
+  const [showSandboxIntro, setShowSandboxIntro] = useState(false);
+  const [decisionDone, setDecisionDone] = useState(initialCompleted);
+  const [pitchDone, setPitchDone] = useState(initialCompleted);
   const [aiParaIndices, setAiParaIndices] = useState<Record<number, number>>({});
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -81,44 +145,85 @@ export default function LessonConversation({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Generate suggested responses based on last AI message
+  // Generate suggested responses based on last AI message.
+  // Every suggestion should give the AI something real to work with.
+  // No filler like "I haven't thought about that" — that stalls the conversation.
   const generateSuggestions = useCallback(() => {
     const lastAiMessage = [...messages].reverse().find((m) => m.role === "assistant");
     if (!lastAiMessage || loading || completed) return;
 
     const content = lastAiMessage.content.toLowerCase();
 
-    // Context-aware suggestions based on what the AI asked
-    if (content.includes("who specifically") || content.includes("who do you think")) {
+    // Customer / audience questions
+    if (content.includes("who") && (content.includes("customer") || content.includes("buy") || content.includes("target") || content.includes("audience"))) {
       setSuggestions([
-        "Mostly people my age at school",
-        "Adults in my neighborhood who need help with this",
-        "I'm not sure yet, that's what I'm trying to figure out",
+        "Kids my age at school who already ask me about this",
+        "People in my neighborhood, mostly parents and families",
+        "I've seen people looking for this online but nobody local does it",
       ]);
-    } else if (content.includes("what price") || content.includes("what should") && content.includes("charge")) {
+    }
+    // Pricing questions
+    else if (content.includes("price") || content.includes("charge") || content.includes("cost") || content.includes("how much")) {
       setSuggestions([
-        "I was thinking around $20-30",
-        "I honestly have no idea where to start",
-        "I looked at competitors and they charge around...",
+        "I looked at what others charge and I think $25-35 is fair",
+        "I'd start low to get my first customers, maybe $15",
+        "I want to charge more than average because my quality is better",
       ]);
-    } else if (content.includes("why should someone trust") || content.includes("what skill")) {
+    }
+    // Competition / differentiation
+    else if (content.includes("competitor") || content.includes("different") || content.includes("stand out") || content.includes("already doing")) {
       setSuggestions([
-        "I've been doing this as a hobby for a while",
-        "I'm still learning but I'm passionate about it",
-        "People always ask me for help with this",
+        "The big companies don't offer the personal touch I can",
+        "Nobody in my area focuses specifically on this niche",
+        "My advantage is I actually understand what my customers want because I'm one of them",
       ]);
-    } else if (content.includes("what could") && content.includes("different")) {
+    }
+    // Skills / trust / credibility
+    else if (content.includes("trust") || content.includes("skill") || content.includes("qualified") || content.includes("experience")) {
       setSuggestions([
-        "I could focus on a specific niche they're ignoring",
-        "I'd offer better customer service since I'm small",
-        "I'm not sure how to stand out yet",
+        "I've been doing this on my own for over a year",
+        "People already come to me for this, I just haven't charged for it",
+        "I learned from someone who does this professionally",
       ]);
-    } else if (content.includes("?")) {
-      // Generic suggestions for any question
+    }
+    // Motivation / why this business
+    else if (content.includes("why") && (content.includes("business") || content.includes("venture") || content.includes("idea") || content.includes("care"))) {
       setSuggestions([
-        "I haven't thought about that yet",
-        "Let me think... I'd say",
-        "Can you give me an example?",
+        "I noticed nobody was solving this problem in my community",
+        "It started as something I love and people kept asking me to do it for them",
+        "I want to build something real, not just talk about it",
+      ]);
+    }
+    // First customers / launch / getting started
+    else if (content.includes("first customer") || content.includes("first sale") || content.includes("get started") || content.includes("launch")) {
+      setSuggestions([
+        "I'd start with people I already know who've shown interest",
+        "I could post about it on Instagram and see who responds",
+        "I'd offer a free trial to 3 people and ask for honest feedback",
+      ]);
+    }
+    // Feelings / confidence / how they feel about something
+    else if (content.includes("feel") || content.includes("confident") || content.includes("ready") || content.includes("nervous")) {
+      setSuggestions([
+        "Honestly pretty nervous but excited at the same time",
+        "More confident than when I started, I know my stuff now",
+        "I feel good about the idea but unsure about the execution",
+      ]);
+    }
+    // Agreement / correction (reaction-first pattern follow-up)
+    else if (content.includes("am i getting") || content.includes("what am i") || content.includes("does that") || content.includes("sound right")) {
+      setSuggestions([
+        "That's close but let me correct one thing",
+        "Yeah that's exactly it, you nailed it",
+        "Kind of, but the real reason is different",
+      ]);
+    }
+    // Generic fallback — still useful, never filler
+    else if (content.includes("?")) {
+      setSuggestions([
+        "Can you give me a real example so I can picture it?",
+        "I think so, but I want to make sure I understand the question",
+        "That's a good question, here's what I'm thinking so far",
       ]);
     } else {
       setSuggestions([]);
@@ -134,7 +239,7 @@ export default function LessonConversation({
       idleTimerRef.current = setTimeout(() => {
         generateSuggestions();
         setShowSuggestions(true);
-      }, 15000);
+      }, 30000);
     }
   }, [loading, completed, messages.length, generateSuggestions]);
 
@@ -280,6 +385,7 @@ export default function LessonConversation({
                 .replace(/\[MOTIVATION:\w+\]/g, "")
                 .replace(/\[REGISTER:\w+\]/g, "")
                 .replace(/\[EMOTION:\w+\]/g, "")
+                .replace(/\[(?:CHECKPOINT|LESSON_COMPLETE|STYLE|PACE|DETAIL|MOTIVATION|REGISTER|EMOTION)[^\]]*$/g, "")
                 .trim();
               setMessages((prev) => {
                 const updated = [...prev];
@@ -291,8 +397,8 @@ export default function LessonConversation({
               const reached = parsed.meta.checkpoints_reached ?? [];
               setCheckpointsReached(reached.length ?? checkpointsReached);
               // Trigger Interview Sandbox when that checkpoint is reached
-              if (reached.includes("interview-sandbox") && !showSandbox) {
-                setTimeout(() => setShowSandbox(true), 1000);
+              if (reached.includes("interview-sandbox") && !showSandbox && !showSandboxIntro) {
+                setTimeout(() => setShowSandboxIntro(true), 1000);
               }
               if (parsed.meta.lesson_complete) {
                 setCompleted(true);
@@ -325,7 +431,7 @@ export default function LessonConversation({
   const progress = totalCheckpoints > 0 ? Math.round((checkpointsReached / totalCheckpoints) * 100) : 0;
 
   return (
-    <div className="flex flex-col h-screen bg-[var(--bg)]">
+    <div className="flex flex-col h-dvh bg-[var(--bg)]">
       {/* Header */}
       <div className="shrink-0">
         <AppNav isAdmin={initialIsAdmin} studentName={studentName} />
@@ -341,8 +447,11 @@ export default function LessonConversation({
             <p className="text-xs font-medium text-[var(--text-primary)]">{lessonTitle}</p>
             <div className="flex-1 h-1.5 rounded-full bg-[var(--bg-muted)]">
               <div
-                className="h-1.5 rounded-full bg-[var(--primary)] transition-all duration-500"
-                style={{ width: `${completed ? 100 : progress}%` }}
+                className="h-1.5 rounded-full checkpoint-bar"
+                style={{
+                  width: `${completed ? 100 : progress}%`,
+                  background: "linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%)",
+                }}
               />
             </div>
             <p className="text-xs text-[var(--text-muted)]">
@@ -385,13 +494,44 @@ export default function LessonConversation({
         </div>
       </div>
 
+      {/* Interview Sandbox Intro */}
+      {showSandboxIntro && !showSandbox && (
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="max-w-md text-center">
+            <p className="text-4xl mb-4">🎤</p>
+            <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+              Time to practice
+            </h2>
+            <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed">
+              You&apos;re about to interview 4 potential customers. Each one has a different personality.
+              Your job: ask the right questions to figure out who actually needs what you&apos;re building
+              and who&apos;s just being polite.
+            </p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">
+              Remember The Mom Test: ask about behavior, not opinions.
+            </p>
+            <button
+              onClick={() => {
+                setShowSandboxIntro(false);
+                setShowSandbox(true);
+              }}
+              className="mt-6 rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+            >
+              Start Interviews
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Interview Sandbox (takes over when triggered) */}
       {showSandbox && (
         <InterviewSandbox
           personas={generatePersonas(niche, targetCustomer).map(({ id, name, age, bio }) => ({ id, name, age, bio }))}
           niche={niche}
-          onComplete={(interviews) => {
+          onComplete={async (interviews) => {
             setShowSandbox(false);
+            // Save interview transcripts so they carry into future lessons
+            await saveInterviewData(progressId, interviews).catch(() => {});
             // Mark the sandbox checkpoint as reached and auto-complete the lesson
             setCheckpointsReached((prev) => prev + 1);
             setCompleted(true);
@@ -405,10 +545,11 @@ export default function LessonConversation({
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-[700px] px-6 py-6 space-y-4">
           {messages.map((msg, i) => {
+            const isNew = i >= initialMessages.length;
             if (msg.role === "user") {
               // Student messages: right-aligned, always fully visible
               return (
-                <div key={i} className="flex justify-end">
+                <div key={i} className={`flex justify-end ${isNew ? "msg-enter-right" : ""}`}>
                   <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
                     <p className="text-base leading-relaxed">{msg.content}</p>
                   </div>
@@ -426,14 +567,16 @@ export default function LessonConversation({
             const totalParas = paragraphs.length;
 
             return (
-              <div key={i} className="flex justify-start">
+              <div key={i} className={`flex justify-start ${isNew ? "msg-enter" : ""}`}>
                 <div className="max-w-[85%]">
-                  <div className="rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px]">
+                  <div className="rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px] space-y-2">
                     {isStreaming && !msg.content ? (
                       <div className="flex items-center gap-3">
-                        <span className="inline-block w-5 h-5 border-2 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin" />
+                        <span className="inline-block w-5 h-5 border-2 border-[var(--text-muted)] border-t-[var(--primary)] rounded-full animate-spin" />
                         <span className="text-base opacity-60">Thinking...</span>
                       </div>
+                    ) : isStreaming && msg.content ? (
+                      <TypewriterText text={msg.content.split(/\n\n+/).filter((p: string) => p.trim())[0] ?? ""} streaming={true} />
                     ) : currentPara ? (
                       <p className="text-base leading-relaxed">{currentPara}</p>
                     ) : paragraphs[0] ? (
@@ -443,23 +586,27 @@ export default function LessonConversation({
 
                   {/* Arrows — only show when AI message has multiple paragraphs */}
                   {totalParas > 1 && (
-                    <div className="flex items-center gap-2 mt-1.5 px-2">
+                    <div className="flex items-center gap-3 mt-2 px-1">
                       <button
                         onClick={() => setAiParaIndices((prev) => ({ ...prev, [i]: Math.max(0, paraIndex - 1) }))}
                         disabled={paraIndex === 0}
-                        className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] disabled:opacity-20"
+                        className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)] disabled:opacity-20 transition-colors"
                       >
-                        ←
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="15 18 9 12 15 6" />
+                        </svg>
                       </button>
-                      <span className="text-xs text-[var(--text-muted)]">
+                      <span className="text-xs text-[var(--text-muted)] tabular-nums">
                         {paraIndex + 1} / {totalParas}
                       </span>
                       <button
                         onClick={() => setAiParaIndices((prev) => ({ ...prev, [i]: Math.min(totalParas - 1, paraIndex + 1) }))}
                         disabled={paraIndex >= totalParas - 1}
-                        className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] disabled:opacity-20"
+                        className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)] disabled:opacity-20 transition-colors"
                       >
-                        →
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
                       </button>
                     </div>
                   )}
@@ -472,18 +619,39 @@ export default function LessonConversation({
       </div>
       )}
 
-      {/* Completed banner */}
-      {completed && !showSandbox && (
-        <div className="shrink-0 border-t border-emerald-200 bg-emerald-50 px-6 py-4">
+      {/* Post-lesson engagement: Decision Journal -> Business Pitch -> Completion banner */}
+      {completed && !showSandbox && !decisionDone && (
+        <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
+          <DecisionJournal
+            lessonId={lessonId}
+            onComplete={() => {
+              setDecisionDone(true);
+              if (!isLastInModule) setPitchDone(true);
+            }}
+          />
+        </div>
+      )}
+
+      {completed && !showSandbox && decisionDone && isLastInModule && !pitchDone && (
+        <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
+          <BusinessPitch
+            moduleSequence={moduleSequence}
+            onComplete={() => setPitchDone(true)}
+          />
+        </div>
+      )}
+
+      {completed && !showSandbox && decisionDone && pitchDone && (
+        <div className="shrink-0 lesson-complete-banner slide-up-enter px-6 py-4">
           <div className="mx-auto max-w-[700px]">
             {isModuleTransition ? (
               /* Module transition celebration */
               <div className="text-center py-2">
                 <p className="text-sm font-semibold text-[var(--success)]">
-                  {currentModuleName} complete ✓
+                  {currentModuleName} complete &#10003;
                 </p>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  Now let's find out if people actually want what you're designing.
+                  Now let&apos;s find out if people actually want what you&apos;re designing.
                 </p>
                 <Link
                   href={`/lessons/${nextLessonId}`}
@@ -549,12 +717,18 @@ export default function LessonConversation({
                 <textarea
                   ref={inputRef}
                   value={input}
-                  onChange={(e) => handleInputChange(e.target.value)}
+                  onChange={(e) => {
+                    handleInputChange(e.target.value);
+                    // Auto-expand textarea
+                    e.target.style.height = "auto";
+                    e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
+                  }}
                   onKeyDown={handleKeyDown}
                   placeholder="Type your response..."
                   rows={1}
                   autoFocus
-                  className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"
+                  className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"
+                  style={{ maxHeight: "150px", overflow: "auto" }}
                 />
                 <button
                   type="submit"

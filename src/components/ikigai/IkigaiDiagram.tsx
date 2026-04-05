@@ -59,7 +59,7 @@ export default function IkigaiDiagram({
   const [hoveredStep, setHoveredStep] = useState<IkigaiStep | null>(null);
 
   return (
-    <div className="relative mx-auto" style={{ width: 500, height: 500 }}>
+    <div className="relative mx-auto w-full max-w-[500px]" style={{ aspectRatio: "1 / 1" }}>
       {STEPS.map((step) => {
         const isCompleted = completedSteps.has(step.id);
         const isHovered = hoveredStep === step.id;

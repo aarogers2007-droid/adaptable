@@ -16,12 +16,34 @@ export async function submitExercise(
   lessonTitle: string,
   exercisePrompt: string,
   studentResponse: string,
-  businessName: string,
-  niche: string
+  _businessName: string, // ignored — use server-side profile
+  _niche: string // ignored — use server-side profile
 ): Promise<{ feedback?: ExerciseFeedback; error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
+
+  // Rate limit
+  const { data: allowed } = await supabase.rpc("reserve_ai_usage", {
+    p_student_id: user.id,
+    p_feature: "guide",
+  });
+  if (!allowed) return { error: "You've reached your message limit. Try again later." };
+
+  // Validate inputs
+  if (!studentResponse || typeof studentResponse !== "string" || studentResponse.trim().length === 0 || studentResponse.length > 5000) {
+    return { error: "Invalid response" };
+  }
+
+  // Content moderation
+  const { moderateContent } = await import("@/lib/content-moderation");
+  const modCheck = moderateContent(studentResponse);
+  if (!modCheck.safe) return { error: modCheck.reason ?? "That content isn't appropriate." };
+
+  // Use server-side profile data to prevent prompt injection
+  const { data: profileData } = await supabase.from("profiles").select("business_idea").eq("id", user.id).single();
+  const businessName = (profileData?.business_idea as { name: string } | null)?.name ?? "their business";
+  const niche = (profileData?.business_idea as { niche: string } | null)?.niche ?? "their niche";
 
   try {
     const result = await sendMessage({

@@ -74,8 +74,15 @@ export default function StepContent({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col"
-      style={{ backgroundColor: step.color }}
+      className="fixed inset-0 z-50 flex flex-col ikigai-expand"
+      style={{
+        backgroundColor: step.color,
+        backgroundImage: `
+          radial-gradient(ellipse 70% 50% at 50% 10%, rgba(255,255,255,0.2) 0%, transparent 70%),
+          radial-gradient(ellipse 50% 40% at 10% 90%, rgba(0,0,0,0.12) 0%, transparent 50%),
+          radial-gradient(ellipse 50% 40% at 90% 90%, rgba(0,0,0,0.12) 0%, transparent 50%)
+        `,
+      }}
     >
       {/* Back button */}
       <div className="px-6 pt-6">
@@ -116,17 +123,18 @@ export default function StepContent({
             </div>
           ) : (
             <div className="flex gap-2.5 flex-wrap justify-center">
-              {suggestions.map((item) => {
+              {suggestions.map((item, idx) => {
                 const isSelected = selectedItems.includes(item);
                 return (
                   <button
                     key={item}
                     onClick={() => toggleItem(item)}
-                    className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
+                    className={`chip-enter rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
                       isSelected
                         ? "bg-[var(--text-primary)] text-white shadow-lg scale-105"
                         : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
                     }`}
+                    style={{ animationDelay: `${idx * 60}ms` }}
                   >
                     {isSelected && <span className="mr-1.5">&#10003;</span>}
                     {item}

@@ -53,16 +53,34 @@ export default async function ReadyPage() {
           </div>
         </div>
 
-        {/* What's coming */}
-        <div className="mt-8 text-center">
-          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
-            Here's what's next
+        {/* How it works */}
+        <div className="mt-8 space-y-4">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)] text-center">
+            How this works
           </h2>
-          <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-md mx-auto">
-            You'll work through 8 lessons that teach you how to turn {name} into a real,
-            paying business. Every lesson is a conversation tailored to your niche.
-            No lectures, no busywork. Just real decisions for your venture. By the end, you'll have a complete plan ready to launch.
-          </p>
+          <div className="grid gap-3">
+            <div className="flex gap-3 items-start rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">1</span>
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">8 conversations, not lectures</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">Each lesson is a real conversation with your AI mentor about {name}. You make decisions, not just answer questions.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 items-start rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">2</span>
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">Your AI Guide is always around</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">Between lessons, ask your AI co-founder anything about {name}. It knows your business, your history, and your goals.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 items-start rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">3</span>
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">You'll build a real business plan</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">Every decision you make assembles into a business plan you can share with anyone. Plus a business card you earn along the way.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Start button */}

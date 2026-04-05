@@ -2,6 +2,15 @@
  * Database types matching supabase/migrations/00001_schema.sql
  */
 
+// Character system types (defined in character-system.ts)
+export type {
+  CharacterConfig,
+  StudentContext,
+  HandoffResult,
+} from "./character-system";
+
+export type { ConsistencyResult } from "./character-consistency";
+
 export type UserRole = "student" | "instructor" | "org_admin";
 export type ProgressStatus = "not_started" | "in_progress" | "completed";
 export type GradeTier = "elementary" | "middle_school" | "high_school";
@@ -147,5 +156,20 @@ export interface AIUsageLog {
   input_tokens: number;
   output_tokens: number;
   estimated_cost_usd: number | null;
+  created_at: string;
+}
+
+export type AlertType = "inactive" | "stuck" | "emotional" | "content_flag" | "parent_message";
+export type AlertSeverity = "info" | "warning" | "urgent";
+
+export interface TeacherAlert {
+  id: string;
+  class_id: string;
+  student_id: string;
+  alert_type: AlertType;
+  severity: AlertSeverity;
+  message: string;
+  context: Record<string, unknown> | null;
+  acknowledged: boolean;
   created_at: string;
 }

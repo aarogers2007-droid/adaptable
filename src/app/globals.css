@@ -45,6 +45,26 @@
   --info: #3B82F6;
 }
 
+/* Dark theme — deferred to v2. Do not add .dark class to HTML. */
+
+/* Shared tier and tint tokens */
+:root {
+  --tier-bronze: #92400E;
+  --tier-silver: #94A3B8;
+  --tier-gold: #D97706;
+  --ikigai-love-tint: #FEF9C3;
+  --ikigai-skills-tint: #ECFCCB;
+  --ikigai-needs-tint: #FFE4E6;
+  --ikigai-money-tint: #CCFBF1;
+}
+
+/* Touch target enforcement on touch devices */
+@media (pointer: coarse) {
+  button, a, [role="button"], input, select, textarea {
+    min-height: 44px;
+  }
+}
+
 @theme inline {
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
@@ -72,6 +92,156 @@ body {
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Global button press feedback */
+button:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 100ms ease-in;
+}
+
+/* Chat message entrance */
+@keyframes msg-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg-enter {
+  animation: msg-enter 300ms ease-out forwards;
+}
+.msg-enter-right {
+  animation: msg-enter-right 300ms ease-out forwards;
+}
+@keyframes msg-enter-right {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Dashboard section stagger entrance */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-enter {
+  animation: fade-up 400ms ease-out both;
+}
+
+/* Suggestion chip stagger */
+@keyframes chip-in {
+  from { opacity: 0; transform: scale(0.85) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.chip-enter {
+  animation: chip-in 250ms ease-out both;
+}
+
+/* Progress bar shimmer */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.progress-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.progress-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Ikigai expand transition */
+@keyframes ikigai-expand {
+  from { transform: scale(0.3); opacity: 0; border-radius: 50%; }
+  to { transform: scale(1); opacity: 1; border-radius: 0; }
+}
+.ikigai-expand {
+  animation: ikigai-expand 400ms ease-out forwards;
+}
+
+/* ─── Art Pass Animations ─── */
+
+/* #1 Completion cascade + general fade-up-sm (shorter travel for inline elements) */
+@keyframes fade-up-sm {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Transition utilities for modals, banners, errors */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.animate-fade-in { animation: fade-in 150ms ease-out both; }
+
+@keyframes slide-down { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.animate-slide-down { animation: slide-down 200ms ease-out both; }
+
+@keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.animate-scale-in { animation: scale-in 250ms ease-out both; }
+
+/* #5 Checkpoint progress bar bounce */
+.checkpoint-bar {
+  transform-origin: left center;
+  transition: width 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes progress-pulse {
+  0% { transform: scaleY(1); }
+  40% { transform: scaleY(2.2); }
+  100% { transform: scaleY(1); }
+}
+.progress-pulse {
+  animation: progress-pulse 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* #6 Decision journal stamp-in */
+@keyframes stamp-in {
+  0% { opacity: 0; transform: scale(0.5); }
+  60% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.decision-stamp {
+  animation: stamp-in 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* #7 Lesson complete banner */
+.lesson-complete-banner {
+  background: linear-gradient(90deg, #F5E64215 0%, #A8DB5A15 33%, #F4A79D15 66%, #6DD5D015 100%);
+  border-left: 3px solid var(--primary);
+}
+
+/* #11 Streak badge pulse */
+@keyframes streak-breathe {
+  0%, 100% { background-color: #F59E0B14; }
+  50% { background-color: #F59E0B22; }
+}
+.streak-badge { animation: streak-breathe 3s ease-in-out infinite; }
+.streak-badge-hot {
+  animation: streak-breathe 2.5s ease-in-out infinite;
+  background-color: #F59E0B22;
+  border: 1px solid #F59E0B30;
+}
+
+/* #14 Suggestions stagger */
+@keyframes suggestions-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* #21 Slide up enter (completion banner, post-lesson panels) */
+@keyframes slide-up-enter {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.slide-up-enter {
+  animation: slide-up-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* #8 Completion page atmosphere */
+.completion-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, #F59E0B12 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, #0D948808 0%, transparent 60%),
+    var(--bg);
 }
 
 /* Reduced motion */

@@ -76,9 +76,6 @@ export default async function LessonsListPage() {
                           <span className={`text-sm font-medium ${isCompleted ? "text-[var(--text-secondary)]" : "text-[var(--text-primary)]"}`}>
                             {lesson.title}
                           </span>
-                          {lesson.video_url && (
-                            <span className="ml-auto text-xs text-[var(--text-muted)]">📹 Video</span>
-                          )}
                         </Link>
                       )}
                     </div>

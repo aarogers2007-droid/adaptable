@@ -68,6 +68,11 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
 
   const [studentName, setStudentName] = useState(initialName ?? "");
   const [nameConfirmed, setNameConfirmed] = useState(!!initialName);
+  const [nameExiting, setNameExiting] = useState(false);
+  const [ikigaiIntroSeen, setIkigaiIntroSeen] = useState(!!initialName);
+  const [ikigaiEntering, setIkigaiEntering] = useState(false);
+  const [ikigaiExiting, setIkigaiExiting] = useState(false);
+  const [diagramEntering, setDiagramEntering] = useState(!!initialName);
   const [showSkipForm, setShowSkipForm] = useState(false);
   const [skipIdea, setSkipIdea] = useState("");
   const [skipValidating, setSkipValidating] = useState(false);
@@ -291,7 +296,13 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
       return;
     }
     setNameError(null);
-    setNameConfirmed(true);
+    setNameExiting(true);
+    // Fade out name screen, then fade in dictionary
+    setTimeout(() => {
+      setNameConfirmed(true);
+      setIkigaiIntroSeen(false);
+      setTimeout(() => setIkigaiEntering(true), 50);
+    }, 800);
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
@@ -311,7 +322,13 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     <>
       {/* NAME INPUT — shown before the diagram */}
       {!nameConfirmed && (
-        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+        <div
+          className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+          style={{
+            opacity: nameExiting ? 0 : 1,
+            transition: "opacity 0.8s ease-in-out",
+          }}
+        >
           <div className="max-w-md w-full text-center">
             <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
               What's your name?
@@ -343,8 +360,73 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
         </div>
       )}
 
+      {/* IKIGAI DICTIONARY INTRO */}
+      {nameConfirmed && !ikigaiIntroSeen && (
+        <div
+          className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+          style={{
+            opacity: ikigaiExiting ? 0 : ikigaiEntering ? 1 : 0,
+            transition: "opacity 0.8s ease-in-out",
+          }}
+        >
+          <div className="max-w-xl w-full">
+            {/* Dictionary card */}
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-10 sm:p-14">
+              {/* Word */}
+              <h1
+                className="text-5xl sm:text-6xl tracking-tight text-[var(--text-primary)]"
+                style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontWeight: 400, fontStyle: "italic" }}
+              >
+                ikigai
+              </h1>
+
+              {/* Pronunciation */}
+              <p className="mt-3 text-base text-[var(--text-muted)]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                /ee·kee·guy/ &nbsp;
+                <span className="italic">noun</span> &nbsp;
+                <span className="text-sm">Japanese</span>
+              </p>
+
+              {/* Divider */}
+              <div className="mt-5 mb-5 border-t border-[var(--border)]" />
+
+              {/* Definition */}
+              <p className="text-lg text-[var(--text-primary)] leading-relaxed" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                A reason for being; the intersection of what you <em>love</em>, what you&apos;re <em>good at</em>,
+                what the world <em>needs</em>, and what you can be <em>paid for</em>.
+              </p>
+
+              {/* Origin */}
+              <p className="mt-6 text-sm text-[var(--text-muted)]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                <span className="font-semibold">Origin: </span>Okinawa, Japan — where the concept is credited as one reason
+                for the island&apos;s unusually long life expectancy.
+              </p>
+            </div>
+
+            {/* CTA below the card */}
+            <div className="mt-8 text-center">
+              <p className="text-base text-[var(--text-secondary)] mb-5">
+                We&apos;re going to find yours, {studentName.split(" ")[0]}.
+              </p>
+              <button
+                onClick={() => {
+                  setIkigaiExiting(true);
+                  setTimeout(() => {
+                    setIkigaiIntroSeen(true);
+                    setTimeout(() => setDiagramEntering(true), 50);
+                  }, 800);
+                }}
+                className="rounded-lg bg-[var(--primary)] px-10 py-3.5 text-base font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+              >
+                Let&apos;s go
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* FULL-SCREEN STEP VIEW */}
-      {nameConfirmed && activeStep && activeStepConfig && (
+      {nameConfirmed && ikigaiIntroSeen && activeStep && activeStepConfig && (
         <StepContent
           step={activeStepConfig}
           suggestions={suggestions[activeStep] ?? []}
@@ -361,8 +443,14 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
       )}
 
       {/* DIAGRAM VIEW */}
-      {nameConfirmed && !activeStep && (
-        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      {nameConfirmed && ikigaiIntroSeen && !activeStep && (
+        <div
+          className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+          style={{
+            opacity: diagramEntering ? 1 : 0,
+            transition: "opacity 1s ease-in-out",
+          }}
+        >
           <div className="mb-6 text-center">
             <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
               Discover Your Business

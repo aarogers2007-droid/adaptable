@@ -1,18 +1,17 @@
 # TODOS
 
-## P0 — Security (next session)
+## P0 — Security (FIXED)
 
-### TOCTOU Race on Daily Message Cap
-The chat endpoint checks message count then proceeds, but concurrent requests can all pass
-the check simultaneously. Fix: use atomic counter (UPDATE ... RETURNING or Redis INCR)
-checked and incremented in a single operation before starting the stream.
-File: src/app/api/chat/route.ts
+### ~~TOCTOU Race on Daily Message Cap~~ ✓
+Fixed: `reserve_ai_usage` DB function uses `pg_advisory_xact_lock` to serialize concurrent
+rate limit checks per student. Reserves a placeholder row atomically before streaming,
+updated with real token counts after.
+Migration: supabase/migrations/00006_security_fixes.sql
 
-### Race Condition on Invite Code Max Uses
-Multiple students redeeming the same invite code concurrently can all pass validation and
-exceed max_uses. Fix: add WHERE current_uses < max_uses to the increment_invite_usage
-function and check row count to detect failure.
-File: supabase/migrations/00004_functions.sql, src/app/(auth)/join/actions.ts
+### ~~Race Condition on Invite Code Max Uses~~ ✓
+Fixed: `increment_invite_usage` now includes `WHERE current_uses < max_uses` and returns
+boolean. Join action rolls back enrollment if increment fails.
+Migration: supabase/migrations/00006_security_fixes.sql
 
 ## P1 — High priority (v1.1)
 
@@ -56,10 +55,9 @@ Effort: M each (human: ~1 week each / CC: ~30 min each)
 - Make.com automation builder integration
 Effort: M each
 
-### Gamification Layer
-- Badges and achievements
-- Leaderboards (build-based, not watch-based)
-Effort: M combined
+### ~~Gamification Layer~~ ✓
+Built: 18 achievements across 5 categories (bronze/silver/gold tiers), 4-category leaderboard
+(Most Consistent, Most Engaged, Deepest Thinker, Most Improved), student profiles on leaderboard.
 
 ### Peer Collaboration
 Student-to-student features. Requires Supabase Realtime.
@@ -82,9 +80,10 @@ Effort: M
 PWA with service worker for offline lesson access. Complex with Next.js App Router.
 Effort: L
 
-### Additional AI Content Safety Layer
-Secondary Claude Haiku call checking AI output age-appropriateness before showing to students.
-Effort: S
+### ~~Additional AI Content Safety Layer~~ ✓
+Built: regex-based output moderation (src/lib/output-moderation.ts) runs post-stream on every
+AI response. Checks for explicit content, age-inappropriate advice, PII requests, hallucinated
+URLs, prompt leakage. Fires teacher alert on flag. Applied to lesson-chat and guide routes.
 
 ### Accessibility Audit (WCAG 2.1 AA)
 Full accessibility audit and remediation. May be a procurement requirement for US schools.
@@ -98,13 +97,10 @@ Effort: M
 
 ### P1 — Teacher Experience
 
-#### Proactive Instructor Alerts
-The instructor dashboard should surface actionable insights automatically without
-the teacher having to dig. Flag students who haven't logged in for 5+ days, students
-stuck on the same lesson for 3+ days, and module-level struggle patterns where more
-than 30% of the class is stalling in the same place. Surface these as a notification
-panel at the top of the instructor dashboard, not buried in a table.
-Effort: M (human: ~1 week / CC: ~30 min)
+#### ~~Proactive Instructor Alerts~~ ✓
+Built: inactive (3+ days), stuck (3+ days), emotional (3+ accumulated signals),
+content flags, class struggle patterns (30%+ stuck on same lesson), check-in quality
+flags. All surfaced in alert panel with resolve/dismiss/message actions.
 
 #### Teacher Agency Tools
 Add the ability for instructors to send a direct nudge message to a specific student
@@ -120,12 +116,9 @@ idea or artifact for group discussion, and can display a live leaderboard of pro
 Students see a simplified focused view when classroom mode is active.
 Effort: L (human: ~2 weeks / CC: ~1 hour)
 
-#### Teacher Onboarding Flow
-A dedicated onboarding experience for instructors separate from the student flow.
-Walks them through setting up their class, previewing the full student experience,
-understanding what each module covers, and knowing what to do when a student gets
-stuck. Should take under 15 minutes to complete and leave the teacher feeling confident.
-Effort: M (human: ~1 week / CC: ~30 min)
+#### ~~Teacher Onboarding Flow~~ ✓
+Built: WelcomeSlideshow (4 steps), reopenable via "How it works" button.
+Missing: teacher preview mode (experience as student). Deferred to v1.1.
 
 ### P1 — School & Administrator Value (pilot-ready)
 
@@ -154,12 +147,9 @@ generated, module-level completion rates, and top performing students. Exportabl
 PDF. Designed to be shown to a principal or superintendent without any explanation needed.
 Effort: M (human: ~1 week / CC: ~30 min)
 
-#### Curriculum Alignment Documentation
-Create a static page within the platform that maps each Adaptable module to relevant
-educational standards including entrepreneurship education standards, business education
-standards, and financial literacy standards. This removes a key procurement objection
-for school administrators.
-Effort: S (human: ~2 days / CC: ~15 min)
+#### ~~Curriculum Alignment Documentation~~ ✓
+Built: /standards page mapping all 8 lessons to NBEA, Jump$tart, Common Core, ISTE
+standards. Printable. Linked from instructor dashboard.
 
 #### Longitudinal Student Data
 Design the data model to support multi-year student journeys. A student's business
@@ -210,22 +200,15 @@ is the product, the launchpad is the graduation gift.
 Depends on: Completion of core venture studio experience.
 Effort: L (human: ~2 weeks / CC: ~1 hour)
 
-## P3 — Low priority (security hardening)
+## P3 — Security hardening (FIXED)
 
-### Lesson Progress Insert Race Condition
-If a student opens the same lesson in two tabs, both try to insert a progress record.
-The unique constraint catches it but the error isn't handled, causing a 500.
-Fix: use Supabase upsert with onConflict instead of insert.
+### ~~Lesson Progress Insert Race Condition~~ ✓
+Fixed: uses upsert with onConflict + fallback fetch for concurrent tab safety.
 File: src/app/(app)/lessons/[id]/page.tsx
 
-### CSRF Protection on Chat Route Handler
-The /api/chat Route Handler doesn't have CSRF protection (Server Actions get it
-automatically). A malicious site could POST to /api/chat with the user's cookies.
-Fix: check Origin/Referer header, or add CSRF token validation.
-File: src/app/api/chat/route.ts
+### ~~CSRF Protection on Chat Route Handlers~~ ✓
+Fixed: Origin/Referer validation via src/lib/csrf.ts, applied to chat, lesson-chat, and transcribe routes.
 
-### increment_invite_usage Security Definer Abuse
-The RPC function runs as security definer (superuser privileges), bypassing RLS.
-Any authenticated user can call it to exhaust any invite code's usage limit.
-Fix: add caller validation inside the function or restrict to specific roles.
-File: supabase/migrations/00004_functions.sql
+### ~~increment_invite_usage Security Definer Abuse~~ ✓
+Fixed: added auth.uid() null check inside the function. Unauthenticated callers get exception.
+Migration: supabase/migrations/00009_security_hardening.sql

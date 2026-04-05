@@ -33,15 +33,29 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
     redirect("/lessons");
   }
 
-  // Get or create progress record
+  // Get or create progress record (upsert to prevent race condition on duplicate tabs)
   let progress = allProgress.find((p) => p.lesson_id === lesson.id) ?? null;
   if (!progress) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("student_progress")
-      .insert({ student_id: user.id, lesson_id: lesson.id, status: "in_progress" })
+      .upsert(
+        { student_id: user.id, lesson_id: lesson.id, status: "in_progress" },
+        { onConflict: "student_id,lesson_id" }
+      )
       .select()
       .single();
-    progress = data as unknown as StudentProgress;
+    if (error) {
+      // If upsert fails, try fetching (another tab may have just created it)
+      const { data: existing } = await supabase
+        .from("student_progress")
+        .select("*")
+        .eq("student_id", user.id)
+        .eq("lesson_id", lesson.id)
+        .single();
+      progress = existing as unknown as StudentProgress;
+    } else {
+      progress = data as unknown as StudentProgress;
+    }
   } else if (progress.status === "not_started") {
     await supabase
       .from("student_progress")
@@ -58,6 +72,7 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const nextLesson = currentIdx < sorted.length - 1 ? sorted[currentIdx + 1] : null;
   const isCompleted = progress?.status === "completed";
   const isModuleTransition = nextLesson ? nextLesson.module_sequence !== lesson.module_sequence : false;
+  const isLastInModule = !nextLesson || nextLesson.module_sequence !== lesson.module_sequence;
   const nextModuleName = nextLesson?.module_name ?? "";
 
   // Get lesson plan for conversational flow
@@ -102,6 +117,7 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       currentModuleName={lesson.module_name}
       niche={profile.business_idea.niche}
       targetCustomer={profile.business_idea.target_customer}
+      isLastInModule={isLastInModule}
     />
   );
 }

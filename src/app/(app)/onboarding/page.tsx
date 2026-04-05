@@ -29,7 +29,10 @@ export default async function OnboardingPage({
   }
 
   // If reset requested, wipe EVERYTHING — full factory reset
-  if (reset === "true") {
+  // Only allow admins to trigger reset (prevents malicious link sharing)
+  const { data: profileCheck } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const isResetAdmin = (profileCheck as { role: string } | null)?.role === "org_admin";
+  if (reset === "true" && isResetAdmin) {
     await Promise.all([
       supabase
         .from("profiles")

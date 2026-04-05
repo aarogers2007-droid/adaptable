@@ -33,6 +33,21 @@ export default function SignupPage() {
       return;
     }
 
+    // Check for pending class enrollment from the join flow
+    try {
+      const pendingJoin = sessionStorage.getItem("pendingClassJoin");
+      const pendingCode = sessionStorage.getItem("pendingInviteCode");
+      if (pendingJoin && pendingCode) {
+        const { completeClassEnrollment } = await import("@/app/(auth)/join/actions");
+        const classInfo = JSON.parse(pendingJoin);
+        await completeClassEnrollment(classInfo.classId, classInfo.orgId, pendingCode);
+        sessionStorage.removeItem("pendingClassJoin");
+        sessionStorage.removeItem("pendingInviteCode");
+      }
+    } catch {
+      // Enrollment will need to be done manually — don't block onboarding
+    }
+
     router.push("/onboarding");
   }
 

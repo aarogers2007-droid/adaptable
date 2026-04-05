@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import SplashScreen from "@/components/ui/SplashScreen";
 
 const dmSans = DM_Sans({
   variable: "--font-body",
@@ -34,7 +35,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)] font-[family-name:var(--font-body)]">
-        {children}
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[9999] focus:rounded-lg focus:bg-[var(--primary)] focus:px-4 focus:py-2 focus:text-white focus:text-sm">
+          Skip to content
+        </a>
+        <SplashScreen>
+          {children}
+        </SplashScreen>
       </body>
     </html>
   );

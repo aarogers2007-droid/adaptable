@@ -56,6 +56,29 @@ export async function completeClassEnrollment(
     return { error: "Not authenticated" };
   }
 
+  // Re-validate the invite code server-side and verify classId matches
+  const { data: codeData } = await supabase
+    .from("invite_codes")
+    .select("class_id, org_id, is_active, expires_at, current_uses, max_uses")
+    .eq("code", inviteCode.trim().toUpperCase())
+    .single();
+
+  if (!codeData) {
+    return { error: "Invalid invite code" };
+  }
+  if (codeData.class_id !== classId || codeData.org_id !== orgId) {
+    return { error: "Invalid invite code for this class" };
+  }
+  if (codeData.is_active === false) {
+    return { error: "This code is no longer active" };
+  }
+  if (codeData.expires_at && new Date(codeData.expires_at) < new Date()) {
+    return { error: "This code has expired" };
+  }
+  if (codeData.max_uses && codeData.current_uses >= codeData.max_uses) {
+    return { error: "This code has reached its maximum uses" };
+  }
+
   // Check if already enrolled
   const { data: existing } = await supabase
     .from("class_enrollments")
@@ -83,8 +106,20 @@ export async function completeClassEnrollment(
     .update({ org_id: orgId })
     .eq("id", user.id);
 
-  // Increment invite usage
-  await supabase.rpc("increment_invite_usage", { invite_code: inviteCode.trim().toUpperCase() });
+  // Atomic increment (returns false if max_uses exceeded)
+  const { data: incremented } = await supabase.rpc("increment_invite_usage", {
+    invite_code: inviteCode.trim().toUpperCase(),
+  });
+
+  if (incremented === false) {
+    // Roll back enrollment since code is exhausted
+    await supabase
+      .from("class_enrollments")
+      .delete()
+      .eq("class_id", classId)
+      .eq("student_id", user.id);
+    return { error: "This invite code has reached its limit. Ask your instructor for a new one." };
+  }
 
   return { success: true };
 }

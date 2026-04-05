@@ -77,6 +77,21 @@ export async function saveDraft(draft: IkigaiDraft) {
 
   if (!user) return { error: "Not authenticated" };
 
+  // Moderate all Ikigai entries server-side
+  const { moderateContent } = await import("@/lib/content-moderation");
+  const allEntries = [
+    ...(draft.passions ?? []),
+    ...(draft.skills ?? []),
+    ...(draft.needs ?? []),
+    ...(draft.monetization ? [draft.monetization] : []),
+  ];
+  for (const entry of allEntries) {
+    if (typeof entry === "string" && entry.length > 0) {
+      const check = moderateContent(entry);
+      if (!check.safe) return { error: check.reason ?? "That content isn't appropriate." };
+    }
+  }
+
   const { error } = await supabase
     .from("profiles")
     .update({ ikigai_draft: draft })
@@ -199,6 +214,21 @@ export async function confirmBusinessIdea(
 
   // Only pass validated fields to prevent extra field injection
   const validatedIdea = validation.data;
+
+  // Content moderation on all business idea fields (prevents prompt injection via business name)
+  const { moderateContent } = await import("@/lib/content-moderation");
+  for (const field of [validatedIdea.name, validatedIdea.niche, validatedIdea.target_customer, validatedIdea.revenue_model]) {
+    if (field) {
+      const check = moderateContent(field);
+      if (!check.safe) return { error: check.reason ?? "That content isn't appropriate." };
+    }
+  }
+
+  // Sanitize: strip control characters and limit length
+  validatedIdea.name = validatedIdea.name.replace(/[\x00-\x1F\x7F\u200B-\u200F\u202A-\u202E\uFEFF]/g, "").trim().slice(0, 100);
+  validatedIdea.niche = validatedIdea.niche.replace(/[\x00-\x1F\x7F\u200B-\u200F\u202A-\u202E\uFEFF]/g, "").trim().slice(0, 200);
+  validatedIdea.target_customer = validatedIdea.target_customer.replace(/[\x00-\x1F\x7F\u200B-\u200F\u202A-\u202E\uFEFF]/g, "").trim().slice(0, 200);
+  validatedIdea.revenue_model = validatedIdea.revenue_model.replace(/[\x00-\x1F\x7F\u200B-\u200F\u202A-\u202E\uFEFF]/g, "").trim().slice(0, 200);
 
   const { error } = await supabase
     .from("profiles")
