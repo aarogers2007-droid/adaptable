@@ -59,18 +59,16 @@ export async function completeClassEnrollment(
   // Re-validate the invite code server-side and verify classId matches
   const { data: codeData } = await supabase
     .from("invite_codes")
-    .select("class_id, org_id, is_active, expires_at, current_uses, max_uses")
+    .select("class_id, expires_at, current_uses, max_uses, classes(org_id)")
     .eq("code", inviteCode.trim().toUpperCase())
     .single();
 
   if (!codeData) {
     return { error: "Invalid invite code" };
   }
-  if (codeData.class_id !== classId || codeData.org_id !== orgId) {
+  const codeOrgId = (codeData.classes as unknown as { org_id: string } | null)?.org_id;
+  if (codeData.class_id !== classId || (codeOrgId && codeOrgId !== orgId)) {
     return { error: "Invalid invite code for this class" };
-  }
-  if (codeData.is_active === false) {
-    return { error: "This code is no longer active" };
   }
   if (codeData.expires_at && new Date(codeData.expires_at) < new Date()) {
     return { error: "This code has expired" };
