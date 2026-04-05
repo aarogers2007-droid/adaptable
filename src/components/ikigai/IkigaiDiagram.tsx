@@ -73,8 +73,8 @@ export default function IkigaiDiagram({
             aria-label={`Step ${step.id} of 4: ${step.label}${isCompleted ? " (completed)" : ""}`}
             className="absolute rounded-full flex items-center justify-center cursor-pointer"
             style={{
-              width: isHovered ? 235 : 220,
-              height: isHovered ? 235 : 220,
+              width: isHovered ? "47%" : "44%",
+              height: isHovered ? "47%" : "44%",
               left: `${step.position.cx}%`,
               top: `${step.position.cy}%`,
               transform: "translate(-50%, -50%)",
@@ -95,8 +95,8 @@ export default function IkigaiDiagram({
       <div
         className="absolute rounded-full flex items-center justify-center pointer-events-none"
         style={{
-          width: showReveal ? 320 : 70,
-          height: showReveal ? 320 : 70,
+          width: showReveal ? "64%" : "14%",
+          height: showReveal ? "64%" : "14%",
           left: "50%",
           top: "52.5%",
           transform: "translate(-50%, -50%)",
