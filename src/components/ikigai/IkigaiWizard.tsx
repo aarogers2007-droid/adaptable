@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import IkigaiDiagram, { STEPS, type IkigaiStep } from "./IkigaiDiagram";
 import StepContent from "./StepContent";
-import Confetti from "./Confetti";
 import type { IkigaiDraft, BusinessIdea } from "@/lib/types";
 
 const MAX_REGENS = 5;
@@ -100,10 +99,9 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
   });
   const [regenCounts, setRegenCounts] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(false);
-  const [showReveal, setShowReveal] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [businessIdea, setBusinessIdea] = useState<BusinessIdea | null>(null);
   const [synthesizing, setSynthesizing] = useState(false);
+  const [revealPhase, setRevealPhase] = useState<"none" | "dimming" | "card" | "ready">("none");
   const [error, setError] = useState<string | null>(null);
 
   // Load suggestions for a step
@@ -181,10 +179,12 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
 
       setSynthesizing(false);
       setBusinessIdea(idea);
-      setTimeout(() => {
-        setShowReveal(true);
-        setTimeout(() => setShowConfetti(true), 300);
-      }, 500);
+      // Phase 1: dim the diagram
+      setTimeout(() => setRevealPhase("dimming"), 200);
+      // Phase 2: show the card
+      setTimeout(() => setRevealPhase("card"), 1200);
+      // Phase 3: show the buttons
+      setTimeout(() => setRevealPhase("ready"), 2000);
     }
   }
 
@@ -220,8 +220,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
   }
 
   async function handleResynthesize() {
-    setShowReveal(false);
-    setShowConfetti(false);
+    setRevealPhase("none");
     setBusinessIdea(null);
     setSynthesizing(true);
 
@@ -239,10 +238,9 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
 
     setSynthesizing(false);
     setBusinessIdea(idea);
-    setTimeout(() => {
-      setShowReveal(true);
-      setTimeout(() => setShowConfetti(true), 300);
-    }, 500);
+    setTimeout(() => setRevealPhase("dimming"), 200);
+    setTimeout(() => setRevealPhase("card"), 1200);
+    setTimeout(() => setRevealPhase("ready"), 2000);
   }
 
   function handleStartOver() {
@@ -252,8 +250,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     setSuggestions({});
     setSelectedItems({});
     setRegenCounts({});
-    setShowReveal(false);
-    setShowConfetti(false);
+    setRevealPhase("none");
     setBusinessIdea(null);
     setError(null);
   }
@@ -445,7 +442,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
       {/* DIAGRAM VIEW */}
       {nameConfirmed && ikigaiIntroSeen && !activeStep && (
         <div
-          className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+          className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden"
           style={{
             opacity: diagramEntering ? 1 : 0,
             transition: "opacity 1s ease-in-out",
@@ -457,18 +454,20 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
             </h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
               {synthesizing
-                ? "Building your business idea..."
-                : showReveal
-                ? "Your business idea is ready!"
+                ? "Putting the pieces together..."
+                : revealPhase === "dimming"
+                ? "Here's what we found."
+                : revealPhase !== "none"
+                ? ""
                 : completedSteps.size === 0
                 ? "Click any circle to start exploring."
                 : completedSteps.size < 4
                 ? `${completedSteps.size}/4 complete. Click a circle to continue.`
-                : "All done!"}
+                : ""}
             </p>
 
             {/* Skip path — elevated to a proper button */}
-            {completedSteps.size === 0 && !showReveal && !synthesizing && !showSkipForm && (
+            {completedSteps.size === 0 && revealPhase === "none" && !synthesizing && !showSkipForm && (
               <button
                 onClick={() => setShowSkipForm(true)}
                 className="mt-3 rounded-full border border-[var(--border-strong)] px-5 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] transition-colors"
@@ -478,81 +477,107 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
             )}
           </div>
 
-          <div className="relative">
+          <div
+            className="relative"
+            style={{
+              opacity: revealPhase === "none" ? 1 : revealPhase === "dimming" ? 0.15 : 0.08,
+              transform: revealPhase !== "none" ? "scale(0.6) translateY(-20%)" : "scale(1)",
+              transition: "all 800ms cubic-bezier(0.4, 0, 0.2, 1)",
+              pointerEvents: revealPhase !== "none" ? "none" : "auto",
+            }}
+          >
             <IkigaiDiagram
               completedSteps={completedSteps}
               onStepClick={handleStepClick}
-              showReveal={showReveal}
-              businessName={businessIdea?.name}
+              showReveal={false}
+              businessName={undefined}
             />
-            <Confetti active={showConfetti} />
           </div>
 
-          {/* Synthesizing spinner */}
-          {synthesizing && (
-            <div className="mt-8 text-center">
-              <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Creating your business idea...
-              </p>
-            </div>
-          )}
+          {/* Personal Card reveal */}
+          {revealPhase !== "none" && businessIdea && (
+            <div
+              className="absolute left-1/2 w-full px-4"
+              style={{
+                maxWidth: "420px",
+                top: revealPhase === "card" || revealPhase === "ready" ? "50%" : "110%",
+                transform: revealPhase === "card" || revealPhase === "ready"
+                  ? "translate(-50%, -50%)"
+                  : "translate(-50%, 0%)",
+                opacity: revealPhase === "card" || revealPhase === "ready" ? 1 : 0,
+                transition: "all 600ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+              }}
+            >
+              <div
+                className="rounded-xl bg-[var(--bg)] border border-[var(--border)] overflow-hidden"
+                style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}
+              >
+                {/* Ikigai gradient bar */}
+                <div className="flex h-1.5">
+                  <div className="flex-1" style={{ backgroundColor: "var(--ikigai-love)" }} />
+                  <div className="flex-1" style={{ backgroundColor: "var(--ikigai-skills)" }} />
+                  <div className="flex-1" style={{ backgroundColor: "var(--ikigai-needs)" }} />
+                  <div className="flex-1" style={{ backgroundColor: "var(--ikigai-money)" }} />
+                </div>
 
-          {/* Reveal card */}
-          {showReveal && businessIdea && (
-            <div className="mt-6 max-w-md w-full">
-              <div className="rounded-xl border border-[var(--border)] bg-white p-6 text-center">
-                <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium">
-                  Your Business
-                </p>
-                <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold">
-                  {businessIdea.name}
-                </h2>
-                <p className="mt-1 text-[var(--text-secondary)]">
-                  {businessIdea.niche}
-                </p>
-                <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                  For {businessIdea.target_customer.toLowerCase()}
-                </p>
-                {/* Why this fits — the discovery moment */}
-                {businessIdea.why_this_fits && (
-                  <div className="mt-4 rounded-lg bg-[var(--primary)]/5 border border-[var(--primary)]/10 px-4 py-3 text-left">
-                    <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider mb-1">
-                      Why this works for you
+                <div className="p-6 text-left">
+                  <p className="text-sm font-medium text-[var(--text-muted)] tracking-wide">
+                    {studentName.split(" ")[0]}&apos;s venture
+                  </p>
+                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-[32px] font-bold leading-tight text-[var(--text-primary)]">
+                    {businessIdea.name}
+                  </h2>
+                  <p className="mt-2 text-base text-[var(--text-secondary)]">
+                    {businessIdea.niche}
+                  </p>
+
+                  {businessIdea.why_this_fits && (
+                    <div className="mt-5 pt-5 border-t border-[var(--border)]">
+                      <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                        Why this fits you
+                      </p>
+                      <p className="text-base text-[var(--text-secondary)] leading-relaxed">
+                        {businessIdea.why_this_fits}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="mt-4 pt-4 border-t border-[var(--border)]">
+                    <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">
+                      How you earn
                     </p>
-                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                      {businessIdea.why_this_fits}
+                    <p className="text-sm text-[var(--text-secondary)]">
+                      {businessIdea.revenue_model}
                     </p>
                   </div>
-                )}
+                </div>
+              </div>
 
-                <div className="mt-3 rounded-lg bg-[var(--bg-muted)] px-4 py-3 text-left">
-                  <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">
-                    How you'll make money
-                  </p>
-                  <p className="text-sm text-[var(--text-primary)]">
-                    {businessIdea.revenue_model}
-                  </p>
-                </div>
-                <div className="mt-6 flex gap-3 justify-center">
-                  <button
-                    onClick={handleConfirm}
-                    className="rounded-lg bg-[var(--accent)] px-6 py-2.5 text-sm font-semibold text-[var(--text-primary)] hover:brightness-110 transition-all"
-                  >
-                    This is my business!
-                  </button>
-                  <button
-                    onClick={handleResynthesize}
-                    className="rounded-lg border border-[var(--border-strong)] px-4 py-2.5 text-sm font-medium hover:bg-[var(--bg-muted)] transition-colors"
-                  >
-                    Try again
-                  </button>
-                </div>
+              {/* Buttons — outside the card, stacked */}
+              <div
+                className="mt-6 flex flex-col items-center gap-3"
+                style={{
+                  opacity: revealPhase === "ready" ? 1 : 0,
+                  transition: "opacity 400ms ease-out",
+                }}
+              >
+                <button
+                  onClick={handleConfirm}
+                  className="w-full rounded-lg bg-[var(--primary)] hover:bg-[var(--primary-light)] active:bg-[var(--primary-dark)] py-3.5 text-base font-semibold text-white transition-colors"
+                >
+                  I&apos;m in
+                </button>
+                <button
+                  onClick={handleResynthesize}
+                  className="text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:underline"
+                >
+                  Show me something else
+                </button>
                 <button
                   onClick={handleStartOver}
-                  className="mt-3 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] underline"
+                  className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] underline"
                 >
-                  Start completely over
+                  Change my answers
                 </button>
               </div>
             </div>
@@ -569,7 +594,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
           )}
 
           {/* Reset button */}
-          {(completedSteps.size > 0 || showReveal) && (
+          {(completedSteps.size > 0 || revealPhase !== "none") && (
             <button
               onClick={() => {
                 if (confirm("This will clear all your answers and start over. Are you sure?")) {
@@ -583,7 +608,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
           )}
 
           {/* Skip form — already have a business idea */}
-          {showSkipForm && !showReveal && !synthesizing && (
+          {showSkipForm && revealPhase === "none" && !synthesizing && (
             <div className="mt-6">{(
                 <div className="max-w-md w-full mx-auto rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">

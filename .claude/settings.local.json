@@ -41,7 +41,10 @@
       "Skill(plan-ceo-review)",
       "Bash(npx tsc:*)",
       "Bash(vercel --version)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(git push:*)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel inspect:*)"
     ]
   }
 }
