@@ -478,7 +478,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
           </div>
 
           <div
-            className="relative"
+            className="relative w-full max-w-[500px]"
             style={{
               opacity: revealPhase === "none" ? 1 : revealPhase === "dimming" ? 0.15 : 0.08,
               transform: revealPhase !== "none" ? "scale(0.6) translateY(-20%)" : "scale(1)",
