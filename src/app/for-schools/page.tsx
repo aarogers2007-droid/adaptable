@@ -197,29 +197,64 @@ const PRIMARY_ICONS: Record<string, () => React.ReactElement> = {
 /* Ikigai SVG for the hero */
 function IkigaiDiagram() {
   return (
-    <svg viewBox="0 0 400 400" className="w-full max-w-[360px]" aria-label="Ikigai diagram showing four overlapping circles: What you love, What you're good at, What the world needs, and What you can be paid for">
-      {/* Four overlapping circles */}
-      <circle cx="200" cy="145" r="110" fill="#F5E642" opacity="0.45" />
-      <circle cx="145" cy="220" r="110" fill="#A8DB5A" opacity="0.45" />
-      <circle cx="255" cy="220" r="110" fill="#F4A79D" opacity="0.45" />
-      <circle cx="200" cy="275" r="110" fill="#6DD5D0" opacity="0.45" />
+    <>
+      <style>{`
+        @media (prefers-reduced-motion: no-preference) {
+          .ikigai-center-pulse {
+            animation: ikigaiPulse 3s ease-in-out infinite;
+            transform-origin: 200px 215px;
+          }
+          @keyframes ikigaiPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+          }
+          .ikigai-circle {
+            transition: opacity 200ms ease-out;
+          }
+          .ikigai-circle:hover {
+            opacity: 0.65 !important;
+          }
+        }
+      `}</style>
+      <svg viewBox="0 0 400 430" className="w-full max-w-[480px]" aria-label="Ikigai diagram showing four overlapping circles: What you love, What you're good at, What the world needs, and What you can be paid for">
+        {/* Four overlapping circles — spread to match product diagram */}
+        <circle className="ikigai-circle" cx="200" cy="120" r="110" fill="#F5E642" opacity="0.55" stroke="#fff" strokeWidth="1" />
+        <circle className="ikigai-circle" cx="120" cy="230" r="110" fill="#A8DB5A" opacity="0.55" stroke="#fff" strokeWidth="1" />
+        <circle className="ikigai-circle" cx="280" cy="230" r="110" fill="#F4A79D" opacity="0.55" stroke="#fff" strokeWidth="1" />
+        <circle className="ikigai-circle" cx="200" cy="310" r="110" fill="#6DD5D0" opacity="0.55" stroke="#fff" strokeWidth="1" />
 
-      {/* Center circles */}
-      <circle cx="200" cy="210" r="42" fill="#8B9E6A" opacity="0.6" />
-      <circle cx="200" cy="210" r="22" fill="#4A6741" opacity="0.8" />
+        {/* Center glow */}
+        <defs>
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#4A6741" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#4A6741" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <circle cx="200" cy="215" r="60" fill="url(#centerGlow)" />
 
-      {/* Labels */}
-      <text x="200" y="75" textAnchor="middle" className="fill-[var(--text-primary)]" fontSize="13" fontWeight="600">What you love</text>
-      <text x="68" y="220" textAnchor="middle" className="fill-[var(--text-primary)]" fontSize="13" fontWeight="600">What you&apos;re</text>
-      <text x="68" y="236" textAnchor="middle" className="fill-[var(--text-primary)]" fontSize="13" fontWeight="600">good at</text>
-      <text x="332" y="220" textAnchor="middle" className="fill-[var(--text-primary)]" fontSize="13" fontWeight="600">What the world</text>
-      <text x="332" y="236" textAnchor="middle" className="fill-[var(--text-primary)]" fontSize="13" fontWeight="600">needs</text>
-      <text x="200" y="355" textAnchor="middle" className="fill-[var(--text-primary)]" fontSize="13" fontWeight="600">What you can be paid for</text>
+        {/* Center circles */}
+        <circle cx="200" cy="215" r="45" fill="#8B9E6A" opacity="0.85" />
+        <circle className="ikigai-center-pulse" cx="200" cy="215" r="24" fill="#4A6741" stroke="#fff" strokeWidth="1.5" />
 
-      {/* Center label */}
-      <text x="200" y="207" textAnchor="middle" fill="white" fontSize="11" fontWeight="700">YOUR</text>
-      <text x="200" y="220" textAnchor="middle" fill="white" fontSize="11" fontWeight="700">BUSINESS</text>
-    </svg>
+        {/* Intersection labels */}
+        <text x="160" y="168" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#6B7A3D" opacity="0.8">Passion</text>
+        <text x="240" y="168" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#B87D4A" opacity="0.8">Mission</text>
+        <text x="155" y="280" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#5A9A5A" opacity="0.8">Profession</text>
+        <text x="248" y="280" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#8A7A5A" opacity="0.8">Vocation</text>
+
+        {/* Outer labels */}
+        <text x="200" y="40" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="13" fontWeight="600" className="fill-[var(--text-primary)]">What you love</text>
+        <text x="38" y="230" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">What you&apos;re</text>
+        <text x="38" y="245" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">good at</text>
+        <text x="362" y="230" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">What the world</text>
+        <text x="362" y="245" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">needs</text>
+        <text x="200" y="400" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="13" fontWeight="600" className="fill-[var(--text-primary)]">What you can be paid for</text>
+
+        {/* Center label */}
+        <text x="200" y="211" textAnchor="middle" fill="white" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="800" letterSpacing="1.5">YOUR</text>
+        <text x="200" y="224" textAnchor="middle" fill="white" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="800" letterSpacing="1.5">BUSINESS</text>
+      </svg>
+    </>
   );
 }
 
@@ -319,7 +354,7 @@ export default function ForSchoolsPage() {
             </div>
 
             {/* Right: Ikigai diagram */}
-            <div className="flex justify-center">
+            <div className="flex justify-center md:justify-end">
               <IkigaiDiagram />
             </div>
           </div>
