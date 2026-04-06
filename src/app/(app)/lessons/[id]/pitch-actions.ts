@@ -110,6 +110,17 @@ export async function getPitchForModule(moduleSequence: number) {
 
 export async function getLatestPitch(studentId: string) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // Students can only read their own pitch
+  if (user.id !== studentId) {
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    if (!profile || (profile.role !== "instructor" && profile.role !== "org_admin")) {
+      return null;
+    }
+  }
+
   const { data } = await supabase
     .from("business_pitches")
     .select("*")

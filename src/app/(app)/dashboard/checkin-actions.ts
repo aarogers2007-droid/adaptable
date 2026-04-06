@@ -147,6 +147,18 @@ export async function getTodayCheckIn() {
 
 export async function getRecentCheckIns(studentId: string, limit = 3) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // Students can only read their own check-ins
+  if (user.id !== studentId) {
+    // Check if caller is an instructor/admin
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    if (!profile || (profile.role !== "instructor" && profile.role !== "org_admin")) {
+      return [];
+    }
+  }
+
   const { data } = await supabase
     .from("daily_checkins")
     .select("*")

@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
   if (progressError || !progressCheck) {
     console.error("[lesson-chat] Progress validation failed. progressId:", progressId, "userId:", user.id, "error:", progressError);
-    return Response.json({ error: "Invalid progress record", debug: { progressId, userId: user.id, dbError: progressError?.message } }, { status: 403 });
+    return Response.json({ error: "Invalid progress record" }, { status: 403 });
   }
 
   // Check if admin (admins bypass rate limits)

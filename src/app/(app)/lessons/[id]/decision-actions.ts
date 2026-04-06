@@ -59,6 +59,17 @@ export async function getDecisionForLesson(lessonId: string) {
 
 export async function getStudentDecisions(studentId: string) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // Students can only read their own decisions
+  if (user.id !== studentId) {
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    if (!profile || (profile.role !== "instructor" && profile.role !== "org_admin")) {
+      return [];
+    }
+  }
+
   const { data } = await supabase
     .from("lesson_decisions")
     .select("*, lessons(title, lesson_sequence)")
