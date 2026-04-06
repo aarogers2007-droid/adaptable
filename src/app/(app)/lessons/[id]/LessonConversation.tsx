@@ -64,6 +64,7 @@ import DecisionJournal from "@/components/lessons/DecisionJournal";
 import BusinessPitch from "@/components/lessons/BusinessPitch";
 import { generatePersonas } from "@/lib/customer-personas";
 import { saveInterviewData } from "./interview-actions";
+import VoiceInput from "@/components/ui/VoiceInput";
 
 interface Message {
   role: "user" | "assistant";
@@ -136,6 +137,8 @@ export default function LessonConversation({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const composingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [showPacingNudge, setShowPacingNudge] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
@@ -254,9 +257,17 @@ export default function LessonConversation({
   // Reset timer on typing
   function handleInputChange(value: string) {
     setInput(value);
+    setShowPacingNudge(false);
     if (value.trim()) {
       setShowSuggestions(false);
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      // Perfectionism timer: if composing for 5+ minutes, nudge
+      if (!composingTimerRef.current) {
+        composingTimerRef.current = setTimeout(() => {
+          setShowPacingNudge(true);
+          composingTimerRef.current = null;
+        }, 300000); // 5 minutes
+      }
     } else {
       resetIdleTimer();
     }
@@ -303,7 +314,9 @@ export default function LessonConversation({
 
     setInput("");
     setShowSuggestions(false);
+    setShowPacingNudge(false);
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    if (composingTimerRef.current) { clearTimeout(composingTimerRef.current); composingTimerRef.current = null; }
     setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
     setLoading(true);
 
@@ -696,7 +709,14 @@ export default function LessonConversation({
               </div>
             )}
 
-            {/* Suggested responses (appear after 15s idle) */}
+            {/* Pacing nudge for perfectionists */}
+            {showPacingNudge && (
+              <div className="mb-3 rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/5 px-4 py-2 text-sm text-[var(--text-secondary)] animate-fade-in">
+                Your thinking is strong — it doesn&apos;t have to be perfect. Send what you have. You can always build on it later.
+              </div>
+            )}
+
+            {/* Suggested responses (appear after 30s idle) */}
             {showSuggestions && suggestions.length > 0 && !nudge && (
               <div className="mb-3 flex flex-wrap gap-2">
                 <span className="text-xs text-[var(--text-muted)] self-center mr-1">Stuck?</span>
@@ -729,6 +749,13 @@ export default function LessonConversation({
                   autoFocus
                   className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"
                   style={{ maxHeight: "150px", overflow: "auto" }}
+                />
+                <VoiceInput
+                  onTranscription={(text) => {
+                    setInput((prev) => prev ? prev + " " + text : text);
+                    setShowPacingNudge(false);
+                  }}
+                  disabled={loading}
                 />
                 <button
                   type="submit"

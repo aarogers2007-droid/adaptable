@@ -68,6 +68,11 @@ export default async function LeaderboardPage() {
     getLeaderboardData(admin, schoolStudentIds, user.id, "this_week"),
   ]);
 
+  // Late-joiner detection: if enrolled within the last 7 days, show "your pace" context
+  const isRecentJoiner = profile.created_at
+    ? (Date.now() - new Date(profile.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000
+    : false;
+
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
       <AppNav
@@ -76,6 +81,11 @@ export default async function LeaderboardPage() {
       />
 
       <div className="mx-auto max-w-[1200px] px-6 py-8">
+        {isRecentJoiner && (
+          <div className="mb-4 rounded-lg border border-[var(--primary)]/20 bg-[var(--primary)]/5 px-4 py-3 text-sm text-[var(--text-secondary)]">
+            You just started — these rankings will make more sense after your first week. Focus on your business for now.
+          </div>
+        )}
         <div className="mb-6">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
             Leaderboard
