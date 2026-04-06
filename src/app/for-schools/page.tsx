@@ -200,14 +200,6 @@ function IkigaiDiagram() {
     <>
       <style>{`
         @media (prefers-reduced-motion: no-preference) {
-          .ikigai-center-pulse {
-            animation: ikigaiPulse 3s ease-in-out infinite;
-            transform-origin: 200px 215px;
-          }
-          @keyframes ikigaiPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.9; }
-          }
           .ikigai-circle {
             transition: opacity 200ms ease-out;
           }
@@ -234,7 +226,7 @@ function IkigaiDiagram() {
 
         {/* Center circles */}
         <circle cx="200" cy="215" r="45" fill="#8B9E6A" opacity="0.85" />
-        <circle className="ikigai-center-pulse" cx="200" cy="215" r="24" fill="#4A6741" stroke="#fff" strokeWidth="1.5" />
+        <circle cx="200" cy="215" r="24" fill="#4A6741" stroke="#fff" strokeWidth="1.5" />
 
         {/* Intersection labels */}
         <text x="160" y="168" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#6B7A3D" opacity="0.8">Passion</text>
