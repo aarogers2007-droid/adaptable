@@ -73,9 +73,10 @@ export default function CompletionCeremony({
     [activeScene]
   );
 
-  // ─── SCENE 1: FOUNDER'S LETTER ───
+  // ─── SCENE 1 → 3: FOUNDER'S LETTER → COMPLETE → REVEAL ───
+  // Runs ONCE on mount. Must not depend on activeScene, or self-transitions
+  // below would cancel the sequence mid-flight via the cleanup.
   useEffect(() => {
-    if (activeScene !== "letter") return;
     let cancelled = false;
 
     (async () => {
@@ -174,7 +175,8 @@ export default function CompletionCeremony({
     return () => {
       cancelled = true;
     };
-  }, [activeScene]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ─── MENTOR FAREWELL TYPEWRITER ───
   useEffect(() => {
