@@ -517,28 +517,45 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
                 className="ikigai-reveal-card rounded-xl bg-[var(--bg)] border border-[var(--border)]"
                 style={{ position: "relative", overflow: "visible" }}
               >
-                {/* Ikigai aura glow — color edges on left and right */}
-                <div className="ikigai-reveal-aura ikigai-reveal-aura-left" />
-                <div className="ikigai-reveal-aura ikigai-reveal-aura-right" />
+                {/* Three breathing glow shells */}
+                <div className="ikigai-reveal-glow ikigai-reveal-glow-outer" />
+                <div className="ikigai-reveal-glow ikigai-reveal-glow-mid" />
+                <div className="ikigai-reveal-glow ikigai-reveal-glow-inner" />
 
-                {/* Aura particles */}
+                {/* Gradient bar glow + warm wash */}
+                <div className="ikigai-reveal-bar-glow" />
+                <div className="ikigai-reveal-gradient-wash" />
+
+                {/* Aura particles — sparks from all edges */}
                 <div className="ikigai-reveal-particles">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="ikigai-reveal-particle"
-                      style={{
-                        left: `${(i % 2 === 0) ? -6 + Math.random() * 12 : 94 + Math.random() * 12}%`,
-                        top: `${10 + (i / 12) * 80}%`,
-                        animationDelay: `${i * 0.4}s`,
-                        animationDuration: `${2.618 + Math.random() * 1.618}s`,
-                        backgroundColor: [
-                          "var(--ikigai-love)", "var(--ikigai-skills)",
-                          "var(--ikigai-needs)", "var(--ikigai-money)",
-                        ][i % 4],
-                      }}
-                    />
-                  ))}
+                  {Array.from({ length: 32 }).map((_, i) => {
+                    const colors = ["#F5E642", "#A8DB5A", "#F4A79D", "#6DD5D0"];
+                    const color = colors[i % 4];
+                    const size = 4 + Math.random() * 5;
+                    const edge = i % 4;
+                    const pos = edge === 0
+                      ? { left: `${-3 + Math.random() * 6}%`, top: `${5 + Math.random() * 90}%` }
+                      : edge === 1
+                      ? { left: `${97 + Math.random() * 6}%`, top: `${5 + Math.random() * 90}%` }
+                      : edge === 2
+                      ? { left: `${10 + Math.random() * 80}%`, top: `${-3 + Math.random() * 6}%` }
+                      : { left: `${10 + Math.random() * 80}%`, top: `${97 + Math.random() * 6}%` };
+                    return (
+                      <div
+                        key={i}
+                        className="ikigai-reveal-particle"
+                        style={{
+                          ...pos,
+                          width: `${size}px`,
+                          height: `${size}px`,
+                          backgroundColor: color,
+                          boxShadow: `0 0 ${size * 2}px ${color}66, 0 0 ${size * 4}px ${color}33`,
+                          animationDelay: `${Math.random() * 4}s`,
+                          animationDuration: `${2 + Math.random() * 2.618}s`,
+                        }}
+                      />
+                    );
+                  })}
                 </div>
 
                 {/* Ikigai gradient bar */}

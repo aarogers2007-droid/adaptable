@@ -246,79 +246,88 @@ button:active:not(:disabled) {
 
 /* ─── Ikigai Wizard Reveal Card ─── */
 
-/* Subtle glow on the card when it reveals */
+/* ── Ikigai Wizard Reveal: Multi-layer breathing glow ── */
 .ikigai-reveal-card {
-  box-shadow:
-    0 4px 24px rgba(0,0,0,0.06),
-    0 0 40px rgba(74, 103, 65, 0.12),
-    0 0 80px rgba(74, 103, 65, 0.06);
-  animation: ikigai-card-glow 2.618s ease-out forwards;
-}
-@keyframes ikigai-card-glow {
-  0% {
-    box-shadow:
-      0 4px 24px rgba(0,0,0,0.06),
-      0 0 60px rgba(245, 230, 66, 0.2),
-      0 0 80px rgba(168, 219, 90, 0.15),
-      0 0 100px rgba(244, 167, 157, 0.15),
-      0 0 120px rgba(109, 213, 208, 0.2);
-  }
-  100% {
-    box-shadow:
-      0 4px 24px rgba(0,0,0,0.06),
-      0 0 30px rgba(74, 103, 65, 0.08),
-      0 0 60px rgba(74, 103, 65, 0.04);
-  }
+  overflow: visible !important;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.06);
 }
 
-/* Ikigai color auras on left and right edges */
-.ikigai-reveal-aura {
-  position: absolute;
-  top: 10%;
-  bottom: 10%;
-  width: 3px;
-  border-radius: 2px;
-  z-index: 1;
-  opacity: 0;
-  animation: ikigai-aura-in 1.618s ease-out 0.3s forwards;
+/* Three glow shells — breathing at different speeds for organic life */
+.ikigai-reveal-glow {
+  position: absolute; inset: 0; border-radius: 12px;
+  pointer-events: none; z-index: 0; opacity: 0;
 }
-.ikigai-reveal-aura-left {
-  left: -8px;
-  background: linear-gradient(to bottom, #F5E642, #A8DB5A);
-  box-shadow: 0 0 12px rgba(168, 219, 90, 0.4), 0 0 24px rgba(245, 230, 66, 0.2);
+.ikigai-reveal-glow-inner {
+  box-shadow: 0 0 30px rgba(245,230,66,0.25), 0 0 40px rgba(168,219,90,0.2),
+    0 0 50px rgba(244,167,157,0.2), 0 0 60px rgba(109,213,208,0.25);
+  animation: ikigai-glow-burst-inner 0.8s ease-out forwards, ikigai-glow-breathe-inner 4s ease-in-out 0.8s infinite;
 }
-.ikigai-reveal-aura-right {
-  right: -8px;
-  background: linear-gradient(to bottom, #F4A79D, #6DD5D0);
-  box-shadow: 0 0 12px rgba(244, 167, 157, 0.4), 0 0 24px rgba(109, 213, 208, 0.2);
+.ikigai-reveal-glow-mid {
+  inset: -8px; border-radius: 18px;
+  box-shadow: 0 0 60px rgba(245,230,66,0.18), 0 0 90px rgba(168,219,90,0.15),
+    0 0 90px rgba(244,167,157,0.15), 0 0 120px rgba(109,213,208,0.18);
+  animation: ikigai-glow-burst-mid 1.2s ease-out forwards, ikigai-glow-breathe-mid 5.5s ease-in-out 1.2s infinite;
 }
-@keyframes ikigai-aura-in {
-  0% { opacity: 0; top: 45%; bottom: 45%; }
-  60% { opacity: 0.8; }
-  100% { opacity: 0.6; top: 10%; bottom: 10%; }
+.ikigai-reveal-glow-outer {
+  inset: -20px; border-radius: 28px;
+  box-shadow: 0 0 100px rgba(245,230,66,0.1), 0 0 160px rgba(168,219,90,0.08),
+    0 0 160px rgba(244,167,157,0.08), 0 0 200px rgba(109,213,208,0.1), 0 0 300px rgba(74,103,65,0.06);
+  animation: ikigai-glow-burst-outer 1.6s ease-out forwards, ikigai-glow-breathe-outer 7s ease-in-out 1.6s infinite;
 }
 
-/* Aura particles — small colored dots that float upward from the edges */
+@keyframes ikigai-glow-burst-inner { 0% { opacity:0; transform:scale(0.9); } 30% { opacity:1; transform:scale(1.05); } 100% { opacity:0.85; transform:scale(1); } }
+@keyframes ikigai-glow-burst-mid { 0% { opacity:0; transform:scale(0.85); } 25% { opacity:1; transform:scale(1.08); } 100% { opacity:0.7; transform:scale(1); } }
+@keyframes ikigai-glow-burst-outer { 0% { opacity:0; transform:scale(0.8); } 20% { opacity:0.8; transform:scale(1.1); } 100% { opacity:0.5; transform:scale(1); } }
+@keyframes ikigai-glow-breathe-inner { 0%,100% { opacity:0.85; transform:scale(1); } 50% { opacity:1; transform:scale(1.01); } }
+@keyframes ikigai-glow-breathe-mid { 0%,100% { opacity:0.7; transform:scale(1); } 50% { opacity:0.85; transform:scale(1.015); } }
+@keyframes ikigai-glow-breathe-outer { 0%,100% { opacity:0.5; transform:scale(1); } 50% { opacity:0.65; transform:scale(1.02); } }
+
+/* Gradient bar glow — casts warm light downward */
+.ikigai-reveal-bar-glow {
+  position: absolute; top: -2px; left: 10%; right: 10%; height: 10px;
+  border-radius: 6px; background: linear-gradient(to right, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  filter: blur(8px); opacity: 0; pointer-events: none; z-index: 3;
+  animation: ikigai-bar-glow-in 0.6s ease-out 0.2s forwards, ikigai-bar-glow-breathe 4s ease-in-out 0.8s infinite;
+}
+@keyframes ikigai-bar-glow-in { 0% { opacity:0; } 50% { opacity:1; } 100% { opacity:0.7; } }
+@keyframes ikigai-bar-glow-breathe { 0%,100% { opacity:0.7; } 50% { opacity:0.9; } }
+
+/* Gradient warm wash below the bar */
+.ikigai-reveal-gradient-wash {
+  position: absolute; top: 0; left: 0; right: 0; height: 80px;
+  border-radius: 12px 12px 0 0; pointer-events: none; z-index: 1; opacity: 0;
+  background: linear-gradient(to bottom, rgba(245,230,66,0.15) 0%, rgba(168,219,90,0.12) 20%, rgba(244,167,157,0.08) 40%, transparent 100%);
+  animation: ikigai-wash-in 1s ease-out forwards, ikigai-wash-breathe 5s ease-in-out 1s infinite;
+}
+@keyframes ikigai-wash-in { 0% { opacity:0; } 40% { opacity:1; } 100% { opacity:0.8; } }
+@keyframes ikigai-wash-breathe { 0%,100% { opacity:0.8; } 50% { opacity:1; } }
+
+/* Card surface shimmer */
+.ikigai-reveal-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 12px;
+  background: linear-gradient(135deg, transparent 0%, rgba(245,230,66,0.03) 25%, transparent 50%, rgba(109,213,208,0.03) 75%, transparent 100%);
+  background-size: 200% 200%; animation: ikigai-card-shimmer 8s ease-in-out infinite;
+  pointer-events: none; z-index: 1;
+}
+@keyframes ikigai-card-shimmer { 0%,100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+
+/* Aura particles — sparks floating from all edges */
 .ikigai-reveal-particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: visible;
+  position: absolute; inset: -30px; pointer-events: none; overflow: visible; z-index: 20;
 }
 .ikigai-reveal-particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  opacity: 0;
-  animation: ikigai-particle-float ease-out infinite;
+  position: absolute; border-radius: 50%; opacity: 0;
+  animation: ikigai-particle-rise ease-in-out infinite;
 }
-@keyframes ikigai-particle-float {
-  0% { opacity: 0; transform: translateY(0) scale(0.5); }
-  15% { opacity: 0.6; transform: translateY(-4px) scale(1); }
-  60% { opacity: 0.3; }
-  100% { opacity: 0; transform: translateY(-28px) scale(0.3); }
+.ikigai-reveal-particle::after {
+  content: ''; position: absolute; width: 200%; height: 100%;
+  border-radius: 50%; background: inherit; opacity: 0.3; filter: blur(3px); left: -50%; top: 0;
+}
+@keyframes ikigai-particle-rise {
+  0% { opacity: 0; transform: translateY(0) scale(0.3); }
+  15% { opacity: 0.8; transform: translateY(-6px) scale(1); }
+  50% { opacity: 0.5; transform: translateY(-28px) scale(0.7); }
+  100% { opacity: 0; transform: translateY(-55px) scale(0.15); }
 }
 
 /* ─── For-Schools Hero Animations ─── */
