@@ -154,6 +154,13 @@ export async function sendMessage(
     return { error: "Not authorized" };
   }
 
+  // Content moderation on teacher messages (defense-in-depth)
+  const { moderateContent } = await import("@/lib/content-moderation");
+  const modResult = moderateContent(message);
+  if (!modResult.safe) {
+    return { error: "Message contains content that cannot be sent to students." };
+  }
+
   // Store message using teacher_alerts with alert_type='teacher_message'
   // For announcements (studentId=null), we store one record per student in the class
   if (studentId) {
@@ -204,9 +211,11 @@ export async function sendMessage(
 
 function generateInviteCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // No I/O/0/1 for readability
+  const randomBytes = new Uint8Array(6);
+  crypto.getRandomValues(randomBytes);
   let code = "";
   for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
+    code += chars[randomBytes[i] % chars.length];
   }
   return code;
 }

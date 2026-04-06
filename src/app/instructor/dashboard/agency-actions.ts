@@ -69,6 +69,11 @@ export async function addComment(
   if (!commentText.trim()) return { error: "Comment cannot be empty" };
   if (commentText.length > 1000) return { error: "Comment too long" };
 
+  // Content moderation on teacher comments
+  const { moderateContent } = await import("@/lib/content-moderation");
+  const modResult = moderateContent(commentText.trim());
+  if (!modResult.safe) return { error: "Comment contains content that cannot be sent to students." };
+
   const { error: insertErr } = await supabase.from("teacher_comments").insert({
     teacher_id: user.id,
     student_id: studentId,
@@ -230,6 +235,11 @@ export async function sendNudge(
 ) {
   const { supabase, user, error } = await requireTeacher();
   if (error || !supabase || !user) return { error };
+
+  // Content moderation on nudge messages
+  const { moderateContent } = await import("@/lib/content-moderation");
+  const modResult = moderateContent(message);
+  if (!modResult.safe) return { error: "Message contains content that cannot be sent to students." };
 
   // Insert as a teacher alert/message (reusing existing pattern)
   await supabase.from("teacher_alerts").insert({

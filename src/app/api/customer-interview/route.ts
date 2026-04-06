@@ -73,10 +73,28 @@ export async function POST(request: Request) {
     return new Response("Invalid persona", { status: 400 });
   }
 
-  // Build conversation
-  const history = (conversationHistory ?? []) as { role: "user" | "assistant"; content: string }[];
+  // Validate and sanitize conversation history from client
+  const rawHistory = Array.isArray(conversationHistory) ? conversationHistory : [];
+  const history: { role: "user" | "assistant"; content: string }[] = [];
+  for (const entry of rawHistory.slice(-10)) {
+    if (
+      entry &&
+      typeof entry === "object" &&
+      (entry.role === "user" || entry.role === "assistant") &&
+      typeof entry.content === "string" &&
+      entry.content.length <= 4000
+    ) {
+      // Moderate historical user messages to prevent injected content
+      if (entry.role === "user") {
+        const histCheck = moderateContent(entry.content);
+        if (!histCheck.safe) continue; // skip flagged entries
+      }
+      history.push({ role: entry.role, content: entry.content });
+    }
+  }
+
   const messages: { role: "user" | "assistant"; content: string }[] = [
-    ...history.slice(-10),
+    ...history,
     { role: "user", content: message },
   ];
 
@@ -103,8 +121,11 @@ export async function POST(request: Request) {
           // Output moderation
           const outputCheck = moderateOutput(fullResponse);
           if (!outputCheck.safe) {
-            // Stream was already sent — log the flag for teacher review
             console.warn("[customer-interview] Output flagged:", outputCheck.reason);
+            // Fire teacher alert for flagged AI output
+            import("@/lib/teacher-alerts").then(({ alertContentFlag }) =>
+              alertContentFlag(supabase, user.id, `AI output flagged in interview (${outputCheck.reason}): ${outputCheck.flagged_content}`, "ai_output", "customer-interview")
+            ).catch(() => {});
           }
 
           // Log usage

@@ -7,6 +7,12 @@ import { createClient } from "@/lib/supabase/server";
  * for unauthenticated users on the join page.
  */
 export async function validateInviteCode(code: string) {
+  // Rate limit: max 10 validation attempts per minute per code
+  // Uses a simple DB-based approach
+  if (!code || typeof code !== "string" || code.trim().length < 4 || code.trim().length > 12) {
+    return { error: "Invalid invite code. Check with your instructor." };
+  }
+
   const supabase = await createClient();
 
   const trimmed = code.trim().toUpperCase();

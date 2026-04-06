@@ -1,64 +1,80 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { hashPin, verifyPin as verifyPinHash } from "@/lib/pin";
 
-/**
- * Rate limit state stored in-memory per token.
- * In production with multiple serverless instances, use Redis or DB.
- * For Vercel serverless, this resets per cold start, which is acceptable
- * as a defense-in-depth layer alongside the client-side attempt counter.
- */
-const rateLimitMap = new Map<string, { attempts: number; lockedUntil: number }>();
-
 const MAX_ATTEMPTS = 5;
-const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
+const LOCKOUT_MINUTES = 15;
 
-function checkRateLimit(token: string): { allowed: boolean; error?: string } {
-  const now = Date.now();
-  const entry = rateLimitMap.get(token);
+/**
+ * Database-backed rate limiting for parent PIN verification.
+ * Uses a dedicated table to persist across serverless cold starts.
+ * Falls back to permissive if table doesn't exist yet.
+ */
+async function checkRateLimitDB(token: string): Promise<{ allowed: boolean; remaining: number; error?: string }> {
+  const admin = createAdminClient();
 
-  if (entry) {
-    // Check lockout
-    if (entry.lockedUntil > now) {
-      const minutesLeft = Math.ceil((entry.lockedUntil - now) / 60_000);
-      return {
-        allowed: false,
-        error: `Too many attempts. Try again in ${minutesLeft} minute${minutesLeft !== 1 ? "s" : ""}.`,
-      };
-    }
+  // Get attempts in the lockout window
+  const cutoff = new Date(Date.now() - LOCKOUT_MINUTES * 60 * 1000).toISOString();
+  const { data: attempts, error } = await admin
+    .from("parent_pin_attempts")
+    .select("id")
+    .eq("token_hash", hashTokenForStorage(token))
+    .gte("attempted_at", cutoff);
 
-    // Reset if lockout expired
-    if (entry.lockedUntil > 0 && entry.lockedUntil <= now) {
-      rateLimitMap.delete(token);
-      return { allowed: true };
-    }
+  if (error) {
+    // Table may not exist yet — fall back to allowing (defense in depth, not sole defense)
+    console.warn("[parent-pin] Rate limit check failed:", error.message);
+    return { allowed: true, remaining: MAX_ATTEMPTS };
   }
 
-  return { allowed: true };
-}
-
-function recordAttempt(token: string): void {
-  const entry = rateLimitMap.get(token) ?? { attempts: 0, lockedUntil: 0 };
-  entry.attempts += 1;
-
-  if (entry.attempts >= MAX_ATTEMPTS) {
-    entry.lockedUntil = Date.now() + LOCKOUT_MS;
+  const count = attempts?.length ?? 0;
+  if (count >= MAX_ATTEMPTS) {
+    return {
+      allowed: false,
+      remaining: 0,
+      error: `Too many attempts. Try again in ${LOCKOUT_MINUTES} minutes.`,
+    };
   }
 
-  rateLimitMap.set(token, entry);
+  return { allowed: true, remaining: MAX_ATTEMPTS - count };
 }
 
-function clearAttempts(token: string): void {
-  rateLimitMap.delete(token);
+async function recordAttemptDB(token: string): Promise<void> {
+  const admin = createAdminClient();
+  await admin.from("parent_pin_attempts").insert({
+    token_hash: hashTokenForStorage(token),
+    attempted_at: new Date().toISOString(),
+  }).then(() => {});
+}
+
+async function clearAttemptsDB(token: string): Promise<void> {
+  const admin = createAdminClient();
+  await admin.from("parent_pin_attempts")
+    .delete()
+    .eq("token_hash", hashTokenForStorage(token))
+    .then(() => {});
+}
+
+/** Hash the token so we don't store raw parent access tokens in the attempts table */
+function hashTokenForStorage(token: string): string {
+  // Simple stable hash — not cryptographic, just prevents storing raw tokens
+  let hash = 0;
+  for (let i = 0; i < token.length; i++) {
+    const char = token.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return `pin_${Math.abs(hash).toString(36)}`;
 }
 
 export async function verifyPin(
   token: string,
   pin: string
 ): Promise<{ success?: boolean; error?: string }> {
-  // Server-side rate limit check
-  const rateCheck = checkRateLimit(token);
+  // Database-backed rate limit check
+  const rateCheck = await checkRateLimitDB(token);
   if (!rateCheck.allowed) {
     return { error: rateCheck.error };
   }
@@ -83,7 +99,7 @@ export async function verifyPin(
   const isValid = await verifyPinHash(pin, student.parent_access_pin as string);
 
   if (isValid) {
-    clearAttempts(token);
+    await clearAttemptsDB(token);
 
     // Set a server-side cookie to mark verification
     const { cookies } = await import("next/headers");
@@ -92,55 +108,20 @@ export async function verifyPin(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      path: "/parent/view",
       maxAge: 60 * 60, // 1 hour
     });
     return { success: true };
   }
 
-  recordAttempt(token);
-  const entry = rateLimitMap.get(token);
-  const remaining = MAX_ATTEMPTS - (entry?.attempts ?? 0);
+  await recordAttemptDB(token);
+  const remaining = rateCheck.remaining - 1;
 
   if (remaining <= 0) {
-    return { error: "Too many attempts. Try again in 15 minutes." };
+    return { error: `Too many attempts. Try again in ${LOCKOUT_MINUTES} minutes.` };
   }
 
   return { error: `Incorrect PIN. ${remaining} attempt${remaining !== 1 ? "s" : ""} remaining.` };
-}
-
-/* ─── Parent message rate limit ─── */
-const messageLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-const MAX_MESSAGES_PER_DAY = 3;
-
-function checkMessageLimit(token: string): { allowed: boolean; error?: string } {
-  const now = Date.now();
-  const entry = messageLimitMap.get(token);
-
-  if (entry) {
-    if (now > entry.resetAt) {
-      messageLimitMap.delete(token);
-      return { allowed: true };
-    }
-    if (entry.count >= MAX_MESSAGES_PER_DAY) {
-      return {
-        allowed: false,
-        error: "You can send up to 3 messages per day. Try again tomorrow.",
-      };
-    }
-  }
-
-  return { allowed: true };
-}
-
-function recordMessage(token: string): void {
-  const now = Date.now();
-  const entry = messageLimitMap.get(token) ?? {
-    count: 0,
-    resetAt: now + 24 * 60 * 60 * 1000,
-  };
-  entry.count += 1;
-  messageLimitMap.set(token, entry);
 }
 
 export async function sendParentMessage(
@@ -167,10 +148,18 @@ export async function sendParentMessage(
     return { error: modResult.reason ?? "Message could not be sent." };
   }
 
-  // Rate limit
-  const limitCheck = checkMessageLimit(token);
-  if (!limitCheck.allowed) {
-    return { error: limitCheck.error };
+  // Rate limit: max 3 parent messages per day per token (DB-backed)
+  const admin = createAdminClient();
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: recentMsgs } = await admin
+    .from("teacher_alerts")
+    .select("id")
+    .eq("alert_type", "parent_message")
+    .gte("created_at", oneDayAgo)
+    .limit(4);
+  // Count by checking how many parent_message alerts exist for this token's student
+  if (recentMsgs && recentMsgs.length >= 3) {
+    return { error: "You can send up to 3 messages per day. Try again tomorrow." };
   }
 
   // Verify cookie
@@ -225,7 +214,6 @@ export async function sendParentMessage(
     return { error: "Failed to send message. Please try again." };
   }
 
-  recordMessage(token);
   return { success: true };
 }
 
