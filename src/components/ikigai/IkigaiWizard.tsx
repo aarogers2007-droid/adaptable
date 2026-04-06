@@ -298,7 +298,10 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     setTimeout(() => {
       setNameConfirmed(true);
       setIkigaiIntroSeen(false);
-      setTimeout(() => setIkigaiEntering(true), 50);
+      // Double rAF ensures the browser paints opacity:0 before transitioning to 1
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIkigaiEntering(true));
+      });
     }, 800);
     try {
       const { createClient } = await import("@/lib/supabase/client");
@@ -410,7 +413,9 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
                   setIkigaiExiting(true);
                   setTimeout(() => {
                     setIkigaiIntroSeen(true);
-                    setTimeout(() => setDiagramEntering(true), 50);
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(() => setDiagramEntering(true));
+                    });
                   }, 800);
                 }}
                 className="rounded-lg bg-[var(--primary)] px-10 py-3.5 text-base font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
