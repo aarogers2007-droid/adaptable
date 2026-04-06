@@ -182,7 +182,7 @@ export default function DemoShowcase() {
       </Section>
 
       {/* ═══ 3. LESSON CONVERSATION — Using real CSS classes ═══ */}
-      <Section label="The Core Experience" title="AI Lesson Conversations" description="Every conversation is personalized to the student's business idea. The AI asks questions, not gives answers. Checkpoints gate progress. Suggestion chips appear when students are stuck.">
+      <Section label="The Core Experience" title="AI Lesson Conversations" description="Every conversation is personalized to the student's business idea. The AI asks questions instead of giving answers. Checkpoints gate progress. Suggestion chips appear when students are stuck.">
         <div className="mx-auto max-w-[620px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
           {/* Header with real lesson CSS */}
           <div className="border-b border-[var(--border)] bg-[var(--bg)]">
@@ -267,8 +267,8 @@ export default function DemoShowcase() {
       </Section>
 
       {/* ═══ 4. BUSINESS CARD — REAL COMPONENT ═══ */}
-      <Section label="The Reward" title="Business Card Designer" description={`Students design a 3D business card that tilts on hover, flips on click, and unlocks new fonts as they write more. Try hovering over ${ELSA.first}'s card.`}>
-        <div className="mx-auto" style={{ maxWidth: "500px" }}>
+      <Section label="The Reward" title="Business Card Designer" description={`Students design a 3D business card that tilts on hover and unlocks new fonts and finishes as they progress. Try hovering over ${ELSA.first}'s card below — this is the actual component.`}>
+        <div className="mx-auto" style={{ width: "100%", maxWidth: "560px", height: "400px" }}>
           <Card3D
             businessName={STUDIO_BLOOM.name}
             niche={STUDIO_BLOOM.niche}
@@ -277,7 +277,7 @@ export default function DemoShowcase() {
             finish="holographic"
             accentColor="#0D9488"
             cardBase="black"
-            showBack={true}
+            showBack={false}
             backContent={{
               achievements: [
                 { name: "First Idea", icon: "💡", tier: "gold" },
@@ -291,10 +291,10 @@ export default function DemoShowcase() {
             isFounder={true}
             showRotateHint={true}
           />
-          <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-            Hover to tilt &middot; Click to flip &middot; 7 base colors &middot; 8 unlockable fonts &middot; 5 card finishes
-          </p>
         </div>
+        <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
+          Hover to tilt &middot; 7 base colors &middot; 8 unlockable fonts &middot; 5 card finishes (matte, holographic, silver, chrome, gold)
+        </p>
       </Section>
 
       {/* ═══ 5. BUSINESS PLAN — Using real CSS patterns ═══ */}
