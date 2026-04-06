@@ -194,22 +194,17 @@ const PRIMARY_ICONS: Record<string, () => React.ReactElement> = {
   bell: IconBell,
 };
 
-/* Ikigai diagram for the hero — uses HTML divs with mix-blend-mode
-   to match the product's organic color blending at intersections */
-const IKIGAI_CIRCLES = [
-  { label: "What you love", color: "#F5E642", x: 50, y: 28 },
-  { label: "What you're good at", color: "#A8DB5A", x: 32, y: 50 },
-  { label: "What the world needs", color: "#F4A79D", x: 68, y: 50 },
-  { label: "What you can be paid for", color: "#6DD5D0", x: 50, y: 72 },
-] as const;
-
-const LABEL_POSITIONS = [
-  { text: "What you love", x: "50%", y: "4%" },
-  { text: "What you're good at", x: "8%", y: "50%" },
-  { text: "What the world needs", x: "92%", y: "50%" },
-  { text: "What you can be paid for", x: "50%", y: "96%" },
-] as const;
-
+/*
+ * Ikigai Diagram — Golden Ratio Construction
+ *
+ * φ = 1.618034
+ * Cluster diameter = 100/φ = 61.8% of container
+ * Circle center offset = cluster_radius/φ = 19.1 units from center
+ * Circle radius = 20 units (32.5% adjacent overlap, 4.5% opposite overlap)
+ * Center circle radius = R/φ² = 7.64 units
+ * Labels equidistant from center at ~49.2 units
+ * Callout dots computed on circle edges via normalized direction vectors
+ */
 function IkigaiDiagram() {
   return (
     <div
@@ -218,31 +213,43 @@ function IkigaiDiagram() {
       role="img"
       aria-label="Ikigai diagram: four overlapping circles representing what you love, what you're good at, what the world needs, and what you can be paid for, with your business at the center"
     >
-      {/* Four circles — staggered scale entrance */}
-      {IKIGAI_CIRCLES.map((c) => (
-        <div
-          key={c.label}
-          className="absolute rounded-full ikigai-hero-circle hover:opacity-40 transition-opacity duration-200"
-          style={{
-            width: "50%",
-            height: "50%",
-            left: `${c.x}%`,
-            top: `${c.y}%`,
-            backgroundColor: c.color,
-          }}
-        />
-      ))}
+      {/* SVG layer: circles, callout lines, callout dots */}
+      <svg
+        className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
+        viewBox="0 0 100 100"
+        style={{ zIndex: 1 }}
+      >
+        {/* Four main circles — golden ratio positions */}
+        <circle cx="50" cy="30.901" r="20" fill="#F5E642" opacity="0.55" className="ikigai-hero-circle" />
+        <circle cx="30.901" cy="50" r="20" fill="#A8DB5A" opacity="0.55" className="ikigai-hero-circle" />
+        <circle cx="69.099" cy="50" r="20" fill="#F4A79D" opacity="0.55" className="ikigai-hero-circle" />
+        <circle cx="50" cy="69.099" r="20" fill="#6DD5D0" opacity="0.55" className="ikigai-hero-circle" />
 
-      {/* Center — radial gradient with glow, matching the product */}
+        {/* Callout lines + dots (dots on circle edges, 3-unit gap to labels) */}
+        <line x1="31.26" y1="23.92" x2="26" y2="22" stroke="#C4B320" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="31.26" cy="23.92" r="1.05" fill="#C4B320" opacity="0.7" />
+
+        <line x1="21.25" y1="67.52" x2="17.7" y2="73.9" stroke="#7AAD3A" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="21.25" cy="67.52" r="1.05" fill="#7AAD3A" opacity="0.7" />
+
+        <line x1="78.64" y1="32.42" x2="82.1" y2="26.1" stroke="#D4796E" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="78.64" cy="32.42" r="1.05" fill="#D4796E" opacity="0.7" />
+
+        <line x1="68.74" y1="76.08" x2="72" y2="77.3" stroke="#4DBAB4" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="68.74" cy="76.08" r="1.05" fill="#4DBAB4" opacity="0.7" />
+      </svg>
+
+      {/* Center circle — gradient + glow */}
       <div
         className="absolute rounded-full pointer-events-none ikigai-hero-center"
         style={{
-          width: "18%",
-          height: "18%",
+          width: "15.28%",
+          height: "15.28%",
           left: "50%",
           top: "50%",
+          transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, #4A6741 40%, #8B9E6A 100%)",
-          boxShadow: "0 0 24px rgba(74, 103, 65, 0.3)",
+          boxShadow: "0 0 20px rgba(74, 103, 65, 0.3)",
           zIndex: 5,
         }}
       />
@@ -250,33 +257,41 @@ function IkigaiDiagram() {
       {/* Center label */}
       <div
         className="absolute pointer-events-none flex flex-col items-center justify-center ikigai-hero-center"
-        style={{
-          left: "50%",
-          top: "50%",
-          zIndex: 6,
-        }}
+        style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 6 }}
       >
-        <span className="font-[family-name:var(--font-display)] text-[11px] font-bold text-white/90 tracking-[0.15em] leading-tight">
+        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
           YOUR
         </span>
-        <span className="font-[family-name:var(--font-display)] text-[11px] font-bold text-white/90 tracking-[0.15em] leading-tight">
+        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
           BUSINESS
         </span>
       </div>
 
-      {/* Outer labels — positioned inside the container bounds */}
-      {LABEL_POSITIONS.map((lbl) => (
-        <span
-          key={lbl.text}
-          className="absolute font-[family-name:var(--font-display)] text-xs font-semibold text-[var(--text-primary)] whitespace-nowrap pointer-events-none ikigai-hero-label"
-          style={{
-            left: lbl.x,
-            top: lbl.y,
-          }}
-        >
-          {lbl.text}
-        </span>
-      ))}
+      {/* Corner labels — square arrangement, equidistant from center */}
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
+        style={{ top: "16.5%", left: "5%" }}
+      >
+        What you love
+      </div>
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
+        style={{ bottom: "14.5%", left: "5%" }}
+      >
+        What you&apos;re<br />good at
+      </div>
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
+        style={{ top: "14.5%", right: "5%", textAlign: "right" }}
+      >
+        What the world<br />needs
+      </div>
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
+        style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}
+      >
+        What you can<br />be paid for
+      </div>
     </div>
   );
 }
