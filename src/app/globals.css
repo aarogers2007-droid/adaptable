@@ -252,11 +252,21 @@ button:active:not(:disabled) {
     var(--bg);
 }
 
-/* AI message subtle glow */
+/* AI message subtle glow + Ikigai accent */
 .ai-message {
   box-shadow: 0 0 20px rgba(13, 148, 136, 0.04), 0 1px 3px rgba(0,0,0,0.04);
-  border-left: 2px solid transparent;
-  border-image: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0) 1;
+  position: relative;
+  overflow: visible;
+}
+.ai-message::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 2px;
+  border-radius: 1px;
+  background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
 }
 
 /* Ikigai-colored thinking dots */
