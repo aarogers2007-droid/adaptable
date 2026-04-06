@@ -244,6 +244,56 @@ button:active:not(:disabled) {
     var(--bg);
 }
 
+/* ─── For-Schools Hero Animations ─── */
+
+/* Ikigai circle entrance on marketing page */
+@keyframes ikigai-circle-in {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
+}
+.ikigai-hero-circle {
+  opacity: 0;
+  animation: ikigai-circle-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.ikigai-hero-circle:nth-child(1) { animation-delay: 400ms; }
+.ikigai-hero-circle:nth-child(2) { animation-delay: 550ms; }
+.ikigai-hero-circle:nth-child(3) { animation-delay: 700ms; }
+.ikigai-hero-circle:nth-child(4) { animation-delay: 850ms; }
+
+/* Ikigai center reveal */
+@keyframes ikigai-center-in {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+.ikigai-hero-center {
+  opacity: 0;
+  animation: ikigai-center-in 400ms ease-out 1050ms both;
+}
+
+/* Ikigai label fade */
+@keyframes ikigai-label-in {
+  from { transform: translate(-50%, -50%); opacity: 0; }
+  to   { transform: translate(-50%, -50%); opacity: 1; }
+}
+.ikigai-hero-label {
+  opacity: 0;
+  animation: ikigai-label-in 300ms ease-out 1200ms both;
+}
+
+/* Stats band staggered fade-up */
+@keyframes stat-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stat-item {
+  opacity: 0;
+  animation: stat-fade-up 400ms ease-out both;
+}
+.stat-item:nth-child(1) { animation-delay: 200ms; }
+.stat-item:nth-child(2) { animation-delay: 350ms; }
+.stat-item:nth-child(3) { animation-delay: 500ms; }
+.stat-item:nth-child(4) { animation-delay: 650ms; }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

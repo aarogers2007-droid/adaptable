@@ -218,32 +218,29 @@ function IkigaiDiagram() {
       role="img"
       aria-label="Ikigai diagram: four overlapping circles representing what you love, what you're good at, what the world needs, and what you can be paid for, with your business at the center"
     >
-      {/* Four circles — no blend mode, use opacity for overlap effect */}
+      {/* Four circles — staggered scale entrance */}
       {IKIGAI_CIRCLES.map((c) => (
         <div
           key={c.label}
-          className="absolute rounded-full transition-opacity duration-200 hover:opacity-40"
+          className="absolute rounded-full ikigai-hero-circle hover:opacity-40 transition-opacity duration-200"
           style={{
             width: "50%",
             height: "50%",
             left: `${c.x}%`,
             top: `${c.y}%`,
-            transform: "translate(-50%, -50%)",
             backgroundColor: c.color,
-            opacity: 0.55,
           }}
         />
       ))}
 
       {/* Center — radial gradient with glow, matching the product */}
       <div
-        className="absolute rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none ikigai-hero-center"
         style={{
           width: "18%",
           height: "18%",
           left: "50%",
           top: "50%",
-          transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, #4A6741 40%, #8B9E6A 100%)",
           boxShadow: "0 0 24px rgba(74, 103, 65, 0.3)",
           zIndex: 5,
@@ -252,11 +249,10 @@ function IkigaiDiagram() {
 
       {/* Center label */}
       <div
-        className="absolute pointer-events-none flex flex-col items-center justify-center"
+        className="absolute pointer-events-none flex flex-col items-center justify-center ikigai-hero-center"
         style={{
           left: "50%",
           top: "50%",
-          transform: "translate(-50%, -50%)",
           zIndex: 6,
         }}
       >
@@ -272,11 +268,10 @@ function IkigaiDiagram() {
       {LABEL_POSITIONS.map((lbl) => (
         <span
           key={lbl.text}
-          className="absolute font-[family-name:var(--font-display)] text-xs font-semibold text-[var(--text-primary)] whitespace-nowrap pointer-events-none"
+          className="absolute font-[family-name:var(--font-display)] text-xs font-semibold text-[var(--text-primary)] whitespace-nowrap pointer-events-none ikigai-hero-label"
           style={{
             left: lbl.x,
             top: lbl.y,
-            transform: "translate(-50%, -50%)",
           }}
         >
           {lbl.text}
@@ -290,7 +285,7 @@ export default function ForSchoolsPage() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
       {/* Nav */}
-      <nav className="border-b border-[var(--border)] bg-[var(--bg)]">
+      <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-4">
           <Link
             href="/"
@@ -320,7 +315,7 @@ export default function ForSchoolsPage() {
             </Link>
             <a
               href="#request-demo"
-              className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] transition-colors"
+              className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-150"
             >
               Request a Demo
             </a>
@@ -348,7 +343,7 @@ export default function ForSchoolsPage() {
         <div className="mx-auto max-w-[1200px] px-6 py-16 md:py-20">
           <div className="grid items-center gap-12 md:grid-cols-2">
             {/* Left: copy */}
-            <div>
+            <div className="animate-[fade-up_600ms_ease-out_both]">
               <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">
                 Built for VentureLab
               </p>
@@ -358,17 +353,18 @@ export default function ForSchoolsPage() {
               <p className="mt-5 text-lg leading-relaxed text-[var(--text-secondary)] md:text-xl">
                 An AI-native curriculum that adapts to every student's idea, pace, and learning style.
               </p>
-              <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-                {["Discover what they care about", "Validate a real idea", "Interview customers", "Set pricing", "Build a launch plan"].map((step) => (
-                  <span key={step} className="text-sm text-[var(--text-muted)]">
-                    {step}
+              <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2">
+                {["Discover what they care about", "Validate a real idea", "Interview customers", "Set pricing", "Build a launch plan"].map((step, i, arr) => (
+                  <span key={step} className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[var(--text-secondary)]">{step}</span>
+                    {i < arr.length - 1 && <span className="text-[var(--text-muted)]" aria-hidden="true">&middot;</span>}
                   </span>
                 ))}
               </div>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <a
                   href="#request-demo"
-                  className="rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-colors"
+                  className="rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] active:scale-[0.98] transition-all duration-150"
                 >
                   Request a Demo
                 </a>
@@ -391,13 +387,13 @@ export default function ForSchoolsPage() {
 
       {/* Stats band */}
       <section className="border-b border-[var(--border)]">
-        <div className="mx-auto flex max-w-[1200px] flex-col justify-between gap-6 px-6 py-8 sm:flex-row">
+        <div className="mx-auto flex max-w-[1200px] flex-col justify-between gap-6 px-6 py-10 sm:flex-row sm:divide-x sm:divide-[var(--border)]">
           {STATS.map((stat) => (
-            <div key={stat.label} className="flex-1">
-              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--primary)]">
+            <div key={stat.label} className="flex-1 stat-item sm:pl-6 first:pl-0">
+              <p className="font-[family-name:var(--font-display)] text-[36px] font-bold leading-none text-[var(--primary)]">
                 {stat.value}
               </p>
-              <p className="mt-1 text-sm text-[var(--text-secondary)]">{stat.label}</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -415,7 +411,11 @@ export default function ForSchoolsPage() {
 
           <div className="relative mt-12 max-w-[640px] space-y-10">
             {/* Vertical connecting line */}
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-[var(--border)]" aria-hidden="true" />
+            <div
+              className="absolute left-[15px] top-0 bottom-0 w-[2px]"
+              style={{ background: "linear-gradient(to bottom, var(--primary), var(--primary-light), transparent)" }}
+              aria-hidden="true"
+            />
 
             {JOURNEY_STEPS.map((step, idx) => (
               <div key={step.number} className="relative flex gap-6">
@@ -477,14 +477,15 @@ export default function ForSchoolsPage() {
 
           {/* Primary tools — large cards */}
           <div className="mt-12 grid gap-6 md:grid-cols-2">
-            {TEACHER_TOOLS_PRIMARY.map((tool) => {
+            {TEACHER_TOOLS_PRIMARY.map((tool, idx) => {
               const Icon = PRIMARY_ICONS[tool.icon];
               return (
                 <div
                   key={tool.title}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-8 hover:shadow-md hover:border-[var(--primary)]/30 transition-all duration-100"
+                  className="group rounded-xl border border-[var(--border)] bg-[var(--bg)] p-8 hover:shadow-lg hover:border-[var(--primary)]/30 hover:-translate-y-1 transition-all duration-250 ease-out stagger-enter"
+                  style={{ animationDelay: `${idx * 120}ms` }}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-[var(--primary)]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] transition-transform duration-250 ease-out group-hover:scale-110">
                     {Icon && <Icon />}
                   </div>
                   <h3 className="mt-4 font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--text-primary)]">
@@ -498,18 +499,27 @@ export default function ForSchoolsPage() {
             })}
           </div>
 
-          {/* Secondary tools — compact grid, no cards */}
-          <div className="mt-8 grid gap-x-12 gap-y-6 sm:grid-cols-2">
-            {TEACHER_TOOLS_SECONDARY.map((tool) => (
-              <div key={tool.title}>
-                <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)]">
-                  {tool.title}
-                </h3>
-                <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
-                  {tool.description}
-                </p>
-              </div>
-            ))}
+          {/* Secondary tools — compact grid with left accent */}
+          <div className="mt-12">
+            <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+              Also included
+            </p>
+            <div className="mt-4 grid gap-x-12 gap-y-6 sm:grid-cols-2">
+              {TEACHER_TOOLS_SECONDARY.map((tool, idx) => (
+                <div
+                  key={tool.title}
+                  className="border-l-2 border-[var(--border-strong)] pl-4 stagger-enter"
+                  style={{ animationDelay: `${240 + idx * 80}ms` }}
+                >
+                  <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)]">
+                    {tool.title}
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+                    {tool.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -529,9 +539,9 @@ export default function ForSchoolsPage() {
             {STANDARDS.map((std) => (
               <div
                 key={std.code}
-                className="inline-flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-5 py-3"
+                className="inline-flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-5 py-3.5 hover:border-[var(--primary)]/30 hover:shadow-sm transition-all duration-100"
               >
-                <span className="inline-block rounded bg-[var(--primary)]/10 px-2.5 py-0.5 text-xs font-bold text-[var(--primary)]">
+                <span className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] px-2.5 py-1 text-xs font-bold tracking-wide text-white">
                   {std.code}
                 </span>
                 <div>
@@ -542,19 +552,20 @@ export default function ForSchoolsPage() {
             ))}
           </div>
 
-          <div className="mt-4">
+          <div className="mt-6">
             <Link
               href="/standards"
-              className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-dark)] transition-colors"
+              className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)] transition-colors"
             >
-              View full lesson-by-lesson alignment document &rarr;
+              View full lesson-by-lesson alignment document
+              <span className="inline-block transition-transform duration-150 group-hover:translate-x-1">&rarr;</span>
             </Link>
           </div>
 
           {/* Safety items — compact two-column list */}
-          <div className="mt-12 grid gap-x-12 gap-y-4 sm:grid-cols-2">
+          <div className="mt-12 grid gap-x-12 gap-y-5 sm:grid-cols-2">
             {SAFETY_ITEMS.map((item) => (
-              <div key={item.title}>
+              <div key={item.title} className="border-l-2 border-[var(--primary)]/40 pl-4">
                 <h3 className="font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--text-primary)]">
                   {item.title}
                 </h3>
@@ -576,8 +587,9 @@ export default function ForSchoolsPage() {
 
           <div className="mt-12 max-w-[800px] divide-y divide-[var(--border)] border-t border-[var(--border)]">
             {FAQ.map((item, idx) => (
-              <div key={idx} className="py-6">
+              <div key={idx} className="py-6 -mx-4 px-4 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors duration-100">
                 <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)]">
+                  <span className="text-[var(--primary)] mr-1.5">Q:</span>
                   {item.q}
                 </h3>
                 <p className="mt-2 text-base leading-relaxed text-[var(--text-secondary)]">
@@ -603,7 +615,8 @@ export default function ForSchoolsPage() {
             <div className="mt-8">
               <a
                 href="mailto:demo@adaptable.app?subject=Demo%20Request%20-%20Adaptable%20for%20Schools"
-                className="inline-flex rounded-lg bg-[var(--accent)] px-8 py-3 text-base font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-colors"
+                className="inline-flex rounded-lg bg-[var(--accent)] px-8 py-3 text-base font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-all duration-150"
+                style={{ boxShadow: "0 0 20px rgba(245, 158, 11, 0.35), 0 0 60px rgba(245, 158, 11, 0.1)" }}
               >
                 Request a Demo
               </a>
