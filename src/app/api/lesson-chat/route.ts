@@ -460,6 +460,7 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
             { role: "assistant", content: cleanResponse },
           ];
 
+          // Update artifacts via user client (RLS-scoped)
           await supabase
             .from("student_progress")
             .update({
@@ -469,12 +470,20 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
                 checkpoints_reached: newCheckpoints,
                 learning_profile: updatedProfile,
               },
-              ...(lessonComplete
-                ? { status: "completed", completed_at: new Date().toISOString() }
-                : {}),
             })
             .eq("id", progressId)
             .eq("student_id", user.id);
+
+          // Mark lesson complete via admin client (bypasses trigger that blocks student status changes)
+          if (lessonComplete) {
+            const { createAdminClient } = await import("@/lib/supabase/admin");
+            const adminDb = createAdminClient();
+            await adminDb
+              .from("student_progress")
+              .update({ status: "completed", completed_at: new Date().toISOString() })
+              .eq("id", progressId)
+              .eq("student_id", user.id);
+          }
 
           // Send completion and checkpoint info to client
           controller.enqueue(
