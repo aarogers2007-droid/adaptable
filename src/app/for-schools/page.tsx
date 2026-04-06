@@ -252,6 +252,12 @@ export default function ForSchoolsPage() {
             <a href="#faq" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
               FAQ
             </a>
+            <Link
+              href="/login"
+              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              Sign In
+            </Link>
             <a
               href="#request-demo"
               className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] transition-colors"

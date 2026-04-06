@@ -18,7 +18,7 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
     { href: "/dashboard", label: "My Business", icon: "🏠" },
     { href: "/lessons", label: "Lessons", icon: "📖", matchPrefix: true },
     { href: "/chat", label: "AI Guide", icon: "💬" },
-    { href: "/leaderboard", label: "Board", icon: "📊" },
+    { href: "/leaderboard", label: "Leaderboard", icon: "📊" },
     { href: "/card", label: "Card", icon: "💳" },
   ];
 
