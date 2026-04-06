@@ -437,6 +437,30 @@ export default async function InstructorDashboardPage() {
       avgSpeedByLesson,
     };
 
+    // Fetch follow-up flags
+    const { data: flagsData } = await supabase
+      .from("teacher_flags")
+      .select("id, student_id, priority, note, due_date, created_at, resolved")
+      .eq("class_id", cls.id)
+      .eq("resolved", false)
+      .order("priority")
+      .order("due_date", { ascending: true, nullsFirst: false });
+
+    const flags = (flagsData ?? []).map((flag: Record<string, unknown>) => {
+      const student = students.find((s) => s.id === flag.student_id);
+      return {
+        id: flag.id as string,
+        student_id: flag.student_id as string,
+        priority: flag.priority as string,
+        note: flag.note as string | null,
+        due_date: flag.due_date as string | null,
+        created_at: flag.created_at as string,
+        profiles: student
+          ? { full_name: student.full_name, business_idea: student.business_idea ? { name: student.business_idea.name } : null }
+          : null,
+      };
+    });
+
     classDataArray.push({
       id: cls.id,
       name: cls.name,
@@ -446,6 +470,7 @@ export default async function InstructorDashboardPage() {
       feedItems,
       alerts: classAlerts,
       analytics,
+      flags,
     });
   }
 

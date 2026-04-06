@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { acknowledgeAlert, acknowledgeAllAlerts, resolveAlert } from "./actions";
+import NudgeTemplates from "./NudgeTemplates";
 import type { TeacherAlert } from "@/lib/types";
 
 const ALERT_ICONS: Record<string, string> = {
@@ -157,6 +158,15 @@ export default function AlertPanel({
                     minute: "2-digit",
                   })}
                 </p>
+
+                {/* Smart Nudge Templates */}
+                <NudgeTemplates
+                  alertType={alert.alert_type}
+                  studentId={alert.student_id}
+                  studentName={alert.student_name}
+                  businessName={((alert.context as Record<string, string> | null)?.business_name) ?? "their business"}
+                  classId={classIds[0]}
+                />
               </div>
               <div className="flex shrink-0 items-center gap-1">
                 {onMessageStudent && (

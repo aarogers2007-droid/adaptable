@@ -12,7 +12,18 @@ import WelcomeSlideshow from "./WelcomeSlideshow";
 import type { StudentRow } from "./StudentTable";
 import type { FeedItem } from "./LiveFeed";
 import type { AnalyticsData } from "./ClassAnalytics";
+import FollowUpPanel from "./FollowUpPanel";
 import type { TeacherAlert } from "@/lib/types";
+
+export interface ClassFlag {
+  id: string;
+  student_id: string;
+  priority: string;
+  note: string | null;
+  due_date: string | null;
+  created_at: string;
+  profiles: { full_name: string | null; business_idea: { name: string } | null } | null;
+}
 
 export interface ClassData {
   id: string;
@@ -23,6 +34,7 @@ export interface ClassData {
   feedItems: FeedItem[];
   alerts: (TeacherAlert & { student_name: string })[];
   analytics: AnalyticsData;
+  flags: ClassFlag[];
 }
 
 interface DashboardClientProps {
@@ -30,7 +42,7 @@ interface DashboardClientProps {
   totalLessons: number;
 }
 
-type SubTab = "students" | "feed" | "alerts" | "analytics";
+type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics";
 
 export default function DashboardClient({ classes, totalLessons }: DashboardClientProps) {
   const [activeClassIdx, setActiveClassIdx] = useState(0);
@@ -49,10 +61,12 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
   const totalStudents = classes.reduce((sum, c) => sum + c.students.length, 0);
   const totalAlerts = classes.reduce((sum, c) => sum + c.alerts.length, 0);
 
+  const activeFlags = activeClass?.flags ?? [];
   const subTabs: { key: SubTab; label: string; count?: number }[] = [
     { key: "students", label: "Students", count: activeClass?.students.length },
     { key: "feed", label: "Live Feed" },
     { key: "alerts", label: "Alerts", count: activeClass?.alerts.length },
+    { key: "followups", label: "Follow-ups", count: activeFlags.length },
     { key: "analytics", label: "Analytics" },
   ];
 
@@ -233,6 +247,10 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
                       })
                     }
                   />
+                )}
+
+                {activeSubTab === "followups" && (
+                  <FollowUpPanel flags={activeFlags as ClassFlag[]} />
                 )}
 
                 {activeSubTab === "analytics" && (
