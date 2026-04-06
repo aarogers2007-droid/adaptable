@@ -197,17 +197,17 @@ const PRIMARY_ICONS: Record<string, () => React.ReactElement> = {
 /* Ikigai diagram for the hero — uses HTML divs with mix-blend-mode
    to match the product's organic color blending at intersections */
 const IKIGAI_CIRCLES = [
-  { label: "What you love", color: "#F5E642", x: 50, y: 22 },
-  { label: "What you're good at", color: "#A8DB5A", x: 28, y: 53 },
-  { label: "What the world needs", color: "#F4A79D", x: 72, y: 53 },
-  { label: "What you can be paid for", color: "#6DD5D0", x: 50, y: 80 },
+  { label: "What you love", color: "#F5E642", x: 50, y: 28 },
+  { label: "What you're good at", color: "#A8DB5A", x: 32, y: 50 },
+  { label: "What the world needs", color: "#F4A79D", x: 68, y: 50 },
+  { label: "What you can be paid for", color: "#6DD5D0", x: 50, y: 72 },
 ] as const;
 
 const LABEL_POSITIONS = [
-  { text: "What you love", x: "50%", y: "-2%" },
-  { text: "What you're good at", x: "-4%", y: "48%" },
-  { text: "What the world needs", x: "104%", y: "48%" },
-  { text: "What you can be paid for", x: "50%", y: "100%" },
+  { text: "What you love", x: "50%", y: "4%" },
+  { text: "What you're good at", x: "8%", y: "50%" },
+  { text: "What the world needs", x: "92%", y: "50%" },
+  { text: "What you can be paid for", x: "50%", y: "96%" },
 ] as const;
 
 function IkigaiDiagram() {
@@ -218,20 +218,19 @@ function IkigaiDiagram() {
       role="img"
       aria-label="Ikigai diagram: four overlapping circles representing what you love, what you're good at, what the world needs, and what you can be paid for, with your business at the center"
     >
-      {/* Four circles with mix-blend-mode for natural overlap colors */}
+      {/* Four circles — no blend mode, use opacity for overlap effect */}
       {IKIGAI_CIRCLES.map((c) => (
         <div
           key={c.label}
-          className="absolute rounded-full transition-opacity duration-200 hover:opacity-50"
+          className="absolute rounded-full transition-opacity duration-200 hover:opacity-40"
           style={{
-            width: "47%",
-            height: "47%",
+            width: "50%",
+            height: "50%",
             left: `${c.x}%`,
             top: `${c.y}%`,
             transform: "translate(-50%, -50%)",
             backgroundColor: c.color,
-            opacity: 0.4,
-            mixBlendMode: "multiply",
+            opacity: 0.55,
           }}
         />
       ))}
@@ -240,13 +239,13 @@ function IkigaiDiagram() {
       <div
         className="absolute rounded-full pointer-events-none"
         style={{
-          width: "12%",
-          height: "12%",
+          width: "18%",
+          height: "18%",
           left: "50%",
           top: "50%",
           transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, #4A6741 40%, #8B9E6A 100%)",
-          boxShadow: "0 0 24px rgba(74, 103, 65, 0.25)",
+          boxShadow: "0 0 24px rgba(74, 103, 65, 0.3)",
           zIndex: 5,
         }}
       />
@@ -261,15 +260,15 @@ function IkigaiDiagram() {
           zIndex: 6,
         }}
       >
-        <span className="font-[family-name:var(--font-display)] text-[9px] font-bold text-white/90 tracking-[0.15em] leading-tight">
+        <span className="font-[family-name:var(--font-display)] text-[11px] font-bold text-white/90 tracking-[0.15em] leading-tight">
           YOUR
         </span>
-        <span className="font-[family-name:var(--font-display)] text-[9px] font-bold text-white/90 tracking-[0.15em] leading-tight">
+        <span className="font-[family-name:var(--font-display)] text-[11px] font-bold text-white/90 tracking-[0.15em] leading-tight">
           BUSINESS
         </span>
       </div>
 
-      {/* Outer labels — positioned around the diagram */}
+      {/* Outer labels — positioned inside the container bounds */}
       {LABEL_POSITIONS.map((lbl) => (
         <span
           key={lbl.text}
@@ -383,7 +382,7 @@ export default function ForSchoolsPage() {
             </div>
 
             {/* Right: Ikigai diagram */}
-            <div className="flex justify-center md:justify-end">
+            <div className="flex justify-center">
               <IkigaiDiagram />
             </div>
           </div>
