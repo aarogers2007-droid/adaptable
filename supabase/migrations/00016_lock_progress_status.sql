@@ -42,3 +42,40 @@ CREATE TRIGGER trg_prevent_progress_escalation
   BEFORE UPDATE ON student_progress
   FOR EACH ROW
   EXECUTE FUNCTION prevent_student_progress_escalation();
+
+-- Also prevent INSERT with status='completed' — students could skip the UPDATE trigger
+-- by inserting new completed rows for lessons they haven't started yet.
+CREATE OR REPLACE FUNCTION prevent_student_progress_insert_escalation()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  jwt_role text;
+BEGIN
+  BEGIN
+    jwt_role := current_setting('request.jwt.claims', true)::json->>'role';
+  EXCEPTION WHEN OTHERS THEN
+    jwt_role := NULL;
+  END;
+
+  -- Service role can insert anything
+  IF jwt_role = 'service_role' THEN
+    RETURN NEW;
+  END IF;
+
+  -- Force new rows to start as not_started/in_progress with no completed_at
+  IF NEW.status = 'completed' THEN
+    NEW.status := 'in_progress';
+  END IF;
+  NEW.completed_at := NULL;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_prevent_progress_insert_escalation ON student_progress;
+
+CREATE TRIGGER trg_prevent_progress_insert_escalation
+  BEFORE INSERT ON student_progress
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_student_progress_insert_escalation();

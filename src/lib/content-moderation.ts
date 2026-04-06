@@ -155,14 +155,63 @@ export interface ModerationResult {
 /**
  * Moderate any text input. Returns safe:true or safe:false with reason.
  */
+/**
+ * Normalize text to defeat common evasion techniques:
+ * - Strip zero-width characters (ZWJ, ZWNJ, ZW space, etc.)
+ * - Normalize Unicode confusables (Cyrillic а→a, е→e, etc.)
+ * - Collapse repeated whitespace
+ */
+function normalizeForModeration(text: string): string {
+  let normalized = text
+    // Strip zero-width characters
+    .replace(/[\u200B\u200C\u200D\u200E\u200F\uFEFF\u00AD\u034F\u061C\u2060\u2061\u2062\u2063\u2064\u206A-\u206F]/g, "")
+    // Normalize common Cyrillic/Greek lookalikes to Latin
+    .replace(/[\u0430]/g, "a")  // Cyrillic а
+    .replace(/[\u0435\u0451]/g, "e")  // Cyrillic е/ё
+    .replace(/[\u043E]/g, "o")  // Cyrillic о
+    .replace(/[\u0440]/g, "p")  // Cyrillic р
+    .replace(/[\u0441]/g, "c")  // Cyrillic с
+    .replace(/[\u0443]/g, "y")  // Cyrillic у
+    .replace(/[\u0445]/g, "x")  // Cyrillic х
+    .replace(/[\u0456\u0269]/g, "i")  // Cyrillic і
+    .replace(/[\u0501]/g, "d")  // Cyrillic ԁ
+    .replace(/[\u051B]/g, "q")  // Cyrillic ԛ
+    .replace(/[\u0392\u03B2]/g, "B")  // Greek Β/β
+    .replace(/[\u0391\u03B1]/g, "a")  // Greek Α/α
+    // Common leetspeak
+    .replace(/[1!|]/g, (ch) => {
+      // Only replace when adjacent to letters (crude but effective)
+      return "i";
+    })
+    .replace(/[@]/g, "a")
+    .replace(/[3]/g, "e")
+    .replace(/[0]/g, "o")
+    .replace(/[$]/g, "s")
+    .replace(/[5]/g, "s")
+    // Collapse whitespace (catches "f u c k" spacing trick)
+    .replace(/(\w)\s+(?=\w)/g, (match, p1) => {
+      // Only collapse single-char-space-single-char patterns
+      if (match.length <= 3) return match.replace(/\s+/g, "");
+      return match;
+    });
+
+  // Also run Unicode NFKD normalization to decompose accented chars
+  normalized = normalized.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+
+  return normalized;
+}
+
 export function moderateContent(text: string): ModerationResult {
   if (!text || typeof text !== "string") {
     return { safe: true };
   }
 
+  // Normalize text to defeat evasion techniques, then check both original and normalized
+  const normalized = normalizeForModeration(text);
+
   // Check blocked patterns (profanity, slurs, violence, illegal)
   for (const pattern of BLOCKED_PATTERNS) {
-    if (pattern.test(text)) {
+    if (pattern.test(text) || pattern.test(normalized)) {
       return {
         safe: false,
         reason: "That content isn't appropriate here. Let's keep it focused on your venture.",
@@ -171,9 +220,9 @@ export function moderateContent(text: string): ModerationResult {
     }
   }
 
-  // Check prompt injection
+  // Check prompt injection (both original and normalized)
   for (const pattern of INJECTION_PATTERNS) {
-    if (pattern.test(text)) {
+    if (pattern.test(text) || pattern.test(normalized)) {
       return {
         safe: false,
         reason: "I'm here to help you build your business. What are you working on?",

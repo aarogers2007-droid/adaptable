@@ -148,20 +148,6 @@ export async function sendParentMessage(
     return { error: modResult.reason ?? "Message could not be sent." };
   }
 
-  // Rate limit: max 3 parent messages per day per token (DB-backed)
-  const admin = createAdminClient();
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { data: recentMsgs } = await admin
-    .from("teacher_alerts")
-    .select("id")
-    .eq("alert_type", "parent_message")
-    .gte("created_at", oneDayAgo)
-    .limit(4);
-  // Count by checking how many parent_message alerts exist for this token's student
-  if (recentMsgs && recentMsgs.length >= 3) {
-    return { error: "You can send up to 3 messages per day. Try again tomorrow." };
-  }
-
   // Verify cookie
   const { cookies } = await import("next/headers");
   const cookieStore = await cookies();
@@ -170,10 +156,9 @@ export async function sendParentMessage(
     return { error: "Session expired. Please refresh and re-enter your PIN." };
   }
 
-  const supabase = await createClient();
-
-  // Look up student
-  const { data: student } = await supabase
+  // Look up student first (needed for rate limit filter)
+  const admin = createAdminClient();
+  const { data: student } = await admin
     .from("profiles")
     .select("id, full_name")
     .eq("parent_access_token", token)
@@ -183,8 +168,21 @@ export async function sendParentMessage(
     return { error: "Student not found." };
   }
 
+  // Rate limit: max 3 parent messages per day PER STUDENT (DB-backed)
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: recentMsgs } = await admin
+    .from("teacher_alerts")
+    .select("id")
+    .eq("alert_type", "parent_message")
+    .eq("student_id", student.id)
+    .gte("created_at", oneDayAgo)
+    .limit(4);
+  if (recentMsgs && recentMsgs.length >= 3) {
+    return { error: "You can send up to 3 messages per day. Try again tomorrow." };
+  }
+
   // Find class and teacher
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await admin
     .from("class_enrollments")
     .select("class_id")
     .eq("student_id", student.id)
@@ -196,7 +194,7 @@ export async function sendParentMessage(
   }
 
   // Insert alert via the teacher_alerts table
-  const { error } = await supabase.from("teacher_alerts").insert({
+  const { error } = await admin.from("teacher_alerts").insert({
     class_id: enrollment.class_id,
     student_id: student.id,
     alert_type: "parent_message",

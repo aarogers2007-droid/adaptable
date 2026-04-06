@@ -1,17 +1,41 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * Validate an invite code. Uses server-side client which bypasses RLS issues
  * for unauthenticated users on the join page.
  */
 export async function validateInviteCode(code: string) {
-  // Rate limit: max 10 validation attempts per minute per code
-  // Uses a simple DB-based approach
   if (!code || typeof code !== "string" || code.trim().length < 4 || code.trim().length > 12) {
     return { error: "Invalid invite code. Check with your instructor." };
   }
+
+  // Rate limit: max 20 invite validations per minute globally, max 5 per specific code
+  // Reuses parent_pin_attempts table for persistent rate limiting
+  const admin = createAdminClient();
+  const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
+  const codeHash = `inv_${code.trim().toUpperCase()}`;
+
+  const { data: recentAttempts } = await admin
+    .from("parent_pin_attempts")
+    .select("id, token_hash")
+    .like("token_hash", "inv_%")
+    .gte("attempted_at", oneMinuteAgo);
+
+  const globalCount = recentAttempts?.length ?? 0;
+  const codeCount = recentAttempts?.filter(a => a.token_hash === codeHash).length ?? 0;
+
+  if (globalCount >= 20 || codeCount >= 5) {
+    return { error: "Too many attempts. Please wait a moment and try again." };
+  }
+
+  // Record this attempt
+  await admin.from("parent_pin_attempts").insert({
+    token_hash: codeHash,
+    attempted_at: new Date().toISOString(),
+  });
 
   const supabase = await createClient();
 
