@@ -32,6 +32,9 @@ const IKIGAI_ANSWERS = {
   paid: ["Art workshops", "Private lessons", "Commissions"],
 };
 
+const IKIGAI_COLORS = ["#F5E642", "#A8DB5A", "#F4A79D", "#6DD5D0"];
+const IKIGAI_LABELS = ["What you love", "What you're good at", "What the world needs", "What you can be paid for"];
+
 const BUSINESS_NAME = "Studio Bloom";
 const STUDENT_NAME = "Elsa";
 
@@ -76,14 +79,12 @@ export default function DemoShowcase() {
   // Scene-specific auto-play effects
   useEffect(() => {
     if (scene === "ikigai-def") {
-      // Fade in the definition
       const t1 = setTimeout(() => setSubPhase(1), 800);
       const t2 = setTimeout(() => setSubPhase(2), 2000);
       return () => { clearTimeout(t1); clearTimeout(t2); };
     }
 
     if (["ikigai-love", "ikigai-good", "ikigai-needs", "ikigai-paid"].includes(scene)) {
-      // Auto-type items for this circle
       const key = scene.replace("ikigai-", "") as keyof typeof IKIGAI_ANSWERS;
       const items = IKIGAI_ANSWERS[key];
       setTypedItems([]);
@@ -96,27 +97,26 @@ export default function DemoShowcase() {
         }
         await sleep(1200);
         if (cancelled) return;
-        setSubPhase(1); // Show "continue" button
+        setSubPhase(1);
       })();
       return () => { cancelled = true; };
     }
 
     if (scene === "ikigai-reveal") {
-      // Gravitational collapse sequence
       let cancelled = false;
       (async () => {
         await sleep(PHI * PHI * BASE);
         if (cancelled) return;
-        setSubPhase(1); // contracting
+        setSubPhase(1);
         await sleep(2.618 * BASE);
         if (cancelled) return;
-        setSubPhase(2); // center absorb
+        setSubPhase(2);
         await sleep(PHI * BASE);
         if (cancelled) return;
-        setSubPhase(3); // collapse + shockwave + name
+        setSubPhase(3);
         await sleep(2.618 * BASE);
         if (cancelled) return;
-        setSubPhase(4); // origin text + continue
+        setSubPhase(4);
       })();
       return () => { cancelled = true; };
     }
@@ -132,7 +132,7 @@ export default function DemoShowcase() {
         setSubPhase(2);
         await sleep(1800);
         if (cancelled) return;
-        setSubPhase(3); // dissolve
+        setSubPhase(3);
         await sleep(1000);
         if (cancelled) return;
         goTo("lesson-convo");
@@ -148,14 +148,14 @@ export default function DemoShowcase() {
         await sleep(800);
         if (cancelled) return;
         setLessonMessages([
-          { role: "ai", text: "Let's think about who your ideal customer really is. Not just \"everyone\" — but the specific person who would be MOST excited about Studio Bloom." },
+          { role: "ai", text: "Let's think about who your ideal customer really is. Not just \"everyone\" \u2014 but the specific person who would be MOST excited about Studio Bloom." },
         ]);
         await sleep(3000);
         if (cancelled) return;
         setLessonMessages((prev) => [...prev, { role: "ai", text: "Think about age, location, and what problem they're trying to solve. Who comes to mind?" }]);
         await sleep(2000);
         if (cancelled) return;
-        setSubPhase(1); // show input for "see it for yourself"
+        setSubPhase(1);
       })();
       return () => { cancelled = true; };
     }
@@ -174,7 +174,7 @@ export default function DemoShowcase() {
         setLetterPhase(3);
         await sleep(4.236 * BASE);
         if (cancelled) return;
-        setLetterPhase(4); // fade out
+        setLetterPhase(4);
         await sleep(3 * BASE);
         if (cancelled) return;
         goTo("ceremony-complete");
@@ -201,14 +201,14 @@ export default function DemoShowcase() {
         setRevealCenter(true);
         await sleep(PHI * PHI * BASE);
         if (cancelled) return;
-        setSubPhase(1); // contract
+        setSubPhase(1);
         await sleep(2.618 * BASE);
         if (cancelled) return;
-        setSubPhase(2); // name
+        setSubPhase(2);
         setRevealName(true);
         await sleep(PHI * PHI * BASE);
         if (cancelled) return;
-        setSubPhase(3); // continue button
+        setSubPhase(3);
       })();
       return () => { cancelled = true; };
     }
@@ -234,13 +234,12 @@ export default function DemoShowcase() {
     }
   }, [scene, goTo]);
 
-  // Lesson: handle user sending a message
   async function handleLessonSend() {
     if (!lessonInput.trim()) return;
     const text = lessonInput.trim();
     setLessonInput("");
     setLessonMessages((prev) => [...prev, { role: "user", text }]);
-    setSubPhase(0); // hide input
+    setSubPhase(0);
 
     await sleep(1000);
     setLessonThinking(true);
@@ -257,7 +256,7 @@ export default function DemoShowcase() {
 
     await sleep(3000);
     setCheckpointShown(false);
-    setSubPhase(2); // show "continue to completion" button
+    setSubPhase(2);
   }
 
   const sceneActive = (s: Scene) => scene === s && !transitioning;
@@ -289,50 +288,82 @@ export default function DemoShowcase() {
           background: #0D9488; border-color: #0D9488; color: #fff;
         }
         .demo-btn-primary:hover { background: #0F766E; border-color: #0F766E; }
-        .demo-btn-amber {
-          background: #F59E0B; border-color: #F59E0B; color: #111827;
-        }
 
-        /* Welcome */
+        /* Welcome — Satoshi display, DESIGN.md 48px/700 */
         .demo-welcome-badge { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #0D9488; }
-        .demo-welcome-title { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 44px; font-weight: 800; margin-top: 12px; text-align: center; }
+        .demo-welcome-title { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 48px; font-weight: 800; margin-top: 12px; text-align: center; letter-spacing: -0.025em; }
         .demo-welcome-sub { font-size: 17px; color: rgba(255,255,255,0.5); margin-top: 12px; text-align: center; max-width: 480px; line-height: 1.618; }
 
-        /* Ikigai definition */
+        /* Ikigai definition — EB Garamond for the dictionary entry */
         .demo-def { max-width: 480px; text-align: left; }
-        .demo-def-word { font-family: Georgia, serif; font-size: 28px; font-weight: 700; font-style: italic; color: rgba(255,255,255,0.85); }
-        .demo-def-pron { font-family: Georgia, serif; font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 4px; font-style: italic; }
-        .demo-def-body { font-family: Georgia, serif; font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.65); margin-top: 20px; }
+        .demo-def-word { font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700; font-style: italic; color: rgba(255,255,255,0.85); }
+        .demo-def-pron { font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 4px; font-style: italic; }
+        .demo-def-body { font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.65); margin-top: 20px; }
         .demo-def-body em { color: rgba(255,255,255,0.85); font-style: italic; }
 
-        /* Ikigai wizard circles */
-        .demo-wizard { position: relative; width: min(400px, 80vw); aspect-ratio: 1/1; }
-        .demo-wiz-circle {
-          position: absolute; border-radius: 50%; width: 50%; height: 50%;
-          transform: translate(-50%,-50%); opacity: 0.2; transition: opacity 0.6s;
+        /* ─── IKIGAI WIZARD: Full-screen color experience (matches real StepContent) ─── */
+        .demo-wizard-fullscreen {
+          position: fixed; inset: 0; display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          transition: background-color 0.6s ease-out;
         }
-        .demo-wiz-circle.active { opacity: 0.618; }
-        .demo-wiz-circle.done { opacity: 0.4; }
-        .demo-wiz-circle.c1 { background: #F5E642; left: 50%; top: 19.1%; }
-        .demo-wiz-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
-        .demo-wiz-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
-        .demo-wiz-circle.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
-
-        .demo-wiz-label {
-          position: absolute; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); text-align: center;
+        .demo-wizard-fullscreen::before {
+          content: ''; position: absolute; inset: 0;
+          background: radial-gradient(ellipse 70% 50% at 50% 10%, rgba(255,255,255,0.18) 0%, transparent 70%),
+                      radial-gradient(ellipse 50% 40% at 10% 90%, rgba(0,0,0,0.12) 0%, transparent 50%),
+                      radial-gradient(ellipse 50% 40% at 90% 90%, rgba(0,0,0,0.12) 0%, transparent 50%);
+          pointer-events: none;
         }
-        .demo-wiz-items {
-          position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-          text-align: center; z-index: 5;
+        .demo-wiz-fs-title {
+          font-family: var(--font-display), 'Satoshi', sans-serif;
+          font-size: 36px; font-weight: 700; color: rgba(0,0,0,0.85);
+          margin-bottom: 32px; text-align: center;
         }
-        .demo-wiz-item {
-          display: inline-block; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-          border-radius: 99px; padding: 6px 16px; margin: 4px; font-size: 13px; color: rgba(255,255,255,0.8);
+        .demo-wiz-fs-items {
+          display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+          max-width: 400px; margin-bottom: 24px;
+        }
+        .demo-wiz-fs-item {
+          display: inline-flex; align-items: center;
+          background: rgba(255,255,255,0.35); backdrop-filter: blur(8px);
+          border: 1px solid rgba(255,255,255,0.5);
+          border-radius: 9999px; padding: 8px 20px; font-size: 14px; font-weight: 500;
+          color: rgba(0,0,0,0.8);
           animation: demo-chip-in 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
         }
-        @keyframes demo-chip-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .demo-wiz-fs-item::before {
+          content: '\\2713'; margin-right: 8px; font-size: 12px; color: rgba(0,0,0,0.5);
+        }
+        @keyframes demo-chip-in { from { opacity: 0; transform: translateY(8px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* Gravitational collapse (reuses ceremony CSS from globals) */
+        /* Mini Ikigai progress at bottom of wizard */
+        .demo-wiz-mini {
+          position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+          width: 80px; height: 80px; opacity: 0.5;
+        }
+        .demo-wiz-mini-circle {
+          position: absolute; border-radius: 50%; width: 50%; height: 50%;
+          transform: translate(-50%,-50%); opacity: 0.25;
+          transition: opacity 0.5s, box-shadow 0.5s;
+        }
+        .demo-wiz-mini-circle.active { opacity: 0.7; box-shadow: 0 0 12px currentColor; }
+        .demo-wiz-mini-circle.done { opacity: 0.5; }
+        .demo-wiz-mini-circle.c1 { background: #F5E642; left: 50%; top: 19.1%; }
+        .demo-wiz-mini-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
+        .demo-wiz-mini-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
+        .demo-wiz-mini-circle.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
+
+        .demo-wiz-fs-btn {
+          background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5);
+          color: rgba(0,0,0,0.7); padding: 12px 36px; font-size: 13px;
+          font-weight: 600; letter-spacing: 0.08em; border-radius: 8px;
+          cursor: pointer; transition: all 0.3s; margin-top: 16px;
+          font-family: inherit; backdrop-filter: blur(8px);
+        }
+        .demo-wiz-fs-btn:hover { background: rgba(255,255,255,0.5); color: rgba(0,0,0,0.9); }
+
+        /* Gravitational collapse */
+        .demo-wizard { position: relative; width: min(400px, 80vw); aspect-ratio: 1/1; }
         .demo-collapse-circle {
           position: absolute; border-radius: 50%; width: 50%; height: 50%;
           transform: translate(-50%,-50%); opacity: 0.618;
@@ -359,34 +390,60 @@ export default function DemoShowcase() {
         .demo-reveal-name .name { font-size: 28px; font-weight: 800; color: #fff; text-shadow: 0 0 28px rgba(74,103,65,0.5); }
         .demo-reveal-name .origin { display: block; margin-top: 11px; font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.35); letter-spacing: 0.146em; }
 
-        /* Dashboard mockup */
+        /* Dashboard — DESIGN.md: 28px/700 Satoshi for business name, 14px body */
         .demo-dash { background: #f9fafb; border-radius: 12px; padding: 24px; width: min(500px, 85vw); text-align: left; }
-        .demo-dash h2 { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 24px; font-weight: 700; color: #111827; }
-        .demo-dash .sub { font-size: 13px; color: #6b7280; margin-top: 4px; }
+        .demo-dash h2 { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 28px; font-weight: 700; color: #111827; }
+        .demo-dash .sub { font-size: 14px; color: #4b5563; margin-top: 4px; }
         .demo-dash .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-top: 16px; }
         .demo-dash .card-label { font-size: 10px; font-weight: 600; color: #0D9488; text-transform: uppercase; letter-spacing: 0.1em; }
-        .demo-dash .card-title { font-size: 18px; font-weight: 700; color: #111827; margin-top: 4px; }
-        .demo-dash .bar { height: 8px; border-radius: 99px; background: #f3f4f6; margin-top: 12px; overflow: hidden; }
-        .demo-dash .bar-fill { height: 100%; width: 0%; border-radius: 99px; background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0); transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
+        .demo-dash .card-title { font-size: 18px; font-weight: 700; color: #111827; margin-top: 4px; font-family: var(--font-display), 'Satoshi', sans-serif; }
+        .demo-dash .bar { height: 8px; border-radius: 9999px; background: #f3f4f6; margin-top: 12px; overflow: hidden; }
+        .demo-dash .bar-fill { height: 100%; width: 0%; border-radius: 9999px; background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0); transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
 
-        /* Lesson mockup */
+        /* Lesson — matches real LessonConversation exactly */
         .demo-lesson { background: #fff; border-radius: 12px; width: min(520px, 90vw); height: min(500px, 70vh); display: flex; flex-direction: column; overflow: hidden; }
         .demo-lesson-header { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; background: #fff; }
-        .demo-lesson-msgs { flex: 1; overflow-y: auto; padding: 16px; }
-        .demo-lesson-msg { margin-bottom: 16px; animation: demo-msg-in 0.5s ease-out; }
+        .demo-lesson-msgs { flex: 1; overflow-y: auto; padding: 24px; }
+        .demo-lesson-msg { margin-bottom: 20px; animation: demo-msg-in 0.5s ease-out; }
         @keyframes demo-msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .demo-lesson-ai { max-width: 85%; }
-        .demo-lesson-ai .bubble { background: #f3f4f6; color: #111827; border-radius: 16px; padding: 14px 18px; font-size: 14px; line-height: 1.6; position: relative; box-shadow: 0 0 20px rgba(13,148,136,0.04); }
-        .demo-lesson-ai .bubble::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; border-radius: 1px; background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0); }
+        .demo-lesson-ai .bubble {
+          background: #f3f4f6; color: #111827; border-radius: 16px; padding: 20px 24px;
+          font-size: 15px; line-height: 1.6; position: relative;
+          box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+          overflow: visible;
+        }
+        .demo-lesson-ai .bubble::before {
+          content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
+          width: 2px; border-radius: 1px;
+          background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+        }
         .demo-lesson-user { text-align: right; }
-        .demo-lesson-user .bubble { display: inline-block; background: #0D9488; color: #fff; border-radius: 16px; padding: 10px 16px; font-size: 14px; line-height: 1.6; max-width: 80%; text-align: left; }
-        .demo-lesson-guide { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
-        .demo-lesson-guide span { font-size: 9px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; }
+        .demo-lesson-user .bubble {
+          display: inline-block; background: #0D9488; color: #fff;
+          border-radius: 16px; padding: 12px 20px; font-size: 15px; line-height: 1.6;
+          max-width: 80%; text-align: left;
+        }
+        .demo-lesson-guide { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; margin-left: 4px; }
+        .demo-lesson-guide span { font-size: 10px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
         .demo-lesson-input { padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; }
-        .demo-lesson-input input { flex: 1; border: 1px solid #d1d5db; border-radius: 10px; padding: 8px 12px; font-size: 14px; outline: none; font-family: inherit; }
+        .demo-lesson-input input {
+          flex: 1; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 14px;
+          font-size: 15px; outline: none; font-family: inherit; color: #111827;
+        }
         .demo-lesson-input input:focus { border-color: #0D9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
-        .demo-lesson-input button { background: #0D9488; color: #fff; border: none; border-radius: 10px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
-        .demo-checkpoint { text-align: center; padding: 8px; margin: 8px 0; border-radius: 8px; background: linear-gradient(90deg, rgba(245,230,66,0.08), rgba(168,219,90,0.08), rgba(244,167,157,0.08), rgba(109,213,208,0.08)); border: 1px solid rgba(13,148,136,0.15); animation: demo-cp-in 0.4s ease-out; }
+        .demo-lesson-input button {
+          background: #0D9488; color: #fff; border: none; border-radius: 10px;
+          padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+          transition: background 0.15s;
+        }
+        .demo-lesson-input button:hover { background: #0F766E; }
+        .demo-checkpoint {
+          text-align: center; padding: 10px 16px; margin: 8px 0; border-radius: 8px;
+          background: linear-gradient(90deg, rgba(245,230,66,0.08), rgba(168,219,90,0.08), rgba(244,167,157,0.08), rgba(109,213,208,0.08));
+          border: 1px solid rgba(13,148,136,0.15);
+          animation: demo-cp-in 0.4s ease-out;
+        }
         @keyframes demo-cp-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .demo-thinking { display: flex; gap: 5px; padding: 8px 4px; }
         .demo-tdot { width: 7px; height: 7px; border-radius: 50%; animation: demo-tdot 1.2s ease-in-out infinite; }
@@ -395,8 +452,8 @@ export default function DemoShowcase() {
         .demo-tdot:nth-child(3) { background: #F4A79D; animation-delay: 300ms; }
         @keyframes demo-tdot { 0%,60%,100% { opacity: 0.3; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1); } }
 
-        /* Ceremony scenes */
-        .demo-letter { max-width: 480px; font-family: var(--font-serif), Georgia, serif; font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.75); text-align: left; }
+        /* Ceremony: Founder's Letter — EB Garamond */
+        .demo-letter { max-width: 480px; font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.75); text-align: left; }
         .demo-letter p { margin-bottom: 1.618em; opacity: 0; transform: translateY(6px); transition: opacity 1.618s ease-out, transform 1.618s ease-out; }
         .demo-letter p.show { opacity: 1; transform: translateY(0); }
         .demo-letter p.fade { opacity: 0; transition: opacity 2.618s ease-in; }
@@ -406,51 +463,94 @@ export default function DemoShowcase() {
 
         .demo-complete-text { font-size: 17px; font-weight: 600; letter-spacing: 0.236em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
 
-        /* Diploma */
+        /* Diploma — pixel-matched to CompletionCeremony */
         .demo-diploma {
-          background: #f5f0e8; width: min(500px, 85vw); aspect-ratio: 1.618/1;
-          border: 2px solid #c4b18a; outline: 1px solid #d4c9a8; outline-offset: 8px;
+          background: #f5f0e8; width: min(520px, 80.9vw); aspect-ratio: 1.618/1;
+          border: 2px solid #c4b18a; outline: 1px solid #d4c9a8; outline-offset: 8.472px;
           padding: 8%; display: flex; flex-direction: column; align-items: center; justify-content: center;
           text-align: center; position: relative;
           box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(196,177,138,0.08);
-          opacity: 0; transform: scale(0.96); animation: demo-diploma-in 1.618s ease-out 0.5s forwards;
+          opacity: 0; transform: scale(0.96);
+          transition: opacity 1.618s ease-out, transform 1.618s ease-out;
         }
-        @keyframes demo-diploma-in { to { opacity: 1; transform: scale(1); } }
-        .demo-diploma::before { content: ''; position: absolute; inset: 5px; border: 1px solid #d4c9a8; pointer-events: none; }
-        .demo-diploma .inst { font-family: var(--font-serif), Georgia, serif; font-size: 11px; letter-spacing: 0.382em; text-transform: uppercase; color: #8a7d65; margin-bottom: 1.618em; }
+        .demo-scene.active .demo-diploma { opacity: 1; transform: scale(1); }
+        .demo-diploma::before { content: ''; position: absolute; inset: 5.236px; border: 1px solid #d4c9a8; pointer-events: none; }
+        .demo-diploma .inst { font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; letter-spacing: 0.382em; text-transform: uppercase; color: #8a7d65; margin-bottom: 1.618em; }
         .demo-diploma .cert-title { font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 17px; letter-spacing: 0.146em; text-transform: uppercase; color: #5c5240; margin-bottom: 0.618em; }
-        .demo-diploma .sname { font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1a1712; margin-bottom: 0.618em; }
-        .demo-diploma .cert-body { font-family: var(--font-serif), Georgia, serif; font-size: 11px; color: #6b6050; line-height: 1.618; max-width: 340px; margin-bottom: 1.618em; }
-        .demo-diploma .cert-date { font-family: var(--font-serif), Georgia, serif; font-size: 11px; color: #9a8e78; }
+        .demo-diploma .sname { font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1a1712; margin-bottom: 0.618em; line-height: 1.146; }
+        .demo-diploma .cert-body { font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; color: #6b6050; line-height: 1.618; max-width: 340px; margin-bottom: 1.618em; }
+        .demo-diploma .cert-date { font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; color: #9a8e78; letter-spacing: 0.09em; }
+        .demo-diploma .cert-id {
+          position: absolute; bottom: 11px; right: 17px;
+          font-family: var(--font-serif), 'EB Garamond', serif; font-size: 7px; color: #c4b9a0; letter-spacing: 0.056em;
+        }
+        .demo-diploma-continue {
+          margin-top: 28px; background: transparent; border: none;
+          color: rgba(255,255,255,0); font-size: 11px; font-weight: 500;
+          letter-spacing: 0.146em; cursor: pointer; padding: 11px 28px;
+          transition: color 1.618s ease-out 1.618s;
+        }
+        .demo-scene.active .demo-diploma-continue { color: rgba(255,255,255,0.3); }
+        .demo-diploma-continue:hover { color: rgba(255,255,255,0.6) !important; }
 
-        /* Farewell */
-        .demo-farewell { max-width: 500px; text-align: left; }
+        /* Farewell — matches real ceremony width */
+        .demo-farewell { max-width: 500px; text-align: left; width: min(500px, 61.8%); }
         .demo-farewell-mentor { font-size: 11px; font-weight: 500; letter-spacing: 0.146em; color: rgba(255,255,255,0.22); margin-bottom: 1.618em; }
         .demo-farewell-text { font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.65); min-height: 180px; }
         .demo-farewell-cursor { display: inline-block; width: 2px; height: 1em; background: rgba(255,255,255,0.4); margin-left: 2px; animation: demo-blink 0.618s step-end infinite; vertical-align: text-bottom; }
         @keyframes demo-blink { 50% { opacity: 0; } }
 
-        /* End */
-        .demo-end-title { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 32px; font-weight: 800; text-align: center; }
-        .demo-end-sub { font-size: 15px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 12px; }
+        /* End screen — elevated impact for Cristal */
+        .demo-end-wrap {
+          text-align: center;
+          animation: demo-end-in 1.618s ease-out forwards;
+        }
+        @keyframes demo-end-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .demo-end-title {
+          font-family: var(--font-display), 'Satoshi', sans-serif;
+          font-size: 48px; font-weight: 800; text-align: center;
+          letter-spacing: -0.025em;
+          background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .demo-end-line {
+          width: 80px; height: 2px; margin: 24px auto;
+          background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+          border-radius: 1px;
+          opacity: 0; animation: demo-end-line-in 1s ease-out 0.8s forwards;
+        }
+        @keyframes demo-end-line-in { to { opacity: 1; } }
+        .demo-end-sub {
+          font-size: 17px; color: rgba(255,255,255,0.4); text-align: center;
+          max-width: 380px; margin: 0 auto; line-height: 1.618;
+          opacity: 0; animation: demo-end-sub-in 1.618s ease-out 1.2s forwards;
+        }
+        @keyframes demo-end-sub-in { to { opacity: 1; } }
+        .demo-end-actions {
+          display: flex; gap: 12px; justify-content: center; margin-top: 40px;
+          opacity: 0; animation: demo-end-sub-in 1s ease-out 2s forwards;
+        }
 
-        /* Ambient glow for reveal scenes */
+        /* Ambient glow */
         .demo-ambient { position: absolute; width: 61.8vh; height: 61.8vh; left: 50%; top: 50%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%); animation: demo-glow 6.854s ease-in-out infinite; }
         @keyframes demo-glow { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.618; } 50% { transform: translate(-50%,-50%) scale(1.146); opacity: 1; } }
 
-        /* Scene label */
+        /* Scene labels — ultra-subtle, delayed fade-in */
         .demo-scene-label {
-          position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-          font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
-          color: rgba(255,255,255,0.15); z-index: 50; white-space: nowrap;
+          position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+          font-size: 9px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+          color: rgba(255,255,255,0.12); z-index: 50; white-space: nowrap;
+          opacity: 0; animation: demo-label-in 1s ease-out 0.5s forwards;
         }
+        @keyframes demo-label-in { to { opacity: 1; } }
 
         @media (prefers-reduced-motion: reduce) {
           * { animation-duration: 0.01ms !important; transition-duration: 0.1s !important; }
         }
       `}</style>
 
-      {/* ═══ WELCOME ═══ */}
+      {/* WELCOME */}
       <div className={`demo-scene ${sceneActive("welcome") ? "active" : ""}`}>
         <div className="demo-welcome-badge">A VentureLab Product</div>
         <h1 className="demo-welcome-title">Adaptable</h1>
@@ -466,7 +566,7 @@ export default function DemoShowcase() {
         </button>
       </div>
 
-      {/* ═══ IKIGAI DEFINITION ═══ */}
+      {/* IKIGAI DEFINITION */}
       <div className={`demo-scene ${sceneActive("ikigai-def") ? "active" : ""}`}>
         <div className="demo-def">
           <div className="demo-def-word" style={{ opacity: subPhase >= 1 ? 1 : 0, transition: "opacity 1.618s" }}>
@@ -487,53 +587,53 @@ export default function DemoShowcase() {
         )}
       </div>
 
-      {/* ═══ IKIGAI CIRCLES ═══ */}
+      {/* IKIGAI CIRCLES — Full-screen color experience (matches real wizard) */}
       {(["love", "good", "needs", "paid"] as const).map((key, idx) => {
         const sceneKey = `ikigai-${key}` as Scene;
         const circleClass = ["c1", "c2", "c3", "c4"][idx];
-        const labels = ["What you love", "What you're good at", "What the world needs", "What you can be paid for"];
-        const labelPositions = [
-          { left: "50%", top: "4%", transform: "translateX(-50%)" },
-          { left: "2%", top: "48%" },
-          { right: "2%", top: "48%", textAlign: "right" as const },
-          { left: "50%", bottom: "2%", transform: "translateX(-50%)" },
-        ];
         const nextScene = idx < 3 ? `ikigai-${(["love", "good", "needs", "paid"] as const)[idx + 1]}` as Scene : "ikigai-reveal" as Scene;
 
         return (
           <div key={key} className={`demo-scene ${sceneActive(sceneKey) ? "active" : ""}`}>
-            <div className="demo-scene-label">{labels[idx]}</div>
-            <div className="demo-wizard">
-              {["c1", "c2", "c3", "c4"].map((c, ci) => (
-                <div
-                  key={c}
-                  className={`demo-wiz-circle ${c} ${ci === idx ? "active" : ""} ${circlesDone.includes(c) ? "done" : ""}`}
-                />
-              ))}
-              <div className="demo-wiz-label" style={labelPositions[idx]}>{labels[idx]}</div>
-              <div className="demo-wiz-items">
+            <div
+              className="demo-wizard-fullscreen"
+              style={{ backgroundColor: IKIGAI_COLORS[idx] }}
+            >
+              <div className="demo-wiz-fs-title">{IKIGAI_LABELS[idx]}</div>
+              <div className="demo-wiz-fs-items">
                 {typedItems.map((item, i) => (
-                  <span key={i} className="demo-wiz-item">{item}</span>
+                  <span key={i} className="demo-wiz-fs-item">{item}</span>
+                ))}
+              </div>
+
+              {subPhase >= 1 && (
+                <button
+                  className="demo-wiz-fs-btn"
+                  onClick={() => {
+                    setCirclesDone((prev) => [...prev, circleClass]);
+                    setTypedItems([]);
+                    goTo(nextScene);
+                  }}
+                >
+                  Continue
+                </button>
+              )}
+
+              {/* Mini Ikigai diagram at bottom showing progress */}
+              <div className="demo-wiz-mini">
+                {["c1", "c2", "c3", "c4"].map((c, ci) => (
+                  <div
+                    key={c}
+                    className={`demo-wiz-mini-circle ${c} ${ci === idx ? "active" : ""} ${circlesDone.includes(c) ? "done" : ""}`}
+                  />
                 ))}
               </div>
             </div>
-            {subPhase >= 1 && (
-              <button
-                className="demo-btn"
-                onClick={() => {
-                  setCirclesDone((prev) => [...prev, circleClass]);
-                  setTypedItems([]);
-                  goTo(nextScene);
-                }}
-              >
-                Continue
-              </button>
-            )}
           </div>
         );
       })}
 
-      {/* ═══ IKIGAI REVEAL — GRAVITATIONAL COLLAPSE ═══ */}
+      {/* IKIGAI REVEAL — GRAVITATIONAL COLLAPSE */}
       <div className={`demo-scene ${sceneActive("ikigai-reveal") ? "active" : ""}`}>
         <div className="demo-ambient" />
         <div className="demo-wizard" style={{ zIndex: 2 }}>
@@ -562,7 +662,7 @@ export default function DemoShowcase() {
         )}
       </div>
 
-      {/* ═══ DASHBOARD ═══ */}
+      {/* DASHBOARD */}
       <div className={`demo-scene ${sceneActive("dashboard") ? "active" : ""}`}>
         <div className="demo-scene-label">Student Dashboard</div>
         <div className="demo-dash">
@@ -585,18 +685,18 @@ export default function DemoShowcase() {
         </button>
       </div>
 
-      {/* ═══ LESSON ENTRANCE ═══ */}
+      {/* LESSON ENTRANCE */}
       <div className={`demo-scene ${sceneActive("lesson-entrance") ? "active" : ""}`}>
         <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.25em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.4)", opacity: subPhase >= 1 ? 1 : 0, transition: "opacity 0.8s" }}>
           Module 1
         </p>
-        <p style={{ fontSize: "28px", fontWeight: 700, color: "#fff", marginTop: "12px", opacity: subPhase >= 2 ? 1 : 0, transition: "opacity 0.8s" }}>
+        <p style={{ fontFamily: "var(--font-display), 'Satoshi', sans-serif", fontSize: "28px", fontWeight: 700, color: "#fff", marginTop: "12px", opacity: subPhase >= 2 ? 1 : 0, transition: "opacity 0.8s" }}>
           Define Your Target Customer
         </p>
         <div style={{ width: subPhase >= 2 ? "120px" : "0", height: "2px", marginTop: "20px", borderRadius: "1px", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)", transition: "width 1.2s cubic-bezier(0.16,1,0.3,1)" }} />
       </div>
 
-      {/* ═══ LESSON CONVERSATION ═══ */}
+      {/* LESSON CONVERSATION */}
       <div className={`demo-scene ${sceneActive("lesson-convo") ? "active" : ""}`} style={{ justifyContent: "flex-start", paddingTop: "5vh" }}>
         <div className="demo-scene-label">Lesson Experience</div>
         <div className="demo-lesson">
@@ -606,8 +706,8 @@ export default function DemoShowcase() {
                 <div style={{ fontSize: "10px", color: "#9ca3af", textTransform: "uppercase" as const, letterSpacing: "0.12em" }}>Module 1</div>
                 <div style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>Define Your Target Customer</div>
               </div>
-              <div style={{ flex: 1, height: "8px", borderRadius: "99px", background: "#f3f4f6", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: checkpointShown ? "50%" : "25%", borderRadius: "99px", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)", transition: "width 0.8s" }} />
+              <div style={{ flex: 1, height: "8px", borderRadius: "9999px", background: "#f3f4f6", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: checkpointShown ? "50%" : "25%", borderRadius: "9999px", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)", transition: "width 0.8s" }} />
               </div>
               <span style={{ fontSize: "11px", color: "#9ca3af" }}>{checkpointShown ? "2/4" : "1/4"}</span>
             </div>
@@ -632,7 +732,15 @@ export default function DemoShowcase() {
             ))}
             {lessonThinking && (
               <div className="demo-lesson-msg demo-lesson-ai">
-                <div className="demo-lesson-guide"><span>Guide</span></div>
+                <div className="demo-lesson-guide">
+                  <div style={{ position: "relative", width: "12px", height: "12px" }}>
+                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#F5E642", top: 0, left: "3.5px" }} />
+                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#A8DB5A", top: "3.5px", left: 0 }} />
+                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#F4A79D", top: "3.5px", right: 0 }} />
+                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#6DD5D0", bottom: 0, left: "3.5px" }} />
+                  </div>
+                  <span>Guide</span>
+                </div>
                 <div className="bubble" style={{ boxShadow: "none" }}>
                   <div className="demo-thinking">
                     <span className="demo-tdot" /><span className="demo-tdot" /><span className="demo-tdot" />
@@ -653,7 +761,7 @@ export default function DemoShowcase() {
             <div className="demo-lesson-input">
               <input
                 type="text"
-                placeholder="Try it — describe your target customer..."
+                placeholder="Try it \u2014 describe your target customer..."
                 value={lessonInput}
                 onChange={(e) => setLessonInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleLessonSend(); }}
@@ -673,7 +781,7 @@ export default function DemoShowcase() {
         </div>
       </div>
 
-      {/* ═══ CEREMONY: FOUNDER'S LETTER ═══ */}
+      {/* CEREMONY: FOUNDER'S LETTER */}
       <div className={`demo-scene ${sceneActive("ceremony-letter") ? "active" : ""}`}>
         <div className="demo-letter">
           <p className={letterPhase >= 1 ? (letterPhase >= 4 ? "fade" : "show") : ""}>Dear {STUDENT_NAME},</p>
@@ -689,12 +797,12 @@ export default function DemoShowcase() {
         </div>
       </div>
 
-      {/* ═══ CEREMONY: PROGRAM COMPLETE ═══ */}
+      {/* CEREMONY: PROGRAM COMPLETE */}
       <div className={`demo-scene ${sceneActive("ceremony-complete") ? "active" : ""}`}>
         <span className="demo-complete-text">Program Complete.</span>
       </div>
 
-      {/* ═══ CEREMONY: IKIGAI RE-REVEAL ═══ */}
+      {/* CEREMONY: IKIGAI RE-REVEAL */}
       <div className={`demo-scene ${sceneActive("ceremony-reveal") ? "active" : ""}`}>
         <div className="demo-ambient" />
         <div className="demo-wizard" style={{ zIndex: 2 }}>
@@ -727,7 +835,7 @@ export default function DemoShowcase() {
         )}
       </div>
 
-      {/* ═══ CEREMONY: DIPLOMA ═══ */}
+      {/* CEREMONY: DIPLOMA */}
       <div className={`demo-scene ${sceneActive("ceremony-diploma") ? "active" : ""}`} style={{ background: "#0a0a08" }}>
         <div className="demo-diploma">
           <div className="inst">Adaptable Venture Program</div>
@@ -738,13 +846,14 @@ export default function DemoShowcase() {
             an art education studio for creative self-expression.
           </div>
           <div className="cert-date">{new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>
+          <div className="cert-id">AVP-{new Date().getFullYear()}-{Math.random().toString(36).slice(2, 6).toUpperCase()}</div>
         </div>
-        <button className="demo-btn" onClick={() => goTo("ceremony-farewell")}>
+        <button className="demo-diploma-continue" onClick={() => goTo("ceremony-farewell")}>
           Continue
         </button>
       </div>
 
-      {/* ═══ CEREMONY: MENTOR FAREWELL ═══ */}
+      {/* CEREMONY: MENTOR FAREWELL */}
       <div className={`demo-scene ${sceneActive("ceremony-farewell") ? "active" : ""}`}>
         <div className="demo-farewell">
           <div className="demo-farewell-mentor">Nova</div>
@@ -760,17 +869,22 @@ export default function DemoShowcase() {
         </div>
       </div>
 
-      {/* ═══ END ═══ */}
+      {/* END */}
       <div className={`demo-scene ${sceneActive("end") ? "active" : ""}`}>
-        <div className="demo-end-title">This is Adaptable.</div>
-        <p className="demo-end-sub">Built for the students who will build the future.</p>
-        <div style={{ display: "flex", gap: "12px", marginTop: "32px" }}>
-          <a href="/for-schools" className="demo-btn demo-btn-primary" style={{ textDecoration: "none" }}>
-            Learn More
-          </a>
-          <button className="demo-btn" onClick={() => { setScene("welcome"); setCirclesDone([]); setRevealCircles([]); setRevealCenter(false); setRevealName(false); setFarewellText(""); setFarewellDone(false); setLetterPhase(0); }}>
-            Replay
-          </button>
+        <div className="demo-end-wrap">
+          <h2 className="demo-end-title">This is Adaptable.</h2>
+          <div className="demo-end-line" />
+          <p className="demo-end-sub">
+            Built for the students who will build the future.
+          </p>
+          <div className="demo-end-actions">
+            <a href="/for-schools" className="demo-btn demo-btn-primary" style={{ textDecoration: "none", marginTop: 0 }}>
+              Learn More
+            </a>
+            <button className="demo-btn" style={{ marginTop: 0 }} onClick={() => { setScene("welcome"); setCirclesDone([]); setRevealCircles([]); setRevealCenter(false); setRevealName(false); setFarewellText(""); setFarewellDone(false); setLetterPhase(0); }}>
+              Replay
+            </button>
+          </div>
         </div>
       </div>
     </div>
