@@ -194,59 +194,96 @@ const PRIMARY_ICONS: Record<string, () => React.ReactElement> = {
   bell: IconBell,
 };
 
-/* Ikigai SVG for the hero */
+/* Ikigai diagram for the hero — uses HTML divs with mix-blend-mode
+   to match the product's organic color blending at intersections */
+const IKIGAI_CIRCLES = [
+  { label: "What you love", color: "#F5E642", x: 50, y: 22 },
+  { label: "What you're good at", color: "#A8DB5A", x: 28, y: 53 },
+  { label: "What the world needs", color: "#F4A79D", x: 72, y: 53 },
+  { label: "What you can be paid for", color: "#6DD5D0", x: 50, y: 80 },
+] as const;
+
+const LABEL_POSITIONS = [
+  { text: "What you love", x: "50%", y: "-2%" },
+  { text: "What you're good at", x: "-4%", y: "48%" },
+  { text: "What the world needs", x: "104%", y: "48%" },
+  { text: "What you can be paid for", x: "50%", y: "100%" },
+] as const;
+
 function IkigaiDiagram() {
   return (
-    <>
-      <style>{`
-        @media (prefers-reduced-motion: no-preference) {
-          .ikigai-circle {
-            transition: opacity 200ms ease-out;
-          }
-          .ikigai-circle:hover {
-            opacity: 0.65 !important;
-          }
-        }
-      `}</style>
-      <svg viewBox="0 0 400 430" className="w-full max-w-[480px]" aria-label="Ikigai diagram showing four overlapping circles: What you love, What you're good at, What the world needs, and What you can be paid for">
-        {/* Four overlapping circles — spread to match product diagram */}
-        <circle className="ikigai-circle" cx="200" cy="120" r="110" fill="#F5E642" opacity="0.55" stroke="#fff" strokeWidth="1" />
-        <circle className="ikigai-circle" cx="120" cy="230" r="110" fill="#A8DB5A" opacity="0.55" stroke="#fff" strokeWidth="1" />
-        <circle className="ikigai-circle" cx="280" cy="230" r="110" fill="#F4A79D" opacity="0.55" stroke="#fff" strokeWidth="1" />
-        <circle className="ikigai-circle" cx="200" cy="310" r="110" fill="#6DD5D0" opacity="0.55" stroke="#fff" strokeWidth="1" />
+    <div
+      className="relative mx-auto w-full max-w-[480px]"
+      style={{ aspectRatio: "1 / 1" }}
+      role="img"
+      aria-label="Ikigai diagram: four overlapping circles representing what you love, what you're good at, what the world needs, and what you can be paid for, with your business at the center"
+    >
+      {/* Four circles with mix-blend-mode for natural overlap colors */}
+      {IKIGAI_CIRCLES.map((c) => (
+        <div
+          key={c.label}
+          className="absolute rounded-full transition-opacity duration-200 hover:opacity-50"
+          style={{
+            width: "47%",
+            height: "47%",
+            left: `${c.x}%`,
+            top: `${c.y}%`,
+            transform: "translate(-50%, -50%)",
+            backgroundColor: c.color,
+            opacity: 0.4,
+            mixBlendMode: "multiply",
+          }}
+        />
+      ))}
 
-        {/* Center glow */}
-        <defs>
-          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#4A6741" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#4A6741" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="200" cy="215" r="60" fill="url(#centerGlow)" />
+      {/* Center — radial gradient with glow, matching the product */}
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: "12%",
+          height: "12%",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "radial-gradient(circle, #4A6741 40%, #8B9E6A 100%)",
+          boxShadow: "0 0 24px rgba(74, 103, 65, 0.25)",
+          zIndex: 5,
+        }}
+      />
 
-        {/* Center circles */}
-        <circle cx="200" cy="215" r="45" fill="#8B9E6A" opacity="0.85" />
-        <circle cx="200" cy="215" r="24" fill="#4A6741" stroke="#fff" strokeWidth="1.5" />
+      {/* Center label */}
+      <div
+        className="absolute pointer-events-none flex flex-col items-center justify-center"
+        style={{
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 6,
+        }}
+      >
+        <span className="font-[family-name:var(--font-display)] text-[9px] font-bold text-white/90 tracking-[0.15em] leading-tight">
+          YOUR
+        </span>
+        <span className="font-[family-name:var(--font-display)] text-[9px] font-bold text-white/90 tracking-[0.15em] leading-tight">
+          BUSINESS
+        </span>
+      </div>
 
-        {/* Intersection labels */}
-        <text x="160" y="168" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#6B7A3D" opacity="0.8">Passion</text>
-        <text x="240" y="168" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#B87D4A" opacity="0.8">Mission</text>
-        <text x="155" y="280" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#5A9A5A" opacity="0.8">Profession</text>
-        <text x="248" y="280" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="600" fill="#8A7A5A" opacity="0.8">Vocation</text>
-
-        {/* Outer labels */}
-        <text x="200" y="40" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="13" fontWeight="600" className="fill-[var(--text-primary)]">What you love</text>
-        <text x="38" y="230" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">What you&apos;re</text>
-        <text x="38" y="245" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">good at</text>
-        <text x="362" y="230" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">What the world</text>
-        <text x="362" y="245" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="12" fontWeight="600" className="fill-[var(--text-primary)]">needs</text>
-        <text x="200" y="400" textAnchor="middle" fontFamily="'Satoshi', sans-serif" fontSize="13" fontWeight="600" className="fill-[var(--text-primary)]">What you can be paid for</text>
-
-        {/* Center label */}
-        <text x="200" y="211" textAnchor="middle" fill="white" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="800" letterSpacing="1.5">YOUR</text>
-        <text x="200" y="224" textAnchor="middle" fill="white" fontFamily="'Satoshi', sans-serif" fontSize="10" fontWeight="800" letterSpacing="1.5">BUSINESS</text>
-      </svg>
-    </>
+      {/* Outer labels — positioned around the diagram */}
+      {LABEL_POSITIONS.map((lbl) => (
+        <span
+          key={lbl.text}
+          className="absolute font-[family-name:var(--font-display)] text-xs font-semibold text-[var(--text-primary)] whitespace-nowrap pointer-events-none"
+          style={{
+            left: lbl.x,
+            top: lbl.y,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          {lbl.text}
+        </span>
+      ))}
+    </div>
   );
 }
 
