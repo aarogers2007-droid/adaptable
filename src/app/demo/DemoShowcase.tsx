@@ -1,892 +1,520 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+/*
+ * ADAPTABLE PRODUCT DEMO
+ * A premium, scroll-based showcase of every platform feature.
+ * Each section recreates the actual UI at full fidelity.
+ * Cinematic moments (Ikigai reveal, ceremony) interrupt with dark takeovers.
+ *
+ * Student: Elsa
+ * Business: Studio Bloom — an art education studio for creative self-expression
+ */
 
-const PHI = 1.618034;
-const BASE = 1000;
-function sleep(ms: number) { return new Promise<void>((r) => setTimeout(r, ms)); }
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
-type Scene =
-  | "welcome"
-  | "ikigai-def"
-  | "ikigai-love"
-  | "ikigai-good"
-  | "ikigai-needs"
-  | "ikigai-paid"
-  | "ikigai-reveal"
-  | "dashboard"
-  | "lesson-entrance"
-  | "lesson-convo"
-  | "lesson-complete"
-  | "ceremony-letter"
-  | "ceremony-complete"
-  | "ceremony-reveal"
-  | "ceremony-diploma"
-  | "ceremony-farewell"
-  | "end";
-
-const IKIGAI_ANSWERS = {
-  love: ["Painting", "Drawing", "Helping others create"],
-  good: ["Visual composition", "Color theory", "Teaching"],
-  needs: ["Creative outlets", "Art education", "Self-expression"],
-  paid: ["Art workshops", "Private lessons", "Commissions"],
+// ── Demo data for Elsa / Studio Bloom ──
+const STUDENT = { name: "Elsa", fullName: "Elsa Martinez" };
+const BUSINESS = {
+  name: "Studio Bloom",
+  niche: "An art education studio for creative self-expression",
+  target: "14-18 year olds who love creating but don't have access to art programs",
+  revenue: "Weekly group workshops ($25/session) + private lessons ($40/hr)",
 };
-
-const IKIGAI_COLORS = ["#F5E642", "#A8DB5A", "#F4A79D", "#6DD5D0"];
-const IKIGAI_LABELS = ["What you love", "What you're good at", "What the world needs", "What you can be paid for"];
-
-const BUSINESS_NAME = "Studio Bloom";
-const STUDENT_NAME = "Elsa";
+const IKIGAI = {
+  passions: ["Painting", "Drawing", "Helping others create"],
+  skills: ["Visual composition", "Color theory", "Teaching"],
+  needs: ["Creative outlets for teens", "Affordable art education", "Self-expression spaces"],
+  monetization: "Art workshops, Private lessons, Commission pieces",
+};
+const DECISIONS = [
+  { lesson: "Your WHY", text: "I want to help teens express themselves through art because it changed my life." },
+  { lesson: "Niche Validation", text: "There are no affordable teen art programs in my area — the closest is 30 min away and costs $200/month." },
+  { lesson: "Research Your Competition", text: "My edge is that I'm a teen myself. I know what we actually want to create, not what adults think we should." },
+  { lesson: "Target Customer", text: "My ideal customer is a 15-year-old who doodles in class, watches art tutorials on YouTube, and wishes they could take real lessons." },
+];
 
 export default function DemoShowcase() {
-  const [scene, setScene] = useState<Scene>("welcome");
-  const [transitioning, setTransitioning] = useState(false);
-  const [subPhase, setSubPhase] = useState(0);
+  const [revealPhase, setRevealPhase] = useState(0);
+  const revealRef = useRef<HTMLDivElement>(null);
+  const [ceremonyPhase, setCeremonyPhase] = useState(0);
+  const ceremonyRef = useRef<HTMLDivElement>(null);
 
-  // Ikigai wizard state
-  const [typedItems, setTypedItems] = useState<string[]>([]);
-  const [circlesDone, setCirclesDone] = useState<string[]>([]);
-
-  // Lesson state
-  const [lessonMessages, setLessonMessages] = useState<{ role: string; text: string }[]>([]);
-  const [lessonInput, setLessonInput] = useState("");
-  const [lessonThinking, setLessonThinking] = useState(false);
-  const [checkpointShown, setCheckpointShown] = useState(false);
-
-  // Ceremony state
-  const [letterPhase, setLetterPhase] = useState(0);
-  const [revealCircles, setRevealCircles] = useState<number[]>([]);
-  const [revealCenter, setRevealCenter] = useState(false);
-  const [revealName, setRevealName] = useState(false);
-  const [farewellText, setFarewellText] = useState("");
-  const [farewellDone, setFarewellDone] = useState(false);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const goTo = useCallback(async (next: Scene) => {
-    setTransitioning(true);
-    await sleep(800);
-    setScene(next);
-    setSubPhase(0);
-    setTransitioning(false);
-  }, []);
-
-  // Auto-scroll lesson messages
+  // Ikigai reveal trigger on scroll
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [lessonMessages, lessonThinking]);
+    const el = revealRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && revealPhase === 0) {
+        setRevealPhase(1);
+        setTimeout(() => setRevealPhase(2), 2618);
+        setTimeout(() => setRevealPhase(3), 4236);
+        setTimeout(() => setRevealPhase(4), 6854);
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [revealPhase]);
 
-  // Scene-specific auto-play effects
+  // Ceremony trigger on scroll
   useEffect(() => {
-    if (scene === "ikigai-def") {
-      const t1 = setTimeout(() => setSubPhase(1), 800);
-      const t2 = setTimeout(() => setSubPhase(2), 2000);
-      return () => { clearTimeout(t1); clearTimeout(t2); };
-    }
-
-    if (["ikigai-love", "ikigai-good", "ikigai-needs", "ikigai-paid"].includes(scene)) {
-      const key = scene.replace("ikigai-", "") as keyof typeof IKIGAI_ANSWERS;
-      const items = IKIGAI_ANSWERS[key];
-      setTypedItems([]);
-      let cancelled = false;
-      (async () => {
-        for (let i = 0; i < items.length; i++) {
-          await sleep(800);
-          if (cancelled) return;
-          setTypedItems((prev) => [...prev, items[i]]);
-        }
-        await sleep(1200);
-        if (cancelled) return;
-        setSubPhase(1);
-      })();
-      return () => { cancelled = true; };
-    }
-
-    if (scene === "ikigai-reveal") {
-      let cancelled = false;
-      (async () => {
-        await sleep(PHI * PHI * BASE);
-        if (cancelled) return;
-        setSubPhase(1);
-        await sleep(2.618 * BASE);
-        if (cancelled) return;
-        setSubPhase(2);
-        await sleep(PHI * BASE);
-        if (cancelled) return;
-        setSubPhase(3);
-        await sleep(2.618 * BASE);
-        if (cancelled) return;
-        setSubPhase(4);
-      })();
-      return () => { cancelled = true; };
-    }
-
-    if (scene === "lesson-entrance") {
-      let cancelled = false;
-      (async () => {
-        await sleep(800);
-        if (cancelled) return;
-        setSubPhase(1);
-        await sleep(600);
-        if (cancelled) return;
-        setSubPhase(2);
-        await sleep(1800);
-        if (cancelled) return;
-        setSubPhase(3);
-        await sleep(1000);
-        if (cancelled) return;
-        goTo("lesson-convo");
-      })();
-      return () => { cancelled = true; };
-    }
-
-    if (scene === "lesson-convo") {
-      setLessonMessages([]);
-      setCheckpointShown(false);
-      let cancelled = false;
-      (async () => {
-        await sleep(800);
-        if (cancelled) return;
-        setLessonMessages([
-          { role: "ai", text: "Let's think about who your ideal customer really is. Not just \"everyone\" \u2014 but the specific person who would be MOST excited about Studio Bloom." },
-        ]);
-        await sleep(3000);
-        if (cancelled) return;
-        setLessonMessages((prev) => [...prev, { role: "ai", text: "Think about age, location, and what problem they're trying to solve. Who comes to mind?" }]);
-        await sleep(2000);
-        if (cancelled) return;
-        setSubPhase(1);
-      })();
-      return () => { cancelled = true; };
-    }
-
-    if (scene === "ceremony-letter") {
-      let cancelled = false;
-      (async () => {
-        await sleep(PHI * BASE);
-        if (cancelled) return;
-        setLetterPhase(1);
-        await sleep(2.618 * BASE);
-        if (cancelled) return;
-        setLetterPhase(2);
-        await sleep(4.236 * BASE);
-        if (cancelled) return;
-        setLetterPhase(3);
-        await sleep(4.236 * BASE);
-        if (cancelled) return;
-        setLetterPhase(4);
-        await sleep(3 * BASE);
-        if (cancelled) return;
-        goTo("ceremony-complete");
-      })();
-      return () => { cancelled = true; };
-    }
-
-    if (scene === "ceremony-complete") {
-      const t = setTimeout(() => goTo("ceremony-reveal"), PHI * PHI * PHI * BASE);
-      return () => clearTimeout(t);
-    }
-
-    if (scene === "ceremony-reveal") {
-      let cancelled = false;
-      (async () => {
-        await sleep(BASE);
-        for (let i = 0; i < 4; i++) {
-          if (cancelled) return;
-          setRevealCircles((prev) => [...prev, i]);
-          await sleep(PHI * BASE);
-        }
-        await sleep(PHI * PHI * BASE);
-        if (cancelled) return;
-        setRevealCenter(true);
-        await sleep(PHI * PHI * BASE);
-        if (cancelled) return;
-        setSubPhase(1);
-        await sleep(2.618 * BASE);
-        if (cancelled) return;
-        setSubPhase(2);
-        setRevealName(true);
-        await sleep(PHI * PHI * BASE);
-        if (cancelled) return;
-        setSubPhase(3);
-      })();
-      return () => { cancelled = true; };
-    }
-
-    if (scene === "ceremony-farewell") {
-      let cancelled = false;
-      const text = `${STUDENT_NAME}. I remember when you first told me about ${BUSINESS_NAME}. You said it like you weren\u2019t sure you were allowed to want something that big. You were.\n\nYou didn\u2019t take the easy path. When the hard decisions came, you made them. When the research challenged what you assumed, you actually listened.\n\n${BUSINESS_NAME} is real. You built it from who you are.\n\nI\u2019ll be here. For this venture, the next one, or just to talk.`;
-      (async () => {
-        let built = "";
-        for (let i = 0; i < text.length; i++) {
-          if (cancelled) return;
-          built += text[i] === "\n" ? "<br>" : text[i];
-          setFarewellText(built);
-          if (text[i] === "." || text[i] === "?") await sleep(400);
-          else if (text[i] === ",") await sleep(150);
-          else if (text[i] === "\n") await sleep(600);
-          else await sleep(45);
-        }
-        if (cancelled) return;
-        setFarewellDone(true);
-      })();
-      return () => { cancelled = true; };
-    }
-  }, [scene, goTo]);
-
-  async function handleLessonSend() {
-    if (!lessonInput.trim()) return;
-    const text = lessonInput.trim();
-    setLessonInput("");
-    setLessonMessages((prev) => [...prev, { role: "user", text }]);
-    setSubPhase(0);
-
-    await sleep(1000);
-    setLessonThinking(true);
-    await sleep(2500);
-    setLessonThinking(false);
-
-    setLessonMessages((prev) => [...prev, {
-      role: "ai",
-      text: `That\u2019s a great answer. You\u2019re already thinking like a founder. The specificity matters \u2014 it means you can actually find these people and talk to them.`,
-    }]);
-
-    await sleep(1500);
-    setCheckpointShown(true);
-
-    await sleep(3000);
-    setCheckpointShown(false);
-    setSubPhase(2);
-  }
-
-  const sceneActive = (s: Scene) => scene === s && !transitioning;
+    const el = ceremonyRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && ceremonyPhase === 0) {
+        setCeremonyPhase(1);
+        setTimeout(() => setCeremonyPhase(2), 4236);
+        setTimeout(() => setCeremonyPhase(3), 8472);
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ceremonyPhase]);
 
   return (
-    <div className="demo-root">
-      <style>{`
-        .demo-root {
-          position: fixed; inset: 0; background: #000; color: #fff;
-          font-family: var(--font-body), 'DM Sans', sans-serif;
-          overflow: hidden;
-        }
-        .demo-scene {
-          position: fixed; inset: 0; display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          opacity: 0; transition: opacity 0.8s ease-in-out; pointer-events: none;
-        }
-        .demo-scene.active { opacity: 1; pointer-events: auto; }
-
-        .demo-btn {
-          background: transparent; border: 1px solid rgba(255,255,255,0.15);
-          color: rgba(255,255,255,0.5); padding: 14px 40px; font-size: 13px;
-          font-weight: 600; letter-spacing: 0.1em; border-radius: 8px;
-          cursor: pointer; transition: all 0.3s; margin-top: 32px;
-          font-family: inherit;
-        }
-        .demo-btn:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.85); }
-        .demo-btn-primary {
-          background: #0D9488; border-color: #0D9488; color: #fff;
-        }
-        .demo-btn-primary:hover { background: #0F766E; border-color: #0F766E; }
-
-        /* Welcome — Satoshi display, DESIGN.md 48px/700 */
-        .demo-welcome-badge { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #0D9488; }
-        .demo-welcome-title { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 48px; font-weight: 800; margin-top: 12px; text-align: center; letter-spacing: -0.025em; }
-        .demo-welcome-sub { font-size: 17px; color: rgba(255,255,255,0.5); margin-top: 12px; text-align: center; max-width: 480px; line-height: 1.618; }
-
-        /* Ikigai definition — EB Garamond for the dictionary entry */
-        .demo-def { max-width: 480px; text-align: left; }
-        .demo-def-word { font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700; font-style: italic; color: rgba(255,255,255,0.85); }
-        .demo-def-pron { font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 4px; font-style: italic; }
-        .demo-def-body { font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.65); margin-top: 20px; }
-        .demo-def-body em { color: rgba(255,255,255,0.85); font-style: italic; }
-
-        /* ─── IKIGAI WIZARD: Full-screen color experience (matches real StepContent) ─── */
-        .demo-wizard-fullscreen {
-          position: fixed; inset: 0; display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          transition: background-color 0.6s ease-out;
-        }
-        .demo-wizard-fullscreen::before {
-          content: ''; position: absolute; inset: 0;
-          background: radial-gradient(ellipse 70% 50% at 50% 10%, rgba(255,255,255,0.18) 0%, transparent 70%),
-                      radial-gradient(ellipse 50% 40% at 10% 90%, rgba(0,0,0,0.12) 0%, transparent 50%),
-                      radial-gradient(ellipse 50% 40% at 90% 90%, rgba(0,0,0,0.12) 0%, transparent 50%);
-          pointer-events: none;
-        }
-        .demo-wiz-fs-title {
-          font-family: var(--font-display), 'Satoshi', sans-serif;
-          font-size: 36px; font-weight: 700; color: rgba(0,0,0,0.85);
-          margin-bottom: 32px; text-align: center;
-        }
-        .demo-wiz-fs-items {
-          display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-          max-width: 400px; margin-bottom: 24px;
-        }
-        .demo-wiz-fs-item {
-          display: inline-flex; align-items: center;
-          background: rgba(255,255,255,0.35); backdrop-filter: blur(8px);
-          border: 1px solid rgba(255,255,255,0.5);
-          border-radius: 9999px; padding: 8px 20px; font-size: 14px; font-weight: 500;
-          color: rgba(0,0,0,0.8);
-          animation: demo-chip-in 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
-        }
-        .demo-wiz-fs-item::before {
-          content: '\\2713'; margin-right: 8px; font-size: 12px; color: rgba(0,0,0,0.5);
-        }
-        @keyframes demo-chip-in { from { opacity: 0; transform: translateY(8px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-        /* Mini Ikigai progress at bottom of wizard */
-        .demo-wiz-mini {
-          position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
-          width: 80px; height: 80px; opacity: 0.5;
-        }
-        .demo-wiz-mini-circle {
-          position: absolute; border-radius: 50%; width: 50%; height: 50%;
-          transform: translate(-50%,-50%); opacity: 0.25;
-          transition: opacity 0.5s, box-shadow 0.5s;
-        }
-        .demo-wiz-mini-circle.active { opacity: 0.7; box-shadow: 0 0 12px currentColor; }
-        .demo-wiz-mini-circle.done { opacity: 0.5; }
-        .demo-wiz-mini-circle.c1 { background: #F5E642; left: 50%; top: 19.1%; }
-        .demo-wiz-mini-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
-        .demo-wiz-mini-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
-        .demo-wiz-mini-circle.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
-
-        .demo-wiz-fs-btn {
-          background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5);
-          color: rgba(0,0,0,0.7); padding: 12px 36px; font-size: 13px;
-          font-weight: 600; letter-spacing: 0.08em; border-radius: 8px;
-          cursor: pointer; transition: all 0.3s; margin-top: 16px;
-          font-family: inherit; backdrop-filter: blur(8px);
-        }
-        .demo-wiz-fs-btn:hover { background: rgba(255,255,255,0.5); color: rgba(0,0,0,0.9); }
-
-        /* Gravitational collapse */
-        .demo-wizard { position: relative; width: min(400px, 80vw); aspect-ratio: 1/1; }
-        .demo-collapse-circle {
-          position: absolute; border-radius: 50%; width: 50%; height: 50%;
-          transform: translate(-50%,-50%); opacity: 0.618;
-          transition: all 2.618s cubic-bezier(0.55,0,0.2,1);
-        }
-        .demo-collapse-circle.contracting {
-          left: 50% !important; top: 50% !important; width: 3% !important; height: 3% !important; opacity: 0 !important;
-        }
-        .demo-reveal-center {
-          position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-          width: 19.1%; height: 19.1%; border-radius: 50%;
-          background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
-          box-shadow: 0 0 40px rgba(74,103,65,0.5); opacity: 0;
-          transition: all 1.618s ease-out;
-        }
-        .demo-reveal-center.show { opacity: 1; }
-        .demo-reveal-center.collapse { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
-        .demo-reveal-name {
-          position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-          z-index: 10; text-align: center; opacity: 0; transition: opacity 2.618s ease-out;
-          font-family: var(--font-display), 'Satoshi', sans-serif;
-        }
-        .demo-reveal-name.show { opacity: 1; }
-        .demo-reveal-name .name { font-size: 28px; font-weight: 800; color: #fff; text-shadow: 0 0 28px rgba(74,103,65,0.5); }
-        .demo-reveal-name .origin { display: block; margin-top: 11px; font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.35); letter-spacing: 0.146em; }
-
-        /* Dashboard — DESIGN.md: 28px/700 Satoshi for business name, 14px body */
-        .demo-dash { background: #f9fafb; border-radius: 12px; padding: 24px; width: min(500px, 85vw); text-align: left; }
-        .demo-dash h2 { font-family: var(--font-display), 'Satoshi', sans-serif; font-size: 28px; font-weight: 700; color: #111827; }
-        .demo-dash .sub { font-size: 14px; color: #4b5563; margin-top: 4px; }
-        .demo-dash .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-top: 16px; }
-        .demo-dash .card-label { font-size: 10px; font-weight: 600; color: #0D9488; text-transform: uppercase; letter-spacing: 0.1em; }
-        .demo-dash .card-title { font-size: 18px; font-weight: 700; color: #111827; margin-top: 4px; font-family: var(--font-display), 'Satoshi', sans-serif; }
-        .demo-dash .bar { height: 8px; border-radius: 9999px; background: #f3f4f6; margin-top: 12px; overflow: hidden; }
-        .demo-dash .bar-fill { height: 100%; width: 0%; border-radius: 9999px; background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0); transition: width 1.5s cubic-bezier(0.16,1,0.3,1); }
-
-        /* Lesson — matches real LessonConversation exactly */
-        .demo-lesson { background: #fff; border-radius: 12px; width: min(520px, 90vw); height: min(500px, 70vh); display: flex; flex-direction: column; overflow: hidden; }
-        .demo-lesson-header { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; background: #fff; }
-        .demo-lesson-msgs { flex: 1; overflow-y: auto; padding: 24px; }
-        .demo-lesson-msg { margin-bottom: 20px; animation: demo-msg-in 0.5s ease-out; }
-        @keyframes demo-msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .demo-lesson-ai { max-width: 85%; }
-        .demo-lesson-ai .bubble {
-          background: #f3f4f6; color: #111827; border-radius: 16px; padding: 20px 24px;
-          font-size: 15px; line-height: 1.6; position: relative;
-          box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
-          overflow: visible;
-        }
-        .demo-lesson-ai .bubble::before {
-          content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
-          width: 2px; border-radius: 1px;
-          background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
-        }
-        .demo-lesson-user { text-align: right; }
-        .demo-lesson-user .bubble {
-          display: inline-block; background: #0D9488; color: #fff;
-          border-radius: 16px; padding: 12px 20px; font-size: 15px; line-height: 1.6;
-          max-width: 80%; text-align: left;
-        }
-        .demo-lesson-guide { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; margin-left: 4px; }
-        .demo-lesson-guide span { font-size: 10px; font-weight: 500; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
-        .demo-lesson-input { padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; }
-        .demo-lesson-input input {
-          flex: 1; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 14px;
-          font-size: 15px; outline: none; font-family: inherit; color: #111827;
-        }
-        .demo-lesson-input input:focus { border-color: #0D9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
-        .demo-lesson-input button {
-          background: #0D9488; color: #fff; border: none; border-radius: 10px;
-          padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
-          transition: background 0.15s;
-        }
-        .demo-lesson-input button:hover { background: #0F766E; }
-        .demo-checkpoint {
-          text-align: center; padding: 10px 16px; margin: 8px 0; border-radius: 8px;
-          background: linear-gradient(90deg, rgba(245,230,66,0.08), rgba(168,219,90,0.08), rgba(244,167,157,0.08), rgba(109,213,208,0.08));
-          border: 1px solid rgba(13,148,136,0.15);
-          animation: demo-cp-in 0.4s ease-out;
-        }
-        @keyframes demo-cp-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-        .demo-thinking { display: flex; gap: 5px; padding: 8px 4px; }
-        .demo-tdot { width: 7px; height: 7px; border-radius: 50%; animation: demo-tdot 1.2s ease-in-out infinite; }
-        .demo-tdot:nth-child(1) { background: #F5E642; animation-delay: 0ms; }
-        .demo-tdot:nth-child(2) { background: #A8DB5A; animation-delay: 150ms; }
-        .demo-tdot:nth-child(3) { background: #F4A79D; animation-delay: 300ms; }
-        @keyframes demo-tdot { 0%,60%,100% { opacity: 0.3; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1); } }
-
-        /* Ceremony: Founder's Letter — EB Garamond */
-        .demo-letter { max-width: 480px; font-family: var(--font-serif), 'EB Garamond', Georgia, serif; font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.75); text-align: left; }
-        .demo-letter p { margin-bottom: 1.618em; opacity: 0; transform: translateY(6px); transition: opacity 1.618s ease-out, transform 1.618s ease-out; }
-        .demo-letter p.show { opacity: 1; transform: translateY(0); }
-        .demo-letter p.fade { opacity: 0; transition: opacity 2.618s ease-in; }
-        .demo-letter .sig { margin-top: 2.618em; font-style: italic; color: rgba(255,255,255,0.6); }
-        .demo-letter .sig-name { font-style: normal; font-weight: 600; color: rgba(255,255,255,0.7); display: block; margin-top: 6px; }
-        .demo-letter .sig-title { font-style: normal; font-size: 11px; color: rgba(255,255,255,0.4); display: block; margin-top: 3px; }
-
-        .demo-complete-text { font-size: 17px; font-weight: 600; letter-spacing: 0.236em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
-
-        /* Diploma — pixel-matched to CompletionCeremony */
-        .demo-diploma {
-          background: #f5f0e8; width: min(520px, 80.9vw); aspect-ratio: 1.618/1;
-          border: 2px solid #c4b18a; outline: 1px solid #d4c9a8; outline-offset: 8.472px;
-          padding: 8%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          text-align: center; position: relative;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(196,177,138,0.08);
-          opacity: 0; transform: scale(0.96);
-          transition: opacity 1.618s ease-out, transform 1.618s ease-out;
-        }
-        .demo-scene.active .demo-diploma { opacity: 1; transform: scale(1); }
-        .demo-diploma::before { content: ''; position: absolute; inset: 5.236px; border: 1px solid #d4c9a8; pointer-events: none; }
-        .demo-diploma .inst { font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; letter-spacing: 0.382em; text-transform: uppercase; color: #8a7d65; margin-bottom: 1.618em; }
-        .demo-diploma .cert-title { font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 17px; letter-spacing: 0.146em; text-transform: uppercase; color: #5c5240; margin-bottom: 0.618em; }
-        .demo-diploma .sname { font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #1a1712; margin-bottom: 0.618em; line-height: 1.146; }
-        .demo-diploma .cert-body { font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; color: #6b6050; line-height: 1.618; max-width: 340px; margin-bottom: 1.618em; }
-        .demo-diploma .cert-date { font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; color: #9a8e78; letter-spacing: 0.09em; }
-        .demo-diploma .cert-id {
-          position: absolute; bottom: 11px; right: 17px;
-          font-family: var(--font-serif), 'EB Garamond', serif; font-size: 7px; color: #c4b9a0; letter-spacing: 0.056em;
-        }
-        .demo-diploma-continue {
-          margin-top: 28px; background: transparent; border: none;
-          color: rgba(255,255,255,0); font-size: 11px; font-weight: 500;
-          letter-spacing: 0.146em; cursor: pointer; padding: 11px 28px;
-          transition: color 1.618s ease-out 1.618s;
-        }
-        .demo-scene.active .demo-diploma-continue { color: rgba(255,255,255,0.3); }
-        .demo-diploma-continue:hover { color: rgba(255,255,255,0.6) !important; }
-
-        /* Farewell — matches real ceremony width */
-        .demo-farewell { max-width: 500px; text-align: left; width: min(500px, 61.8%); }
-        .demo-farewell-mentor { font-size: 11px; font-weight: 500; letter-spacing: 0.146em; color: rgba(255,255,255,0.22); margin-bottom: 1.618em; }
-        .demo-farewell-text { font-size: 17px; line-height: 1.618; color: rgba(255,255,255,0.65); min-height: 180px; }
-        .demo-farewell-cursor { display: inline-block; width: 2px; height: 1em; background: rgba(255,255,255,0.4); margin-left: 2px; animation: demo-blink 0.618s step-end infinite; vertical-align: text-bottom; }
-        @keyframes demo-blink { 50% { opacity: 0; } }
-
-        /* End screen — elevated impact for Cristal */
-        .demo-end-wrap {
-          text-align: center;
-          animation: demo-end-in 1.618s ease-out forwards;
-        }
-        @keyframes demo-end-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .demo-end-title {
-          font-family: var(--font-display), 'Satoshi', sans-serif;
-          font-size: 48px; font-weight: 800; text-align: center;
-          letter-spacing: -0.025em;
-          background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .demo-end-line {
-          width: 80px; height: 2px; margin: 24px auto;
-          background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
-          border-radius: 1px;
-          opacity: 0; animation: demo-end-line-in 1s ease-out 0.8s forwards;
-        }
-        @keyframes demo-end-line-in { to { opacity: 1; } }
-        .demo-end-sub {
-          font-size: 17px; color: rgba(255,255,255,0.4); text-align: center;
-          max-width: 380px; margin: 0 auto; line-height: 1.618;
-          opacity: 0; animation: demo-end-sub-in 1.618s ease-out 1.2s forwards;
-        }
-        @keyframes demo-end-sub-in { to { opacity: 1; } }
-        .demo-end-actions {
-          display: flex; gap: 12px; justify-content: center; margin-top: 40px;
-          opacity: 0; animation: demo-end-sub-in 1s ease-out 2s forwards;
-        }
-
-        /* Ambient glow */
-        .demo-ambient { position: absolute; width: 61.8vh; height: 61.8vh; left: 50%; top: 50%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%); animation: demo-glow 6.854s ease-in-out infinite; }
-        @keyframes demo-glow { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.618; } 50% { transform: translate(-50%,-50%) scale(1.146); opacity: 1; } }
-
-        /* Scene labels — ultra-subtle, delayed fade-in */
-        .demo-scene-label {
-          position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-          font-size: 9px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
-          color: rgba(255,255,255,0.12); z-index: 50; white-space: nowrap;
-          opacity: 0; animation: demo-label-in 1s ease-out 0.5s forwards;
-        }
-        @keyframes demo-label-in { to { opacity: 1; } }
-
-        @media (prefers-reduced-motion: reduce) {
-          * { animation-duration: 0.01ms !important; transition-duration: 0.1s !important; }
-        }
-      `}</style>
-
-      {/* WELCOME */}
-      <div className={`demo-scene ${sceneActive("welcome") ? "active" : ""}`}>
-        <div className="demo-welcome-badge">A VentureLab Product</div>
-        <h1 className="demo-welcome-title">Adaptable</h1>
-        <p className="demo-welcome-sub">
-          An AI-native venture studio where every student discovers what they care about,
-          validates a real business idea, and builds a plan to launch it.
+    <main className="min-h-screen bg-[var(--bg)]">
+      {/* ═══ HERO ═══ */}
+      <section className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
+        <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">A VentureLab Product</p>
+        <h1 className="mt-3 font-[family-name:var(--font-display)] text-[48px] font-bold leading-[1.1] text-[var(--text-primary)]">Adaptable</h1>
+        <p className="mt-5 max-w-[500px] text-lg leading-relaxed text-[var(--text-secondary)]">
+          An AI-native venture studio where every student discovers what they care about, validates a real business idea, and builds a plan to launch it.
         </p>
-        <p className="demo-welcome-sub" style={{ marginTop: "8px", fontSize: "14px", color: "rgba(255,255,255,0.3)" }}>
-          This is {STUDENT_NAME}&apos;s journey.
-        </p>
-        <button className="demo-btn demo-btn-primary" onClick={() => goTo("ikigai-def")}>
-          Begin
-        </button>
-      </div>
-
-      {/* IKIGAI DEFINITION */}
-      <div className={`demo-scene ${sceneActive("ikigai-def") ? "active" : ""}`}>
-        <div className="demo-def">
-          <div className="demo-def-word" style={{ opacity: subPhase >= 1 ? 1 : 0, transition: "opacity 1.618s" }}>
-            Ikigai
-          </div>
-          <div className="demo-def-pron" style={{ opacity: subPhase >= 1 ? 1 : 0, transition: "opacity 1.618s 0.3s" }}>
-            /ee-kee-guy/ &middot; noun
-          </div>
-          <div className="demo-def-body" style={{ opacity: subPhase >= 2 ? 1 : 0, transition: "opacity 1.618s" }}>
-            A reason for being; the intersection of what you <em>love</em>, what you&apos;re <em>good at</em>,
-            what the world <em>needs</em>, and what you can be <em>paid for</em>.
-          </div>
+        <p className="mt-3 text-sm text-[var(--text-muted)]">Follow {STUDENT.name}&apos;s journey. Scroll to explore.</p>
+        <div className="mt-8 animate-bounce text-[var(--text-muted)]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
         </div>
-        {subPhase >= 2 && (
-          <button className="demo-btn" onClick={() => goTo("ikigai-love")} style={{ opacity: subPhase >= 2 ? 1 : 0 }}>
-            Continue
-          </button>
-        )}
-      </div>
+      </section>
 
-      {/* IKIGAI CIRCLES — Full-screen color experience (matches real wizard) */}
-      {(["love", "good", "needs", "paid"] as const).map((key, idx) => {
-        const sceneKey = `ikigai-${key}` as Scene;
-        const circleClass = ["c1", "c2", "c3", "c4"][idx];
-        const nextScene = idx < 3 ? `ikigai-${(["love", "good", "needs", "paid"] as const)[idx + 1]}` as Scene : "ikigai-reveal" as Scene;
-
-        return (
-          <div key={key} className={`demo-scene ${sceneActive(sceneKey) ? "active" : ""}`}>
-            <div
-              className="demo-wizard-fullscreen"
-              style={{ backgroundColor: IKIGAI_COLORS[idx] }}
-            >
-              <div className="demo-wiz-fs-title">{IKIGAI_LABELS[idx]}</div>
-              <div className="demo-wiz-fs-items">
-                {typedItems.map((item, i) => (
-                  <span key={i} className="demo-wiz-fs-item">{item}</span>
-                ))}
-              </div>
-
-              {subPhase >= 1 && (
-                <button
-                  className="demo-wiz-fs-btn"
-                  onClick={() => {
-                    setCirclesDone((prev) => [...prev, circleClass]);
-                    setTypedItems([]);
-                    goTo(nextScene);
-                  }}
-                >
-                  Continue
-                </button>
-              )}
-
-              {/* Mini Ikigai diagram at bottom showing progress */}
-              <div className="demo-wiz-mini">
-                {["c1", "c2", "c3", "c4"].map((c, ci) => (
-                  <div
-                    key={c}
-                    className={`demo-wiz-mini-circle ${c} ${ci === idx ? "active" : ""} ${circlesDone.includes(c) ? "done" : ""}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      {/* IKIGAI REVEAL — GRAVITATIONAL COLLAPSE */}
-      <div className={`demo-scene ${sceneActive("ikigai-reveal") ? "active" : ""}`}>
-        <div className="demo-ambient" />
-        <div className="demo-wizard" style={{ zIndex: 2 }}>
-          {[
-            { c: "c1", bg: "#F5E642", left: "50%", top: "19.1%" },
-            { c: "c2", bg: "#A8DB5A", left: "19.1%", top: "50%" },
-            { c: "c3", bg: "#F4A79D", left: "80.9%", top: "50%" },
-            { c: "c4", bg: "#6DD5D0", left: "50%", top: "80.9%" },
-          ].map((circle) => (
-            <div
-              key={circle.c}
-              className={`demo-collapse-circle ${subPhase >= 1 ? "contracting" : ""}`}
-              style={{ background: circle.bg, left: circle.left, top: circle.top }}
-            />
-          ))}
-          <div className={`demo-reveal-center ${subPhase >= 0 && subPhase < 3 ? "show" : ""} ${subPhase >= 3 ? "collapse" : ""}`} />
-          <div className={`demo-reveal-name ${subPhase >= 3 ? "show" : ""}`}>
-            <span className="name">{BUSINESS_NAME}</span>
-            {subPhase >= 4 && <span className="origin">This came from who you are.</span>}
-          </div>
-        </div>
-        {subPhase >= 4 && (
-          <button className="demo-btn" style={{ zIndex: 10 }} onClick={() => goTo("dashboard")}>
-            I&apos;M IN
-          </button>
-        )}
-      </div>
-
-      {/* DASHBOARD */}
-      <div className={`demo-scene ${sceneActive("dashboard") ? "active" : ""}`}>
-        <div className="demo-scene-label">Student Dashboard</div>
-        <div className="demo-dash">
-          <h2>{BUSINESS_NAME}</h2>
-          <div className="sub">{STUDENT_NAME}&apos;s venture studio</div>
-          <div className="card">
-            <div className="card-label">Continue Learning</div>
-            <div className="card-title">Lesson 4: Define Your Target Customer</div>
-            <div className="bar">
-              <div
-                className="bar-fill"
-                ref={(el) => { if (el && sceneActive("dashboard")) setTimeout(() => { el.style.width = "37.5%"; }, 300); }}
-              />
-            </div>
-            <div style={{ fontSize: "11px", color: "#9ca3af", marginTop: "6px" }}>3 of 8 lessons complete</div>
-          </div>
-        </div>
-        <button className="demo-btn demo-btn-primary" onClick={() => goTo("lesson-entrance")}>
-          Enter Lesson
-        </button>
-      </div>
-
-      {/* LESSON ENTRANCE */}
-      <div className={`demo-scene ${sceneActive("lesson-entrance") ? "active" : ""}`}>
-        <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.25em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.4)", opacity: subPhase >= 1 ? 1 : 0, transition: "opacity 0.8s" }}>
-          Module 1
-        </p>
-        <p style={{ fontFamily: "var(--font-display), 'Satoshi', sans-serif", fontSize: "28px", fontWeight: 700, color: "#fff", marginTop: "12px", opacity: subPhase >= 2 ? 1 : 0, transition: "opacity 0.8s" }}>
-          Define Your Target Customer
-        </p>
-        <div style={{ width: subPhase >= 2 ? "120px" : "0", height: "2px", marginTop: "20px", borderRadius: "1px", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)", transition: "width 1.2s cubic-bezier(0.16,1,0.3,1)" }} />
-      </div>
-
-      {/* LESSON CONVERSATION */}
-      <div className={`demo-scene ${sceneActive("lesson-convo") ? "active" : ""}`} style={{ justifyContent: "flex-start", paddingTop: "5vh" }}>
-        <div className="demo-scene-label">Lesson Experience</div>
-        <div className="demo-lesson">
-          <div className="demo-lesson-header">
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <div>
-                <div style={{ fontSize: "10px", color: "#9ca3af", textTransform: "uppercase" as const, letterSpacing: "0.12em" }}>Module 1</div>
-                <div style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>Define Your Target Customer</div>
-              </div>
-              <div style={{ flex: 1, height: "8px", borderRadius: "9999px", background: "#f3f4f6", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: checkpointShown ? "50%" : "25%", borderRadius: "9999px", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)", transition: "width 0.8s" }} />
-              </div>
-              <span style={{ fontSize: "11px", color: "#9ca3af" }}>{checkpointShown ? "2/4" : "1/4"}</span>
-            </div>
+      {/* ═══ 1. IKIGAI WIZARD ═══ */}
+      <DemoSection label="The Starting Point" title="Ikigai Discovery" description={`Every student begins by answering four questions about themselves. From their answers, a business idea emerges — not from a template, but from who they are. Here's what ${STUDENT.name} shared:`}>
+        <div className="grid gap-8 md:grid-cols-2 items-start">
+          {/* Ikigai diagram */}
+          <div className="relative mx-auto w-full max-w-[360px]" style={{ aspectRatio: "1/1" }}>
+            <div className="absolute rounded-full" style={{ width: "50%", height: "50%", left: "50%", top: "19.1%", transform: "translate(-50%,-50%)", background: "#F5E642", opacity: 0.55 }} />
+            <div className="absolute rounded-full" style={{ width: "50%", height: "50%", left: "19.1%", top: "50%", transform: "translate(-50%,-50%)", background: "#A8DB5A", opacity: 0.55 }} />
+            <div className="absolute rounded-full" style={{ width: "50%", height: "50%", left: "80.9%", top: "50%", transform: "translate(-50%,-50%)", background: "#F4A79D", opacity: 0.55 }} />
+            <div className="absolute rounded-full" style={{ width: "50%", height: "50%", left: "50%", top: "80.9%", transform: "translate(-50%,-50%)", background: "#6DD5D0", opacity: 0.55 }} />
+            <div className="absolute rounded-full" style={{ width: "19.1%", height: "19.1%", left: "50%", top: "50%", transform: "translate(-50%,-50%)", background: "radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%)", boxShadow: "0 0 40px rgba(74,103,65,0.5)" }} />
+            <span className="absolute text-xs font-semibold text-[var(--text-primary)]" style={{ left: "50%", top: "4%", transform: "translateX(-50%)" }}>What you love</span>
+            <span className="absolute text-xs font-semibold text-[var(--text-primary)]" style={{ left: "2%", top: "48%" }}>What you&apos;re<br/>good at</span>
+            <span className="absolute text-xs font-semibold text-[var(--text-primary)]" style={{ right: "2%", top: "48%", textAlign: "right" }}>What the world<br/>needs</span>
+            <span className="absolute text-xs font-semibold text-[var(--text-primary)]" style={{ left: "50%", bottom: "2%", transform: "translateX(-50%)" }}>What you can be paid for</span>
           </div>
 
-          <div className="demo-lesson-msgs">
-            {lessonMessages.map((msg, i) => (
-              <div key={i} className={`demo-lesson-msg ${msg.role === "user" ? "demo-lesson-user" : "demo-lesson-ai"}`}>
-                {msg.role === "ai" && (
-                  <div className="demo-lesson-guide">
-                    <div style={{ position: "relative", width: "12px", height: "12px" }}>
-                      <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#F5E642", top: 0, left: "3.5px" }} />
-                      <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#A8DB5A", top: "3.5px", left: 0 }} />
-                      <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#F4A79D", top: "3.5px", right: 0 }} />
-                      <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#6DD5D0", bottom: 0, left: "3.5px" }} />
-                    </div>
-                    <span>Guide</span>
-                  </div>
-                )}
-                <div className="bubble">{msg.text}</div>
+          {/* Elsa's answers */}
+          <div className="space-y-4">
+            {[
+              { label: `What ${STUDENT.name} loves`, items: IKIGAI.passions, color: "#F5E642", bg: "rgba(245,230,66,0.1)" },
+              { label: "What she's good at", items: IKIGAI.skills, color: "#A8DB5A", bg: "rgba(168,219,90,0.1)" },
+              { label: "What people need", items: IKIGAI.needs, color: "#F4A79D", bg: "rgba(244,167,157,0.1)" },
+              { label: "How she earns", items: [IKIGAI.monetization], color: "#6DD5D0", bg: "rgba(109,213,208,0.1)" },
+            ].map((group, i) => (
+              <div key={i} className="rounded-lg border border-[var(--border)] p-4" style={{ borderLeftWidth: "3px", borderLeftColor: group.color }}>
+                <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">{group.label}</p>
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <span key={item} className="rounded-full px-3 py-1 text-xs font-medium" style={{ background: group.bg, color: "var(--text-primary)" }}>{item}</span>
+                  ))}
+                </div>
               </div>
             ))}
-            {lessonThinking && (
-              <div className="demo-lesson-msg demo-lesson-ai">
-                <div className="demo-lesson-guide">
-                  <div style={{ position: "relative", width: "12px", height: "12px" }}>
-                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#F5E642", top: 0, left: "3.5px" }} />
-                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#A8DB5A", top: "3.5px", left: 0 }} />
-                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#F4A79D", top: "3.5px", right: 0 }} />
-                    <div style={{ position: "absolute", width: "5px", height: "5px", borderRadius: "50%", background: "#6DD5D0", bottom: 0, left: "3.5px" }} />
-                  </div>
-                  <span>Guide</span>
-                </div>
-                <div className="bubble" style={{ boxShadow: "none" }}>
-                  <div className="demo-thinking">
-                    <span className="demo-tdot" /><span className="demo-tdot" /><span className="demo-tdot" />
-                  </div>
-                </div>
-              </div>
-            )}
-            {checkpointShown && (
-              <div className="demo-checkpoint">
-                <div style={{ fontSize: "13px", fontWeight: 600, color: "#0D9488" }}>Checkpoint reached</div>
-                <div style={{ fontSize: "11px", color: "#9ca3af" }}>2/4 complete</div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
           </div>
-
-          {subPhase === 1 && (
-            <div className="demo-lesson-input">
-              <input
-                type="text"
-                placeholder="Try it \u2014 describe your target customer..."
-                value={lessonInput}
-                onChange={(e) => setLessonInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleLessonSend(); }}
-                autoFocus
-              />
-              <button onClick={handleLessonSend}>Send</button>
-            </div>
-          )}
-
-          {subPhase === 2 && (
-            <div style={{ padding: "12px 16px", borderTop: "1px solid #e5e7eb", textAlign: "center" }}>
-              <button className="demo-btn demo-btn-primary" style={{ marginTop: 0, padding: "10px 24px", fontSize: "13px" }} onClick={() => goTo("ceremony-letter")}>
-                Continue to Graduation
-              </button>
-            </div>
-          )}
         </div>
-      </div>
+      </DemoSection>
 
-      {/* CEREMONY: FOUNDER'S LETTER */}
-      <div className={`demo-scene ${sceneActive("ceremony-letter") ? "active" : ""}`}>
-        <div className="demo-letter">
-          <p className={letterPhase >= 1 ? (letterPhase >= 4 ? "fade" : "show") : ""}>Dear {STUDENT_NAME},</p>
-          <p className={letterPhase >= 2 ? (letterPhase >= 4 ? "fade" : "show") : ""}>
-            With this launchpad, I only hope you realize all that you are capable of.
-            I started this platform with nothing but a vision, and an unstoppable will.
-            You are capable of more than you know.
-          </p>
-          <p className={`sig ${letterPhase >= 3 ? (letterPhase >= 4 ? "fade" : "show") : ""}`}>
-            <span className="sig-name">&mdash; AJ Rogers, age 19</span>
-            <span className="sig-title">Founder of Adaptable</span>
-          </p>
-        </div>
-      </div>
-
-      {/* CEREMONY: PROGRAM COMPLETE */}
-      <div className={`demo-scene ${sceneActive("ceremony-complete") ? "active" : ""}`}>
-        <span className="demo-complete-text">Program Complete.</span>
-      </div>
-
-      {/* CEREMONY: IKIGAI RE-REVEAL */}
-      <div className={`demo-scene ${sceneActive("ceremony-reveal") ? "active" : ""}`}>
-        <div className="demo-ambient" />
-        <div className="demo-wizard" style={{ zIndex: 2 }}>
+      {/* ═══ 2. IKIGAI REVEAL — CINEMATIC ═══ */}
+      <section ref={revealRef} className="relative flex items-center justify-center min-h-screen bg-black overflow-hidden">
+        <div className="absolute" style={{ width: "61.8vh", height: "61.8vh", left: "50%", top: "50%", transform: "translate(-50%,-50%)", background: "radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%)" }} />
+        <div className="relative" style={{ width: "min(420px, 61.8vh)", aspectRatio: "1/1" }}>
           {[
             { bg: "#F5E642", left: "50%", top: "19.1%" },
             { bg: "#A8DB5A", left: "19.1%", top: "50%" },
             { bg: "#F4A79D", left: "80.9%", top: "50%" },
             { bg: "#6DD5D0", left: "50%", top: "80.9%" },
           ].map((c, i) => (
-            <div
-              key={i}
-              className={`demo-collapse-circle ${subPhase >= 1 ? "contracting" : ""}`}
-              style={{
-                background: c.bg, left: c.left, top: c.top,
-                opacity: revealCircles.includes(i) ? 0.618 : 0,
-                transition: subPhase >= 1 ? "all 2.618s cubic-bezier(0.55,0,0.2,1)" : "opacity 1s ease-out",
-              }}
-            />
+            <div key={i} className="absolute rounded-full" style={{
+              width: revealPhase >= 2 ? "3%" : "50%", height: revealPhase >= 2 ? "3%" : "50%",
+              left: revealPhase >= 2 ? "50%" : c.left, top: revealPhase >= 2 ? "50%" : c.top,
+              transform: "translate(-50%,-50%)", background: c.bg,
+              opacity: revealPhase >= 1 ? (revealPhase >= 2 ? 0 : 0.618) : 0,
+              transition: "all 2.618s cubic-bezier(0.55,0,0.2,1)",
+            }} />
           ))}
-          <div className={`demo-reveal-center ${revealCenter && subPhase < 2 ? "show" : ""} ${subPhase >= 2 ? "collapse" : ""}`} />
-          <div className={`demo-reveal-name ${revealName ? "show" : ""}`}>
-            <span className="name">{BUSINESS_NAME}</span>
-            <span className="origin">This came from who you are.</span>
+          <div className="absolute rounded-full" style={{
+            width: "19.1%", height: "19.1%", left: "50%", top: "50%",
+            background: "radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%)",
+            boxShadow: "0 0 40px rgba(74,103,65,0.5)",
+            opacity: revealPhase >= 1 && revealPhase < 3 ? 1 : 0,
+            transform: `translate(-50%,-50%) scale(${revealPhase >= 2 ? 0.3 : 1})`,
+            transition: "all 1.618s ease-out",
+          }} />
+          <div className="absolute text-center" style={{
+            left: "50%", top: "50%", transform: "translate(-50%,-50%)", zIndex: 10,
+            opacity: revealPhase >= 3 ? 1 : 0, transition: "opacity 2.618s ease-out",
+          }}>
+            <span className="font-[family-name:var(--font-display)] text-[28px] font-extrabold text-white" style={{ textShadow: "0 0 28px rgba(74,103,65,0.5)" }}>{BUSINESS.name}</span>
+            {revealPhase >= 4 && <span className="block mt-3 text-[11px] font-medium text-white/35 tracking-[0.146em]">This came from who you are.</span>}
           </div>
         </div>
-        {subPhase >= 3 && (
-          <button className="demo-btn" style={{ zIndex: 10 }} onClick={() => goTo("ceremony-diploma")}>
-            Continue
+      </section>
+
+      {/* ═══ 3. STUDENT DASHBOARD ═══ */}
+      <DemoSection label="The Home Base" title="Student Dashboard" description={`After Ikigai discovery, ${STUDENT.name} lands on her personalized venture studio. Everything revolves around her business idea.`}>
+        <div className="mx-auto max-w-[600px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+          {/* Business hero */}
+          <div className="p-6 border-b border-[var(--border)]">
+            <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider">Your Venture</p>
+            <h3 className="mt-1 font-[family-name:var(--font-display)] text-[28px] font-bold text-[var(--text-primary)]">{BUSINESS.name}</h3>
+            <p className="text-sm text-[var(--text-secondary)]">{BUSINESS.niche}</p>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div><p className="text-xs font-medium text-[var(--text-muted)]">Target Customer</p><p className="mt-1 text-sm text-[var(--text-primary)]">{BUSINESS.target}</p></div>
+              <div><p className="text-xs font-medium text-[var(--text-muted)]">Revenue Model</p><p className="mt-1 text-sm text-[var(--text-primary)]">{BUSINESS.revenue}</p></div>
+            </div>
+          </div>
+          {/* Progress */}
+          <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-subtle)]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-[var(--text-primary)]">Your Progress</span>
+              <span className="text-xs text-[var(--text-muted)]">5 of 8 lessons</span>
+            </div>
+            <div className="h-2 rounded-full bg-[var(--bg-muted)]">
+              <div className="h-2 rounded-full" style={{ width: "62.5%", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
+            </div>
+          </div>
+          {/* Continue CTA */}
+          <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-[var(--primary)]">Continue Learning</p>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">Lesson 6: What Did You Learn?</p>
+              <p className="text-xs text-[var(--text-muted)]">Module 2 &middot; Customer Discovery</p>
+            </div>
+            <span className="rounded-lg bg-[var(--primary)] px-4 py-2 text-xs font-semibold text-white">Continue →</span>
+          </div>
+          {/* Decisions */}
+          <div className="p-4">
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">Key Decisions</p>
+            <div className="space-y-3">
+              {DECISIONS.slice(0, 3).map((d, i) => (
+                <div key={i} className="flex gap-3">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--primary)]/10 text-[10px] font-bold text-[var(--primary)]">{i + 1}</span>
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)]">{d.lesson}</p>
+                    <p className="text-sm text-[var(--text-primary)]">{d.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DemoSection>
+
+      {/* ═══ 4. LESSON EXPERIENCE ═══ */}
+      <DemoSection label="The Core Experience" title="AI Lesson Conversations" description="Every conversation is personalized to the student's business idea. The AI asks questions, not gives answers. Checkpoints gate progress. Suggestion chips appear when students are stuck.">
+        <div className="mx-auto max-w-[600px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+          {/* Header */}
+          <div className="p-4 border-b border-[var(--border)]">
+            <div className="rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-2 mb-2">
+              <p className="text-[10px] font-medium text-[var(--primary)]">Goal</p>
+              <p className="text-xs text-[var(--text-secondary)]">Define your target customer and understand their specific needs.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="shrink-0">
+                <p className="text-[9px] text-[var(--text-muted)] uppercase tracking-wider">Module 1</p>
+                <p className="text-xs font-semibold text-[var(--text-primary)]">Define Your Target Customer</p>
+              </div>
+              <div className="flex-1 h-2 rounded-full bg-[var(--bg-muted)]"><div className="h-2 rounded-full" style={{ width: "50%", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} /></div>
+              <span className="text-[10px] text-[var(--text-muted)]">2/4</span>
+            </div>
+          </div>
+          {/* Messages */}
+          <div className="p-5 space-y-5" style={{ background: "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13,148,136,0.03) 0%, transparent 70%), var(--bg)" }}>
+            {/* AI message 1 */}
+            <div>
+              <div className="flex items-center gap-1.5 mb-1 ml-1">
+                <div className="relative" style={{ width: "12px", height: "12px" }}>
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#F5E642", top: 0, left: "3.5px" }} />
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#A8DB5A", top: "3.5px", left: 0 }} />
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#F4A79D", top: "3.5px", right: 0 }} />
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#6DD5D0", bottom: 0, left: "3.5px" }} />
+                </div>
+                <span className="text-[9px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Guide</span>
+              </div>
+              <div className="ai-message rounded-2xl bg-[var(--bg-muted)] px-5 py-4 max-w-[85%] space-y-2">
+                <p className="text-sm leading-relaxed text-[var(--text-primary)]">Let&apos;s think about who your ideal customer really is. Not just &ldquo;everyone&rdquo; — but the specific person who would be MOST excited about {BUSINESS.name}.</p>
+                <p className="text-sm leading-relaxed text-[var(--text-primary)]">Think about age, interests, and what problem they&apos;re trying to solve. Who comes to mind?</p>
+              </div>
+            </div>
+            {/* Student message */}
+            <div className="flex justify-end">
+              <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
+                <p className="text-sm leading-relaxed">I think it would be teens who love art but can&apos;t afford expensive classes or don&apos;t have art programs at school</p>
+              </div>
+            </div>
+            {/* AI message 2 */}
+            <div>
+              <div className="flex items-center gap-1.5 mb-1 ml-1">
+                <div className="relative" style={{ width: "12px", height: "12px" }}>
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#F5E642", top: 0, left: "3.5px" }} />
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#A8DB5A", top: "3.5px", left: 0 }} />
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#F4A79D", top: "3.5px", right: 0 }} />
+                  <div className="absolute rounded-full" style={{ width: "5px", height: "5px", background: "#6DD5D0", bottom: 0, left: "3.5px" }} />
+                </div>
+                <span className="text-[9px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Guide</span>
+              </div>
+              <div className="ai-message rounded-2xl bg-[var(--bg-muted)] px-5 py-4 max-w-[85%] space-y-2">
+                <p className="text-sm leading-relaxed text-[var(--text-primary)]">Now THAT is a target customer. A teen who loves creating but doesn&apos;t have access. You can picture her — she doodles in class, watches art tutorials on YouTube.</p>
+                <p className="text-sm leading-relaxed text-[var(--text-primary)]">That specificity is what makes a business real. Where does she hang out? How would you find her?</p>
+              </div>
+            </div>
+            {/* Checkpoint */}
+            <div className="checkpoint-celebration rounded-lg px-4 py-2.5 text-center" style={{ animation: "none", opacity: 1 }}>
+              <p className="text-sm font-semibold text-[var(--primary)]">Checkpoint reached</p>
+              <p className="text-xs text-[var(--text-muted)]">2/4 complete</p>
+            </div>
+            {/* Suggestions */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-xs text-[var(--text-muted)] self-center mr-1">Stuck?</span>
+              {["Instagram art accounts", "School art clubs", "Local community centers"].map(s => (
+                <span key={s} className="rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)]">{s}</span>
+              ))}
+            </div>
+          </div>
+          {/* Input */}
+          <div className="p-4 border-t border-[var(--border)] bg-[var(--bg-subtle)]">
+            <div className="flex gap-3">
+              <div className="flex-1 rounded-xl border border-[var(--border-strong)] px-4 py-3 text-sm text-[var(--text-muted)]">What are you thinking?</div>
+              <span className="rounded-xl bg-[var(--primary)] px-5 py-3 text-xs font-semibold text-white">Send</span>
+            </div>
+          </div>
+        </div>
+      </DemoSection>
+
+      {/* ═══ 5. BUSINESS CARD ═══ */}
+      <DemoSection label="The Reward" title="Business Card Designer" description="Students design a 3D business card that tilts on hover and flips to show achievements. Fonts unlock as they write more. Finishes unlock via achievements. It's a reward system disguised as a design tool.">
+        <div className="mx-auto max-w-[500px]">
+          <div className="relative mx-auto rounded-2xl p-8 text-white" style={{
+            width: "100%", maxWidth: "400px", aspectRatio: "16/10",
+            background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.3), 0 0 1px rgba(255,255,255,0.1) inset",
+          }}>
+            <div className="flex h-1 rounded-full overflow-hidden mb-6">
+              <div className="flex-1 bg-[#F5E642]" /><div className="flex-1 bg-[#A8DB5A]" /><div className="flex-1 bg-[#F4A79D]" /><div className="flex-1 bg-[#6DD5D0]" />
+            </div>
+            <p className="font-[family-name:var(--font-display)] text-2xl font-bold">{STUDENT.fullName}</p>
+            <p className="mt-1 text-lg font-semibold text-white/90">{BUSINESS.name}</p>
+            <p className="mt-2 text-sm text-white/50">{BUSINESS.niche}</p>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            {[
+              { n: "7", d: "Base colors — black, white, navy, forest, wine, and more" },
+              { n: "8", d: "Fonts unlock as students write more across the platform" },
+              { n: "5", d: "Finishes — matte, holographic, silver, chrome, gold" },
+              { n: "3D", d: "Pure CSS — tilts on hover, flips to show achievements" },
+            ].map((f, i) => (
+              <div key={i} className="flex gap-3 items-start">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-xs font-bold text-[var(--primary)]">{f.n}</span>
+                <p className="text-sm text-[var(--text-secondary)]">{f.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </DemoSection>
+
+      {/* ═══ 6. BUSINESS PLAN ═══ */}
+      <DemoSection label="The Output" title="Auto-Assembled Business Plan" description="Students never 'write a business plan.' It assembles itself from their decisions and conversations across all 8 lessons.">
+        <div className="mx-auto max-w-[550px] rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 shadow-sm">
+          <div className="space-y-5">
+            {[
+              { n: 1, t: "Vision", b: `${BUSINESS.niche}. Born from ${STUDENT.name}'s Ikigai — her love of painting, her teaching ability, and her community's need for affordable art education.` },
+              { n: 2, t: "Target Customer", b: `${BUSINESS.target}. Revenue model: ${BUSINESS.revenue}.` },
+              { n: 3, t: "Competitive Edge", b: DECISIONS[2].text },
+            ].map((s) => (
+              <div key={s.n} className="flex gap-4">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">{s.n}</span>
+                <div>
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)]">{s.t}</h4>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)] leading-relaxed">{s.b}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 pt-5 border-t border-[var(--border)]">
+            <p className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider mb-2">The Pitch</p>
+            <p className="text-lg font-medium font-[family-name:var(--font-display)] text-[var(--text-primary)] leading-relaxed italic">
+              &ldquo;{BUSINESS.name} gives teens a place to create, learn, and earn through art — because everyone deserves to express themselves, regardless of what they can afford.&rdquo;
+            </p>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">&mdash; {STUDENT.name}, Founder of {BUSINESS.name}</p>
+          </div>
+        </div>
+      </DemoSection>
+
+      {/* ═══ 7. INSTRUCTOR DASHBOARD ═══ */}
+      <DemoSection label="For Teachers" title="Instructor Dashboard" description="Real-time visibility into every student's progress, business idea, and emotional state. Smart alerts detect when students are stuck. One-click nudges keep them moving.">
+        <div className="mx-auto max-w-[700px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
+            <div>
+              <h3 className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--text-primary)]">Entrepreneurship — Period 3</h3>
+              <p className="text-xs text-[var(--text-muted)]">28 students &middot; 2 alerts</p>
+            </div>
+            <div className="flex gap-1">
+              {["Students", "Live Feed", "Alerts", "Follow-ups", "Analytics"].map((tab, i) => (
+                <span key={tab} className={`rounded-lg px-3 py-1.5 text-xs font-medium ${i === 0 ? "bg-[var(--primary)] text-white" : "text-[var(--text-muted)]"}`}>
+                  {tab}{tab === "Alerts" && <span className="ml-1 text-[10px]">(2)</span>}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead><tr className="border-b border-[var(--border)] text-left text-xs text-[var(--text-muted)]">
+                <th className="p-3 font-medium">Student</th><th className="p-3 font-medium">Business Idea</th><th className="p-3 font-medium">Progress</th><th className="p-3 font-medium">Last Active</th><th className="p-3 font-medium">Status</th>
+              </tr></thead>
+              <tbody>
+                {[
+                  { name: STUDENT.fullName, biz: BUSINESS.name, pct: 62.5, active: "2 min ago", status: "On track", color: "var(--success)" },
+                  { name: "Marcus Johnson", biz: "Fresh Kicks Co.", pct: 37.5, active: "3 days ago", status: "Needs help", color: "var(--warning)" },
+                  { name: "Priya Sharma", biz: "Spice Route", pct: 87.5, active: "1 hr ago", status: "On track", color: "var(--success)" },
+                  { name: "Jaylen Carter", biz: "Cart Culture", pct: 25, active: "5 days ago", status: "Inactive", color: "var(--error)" },
+                ].map((s, i) => (
+                  <tr key={i} className="border-b border-[var(--border)]">
+                    <td className="p-3 font-medium text-[var(--text-primary)]">{s.name}</td>
+                    <td className="p-3 text-[var(--text-secondary)]">{s.biz}</td>
+                    <td className="p-3"><div className="h-1.5 w-24 rounded-full bg-[var(--bg-muted)]"><div className="h-1.5 rounded-full" style={{ width: `${s.pct}%`, background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} /></div></td>
+                    <td className="p-3 text-[var(--text-muted)]">{s.active}</td>
+                    <td className="p-3"><span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ color: s.color, background: `color-mix(in srgb, ${s.color} 10%, transparent)` }}>{s.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Alert */}
+          <div className="p-4 flex items-start gap-3 border-t border-amber-200 bg-amber-50">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-amber-600">!</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[var(--text-primary)]">Marcus Johnson — Stuck on Lesson 3 for 4 days</p>
+              <p className="text-xs text-[var(--text-muted)]">Student hasn&apos;t progressed. Consider a check-in.</p>
+            </div>
+            <span className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--primary)] hover:bg-white cursor-pointer">Send Nudge</span>
+          </div>
+        </div>
+      </DemoSection>
+
+      {/* ═══ 8. PARENT VIEW ═══ */}
+      <DemoSection label="For Parents" title="Parent View" description="Parents see their child's progress, business idea, and Ikigai — all behind a PIN set by the teacher. Designed for 60 seconds of context.">
+        <div className="mx-auto max-w-[500px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+          <div className="p-6 flex items-center gap-5 border-b border-[var(--border)]">
+            <div className="relative" style={{ width: "72px", height: "72px" }}>
+              <svg viewBox="0 0 120 120" className="w-full h-full">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="var(--bg-muted)" strokeWidth="8" />
+                <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" strokeWidth="8"
+                  strokeDasharray={`${2 * Math.PI * 52 * 0.625} ${2 * Math.PI * 52 * 0.375}`}
+                  strokeLinecap="round" transform="rotate(-90 60 60)" />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--primary)]">63%</span>
+            </div>
+            <div>
+              <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">{STUDENT.fullName}</h3>
+              <p className="text-xs text-[var(--text-muted)]">Ms. Davis&apos;s Entrepreneurship &middot; Period 3</p>
+              <p className="text-xs text-[var(--text-secondary)]">5 of 8 lessons complete</p>
+            </div>
+          </div>
+          <div className="p-4 border-b border-[var(--border)]">
+            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Business Idea</p>
+            <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">{BUSINESS.name}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{BUSINESS.niche}</p>
+          </div>
+          <div className="p-4 grid grid-cols-2 gap-3 border-b border-[var(--border)]">
+            {[
+              { label: "What She Loves", items: IKIGAI.passions.join(", "), bg: "rgba(245,230,66,0.12)" },
+              { label: "What She's Good At", items: IKIGAI.skills.join(", "), bg: "rgba(168,219,90,0.12)" },
+              { label: "What People Need", items: IKIGAI.needs.join(", "), bg: "rgba(244,167,157,0.12)" },
+              { label: "How She Earns", items: IKIGAI.monetization, bg: "rgba(109,213,208,0.12)" },
+            ].map((q, i) => (
+              <div key={i} className="rounded-lg p-3" style={{ background: q.bg }}>
+                <p className="text-[10px] font-semibold text-[var(--text-primary)]">{q.label}</p>
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">{q.items}</p>
+              </div>
+            ))}
+          </div>
+          <div className="p-4">
+            <p className="text-xs font-semibold text-[var(--text-primary)] mb-1">How You Can Help</p>
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              {STUDENT.name} is halfway through and doing great. Ask her about the customer interviews she&apos;s been practicing. Encouraging her to talk to real people about {BUSINESS.name} would be the most valuable thing right now.
+            </p>
+          </div>
+        </div>
+      </DemoSection>
+
+      {/* ═══ 9. COMPLETION CEREMONY — CINEMATIC ═══ */}
+      <section ref={ceremonyRef} className="relative flex items-center justify-center min-h-screen bg-black overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center transition-all duration-[2618ms]" style={{ opacity: ceremonyPhase >= 1 && ceremonyPhase < 2 ? 1 : 0 }}>
+          <div className="max-w-[480px] text-left" style={{ fontFamily: "var(--font-serif), Georgia, serif", fontSize: "17px", lineHeight: 1.618, color: "rgba(255,255,255,0.75)" }}>
+            <p>Dear {STUDENT.name},</p>
+            <p className="mt-[1.618em]">With this launchpad, I only hope you realize all that you are capable of. I started this platform with nothing but a vision, and an unstoppable will. You are capable of more than you know.</p>
+            <p className="mt-[2.618em]" style={{ fontStyle: "italic", color: "rgba(255,255,255,0.6)" }}>
+              <span className="block mt-[0.382em] not-italic font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>&mdash; AJ Rogers, age 19</span>
+              <span className="block mt-[0.236em] not-italic text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>Founder of Adaptable</span>
+            </p>
+          </div>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center transition-all duration-[2618ms]" style={{ opacity: ceremonyPhase === 2 ? 1 : 0 }}>
+          <span style={{ fontSize: "17px", fontWeight: 600, letterSpacing: "0.236em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.65)" }}>Program Complete.</span>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center transition-all duration-[2618ms]" style={{ opacity: ceremonyPhase >= 3 ? 1 : 0 }}>
+          <div className="rounded-xl overflow-hidden" style={{
+            background: "#f5f0e8", width: "min(520px, 80.9vw)", aspectRatio: "1.618/1",
+            border: "2px solid #c4b18a", outline: "1px solid #d4c9a8", outlineOffset: "8.472px",
+            padding: "8%", display: "flex", flexDirection: "column" as const, alignItems: "center", justifyContent: "center", textAlign: "center" as const,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(196,177,138,0.08)",
+            animation: ceremonyPhase >= 3 ? "ceremony-name-fade 1.618s ease-out forwards" : "none",
+          }}>
+            <div style={{ fontFamily: "var(--font-serif), Georgia, serif", fontSize: "11px", letterSpacing: "0.382em", textTransform: "uppercase" as const, color: "#8a7d65", marginBottom: "1.618em" }}>Adaptable Venture Program</div>
+            <div style={{ fontFamily: "var(--font-diploma), 'Playfair Display', serif", fontSize: "17px", letterSpacing: "0.146em", textTransform: "uppercase" as const, color: "#5c5240", marginBottom: "0.618em" }}>Certificate of Completion</div>
+            <div style={{ fontFamily: "var(--font-diploma), 'Playfair Display', serif", fontSize: "28px", fontWeight: 700, color: "#1a1712", marginBottom: "0.618em" }}>{STUDENT.fullName}</div>
+            <div style={{ fontFamily: "var(--font-serif), Georgia, serif", fontSize: "11px", color: "#6b6050", lineHeight: 1.618, maxWidth: "340px", marginBottom: "1.618em" }}>
+              has completed the Adaptable Venture Program and designed <strong>{BUSINESS.name}</strong>, {BUSINESS.niche.toLowerCase()}.
+            </div>
+            <div style={{ fontFamily: "var(--font-serif), Georgia, serif", fontSize: "11px", color: "#9a8e78", letterSpacing: "0.09em" }}>
+              {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ CLOSING ═══ */}
+      <section className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center bg-[var(--bg)]">
+        <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">Built for VentureLab</p>
+        <h2 className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold text-[var(--text-primary)]">This is Adaptable.</h2>
+        <p className="mt-4 max-w-[440px] text-base text-[var(--text-secondary)] leading-relaxed">
+          No platform has ever streamlined the entrepreneurial process for students like this. We are the first. And the work speaks for itself.
+        </p>
+        <div className="mt-8 flex gap-4">
+          <Link href="/for-schools" className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors">
+            Bring This to Your Students
+          </Link>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="rounded-lg border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors">
+            Back to Top
           </button>
-        )}
-      </div>
-
-      {/* CEREMONY: DIPLOMA */}
-      <div className={`demo-scene ${sceneActive("ceremony-diploma") ? "active" : ""}`} style={{ background: "#0a0a08" }}>
-        <div className="demo-diploma">
-          <div className="inst">Adaptable Venture Program</div>
-          <div className="cert-title">Certificate of Completion</div>
-          <div className="sname">{STUDENT_NAME}</div>
-          <div className="cert-body">
-            has completed the Adaptable Venture Program and designed <strong>{BUSINESS_NAME}</strong>,
-            an art education studio for creative self-expression.
-          </div>
-          <div className="cert-date">{new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>
-          <div className="cert-id">AVP-{new Date().getFullYear()}-{Math.random().toString(36).slice(2, 6).toUpperCase()}</div>
         </div>
-        <button className="demo-diploma-continue" onClick={() => goTo("ceremony-farewell")}>
-          Continue
-        </button>
-      </div>
+      </section>
+    </main>
+  );
+}
 
-      {/* CEREMONY: MENTOR FAREWELL */}
-      <div className={`demo-scene ${sceneActive("ceremony-farewell") ? "active" : ""}`}>
-        <div className="demo-farewell">
-          <div className="demo-farewell-mentor">Nova</div>
-          <div className="demo-farewell-text">
-            <span dangerouslySetInnerHTML={{ __html: farewellText }} />
-            {!farewellDone && <span className="demo-farewell-cursor" />}
-          </div>
-          {farewellDone && (
-            <button className="demo-btn" style={{ marginTop: "2.618em" }} onClick={() => goTo("end")}>
-              Begin
-            </button>
-          )}
+function DemoSection({ label, title, description, children }: {
+  label: string; title: string; description: string; children: React.ReactNode;
+}) {
+  return (
+    <section className="px-6 py-20 border-b border-[var(--border)]">
+      <div className="mx-auto max-w-[800px]">
+        <div className="mb-12">
+          <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">{label}</p>
+          <h2 className="mt-2 font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">{title}</h2>
+          <p className="mt-3 max-w-[600px] text-base text-[var(--text-secondary)] leading-relaxed">{description}</p>
         </div>
+        {children}
       </div>
-
-      {/* END */}
-      <div className={`demo-scene ${sceneActive("end") ? "active" : ""}`}>
-        <div className="demo-end-wrap">
-          <h2 className="demo-end-title">This is Adaptable.</h2>
-          <div className="demo-end-line" />
-          <p className="demo-end-sub">
-            Built for the students who will build the future.
-          </p>
-          <div className="demo-end-actions">
-            <a href="/for-schools" className="demo-btn demo-btn-primary" style={{ textDecoration: "none", marginTop: 0 }}>
-              Learn More
-            </a>
-            <button className="demo-btn" style={{ marginTop: 0 }} onClick={() => { setScene("welcome"); setCirclesDone([]); setRevealCircles([]); setRevealCenter(false); setRevealName(false); setFarewellText(""); setFarewellDone(false); setLetterPhase(0); }}>
-              Replay
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
