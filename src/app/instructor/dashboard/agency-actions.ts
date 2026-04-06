@@ -217,34 +217,8 @@ export async function getClassFlags(classId: string) {
 }
 
 // ─── Smart Nudge Templates ───
-
-export function getNudgeTemplates(alertType: string, studentName: string, businessName: string) {
-  const templates: Record<string, string[]> = {
-    emotional: [
-      `Hey ${studentName}, I can see you're working through some tough stuff. Your work on ${businessName} is strong. Take your time — I'm here when you're ready.`,
-      `${studentName}, just checking in. You don't have to have it all figured out right now. What's one small thing you feel good about with ${businessName}?`,
-    ],
-    stuck: [
-      `${studentName}, I see you've been on this lesson for a bit. Try breaking it into one small question: what's the ONE thing you're unsure about?`,
-      `Hey ${studentName}, sometimes the best move is to write something imperfect and fix it later. What's your gut answer?`,
-    ],
-    inactive: [
-      `Hey ${studentName}, just thinking about you. Your ${businessName} idea was really promising. No pressure — pick up whenever you're ready. I'm here.`,
-      `${studentName}, it's been a few days. Everything okay? Your ${businessName} work was strong — don't let it go cold.`,
-    ],
-    checkin_quality: [
-      `${studentName}, I noticed your check-ins have been brief lately. Everything going okay? Even one real sentence helps me understand where you're at.`,
-      `Hey ${studentName}, the check-ins work best when they're honest, even if short. What's one thing on your mind about ${businessName}?`,
-    ],
-    content_flag: [
-      `${studentName}, I saw something in your recent work that I want to chat about. Can we find a few minutes to talk?`,
-    ],
-  };
-
-  return templates[alertType] ?? [
-    `Hey ${studentName}, just wanted to check in on your progress with ${businessName}. How's it going?`,
-  ];
-}
+// Note: getNudgeTemplates is a pure function, moved to NudgeTemplates.tsx (client component)
+// because server action files can only export async functions.
 
 // ─── Send Nudge (message + log) ───
 
