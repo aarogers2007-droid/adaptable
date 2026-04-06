@@ -514,11 +514,35 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
               }}
             >
               <div
-                className="rounded-xl bg-[var(--bg)] border border-[var(--border)] overflow-hidden"
-                style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}
+                className="ikigai-reveal-card rounded-xl bg-[var(--bg)] border border-[var(--border)]"
+                style={{ position: "relative", overflow: "visible" }}
               >
+                {/* Ikigai aura glow — color edges on left and right */}
+                <div className="ikigai-reveal-aura ikigai-reveal-aura-left" />
+                <div className="ikigai-reveal-aura ikigai-reveal-aura-right" />
+
+                {/* Aura particles */}
+                <div className="ikigai-reveal-particles">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="ikigai-reveal-particle"
+                      style={{
+                        left: `${(i % 2 === 0) ? -6 + Math.random() * 12 : 94 + Math.random() * 12}%`,
+                        top: `${10 + (i / 12) * 80}%`,
+                        animationDelay: `${i * 0.4}s`,
+                        animationDuration: `${2.618 + Math.random() * 1.618}s`,
+                        backgroundColor: [
+                          "var(--ikigai-love)", "var(--ikigai-skills)",
+                          "var(--ikigai-needs)", "var(--ikigai-money)",
+                        ][i % 4],
+                      }}
+                    />
+                  ))}
+                </div>
+
                 {/* Ikigai gradient bar */}
-                <div className="flex h-1.5">
+                <div className="flex h-1.5" style={{ position: "relative", zIndex: 2, borderRadius: "12px 12px 0 0", overflow: "hidden" }}>
                   <div className="flex-1" style={{ backgroundColor: "var(--ikigai-love)" }} />
                   <div className="flex-1" style={{ backgroundColor: "var(--ikigai-skills)" }} />
                   <div className="flex-1" style={{ backgroundColor: "var(--ikigai-needs)" }} />

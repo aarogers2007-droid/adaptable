@@ -244,6 +244,83 @@ button:active:not(:disabled) {
     var(--bg);
 }
 
+/* ─── Ikigai Wizard Reveal Card ─── */
+
+/* Subtle glow on the card when it reveals */
+.ikigai-reveal-card {
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.06),
+    0 0 40px rgba(74, 103, 65, 0.12),
+    0 0 80px rgba(74, 103, 65, 0.06);
+  animation: ikigai-card-glow 2.618s ease-out forwards;
+}
+@keyframes ikigai-card-glow {
+  0% {
+    box-shadow:
+      0 4px 24px rgba(0,0,0,0.06),
+      0 0 60px rgba(245, 230, 66, 0.2),
+      0 0 80px rgba(168, 219, 90, 0.15),
+      0 0 100px rgba(244, 167, 157, 0.15),
+      0 0 120px rgba(109, 213, 208, 0.2);
+  }
+  100% {
+    box-shadow:
+      0 4px 24px rgba(0,0,0,0.06),
+      0 0 30px rgba(74, 103, 65, 0.08),
+      0 0 60px rgba(74, 103, 65, 0.04);
+  }
+}
+
+/* Ikigai color auras on left and right edges */
+.ikigai-reveal-aura {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  border-radius: 2px;
+  z-index: 1;
+  opacity: 0;
+  animation: ikigai-aura-in 1.618s ease-out 0.3s forwards;
+}
+.ikigai-reveal-aura-left {
+  left: -8px;
+  background: linear-gradient(to bottom, #F5E642, #A8DB5A);
+  box-shadow: 0 0 12px rgba(168, 219, 90, 0.4), 0 0 24px rgba(245, 230, 66, 0.2);
+}
+.ikigai-reveal-aura-right {
+  right: -8px;
+  background: linear-gradient(to bottom, #F4A79D, #6DD5D0);
+  box-shadow: 0 0 12px rgba(244, 167, 157, 0.4), 0 0 24px rgba(109, 213, 208, 0.2);
+}
+@keyframes ikigai-aura-in {
+  0% { opacity: 0; top: 45%; bottom: 45%; }
+  60% { opacity: 0.8; }
+  100% { opacity: 0.6; top: 10%; bottom: 10%; }
+}
+
+/* Aura particles — small colored dots that float upward from the edges */
+.ikigai-reveal-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+.ikigai-reveal-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ikigai-particle-float ease-out infinite;
+}
+@keyframes ikigai-particle-float {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  15% { opacity: 0.6; transform: translateY(-4px) scale(1); }
+  60% { opacity: 0.3; }
+  100% { opacity: 0; transform: translateY(-28px) scale(0.3); }
+}
+
 /* ─── For-Schools Hero Animations ─── */
 
 /* Ikigai circle entrance on marketing page (SVG circles) */
