@@ -135,6 +135,10 @@ export default function LessonConversation({
   const [pitchDone, setPitchDone] = useState(initialCompleted);
   const [checkpointCelebration, setCheckpointCelebration] = useState(false);
   const prevCheckpointsRef = useRef(initialCheckpoints);
+  const [showEntrance, setShowEntrance] = useState(() => initialMessages.length === 0 && !initialCompleted);
+  const [entrancePhase, setEntrancePhase] = useState<"mod" | "title" | "line" | "done">("mod");
+  const [goalCollapsed, setGoalCollapsed] = useState(false);
+  const [showCompletionOverlay, setShowCompletionOverlay] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -144,6 +148,23 @@ export default function LessonConversation({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
+  // Lesson entrance sequence
+  useEffect(() => {
+    if (!showEntrance) return;
+    const t1 = setTimeout(() => setEntrancePhase("title"), 800);
+    const t2 = setTimeout(() => setEntrancePhase("line"), 1400);
+    const t3 = setTimeout(() => setEntrancePhase("done"), 3500);
+    const t4 = setTimeout(() => setShowEntrance(false), 4300);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+  }, [showEntrance]);
+
+  // Collapse goal after 3 messages to save space
+  useEffect(() => {
+    if (messages.length >= 4 && !goalCollapsed) {
+      setGoalCollapsed(true);
+    }
+  }, [messages.length, goalCollapsed]);
+
   // Checkpoint celebration
   useEffect(() => {
     if (checkpointsReached > prevCheckpointsRef.current) {
@@ -152,6 +173,13 @@ export default function LessonConversation({
       setTimeout(() => setCheckpointCelebration(false), 2500);
     }
   }, [checkpointsReached]);
+
+  // Show completion overlay when lesson completes
+  useEffect(() => {
+    if (completed && decisionDone && pitchDone) {
+      setTimeout(() => setShowCompletionOverlay(true), 500);
+    }
+  }, [completed, decisionDone, pitchDone]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -455,6 +483,19 @@ export default function LessonConversation({
 
   return (
     <div className="flex flex-col h-dvh lesson-atmosphere">
+      {/* Lesson Entrance — chapter opening */}
+      {showEntrance && (
+        <div className={`lesson-entrance ${entrancePhase === "done" ? "lesson-entrance-gone" : ""}`}>
+          <p className={`lesson-entrance-module ${entrancePhase !== "mod" ? "show" : ""}`}>
+            Module {moduleSequence}
+          </p>
+          <p className={`lesson-entrance-title ${["title", "line", "done"].includes(entrancePhase) ? "show" : ""}`}>
+            {lessonTitle}
+          </p>
+          <div className={`lesson-entrance-line ${["line", "done"].includes(entrancePhase) ? "show" : ""}`} />
+        </div>
+      )}
+
       {/* Header */}
       <div className="shrink-0">
         <AppNav isAdmin={initialIsAdmin} studentName={studentName} />
@@ -462,9 +503,12 @@ export default function LessonConversation({
 
         {/* Goal summary + Progress bar */}
         <div className="mx-auto max-w-[800px] px-6 py-3">
-          <div className="rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-2.5 mb-2">
+          <div
+            className={`lesson-goal-box rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] px-4 py-2.5 mb-2 cursor-pointer ${goalCollapsed ? "lesson-goal-collapsed" : ""}`}
+            onClick={() => setGoalCollapsed(!goalCollapsed)}
+          >
             <p className="text-xs font-medium text-[var(--primary)]">Goal</p>
-            <p className="text-sm text-[var(--text-secondary)]">{objective}</p>
+            {!goalCollapsed && <p className="text-sm text-[var(--text-secondary)]">{objective}</p>}
           </div>
           <div className="flex items-center gap-3">
             <div className="shrink-0">
@@ -590,7 +634,7 @@ export default function LessonConversation({
               // Student messages: right-aligned, always fully visible
               return (
                 <div key={i} className={`flex justify-end ${isNew ? "msg-enter-right" : ""}`}>
-                  <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
+                  <div className={`max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3 ${isNew ? "msg-land" : ""}`}>
                     <p className="text-base leading-relaxed">{msg.content}</p>
                   </div>
                 </div>
@@ -603,10 +647,13 @@ export default function LessonConversation({
             return (
               <div key={i} className={`flex justify-start ${isNew ? "msg-enter" : ""}`}>
                 <div className="max-w-[85%]">
-                  <p className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1 ml-1">Guide</p>
+                  <div className="flex items-center gap-1.5 mb-1 ml-1">
+                    <div className="ikigai-icon"><div className="ikigai-icon-dot ik-d1" /><div className="ikigai-icon-dot ik-d2" /><div className="ikigai-icon-dot ik-d3" /><div className="ikigai-icon-dot ik-d4" /></div>
+                    <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Guide</span>
+                  </div>
                   <div className={`rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px] space-y-3 ${!(isStreaming && !msg.content) ? "ai-message" : ""}`}>
                     {isStreaming && !msg.content ? (
-                      <div className="flex items-center gap-1.5 py-2">
+                      <div className="thinking-bubble-glow flex items-center gap-1.5 py-2">
                         <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-love)" }} />
                         <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-skills)" }} />
                         <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-needs)" }} />
@@ -656,50 +703,35 @@ export default function LessonConversation({
         </div>
       )}
 
-      {completed && !showSandbox && decisionDone && pitchDone && (
-        <div className="shrink-0 lesson-complete-banner slide-up-enter px-6 py-4">
-          <div className="mx-auto max-w-[700px]">
-            {isModuleTransition ? (
-              /* Module transition celebration */
-              <div className="text-center py-2">
-                <p className="text-sm font-semibold text-[var(--success)]">
-                  {currentModuleName} complete &#10003;
-                </p>
-                <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  Now let&apos;s find out if people actually want what you&apos;re designing.
-                </p>
-                <Link
-                  href={`/lessons/${nextLessonId}`}
-                  className="mt-3 inline-block rounded-lg bg-[var(--primary)] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
-                >
-                  Start {nextModuleName} →
-                </Link>
-              </div>
+      {/* Completion overlay */}
+      {showCompletionOverlay && (
+        <>
+          <div className="lesson-dim" />
+          <div className="lesson-complete-card">
+            <div className="lesson-complete-check">✓</div>
+            <p className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">
+              {isModuleTransition ? `${currentModuleName} Complete` : lessonTitle}
+            </p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              {isModuleTransition ? `Now let's find out if people actually want what you're designing.` : "Lesson complete"}
+            </p>
+            {nextLessonId ? (
+              <Link
+                href={`/lessons/${nextLessonId}`}
+                className="mt-5 inline-block rounded-lg bg-[var(--primary)] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+              >
+                {isModuleTransition ? `Start ${nextModuleName} →` : "Next Lesson →"}
+              </Link>
             ) : (
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-[var(--success)]">✓ {lessonTitle}</p>
-                  <p className="text-xs text-[var(--text-muted)]">Lesson complete</p>
-                </div>
-                {nextLessonId ? (
-                  <Link
-                    href={`/lessons/${nextLessonId}`}
-                    className="rounded-lg bg-[var(--primary)] px-5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
-                  >
-                    Next Lesson →
-                  </Link>
-                ) : (
-                  <Link
-                    href="/completion"
-                    className="rounded-lg bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-[var(--text-primary)] hover:brightness-110 transition-all"
-                  >
-                    See What You Built ✨
-                  </Link>
-                )}
-              </div>
+              <Link
+                href="/completion"
+                className="mt-5 inline-block rounded-lg bg-[var(--accent)] px-6 py-2.5 text-sm font-semibold text-[var(--text-primary)] hover:brightness-110 transition-all"
+              >
+                See What You Built
+              </Link>
             )}
           </div>
-        </div>
+        </>
       )}
 
 
@@ -729,7 +761,8 @@ export default function LessonConversation({
                   <button
                     key={i}
                     onClick={() => useSuggestion(s)}
-                    className="rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors"
+                    className="chip-cascade rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors"
+                    style={{ animationDelay: `${i * 200}ms` }}
                   >
                     {s}
                   </button>
@@ -752,7 +785,7 @@ export default function LessonConversation({
                   placeholder="What are you thinking?"
                   rows={1}
                   autoFocus
-                  className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"
+                  className="lesson-input flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none transition-all"
                   style={{ maxHeight: "150px", overflow: "auto" }}
                 />
                 <VoiceInput
