@@ -133,7 +133,8 @@ export default function LessonConversation({
   const [showSandboxIntro, setShowSandboxIntro] = useState(false);
   const [decisionDone, setDecisionDone] = useState(initialCompleted);
   const [pitchDone, setPitchDone] = useState(initialCompleted);
-  const [aiParaIndices, setAiParaIndices] = useState<Record<number, number>>({});
+  const [checkpointCelebration, setCheckpointCelebration] = useState(false);
+  const prevCheckpointsRef = useRef(initialCheckpoints);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -142,6 +143,15 @@ export default function LessonConversation({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+
+  // Checkpoint celebration
+  useEffect(() => {
+    if (checkpointsReached > prevCheckpointsRef.current) {
+      prevCheckpointsRef.current = checkpointsReached;
+      setCheckpointCelebration(true);
+      setTimeout(() => setCheckpointCelebration(false), 2500);
+    }
+  }, [checkpointsReached]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -444,7 +454,7 @@ export default function LessonConversation({
   const progress = totalCheckpoints > 0 ? Math.round((checkpointsReached / totalCheckpoints) * 100) : 0;
 
   return (
-    <div className="flex flex-col h-dvh bg-[var(--bg)]">
+    <div className="flex flex-col h-dvh lesson-atmosphere">
       {/* Header */}
       <div className="shrink-0">
         <AppNav isAdmin={initialIsAdmin} studentName={studentName} />
@@ -457,10 +467,13 @@ export default function LessonConversation({
             <p className="text-sm text-[var(--text-secondary)]">{objective}</p>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-xs font-medium text-[var(--text-primary)]">{lessonTitle}</p>
-            <div className="flex-1 h-1.5 rounded-full bg-[var(--bg-muted)]">
+            <div className="shrink-0">
+              <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Module {moduleSequence}</p>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{lessonTitle}</p>
+            </div>
+            <div className="flex-1 h-2 rounded-full bg-[var(--bg-muted)]">
               <div
-                className="h-1.5 rounded-full checkpoint-bar"
+                className="h-2 rounded-full checkpoint-bar"
                 style={{
                   width: `${completed ? 100 : progress}%`,
                   background: "linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%)",
@@ -472,6 +485,20 @@ export default function LessonConversation({
             </p>
           </div>
         </div>
+
+        {/* Checkpoint celebration */}
+        {checkpointCelebration && (
+          <div className="mx-auto max-w-[800px] px-6 pb-2">
+            <div className="checkpoint-celebration rounded-lg px-4 py-2.5 text-center">
+              <p className="text-sm font-semibold text-[var(--primary)]">
+                Checkpoint reached
+              </p>
+              <p className="text-xs text-[var(--text-muted)]">
+                {checkpointsReached}/{totalCheckpoints} complete
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Admin: Learning Profile Debug Panel */}
         {adminMode && (
@@ -553,10 +580,10 @@ export default function LessonConversation({
         />
       )}
 
-      {/* Messages — chat layout with paginated AI messages */}
+      {/* Messages — flowing conversation layout */}
       {!showSandbox && (
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-[700px] px-6 py-6 space-y-4">
+        <div className="mx-auto max-w-[700px] px-6 py-6 space-y-5">
           {messages.map((msg, i) => {
             const isNew = i >= initialMessages.length;
             if (msg.role === "user") {
@@ -570,59 +597,34 @@ export default function LessonConversation({
               );
             }
 
-            // AI messages: left-aligned, split into paragraphs with arrows
-            const paragraphs = msg.content
-              ? msg.content.split(/\n\n+/).filter((p) => p.trim())
-              : [];
+            // AI messages: all paragraphs visible, no pagination
             const isStreaming = i === messages.length - 1 && loading;
-            const paraIndex = aiParaIndices[i] ?? 0;
-            const currentPara = paragraphs[paraIndex];
-            const totalParas = paragraphs.length;
 
             return (
               <div key={i} className={`flex justify-start ${isNew ? "msg-enter" : ""}`}>
                 <div className="max-w-[85%]">
-                  <div className="rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px] space-y-2">
+                  <p className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1 ml-1">Guide</p>
+                  <div className="ai-message rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px] space-y-3">
                     {isStreaming && !msg.content ? (
-                      <div className="flex items-center gap-3">
-                        <span className="inline-block w-5 h-5 border-2 border-[var(--text-muted)] border-t-[var(--primary)] rounded-full animate-spin" />
-                        <span className="text-base opacity-60">Thinking...</span>
+                      <div className="flex items-center gap-1.5 py-2">
+                        <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-love)" }} />
+                        <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-skills)" }} />
+                        <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-needs)" }} />
                       </div>
                     ) : isStreaming && msg.content ? (
-                      <TypewriterText text={msg.content.split(/\n\n+/).filter((p: string) => p.trim())[0] ?? ""} streaming={true} />
-                    ) : currentPara ? (
-                      <p className="text-base leading-relaxed">{currentPara}</p>
-                    ) : paragraphs[0] ? (
-                      <p className="text-base leading-relaxed">{paragraphs[0]}</p>
-                    ) : null}
+                      <TypewriterText text={msg.content} streaming={true} />
+                    ) : (
+                      msg.content.split(/\n\n+/).filter((p: string) => p.trim()).map((para: string, j: number) => (
+                        <p
+                          key={j}
+                          className={`text-base leading-relaxed ${isNew ? "stagger-enter" : ""}`}
+                          style={isNew ? { animationDelay: `${j * 150}ms` } : undefined}
+                        >
+                          {para}
+                        </p>
+                      ))
+                    )}
                   </div>
-
-                  {/* Arrows — only show when AI message has multiple paragraphs */}
-                  {totalParas > 1 && (
-                    <div className="flex items-center gap-3 mt-2 px-1">
-                      <button
-                        onClick={() => setAiParaIndices((prev) => ({ ...prev, [i]: Math.max(0, paraIndex - 1) }))}
-                        disabled={paraIndex === 0}
-                        className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)] disabled:opacity-20 transition-colors"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="15 18 9 12 15 6" />
-                        </svg>
-                      </button>
-                      <span className="text-xs text-[var(--text-muted)] tabular-nums">
-                        {paraIndex + 1} / {totalParas}
-                      </span>
-                      <button
-                        onClick={() => setAiParaIndices((prev) => ({ ...prev, [i]: Math.min(totalParas - 1, paraIndex + 1) }))}
-                        disabled={paraIndex >= totalParas - 1}
-                        className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-muted)] disabled:opacity-20 transition-colors"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -675,7 +677,10 @@ export default function LessonConversation({
               </div>
             ) : (
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-[var(--success)]">✓ Lesson complete! Nice work.</p>
+                <div>
+                  <p className="text-sm font-semibold text-[var(--success)]">✓ {lessonTitle}</p>
+                  <p className="text-xs text-[var(--text-muted)]">Lesson complete</p>
+                </div>
                 {nextLessonId ? (
                   <Link
                     href={`/lessons/${nextLessonId}`}
@@ -744,7 +749,7 @@ export default function LessonConversation({
                     e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type your response..."
+                  placeholder="What are you thinking?"
                   rows={1}
                   autoFocus
                   className="flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 transition-colors"

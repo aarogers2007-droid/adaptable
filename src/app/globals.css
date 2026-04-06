@@ -244,6 +244,49 @@ button:active:not(:disabled) {
     var(--bg);
 }
 
+/* ─── Lesson Conversation Atmosphere ─── */
+
+.lesson-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13, 148, 136, 0.03) 0%, transparent 70%),
+    var(--bg);
+}
+
+/* AI message subtle glow */
+.ai-message {
+  box-shadow: 0 0 20px rgba(13, 148, 136, 0.04), 0 1px 3px rgba(0,0,0,0.04);
+  border-left: 2px solid transparent;
+  border-image: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0) 1;
+}
+
+/* Ikigai-colored thinking dots */
+.thinking-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  animation: thinking-pulse 1.2s ease-in-out infinite;
+}
+.thinking-dot:nth-child(1) { animation-delay: 0ms; }
+.thinking-dot:nth-child(2) { animation-delay: 150ms; }
+.thinking-dot:nth-child(3) { animation-delay: 300ms; }
+
+@keyframes thinking-pulse {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+
+/* Checkpoint celebration */
+.checkpoint-celebration {
+  background: linear-gradient(90deg, rgba(245,230,66,0.08), rgba(168,219,90,0.08), rgba(244,167,157,0.08), rgba(109,213,208,0.08));
+  border: 1px solid rgba(13, 148, 136, 0.15);
+  animation: checkpoint-celebrate 2.5s ease-out forwards;
+}
+@keyframes checkpoint-celebrate {
+  0% { opacity: 0; transform: translateY(-8px); }
+  15% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
 /* ─── Ikigai Wizard Reveal Card ─── */
 
 /* ── Ikigai Wizard Reveal: Multi-layer breathing glow ── */
