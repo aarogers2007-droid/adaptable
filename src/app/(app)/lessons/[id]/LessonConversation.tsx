@@ -604,7 +604,7 @@ export default function LessonConversation({
               <div key={i} className={`flex justify-start ${isNew ? "msg-enter" : ""}`}>
                 <div className="max-w-[85%]">
                   <p className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1 ml-1">Guide</p>
-                  <div className="ai-message rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px] space-y-3">
+                  <div className={`rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 min-h-[60px] space-y-3 ${!(isStreaming && !msg.content) ? "ai-message" : ""}`}>
                     {isStreaming && !msg.content ? (
                       <div className="flex items-center gap-1.5 py-2">
                         <span className="thinking-dot" style={{ backgroundColor: "var(--ikigai-love)" }} />
