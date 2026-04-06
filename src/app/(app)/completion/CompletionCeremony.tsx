@@ -37,8 +37,12 @@ export default function CompletionCeremony({
   const [revealedCircles, setRevealedCircles] = useState<number[]>([]);
   const [revealedAnswers, setRevealedAnswers] = useState<number[]>([]);
   const [centerVisible, setCenterVisible] = useState(false);
+  const [contracting, setContracting] = useState(false);
+  const [centerAbsorb, setCenterAbsorb] = useState(false);
+  const [centerCollapse, setCenterCollapse] = useState(false);
+  const [shockwave, setShockwave] = useState(false);
   const [bizVisible, setBizVisible] = useState(false);
-  const [bizTyping, setBizTyping] = useState(false);
+  const [circlesReturning, setCirclesReturning] = useState(false);
   const [originVisible, setOriginVisible] = useState(false);
   const [imInVisible, setImInVisible] = useState(false);
   const [farewellText, setFarewellText] = useState("");
@@ -123,20 +127,46 @@ export default function CompletionCeremony({
         await sleep(BASE);
       }
 
-      await sleep(PHI * PHI * BASE); // Convergence pause
-      if (cancelled) return;
-      setCenterVisible(true);
-      await sleep(PHI * PHI * BASE);
+      await sleep(PHI * PHI * BASE); // Let all four breathe together
 
+      // Gravitational collapse — circles contract inward
+      if (cancelled) return;
+      setContracting(true);
+
+      // Wait for contraction to near completion, then center absorbs
+      await sleep(1.618 * BASE);
+      if (cancelled) return;
+      setCenterAbsorb(true);
+      await sleep(PHI * BASE);
+
+      // Center collapses and disappears
+      if (cancelled) return;
+      setCenterCollapse(true);
+      setCenterAbsorb(false);
+
+      // Shockwaves
+      await sleep(0.382 * BASE);
+      if (cancelled) return;
+      setShockwave(true);
+
+      // Business name fades in with glow
+      await sleep(0.382 * BASE);
       if (cancelled) return;
       setBizVisible(true);
-      setBizTyping(true);
-      await sleep(Math.pow(PHI, 3) * BASE);
 
-      if (cancelled) return;
-      setOriginVisible(true);
+      // Wait for name + glow to settle
       await sleep(PHI * PHI * BASE);
 
+      // "This came from who you are."
+      if (cancelled) return;
+      setOriginVisible(true);
+
+      // Circles return as ghosts
+      await sleep(PHI * BASE);
+      if (cancelled) return;
+      setCirclesReturning(true);
+
+      await sleep(PHI * PHI * BASE);
       if (cancelled) return;
       setImInVisible(true);
     })();
@@ -199,8 +229,6 @@ export default function CompletionCeremony({
     return "";
   };
 
-  const charCount = businessName.length;
-  const typeSpeed = Math.max(2, Math.min(4.236, charCount * 0.15));
 
   return (
     <div className="ceremony-root">
@@ -241,32 +269,29 @@ export default function CompletionCeremony({
             </div>
           ))}
 
-          {/* Four circles */}
+          {/* Four circles — collapse inward, then return as ghosts */}
           {["c1", "c2", "c3", "c4"].map((cls, i) => (
             <div
               key={cls}
-              className={`ceremony-ik-circle ${cls} ${revealedCircles.includes(i) ? "reveal" : ""}`}
+              className={`ceremony-ik-circle ${cls} ${revealedCircles.includes(i) ? "reveal" : ""} ${contracting ? "contracting" : ""} ${circlesReturning ? "returning" : ""}`}
+              style={contracting ? { animationDelay: `${i * 0.382}s` } : circlesReturning ? { animationDelay: `${i * 0.236}s` } : undefined}
             />
           ))}
 
-          {/* Center glow */}
-          <div className={`ceremony-ik-center ${centerVisible ? "visible" : ""}`} />
+          {/* Center glow — absorbs then collapses to nothing */}
+          <div className={`ceremony-ik-center ${centerAbsorb ? "absorb" : ""} ${centerCollapse ? "collapse" : ""}`} />
 
-          {/* Business name */}
-          <div className={`ceremony-biz-wrap ${bizVisible ? "visible" : ""}`}>
-            <span
-              className={`ceremony-biz-name ${bizTyping ? "typing" : ""}`}
-              style={
-                bizTyping
-                  ? ({
-                      animationDuration: `${typeSpeed}s`,
-                      "--char-count": `${charCount}ch`,
-                    } as React.CSSProperties)
-                  : undefined
-              }
-            >
-              {businessName}
-            </span>
+          {/* Shockwaves */}
+          {shockwave && (
+            <>
+              <div className="ceremony-shockwave expanding" />
+              <div className="ceremony-shockwave s2 expanding" style={{ animationDelay: "0.236s" }} />
+            </>
+          )}
+
+          {/* Business name — fades in with glow burst */}
+          <div className={`ceremony-biz-wrap ${bizVisible ? "birthing" : ""}`}>
+            <span className="ceremony-biz-name">{businessName}</span>
             <span className={`ceremony-biz-origin ${originVisible ? "visible" : ""}`}>
               This came from who you are.
             </span>
