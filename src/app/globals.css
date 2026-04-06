@@ -296,6 +296,213 @@ button:active:not(:disabled) {
 .stat-item:nth-child(3) { animation-delay: 500ms; }
 .stat-item:nth-child(4) { animation-delay: 650ms; }
 
+/* ═══════════════════════════════════════════
+   COMPLETION CEREMONY — Golden Ratio Construction
+   φ = 1.618034 governs all proportion and timing
+   ═══════════════════════════════════════════ */
+
+.ceremony-root { position: fixed; inset: 0; z-index: 100; background: #000; overflow: hidden; }
+
+.ceremony-scene {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 1.618s ease-in-out;
+}
+.ceremony-scene.active { opacity: 1; pointer-events: auto; }
+.ceremony-scene.exiting { opacity: 0; pointer-events: none; }
+
+/* Scene 1: Founder's Letter */
+.ceremony-letter-content {
+  width: min(480px, 61.8%);
+  font-family: var(--font-serif), 'EB Garamond', 'Times New Roman', serif;
+  font-size: 17px; line-height: 1.618;
+  color: rgba(255,255,255,0.75); text-align: left;
+}
+.ceremony-letter-content p {
+  margin-bottom: 1.618em; opacity: 0; transform: translateY(8px);
+  transition: opacity 1.618s ease-out, transform 1.618s ease-out;
+}
+.ceremony-letter-content p.ceremony-letter-fade-in { opacity: 1; transform: translateY(0); }
+.ceremony-letter-content p.ceremony-letter-fade-out { opacity: 0; transform: translateY(0); transition: opacity 2.618s ease-in; }
+.ceremony-letter-signature { margin-top: 2.618em; font-style: italic; color: rgba(255,255,255,0.6); }
+.ceremony-letter-name { font-style: normal; font-weight: 600; color: rgba(255,255,255,0.7); display: block; margin-top: 0.382em; }
+.ceremony-letter-title { font-style: normal; font-size: 11px; color: rgba(255,255,255,0.4); display: block; margin-top: 0.236em; }
+
+/* Scene 2: Program Complete */
+.ceremony-complete-text {
+  font-family: var(--font-display), 'Satoshi', sans-serif;
+  font-size: 17px; font-weight: 600; letter-spacing: 0.236em;
+  color: rgba(255,255,255,0.65); text-transform: uppercase;
+}
+
+/* Scene 3: Ikigai Reveal */
+.ceremony-particles { position: absolute; inset: 0; overflow: hidden; }
+.ceremony-ambient-glow {
+  position: absolute; width: 61.8vh; height: 61.8vh; left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%);
+  animation: ceremony-glow-breathe 6.854s ease-in-out infinite;
+}
+@keyframes ceremony-glow-breathe {
+  0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.618; }
+  50% { transform: translate(-50%,-50%) scale(1.146); opacity: 1; }
+}
+
+.ceremony-ik-wrap { position: relative; width: min(420px, 61.8vh); aspect-ratio: 1/1; z-index: 2; }
+
+.ceremony-ik-circle {
+  position: absolute; border-radius: 50%; width: 50%; height: 50%;
+  opacity: 0; filter: blur(10px); transform: translate(-50%,-50%) scale(0.236);
+}
+.ceremony-ik-circle.reveal { animation: ceremony-circle-birth 2.618s cubic-bezier(0.16,1,0.3,1) forwards; }
+@keyframes ceremony-circle-birth {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(0.236); filter: blur(10px); }
+  50% { opacity: 0.382; filter: blur(3px); }
+  100% { opacity: 0.618; transform: translate(-50%,-50%) scale(1); filter: blur(0); }
+}
+.ceremony-ik-circle.c1 { background: #F5E642; left: 50%; top: 19.1%; }
+.ceremony-ik-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
+.ceremony-ik-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
+.ceremony-ik-circle.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
+
+.ceremony-ik-answer {
+  position: absolute; font-size: 11px; font-weight: 500; letter-spacing: 0.056em;
+  color: rgba(255,255,255,0); text-align: center; z-index: 3;
+  transition: color 1.618s ease-out; line-height: 1.382;
+}
+.ceremony-ik-answer.visible { color: rgba(255,255,255,0.6); }
+.ceremony-ik-answer.a1 { left: 50%; top: 2.36%; transform: translateX(-50%); }
+.ceremony-ik-answer.a2 { left: 0; top: 50%; transform: translateY(-50%); }
+.ceremony-ik-answer.a3 { right: 0; top: 50%; transform: translateY(-50%); text-align: right; }
+.ceremony-ik-answer.a4 { left: 50%; bottom: 0; transform: translateX(-50%); }
+
+.ceremony-ik-center {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+  width: 19.1%; height: 19.1%; border-radius: 50%;
+  background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+  box-shadow: 0 0 40px rgba(74,103,65,0.5), 0 0 80px rgba(74,103,65,0.2);
+  opacity: 0; z-index: 4; transition: opacity 2.618s ease-out;
+}
+.ceremony-ik-center.visible { opacity: 1; }
+
+.ceremony-biz-wrap {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+  z-index: 10; text-align: center; opacity: 0; transition: opacity 1.618s ease-out;
+}
+.ceremony-biz-wrap.visible { opacity: 1; }
+.ceremony-biz-name {
+  font-size: 28px; font-weight: 800; color: #fff;
+  text-shadow: 0 0 30px rgba(74,103,65,0.6), 0 0 60px rgba(74,103,65,0.25);
+  overflow: hidden; white-space: nowrap; display: inline-block;
+  border-right: 2px solid rgba(255,255,255,0.4); width: 0;
+}
+.ceremony-biz-name.typing {
+  animation: ceremony-type-name var(--type-speed, 2.618s) steps(var(--char-steps, 18)) forwards,
+             ceremony-blink-cursor 0.618s step-end 5 forwards;
+}
+@keyframes ceremony-type-name { from { width: 0; } to { width: var(--char-count, 18ch); } }
+@keyframes ceremony-blink-cursor { 50% { border-color: transparent; } }
+
+.ceremony-biz-origin {
+  display: block; margin-top: 11px; font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0); letter-spacing: 0.146em; transition: color 2.618s ease-out;
+}
+.ceremony-biz-origin.visible { color: rgba(255,255,255,0.35); }
+
+.ceremony-imin-wrap {
+  position: absolute; left: 50%; bottom: 9.02%; transform: translateX(-50%);
+  z-index: 10; opacity: 0; transition: opacity 1.618s ease-out;
+}
+.ceremony-imin-wrap.visible { opacity: 1; }
+.ceremony-imin {
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.5); padding: 17px 44px; font-size: 11px;
+  font-weight: 600; letter-spacing: 0.146em; border-radius: 8px;
+  cursor: pointer; transition: all 0.382s ease;
+}
+.ceremony-imin:hover {
+  border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.85);
+  box-shadow: 0 0 30px rgba(74,103,65,0.15);
+}
+
+/* Scene 4: Diploma */
+.ceremony-diploma {
+  background: #f5f0e8; width: min(520px, 80.9vw); aspect-ratio: 1.618/1;
+  border: 2px solid #c4b18a; outline: 1px solid #d4c9a8; outline-offset: 8.472px;
+  padding: 8%; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0 80px rgba(196,177,138,0.08);
+  opacity: 0; transform: scale(0.96);
+  transition: opacity 1.618s ease-out, transform 1.618s ease-out;
+}
+.ceremony-scene.active .ceremony-diploma { opacity: 1; transform: scale(1); }
+.ceremony-diploma::before {
+  content: ''; position: absolute; inset: 5.236px; border: 1px solid #d4c9a8; pointer-events: none;
+}
+.ceremony-diploma-institution {
+  font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; letter-spacing: 0.382em;
+  text-transform: uppercase; color: #8a7d65; margin-bottom: 1.618em;
+}
+.ceremony-diploma-title {
+  font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 17px; letter-spacing: 0.146em;
+  text-transform: uppercase; color: #5c5240; margin-bottom: 0.618em;
+}
+.ceremony-diploma-name {
+  font-family: var(--font-diploma), 'Playfair Display', serif; font-size: 28px; font-weight: 700;
+  color: #1a1712; margin-bottom: 0.618em; line-height: 1.146;
+}
+.ceremony-diploma-body {
+  font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; color: #6b6050;
+  line-height: 1.618; max-width: 340px; margin-bottom: 1.618em;
+}
+.ceremony-diploma-date {
+  font-family: var(--font-serif), 'EB Garamond', serif; font-size: 11px; color: #9a8e78; letter-spacing: 0.09em;
+}
+.ceremony-diploma-id {
+  position: absolute; bottom: 11px; right: 17px;
+  font-family: var(--font-serif), 'EB Garamond', serif; font-size: 7px; color: #c4b9a0; letter-spacing: 0.056em;
+}
+.ceremony-diploma-continue {
+  margin-top: 28px; background: transparent; border: none;
+  color: rgba(255,255,255,0); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.146em; cursor: pointer; padding: 11px 28px;
+}
+.ceremony-scene.active .ceremony-diploma-continue {
+  color: rgba(255,255,255,0.3); transition: color 1.618s ease-out 1.618s;
+}
+.ceremony-diploma-continue:hover { color: rgba(255,255,255,0.6) !important; }
+
+/* Scene 5: Mentor Farewell */
+.ceremony-farewell-content { width: min(500px, 61.8%); text-align: left; }
+.ceremony-farewell-mentor {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.146em;
+  color: rgba(255,255,255,0.22); margin-bottom: 1.618em;
+}
+.ceremony-farewell-text {
+  font-size: 17px; font-weight: 400; line-height: 1.618;
+  color: rgba(255,255,255,0.65); min-height: 200px;
+}
+.ceremony-farewell-cursor {
+  display: inline-block; width: 2px; height: 1em;
+  background: rgba(255,255,255,0.4); margin-left: 2px;
+  animation: ceremony-farewell-blink 0.618s step-end infinite; vertical-align: text-bottom;
+}
+@keyframes ceremony-farewell-blink { 50% { opacity: 0; } }
+.ceremony-farewell-cta {
+  margin-top: 2.618em; opacity: 0; transition: opacity 1.618s ease-out;
+}
+.ceremony-farewell-cta.visible { opacity: 1; }
+.ceremony-farewell-cta button {
+  background: transparent; border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.4); padding: 11px 28px; font-size: 11px;
+  font-weight: 500; letter-spacing: 0.146em; border-radius: 8px;
+  cursor: pointer; transition: all 0.382s ease;
+}
+.ceremony-farewell-cta button:hover {
+  border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -303,4 +510,5 @@ button:active:not(:disabled) {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .ceremony-particles { display: none; }
 }

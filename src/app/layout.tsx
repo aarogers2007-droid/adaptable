@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, EB_Garamond, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import SplashScreen from "@/components/ui/SplashScreen";
 
@@ -11,6 +11,18 @@ const dmSans = DM_Sans({
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const ebGaramond = EB_Garamond({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-diploma",
   subsets: ["latin"],
   display: "swap",
 });
@@ -27,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${dmSans.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} ${playfairDisplay.variable}`}>
       <head>
         <link
           href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"

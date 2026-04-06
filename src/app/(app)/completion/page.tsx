@@ -6,6 +6,7 @@ import { ACHIEVEMENTS, ACHIEVEMENT_MAP } from "@/lib/achievements";
 import Link from "next/link";
 import CompletionConfetti from "./CompletionConfetti";
 import AppNav from "@/components/ui/AppNav";
+import CompletionWrapper from "./CompletionWrapper";
 
 export default async function CompletionPage() {
   const supabase = await createClient();
@@ -60,6 +61,17 @@ export default async function CompletionPage() {
     .filter(Boolean);
 
   return (
+    <CompletionWrapper
+      studentName={profile.full_name || "Student"}
+      businessName={businessIdea.name}
+      businessNiche={businessIdea.niche}
+      ikigai={ikigaiResult ? {
+        passions: ikigaiResult.passions || [],
+        skills: ikigaiResult.skills || [],
+        needs: ikigaiResult.needs || [],
+        monetization: ikigaiResult.monetization || "",
+      } : null}
+    >
     <main className="min-h-screen completion-atmosphere">
       <AppNav isAdmin={isAdmin} studentName={profile.full_name || undefined} />
       <CompletionConfetti />
@@ -239,5 +251,6 @@ export default async function CompletionPage() {
         </p>
       </div>
     </main>
+    </CompletionWrapper>
   );
 }
