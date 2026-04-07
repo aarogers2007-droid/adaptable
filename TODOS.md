@@ -39,12 +39,53 @@ result. Cost ~$0.0001 per message. Negligible.
 Effort: M (human: ~half day / CC: ~1 hour)
 
 ### Commit a baseline schema for tables created via Supabase dashboard
-FOOTGUN: `teacher_alerts` is referenced everywhere in code but never declared in
-any committed migration. Discovered when migration 00018 hit a check-constraint
-error from data my code didn't know about. If a fresh staging DB is ever spun up,
-the app explodes. Use `supabase db dump` or pg_dump to capture the live schema and
-commit as `00000_baseline.sql`. Then audit for any other tables in the same state.
-Effort: S (human: ~30 min)
+**FOOTGUN — P0 critical.** Two tables are referenced in code but never declared in
+any committed migration:
+
+1. **`teacher_alerts`** — referenced in 8 code files (alerts pipeline, dashboard,
+   types, crisis email path). Discovered when migration 00018 hit a check-constraint
+   error from data the code didn't know about.
+2. **`knowledge_base`** — referenced in `src/lib/knowledge-retrieval.ts` (RAG context
+   for the lesson chat AI). This one is sneakier than `teacher_alerts` because
+   `getRelevantKnowledge()` returns `""` on missing/empty table. The mentor silently
+   gets dumber with no error and no alarm. If you ever lose this table or rebuild
+   your DB, you might not notice for weeks.
+
+Both tables exist in your prod DB only because someone created them via the Supabase
+dashboard. **A fresh staging DB will explode** the moment any code touches them.
+
+**Exact fix (you need supabase CLI access):**
+```bash
+# From the project root, with supabase CLI logged in to the project:
+supabase db dump --schema-only > supabase/migrations/00000_baseline.sql
+
+# Or if you don't have the CLI configured, use psql directly:
+# pg_dump --schema-only --no-owner --no-acl "$DATABASE_URL" > supabase/migrations/00000_baseline.sql
+```
+
+Then diff the file against the existing numbered migrations and confirm the only
+NEW tables introduced are `teacher_alerts` and `knowledge_base`. Anything else
+that shows up is another silent footgun and should be promoted to a real migration.
+
+Effort: S (human: ~5 min for the dump + ~15 min for the audit)
+
+### Investigate `knowledge_base` is actually populated in prod
+Connected to the footgun above: `getRelevantKnowledge()` is the RAG context fed
+into the lesson chat AI. If this table is empty in prod, the AI mentor is operating
+without any of the curated entrepreneurship content the team thought it had. Sample
+query:
+```sql
+select count(*), array_agg(distinct lesson_tag) from knowledge_base;
+```
+If the count is 0 or the lesson_tags don't match what `lesson-chat/route.ts` is
+querying for, the mentor has been running blind. Check before any pilot.
+Effort: S (human: ~5 min)
+
+### Note: `organizations` table is FK-only, not dead schema
+Investigated as part of the schema audit. `organizations` is referenced in code
+exclusively via FK joins (`profiles.org_id`, `classes.org_id`) — no `.from("organizations")`
+calls anywhere. This is correct architecture: it's a referential anchor for RLS
+scoping. **Do NOT drop it.** Logged here so future audits don't waste time on this.
 
 ### Lessons as gradeable artifacts + native gradebook integration
 Right now `exportGradebookCSV` returns a participation report (lessons completed,
