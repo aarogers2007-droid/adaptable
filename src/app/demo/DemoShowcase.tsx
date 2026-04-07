@@ -90,6 +90,78 @@ export default function DemoShowcase() {
         </p>
       </section>
 
+      {/* ═══ THE FULL STORY — long-form essay in Times New Roman ═══ */}
+      <section
+        className="px-6 border-b border-[var(--border)] bg-[var(--bg-subtle)]"
+        style={{ paddingTop: "96px", paddingBottom: "96px" }}
+      >
+        <div className="mx-auto max-w-[720px]">
+          <div className="mb-12 text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[var(--primary)]">The Full Story</p>
+            <h2
+              className="mt-3 text-[40px] font-bold text-[var(--text-primary)]"
+              style={{ fontFamily: '"Times New Roman", Times, serif', letterSpacing: "-0.01em" }}
+            >
+              Adaptable, in 49 Sentences
+            </h2>
+            <p
+              className="mt-3 text-base text-[var(--text-muted)] italic"
+              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+            >
+              The whole product, every feature, in one read.
+            </p>
+          </div>
+
+          <article
+            className="space-y-6 text-[var(--text-primary)]"
+            style={{
+              fontFamily: '"Times New Roman", Times, serif',
+              fontSize: "18px",
+              lineHeight: "1.75",
+            }}
+          >
+            <p>
+              Adaptable is an AI-native venture studio platform built for VentureLab that takes a teenager from &ldquo;I have no idea what business to start&rdquo; to &ldquo;I have a real business I&apos;m building&rdquo; — without ever leaving the structured safety of a curriculum a teacher can deploy in a classroom. The platform solves the single hardest moment in teen entrepreneurship education: the blank page before the business exists. Most teen entrepreneurship products assume the student already has an idea — Adaptable starts at zero and treats the discovery itself as the first lesson. The journey begins with an interactive Ikigai discovery where the student answers four guided questions about what they love, what they&apos;re good at, what the world needs, and how they could be paid, and an AI mentor synthesizes all four into one specific, executable, teen-ready business idea in under ten minutes. That synthesis isn&apos;t a generic chatbot suggestion — it&apos;s the output of a prompt that has been iterated over four rounds of evaluation, stress-tested against 144 simulated student personas across 16 coherence buckets, judged by an independent Claude Opus model to eliminate self-preference bias, and currently scores 26.50 out of 30 on a seven-dimension rubric covering specificity, coherence, no-forced-hybrids, capital required, customer realism, insight quality, and brand-name quality.
+            </p>
+
+            <p>
+              Once the student has their idea, they enter a 22-lesson curriculum across six modules: Find Your Niche, Know Your Customer, Build Your Brand, Get Your First Customer, Run the Numbers, and Launch and Learn — taking the student from discovery all the way through their first sale. Every lesson is delivered by a one-to-one AI mentor that talks to the student conversationally, asks Socratic questions instead of giving lectures, references the student&apos;s specific business by name in every message, and gates progression on checkpoint mastery so students can&apos;t skip ahead by typing &ldquo;yes&rdquo; three times. The AI adapts its register to each student in real time — a slang-heavy student gets slang-respecting responses, an ESL student doesn&apos;t get grammar-corrected, an analytical student gets numbers and a visual student gets examples — using a learning-style detection layer that updates every conversation. Every lesson pulls in relevant context from a curated knowledge base of 25 entries spanning Marty Neumeier on branding, Donald Miller on storytelling, Clayton Christensen on jobs-to-be-done, Sara Blakely on pricing confidence, Mike Michalowicz on financial literacy, and Patrick Campbell on value-based pricing — so the AI mentor speaks with the authority of real founders and frameworks, not generic advice.
+            </p>
+
+            <p>
+              The full safety stack runs two layers of moderation on every input AND every output — a fast regex pattern check, then a Claude Haiku ML classifier as a second opinion — with multilingual crisis detection that catches self-harm, abuse, and hopelessness signals in English and Spanish, and bypasses deduplication so every safety signal surfaces immediately to the instructor via a real-time email alert through Resend, not a database row that gets seen Monday morning. Every alert has a structured audit trail with crisis type, severity at creation, acknowledgement timestamp, resolution action, and resolution notes — built for the kind of FERPA documentation a school district needs to defend its decisions in a deposition. COPPA scaffolding is fully built: signups capture date of birth, students under 13 are gated through a hashed-token email link sent to a parent or guardian who must explicitly grant consent before the student can access the platform, and the consent record is stored as a verified attestation. Students can export their entire data record as a JSON file at any time and request account deletion through a 30-day cancellable grace period — both with full audit logging — meeting the data-rights expectations of any pilot district contract. Every lesson is mapped to recognized national standards — NBEA Entrepreneurship Standards I through V, Common Core State Standards in ELA and Math, ISTE Standards for Students, and Jump$tart Personal Financial Literacy Standards — across all 22 lessons, presented in a procurement-ready document grouped by module that any curriculum coordinator can scan in five minutes.
+            </p>
+
+            <p>
+              Teachers get an instructor dashboard with 15 components: a real-time student table showing every kid&apos;s progress and business idea, a live activity feed of class engagement, smart alerts for inactive students (3+ days), stuck students (3+ days on the same lesson), emotional pattern detection (3+ accumulated negative signals), content moderation flags, and class-wide struggle pattern alerts when 30% or more of the class is stuck on the same lesson — turning AI tutoring into actual pedagogy. Teachers can send direct nudge messages, leave comments on student artifacts, flag students for personal follow-up, and export the full class gradebook as a CSV importable to PowerSchool, Google Classroom, or Canvas. Every teacher action is logged for documentation and accountability. Per-class settings let instructors disable streak gamification for communities that prefer it, and disable microphone or voice input for districts with audio restrictions on student Chromebooks — both as one-toggle flips with no IT involvement. The platform includes a parent view accessible via a teacher-set PIN, designed for 60 seconds of context — showing the student&apos;s progress, business idea, Ikigai answers, and a personalized &ldquo;how you can help&rdquo; note — with rate-limited PIN attempts protected at the database level, not in memory. Students have their own dashboard showing daily check-ins, a streak counter (toggleable), an 18-achievement gamification system across five categories with bronze, silver, and gold tiers, a four-category leaderboard ranking the most consistent, most engaged, deepest thinker, and most improved students, and a 3D business card designer that tilts on hover and unlocks new fonts and finishes as the student progresses. The platform runs entirely in the browser on school Chromebooks with no WebGL, no plugins, no downloads, no microphone requirements that can&apos;t be disabled per class — built specifically for the device IT departments actually deploy. When a student completes all 22 lessons they experience a multi-scene completion ceremony — a founder&apos;s letter, their Ikigai re-revealed, a formal diploma, and a personal farewell from their AI mentor — designed to make the moment feel like a real graduation, not a &ldquo;course complete&rdquo; toast.
+            </p>
+
+            <p>
+              The product is built with engineering rigor uncommon at this stage: 31,000+ lines of code, 21 SQL migrations, full CSRF protection on every chat route, RLS-enforced data scoping at the database level so instructors only see their own classes, security hardening commits across multiple races and edge cases, an entire eval harness committed to the repo with three numbered iterations and four rounds of measured prompt improvement. Every commit ships with an evidence-based justification — the engineering culture is closer to a senior ML team at Anthropic than a typical pre-seed founder. The latest measured outcomes from the confidence eval — 60 simulated student journeys judged by Claude Opus 4.6 — show that 100% of students gained self-confidence (+1.15 average on a 5-point scale), 100% gained understanding of what entrepreneurship actually means (+1.53 average), 97% flipped from &ldquo;business is something other people do&rdquo; to &ldquo;this could be me,&rdquo; and 70% were decisively moved by the wizard with zero students not moved at all. The simulated funnel eval also shows that confidence and understanding gains hold steady across coherent students, multi-track students, slang and ESL students, age-12 students, age-18 students, and students who already run a small business — meaning the wizard works the same for the kid who&apos;s never thought about entrepreneurship and the kid who&apos;s already braiding hair for $40 a session.
+            </p>
+
+            <p>
+              Beyond the metrics, the platform was built around a core mission articulated by its 19-year-old founder, AJ Rogers: transformation, not education. The diploma matters more than the certificate, the conversation matters more than the lecture, and the kid walking away thinking &ldquo;I could do this&rdquo; matters infinitely more than the kid walking away with a worksheet. Adaptable is the missing first step in teen entrepreneurship education — the place where a 14-year-old who has never thought about business gets a real, executable idea, learns it through 22 conversations that talk to them like a real founder would, and walks out the other side understanding entrepreneurship as something accessible instead of foreign. Inside VentureLab, it becomes a multiplier — same teachers, same schools, same global reach, with a tool that gets every student to &ldquo;I have an idea I actually want to build&rdquo; before lesson one, and then walks them all the way to their first real sale.
+            </p>
+
+            <div className="pt-8 mt-4 border-t border-[var(--border)]">
+              <p
+                className="text-base italic text-[var(--text-secondary)]"
+                style={{ fontFamily: '"Times New Roman", Times, serif' }}
+              >
+                — AJ Rogers, founder, age 19
+              </p>
+              <p
+                className="mt-1 text-sm text-[var(--text-muted)]"
+                style={{ fontFamily: '"Times New Roman", Times, serif' }}
+              >
+                Built for Cristal and the VentureLab team.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
       {/* ═══ 1. IKIGAI DIAGRAM — REAL COMPONENT ═══ */}
       <Section label="The Starting Point" title="Ikigai Discovery" description={`Every student begins by answering four questions about themselves. The Ikigai diagram guides them through the process. Here is the actual interactive diagram — click any circle.`}>
         <div className="grid gap-12 md:grid-cols-2 items-center">
