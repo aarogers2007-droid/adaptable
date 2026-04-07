@@ -93,6 +93,7 @@ interface LessonConversationProps {
   niche: string;
   targetCustomer: string;
   isLastInModule: boolean;
+  voiceEnabled: boolean;
 }
 
 export default function LessonConversation({
@@ -117,6 +118,7 @@ export default function LessonConversation({
   niche,
   targetCustomer,
   isLastInModule,
+  voiceEnabled,
 }: LessonConversationProps) {
   const [messages, setMessages] = useState<Message[]>(() =>
     initialMessages.length > 0
@@ -796,6 +798,7 @@ export default function LessonConversation({
                     setShowPacingNudge(false);
                   }}
                   disabled={loading}
+                  enabled={voiceEnabled}
                 />
                 <button
                   type="submit"

@@ -11,12 +11,22 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [profileRes, lessonRes, allLessonsRes, allProgressRes] = await Promise.all([
+  const [profileRes, lessonRes, allLessonsRes, allProgressRes, classRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("lessons").select("*").eq("id", id).single(),
     supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
+    // Fetch the student's class voice_enabled setting (if enrolled)
+    supabase
+      .from("class_enrollments")
+      .select("classes(voice_enabled)")
+      .eq("student_id", user.id)
+      .limit(1)
+      .maybeSingle(),
   ]);
+
+  const classData = classRes.data as { classes: { voice_enabled?: boolean } | null } | null;
+  const voiceEnabled = classData?.classes?.voice_enabled ?? true;
 
   const profile = profileRes.data as unknown as Profile | null;
   if (!profile?.business_idea) redirect("/onboarding");
@@ -118,6 +128,7 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
       niche={profile.business_idea.niche}
       targetCustomer={profile.business_idea.target_customer}
       isLastInModule={isLastInModule}
+      voiceEnabled={voiceEnabled}
     />
   );
 }

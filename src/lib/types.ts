@@ -159,7 +159,7 @@ export interface AIUsageLog {
   created_at: string;
 }
 
-export type AlertType = "inactive" | "stuck" | "emotional" | "content_flag" | "parent_message";
+export type AlertType = "inactive" | "stuck" | "emotional" | "content_flag" | "parent_message" | "crisis";
 export type AlertSeverity = "info" | "warning" | "urgent";
 
 export interface TeacherAlert {
@@ -172,4 +172,14 @@ export interface TeacherAlert {
   context: Record<string, unknown> | null;
   acknowledged: boolean;
   created_at: string;
+  // Crisis audit fields (populated for alert_type='crisis')
+  crisis_type?: string | null;
+  severity_at_creation?: string | null;
+  acknowledged_at?: string | null;
+  acknowledged_by?: string | null;
+  resolution_action?: string | null;
+  resolution_notes?: string | null;
+  notified_at?: string | null;
+  notification_channel?: string | null;
+  notification_failed?: boolean | null;
 }

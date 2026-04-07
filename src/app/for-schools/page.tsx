@@ -11,7 +11,7 @@ const STATS = [
   { value: "1:1", label: "Every student gets a personal AI mentor" },
   { value: "8", label: "Lessons, standards-aligned and checkpoint-gated" },
   { value: "4", label: "National frameworks mapped per lesson" },
-  { value: "155", label: "Countries with language support" },
+  { value: "2", label: "Languages with full safety coverage (English, Spanish)" },
 ];
 
 const JOURNEY_STEPS = [

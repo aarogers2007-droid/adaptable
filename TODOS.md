@@ -13,6 +13,50 @@ Fixed: `increment_invite_usage` now includes `WHERE current_uses < max_uses` and
 boolean. Join action rolls back enrollment if increment fails.
 Migration: supabase/migrations/00006_security_fixes.sql
 
+## P0 — Pilot blockers (do before any school sees the product)
+
+### Domain + Resend production sender
+We have the email pipeline scaffolded (`src/lib/email.ts`, Resend SDK installed,
+crisis alerts wire-up complete). Currently using `onboarding@resend.dev` which only
+delivers to the email used to sign up at Resend. Before any real teacher hears
+about a real crisis: register a domain (Cloudflare ~$10/yr), verify it in Resend
+DNS, swap `RESEND_FROM_ADDRESS` env var. ~15 min once you have the $10.
+Effort: S (human: ~15 min)
+
+### Real-time crisis email failure surfacing in dashboard
+The `notification_failures` table is populated when a crisis email fails to deliver.
+A hard banner needs to be added at the top of `/instructor/dashboard` that loads
+unresolved failures and screams about them. Right now the failure path is silent
+to instructors — only visible if you query the table directly.
+Effort: S (human: ~30 min / CC: ~15 min)
+
+### Multi-language crisis detection (LLM second opinion)
+Current `crisis-detection.ts` is regex, English-first with 4 Spanish patches. Admin
+reviewer flagged: "I don't want to be alive" misses, all non-English misses, indirect
+language misses ("everything hurts," "made a plan," "if I just disappeared," "unalive").
+The honest fix: Claude Haiku classifier running in parallel with the regex, OR-ing the
+result. Cost ~$0.0001 per message. Negligible.
+Effort: M (human: ~half day / CC: ~1 hour)
+
+### Commit a baseline schema for tables created via Supabase dashboard
+FOOTGUN: `teacher_alerts` is referenced everywhere in code but never declared in
+any committed migration. Discovered when migration 00018 hit a check-constraint
+error from data my code didn't know about. If a fresh staging DB is ever spun up,
+the app explodes. Use `supabase db dump` or pg_dump to capture the live schema and
+commit as `00000_baseline.sql`. Then audit for any other tables in the same state.
+Effort: S (human: ~30 min)
+
+### Lessons as gradeable artifacts + native gradebook integration
+Right now `exportGradebookCSV` returns a participation report (lessons completed,
+%, last active) — admin reviewer correctly called this "not a gradebook." For real
+classroom adoption, lessons need: a per-lesson rubric score, time-on-task, standards
+mastery indicators, and the ability to push grades to PowerSchool / Infinite Campus
+/ Skyward / Google Classroom / Canvas via LTI 1.3 + OneRoster + Assignments and
+Grade Services. Without this, teachers run the platform once and ask "where's the
+actual grade?"
+Effort: L (human: ~3 weeks / CC: ~2 hours per LMS provider)
+Priority: P1 — required for sustained classroom adoption beyond pilot
+
 ## P1 — High priority (v1.1)
 
 ### Clever/ClassLink SSO

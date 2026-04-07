@@ -14,6 +14,8 @@ interface VoiceInputProps {
   onTranscription: (text: string) => void;
   disabled?: boolean;
   className?: string;
+  /** When false (set per-class by instructor), the component renders nothing. */
+  enabled?: boolean;
 }
 
 type VoiceState = "idle" | "listening" | "processing";
@@ -21,18 +23,23 @@ type VoiceState = "idle" | "listening" | "processing";
 /**
  * Voice input using the browser's Web Speech API (SpeechRecognition).
  * Free, no API key, works on Chrome/Chromebooks.
- * Falls back to hidden if browser doesn't support it.
+ * Falls back to hidden if browser doesn't support it OR if the student's
+ * class has voice_enabled=false (set by the instructor in ClassSettings).
  */
 export default function VoiceInput({
   onTranscription,
   disabled = false,
   className = "",
+  enabled = true,
 }: VoiceInputProps) {
   const [state, setState] = useState<VoiceState>("idle");
   const [supported, setSupported] = useState(true);
   const [transcript, setTranscript] = useState("");
   const [showHint, setShowHint] = useState(false);
   const recognitionRef = useRef<any>(null);
+
+  // Class-level disable: render nothing
+  if (!enabled) return null;
 
   // Show voice hint on first visit
   useEffect(() => {

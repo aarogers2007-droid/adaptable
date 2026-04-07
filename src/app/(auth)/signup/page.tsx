@@ -5,21 +5,52 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+function computeAge(dob: string): number | null {
+  if (!dob) return null;
+  const birth = new Date(dob);
+  if (isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+  return age;
+}
+
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [dob, setDob] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
+  const age = computeAge(dob);
+  const isUnder13 = age !== null && age < 13;
+  const isUnder18 = age !== null && age < 18;
+  const tooYoung = age !== null && age < 12; // hard floor
+
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Hard age floor: 12+
+    if (tooYoung) {
+      setError("Adaptable is for students age 12 and older. If you're younger, please come back when you're 12.");
+      return;
+    }
+
+    // Under-13s require a parent email for COPPA-verifiable consent
+    if (isUnder13 && !parentEmail) {
+      setError("Because you're under 13, we need a parent or guardian's email to send a consent request.");
+      return;
+    }
+
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
+    const { data: authData, error: signupError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -27,10 +58,34 @@ export default function SignupPage() {
       },
     });
 
-    if (error) {
-      setError(error.message);
+    if (signupError) {
+      setError(signupError.message);
       setLoading(false);
       return;
+    }
+
+    // Save DOB + initial consent state on the profile
+    if (authData.user) {
+      const consentStatus = isUnder13 ? "pending_parental" : "not_required";
+      await supabase
+        .from("profiles")
+        .update({
+          date_of_birth: dob,
+          consent_status: consentStatus,
+        })
+        .eq("id", authData.user.id);
+
+      // For under-13s, kick off the parental consent email flow.
+      // (Server-side; the action checks rate limits and handles the email send.)
+      if (isUnder13 && parentEmail) {
+        try {
+          const { startParentalConsent } = await import("@/lib/parental-consent");
+          await startParentalConsent(authData.user.id, parentEmail);
+        } catch (e) {
+          console.error("[signup] parental consent kickoff failed", e);
+          // Don't block signup — they can retry from the dashboard
+        }
+      }
     }
 
     // Check for pending class enrollment from the join flow
@@ -48,7 +103,8 @@ export default function SignupPage() {
       // Enrollment will need to be done manually — don't block onboarding
     }
 
-    router.push("/onboarding");
+    // Under-13s land on a "waiting for parent" page; everyone else goes to onboarding.
+    router.push(isUnder13 ? "/parental-consent-pending" : "/onboarding");
   }
 
   async function handleGoogleSignup() {
@@ -147,6 +203,55 @@ export default function SignupPage() {
               />
             </div>
 
+            <div>
+              <label htmlFor="dob" className="block text-sm font-medium text-[var(--text-primary)]">
+                Date of birth
+              </label>
+              <input
+                id="dob"
+                type="date"
+                required
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                max={new Date().toISOString().split("T")[0]}
+                className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+              />
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                We need this to make sure Adaptable is right for you. Adaptable is for ages 12+.
+              </p>
+            </div>
+
+            {isUnder13 && !tooYoung && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
+                <p className="text-xs font-semibold text-amber-900">A parent or guardian needs to say yes</p>
+                <p className="mt-1 text-xs text-amber-800">
+                  Because you&apos;re under 13, we need to send a quick approval request to a parent or guardian.
+                  They&apos;ll get an email with a link.
+                </p>
+                <input
+                  id="parent_email"
+                  type="email"
+                  required={isUnder13}
+                  value={parentEmail}
+                  onChange={(e) => setParentEmail(e.target.value)}
+                  className="mt-3 block w-full rounded-lg border border-amber-300 px-3 py-2 text-sm outline-none transition-colors focus:border-amber-600 focus:ring-2 focus:ring-amber-500/15"
+                  placeholder="parent@example.com"
+                />
+              </div>
+            )}
+
+            {tooYoung && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-xs text-red-900">
+                Adaptable is for students age 12 and older. Come back when you&apos;re 12!
+              </div>
+            )}
+
+            {age !== null && isUnder18 && !isUnder13 && (
+              <p className="text-xs text-[var(--text-muted)]">
+                Your account is good to go. We&apos;ll let you know if anything in your activity needs a parent&apos;s eye.
+              </p>
+            )}
+
             {error && (
               <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
@@ -155,7 +260,7 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || tooYoung}
               className="w-full rounded-lg bg-[var(--primary)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
             >
               {loading ? "Creating account..." : "Create Account"}

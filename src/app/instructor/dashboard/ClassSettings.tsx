@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { setStreaksEnabled, exportGradebookCSV } from "./actions";
+import { setStreaksEnabled, setVoiceEnabled, exportGradebookCSV } from "./actions";
 
 interface ClassSettingsProps {
   classId: string;
   className: string;
   initialStreaksEnabled: boolean;
+  initialVoiceEnabled: boolean;
 }
 
-export default function ClassSettings({ classId, className, initialStreaksEnabled }: ClassSettingsProps) {
+export default function ClassSettings({ classId, className, initialStreaksEnabled, initialVoiceEnabled }: ClassSettingsProps) {
   const [streaksEnabled, setStreaksEnabledState] = useState(initialStreaksEnabled);
+  const [voiceEnabled, setVoiceEnabledState] = useState(initialVoiceEnabled);
   const [isPending, startTransition] = useTransition();
   const [exportStatus, setExportStatus] = useState<string | null>(null);
 
@@ -21,6 +23,17 @@ export default function ClassSettings({ classId, className, initialStreaksEnable
       const result = await setStreaksEnabled(classId, next);
       if (result.error) {
         setStreaksEnabledState(!next); // Revert
+      }
+    });
+  }
+
+  function handleVoiceToggle() {
+    const next = !voiceEnabled;
+    setVoiceEnabledState(next); // Optimistic
+    startTransition(async () => {
+      const result = await setVoiceEnabled(classId, next);
+      if (result.error) {
+        setVoiceEnabledState(!next); // Revert
       }
     });
   }
@@ -109,6 +122,37 @@ export default function ClassSettings({ classId, className, initialStreaksEnable
         </div>
         <p className="mt-3 text-xs text-[var(--text-muted)]">
           Currently: <strong className="text-[var(--text-primary)]">{streaksEnabled ? "Enabled" : "Disabled"}</strong>
+        </p>
+      </div>
+
+      {/* Voice Input Toggle */}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Microphone / Voice Input</h3>
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">
+              Allow students to dictate their answers using the device microphone.
+              Disable this if your district restricts microphone use on student Chromebooks
+              or if classroom audio would be disruptive.
+            </p>
+          </div>
+          <button
+            onClick={handleVoiceToggle}
+            disabled={isPending}
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+              voiceEnabled ? "bg-[var(--primary)]" : "bg-[var(--bg-muted)]"
+            }`}
+            aria-label="Toggle voice input"
+          >
+            <span
+              className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                voiceEnabled ? "translate-x-5" : "translate-x-0.5"
+              }`}
+            />
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-[var(--text-muted)]">
+          Currently: <strong className="text-[var(--text-primary)]">{voiceEnabled ? "Enabled" : "Disabled"}</strong>
         </p>
       </div>
     </div>

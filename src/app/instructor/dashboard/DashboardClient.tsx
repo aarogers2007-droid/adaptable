@@ -37,6 +37,7 @@ export interface ClassData {
   analytics: AnalyticsData;
   flags: ClassFlag[];
   streaksEnabled: boolean;
+  voiceEnabled: boolean;
 }
 
 interface DashboardClientProps {
@@ -265,6 +266,7 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
                     classId={activeClass.id}
                     className={activeClass.name}
                     initialStreaksEnabled={activeClass.streaksEnabled}
+                    initialVoiceEnabled={activeClass.voiceEnabled}
                   />
                 )}
               </div>

@@ -164,6 +164,7 @@ Return a JSON object with exactly these fields:
 - target_customer: specific description of who would pay, named per rule 2 (peers / parents of peers / neighbors / family).
 - revenue_model: brief sentence describing how they make money. If the student named a model that doesn't fit (e.g., "monthly retainers," "subscription," "creator deals") and you swapped to a teen-executable one, name the swap explicitly: "You said X, but for now Y will get you paid faster because…"
 - legal_note: a SHORT string (one sentence, can be empty "") flagging any real legal/regulatory constraint a teen needs to know about this specific idea. Examples: "Selling baked goods from home is fine in most US states under cottage food laws if you stay under the income cap and label allergens." OR "Cosmetology services on others' bodies legally require a license in most states — keep this to friends and don't advertise publicly." OR "Accepting money for fantasy sports picks crosses into unlicensed gambling in some states even between friends — keep it free and just for bragging rights." If no legal concern applies, return "".
+- parent_note: a SHORT string (one sentence) telling the student to involve a parent or guardian BEFORE they take real-world action on this idea. This is REQUIRED for any idea that involves taking money from another person, meeting customers in person, going to anyone's home, sharing an address, ordering paid supplies, or any in-person service. Examples: "Before you charge anyone real money for this, walk the plan through with a parent or guardian — they need to know what you're doing and where." OR "If you're going to a stranger's house to walk their dog, a parent or guardian needs to know the address and the time, every single visit." If the idea is purely digital and zero-money (e.g. free Discord moderation), return "Even free things benefit from a parent knowing what you're spending time on — give them the heads up."
 - why_this_fits: 2-3 sentences connecting their inputs in a way that feels like a discovery. Write like a 25-year-old founder talking to a 15-year-old, not like a LinkedIn post. Include one observation about their inputs they probably haven't connected themselves. FORBIDDEN PHRASES (do not use ANY of these): "perfect storm," "secret weapon," "secret sauce," "have you considered," "what most people don't realize," "leverage," "unlock," "synergy," "cracked the code," "natural arbitrage," "your superpower."`,
       messages: [
         {
@@ -211,18 +212,20 @@ First, identify the distinct themes in their answers. If their interests span mu
     }
 
     if (parsed.niche && parsed.target_customer && parsed.revenue_model) {
-      // Append legal_note to why_this_fits so the student sees it inline.
+      // Append legal_note and parent_note to why_this_fits so the student sees them inline.
       const legalNote = typeof parsed.legal_note === "string" ? parsed.legal_note.trim() : "";
+      const parentNote = typeof parsed.parent_note === "string" ? parsed.parent_note.trim() : "";
       const whyText = parsed.why_this_fits ?? "";
-      const whyWithLegal = legalNote
-        ? `${whyText}\n\nHeads up: ${legalNote}`.trim()
-        : whyText || undefined;
+      const parts = [whyText];
+      if (legalNote) parts.push(`Heads up: ${legalNote}`);
+      if (parentNote) parts.push(`Talk to a parent: ${parentNote}`);
+      const whyComposed = parts.filter(Boolean).join("\n\n").trim() || undefined;
       const idea: BusinessIdea = {
         niche: parsed.niche,
         name: parsed.name ?? `${studentName}'s New Thing`,
         target_customer: parsed.target_customer,
         revenue_model: parsed.revenue_model,
-        why_this_fits: whyWithLegal,
+        why_this_fits: whyComposed,
       };
       return { idea };
     }

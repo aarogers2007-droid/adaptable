@@ -102,6 +102,10 @@ export async function alertContentFlag(
  * crisis-detection identifies a self-harm/suicidal/abuse signal.
  *
  * Bypasses deduplication — every crisis signal creates an alert.
+ * Writes the distinct alert_type='crisis' with structured audit fields.
+ *
+ * Returns { alertId, classId, instructorId } so the caller can fire the
+ * real-time notification path (email/SMS) and update notified_at on success.
  */
 export async function alertCrisis(
   supabase: SupabaseClient,
@@ -110,34 +114,50 @@ export async function alertCrisis(
   matchedText: string,
   flaggedMessage: string,
   feature: string,
-) {
-  // Find the student's class
+): Promise<{ alertId: string; classId: string; instructorId: string | null } | null> {
+  // Find the student's class + instructor in one query
   const { data: enrollment } = await supabase
     .from("class_enrollments")
-    .select("class_id")
+    .select("class_id, classes(instructor_id)")
     .eq("student_id", studentId)
     .limit(1)
-    .single();
+    .single<{ class_id: string; classes: { instructor_id: string } | null }>();
 
-  if (!enrollment) return;
+  if (!enrollment) return null;
+
+  const classId = enrollment.class_id;
+  const instructorId = enrollment.classes?.instructor_id ?? null;
 
   // Insert without deduplication — every crisis signal must surface
-  await supabase.from("teacher_alerts").insert({
-    class_id: enrollment.class_id,
-    student_id: studentId,
-    alert_type: "content_flag",
-    severity: "urgent",
-    message: `URGENT: Student may be in crisis. Type: ${crisisType}. Please check in immediately.`,
-    context: {
+  const { data: inserted, error } = await supabase
+    .from("teacher_alerts")
+    .insert({
+      class_id: classId,
+      student_id: studentId,
+      alert_type: "crisis",
+      severity: "urgent",
+      message: `URGENT: Student may be in crisis. Type: ${crisisType}. Please check in immediately.`,
+      context: {
+        crisis_type: crisisType,
+        matched_phrase: matchedText.slice(0, 100),
+        surrounding_message: flaggedMessage.slice(0, 500),
+        feature,
+        timestamp: new Date().toISOString(),
+        requires_immediate_attention: true,
+      },
       crisis_type: crisisType,
-      matched_phrase: matchedText.slice(0, 100),
-      surrounding_message: flaggedMessage.slice(0, 500),
-      feature,
-      timestamp: new Date().toISOString(),
-      requires_immediate_attention: true,
-    },
-    acknowledged: false,
-  });
+      severity_at_creation: "urgent",
+      acknowledged: false,
+    })
+    .select("id")
+    .single<{ id: string }>();
+
+  if (error || !inserted) {
+    console.error("[alertCrisis] failed to insert alert", error);
+    return null;
+  }
+
+  return { alertId: inserted.id, classId, instructorId };
 }
 
 /**

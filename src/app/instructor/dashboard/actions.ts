@@ -63,6 +63,40 @@ export async function setStreaksEnabled(classId: string, enabled: boolean) {
 }
 
 /**
+ * Toggle whether the microphone/voice input UI is shown to students in this class.
+ * When false, VoiceInput is hidden — students must type. Use this for districts
+ * with microphone restrictions or classrooms where audio is disruptive.
+ */
+export async function setVoiceEnabled(classId: string, enabled: boolean) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || (profile.role !== "instructor" && profile.role !== "org_admin")) {
+    return { error: "Not authorized" };
+  }
+
+  const { data: cls } = await supabase
+    .from("classes")
+    .select("instructor_id")
+    .eq("id", classId)
+    .single();
+  if (!cls) return { error: "Class not found" };
+  if (profile.role === "instructor" && cls.instructor_id !== user.id) {
+    return { error: "Not authorized" };
+  }
+
+  const { error } = await supabase
+    .from("classes")
+    .update({ voice_enabled: enabled, updated_at: new Date().toISOString() })
+    .eq("id", classId);
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+/**
  * Export a CSV gradebook for an entire class.
  * Includes: student name, business name, lessons completed, total lessons,
  * % progress, last active, and any decisions/pitches captured.
