@@ -22,7 +22,10 @@ import { createHash, randomBytes } from "crypto";
  * production for under-13 students.
  */
 
-const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://adaptable.app";
+const APP_BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.NEXT_PUBLIC_APP_URL ??
+  "https://adaptable.app";
 
 function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");

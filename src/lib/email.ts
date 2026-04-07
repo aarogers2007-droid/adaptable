@@ -23,7 +23,10 @@ const resendClient = process.env.RESEND_API_KEY
   : null;
 
 const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? "alerts@adaptable.app";
-const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://adaptable.app";
+const APP_BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.NEXT_PUBLIC_APP_URL ??
+  "https://adaptable.app";
 
 export interface CrisisEmailParams {
   to: string;

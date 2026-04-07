@@ -47,7 +47,7 @@ What we DO NOT collect:
 - Financial information
 - Any data we share with advertisers (we never sell student data)
 
-You can review our full privacy policy at ${process.env.NEXT_PUBLIC_APP_URL ?? "https://adaptable.app"}/privacy-policy
+You can review our full privacy policy at ${process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "https://adaptable.app"}/privacy-policy
 
 If you APPROVE this child using Adaptable, click here:
 ${params.verificationUrl}
