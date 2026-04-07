@@ -38,9 +38,6 @@ export default function VoiceInput({
   const [showHint, setShowHint] = useState(false);
   const recognitionRef = useRef<any>(null);
 
-  // Class-level disable: render nothing
-  if (!enabled) return null;
-
   // Show voice hint on first visit
   useEffect(() => {
     if (typeof window !== "undefined" && !localStorage.getItem("voice-hint-seen")) {
@@ -142,7 +139,8 @@ export default function VoiceInput({
     }
   }, [state, stopListening, startListening, showHint]);
 
-  if (!supported) return null;
+  // Class-level disable from instructor settings, OR browser doesn't support it
+  if (!enabled || !supported) return null;
 
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
