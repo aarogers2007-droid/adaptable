@@ -488,11 +488,11 @@ CRITICAL RULES:
    (d) the student's own family or family business (if mentioned in their inputs)
    "Custom Python scripts for local family businesses" is BAD — those owners are strangers. "Python tutoring for kids in my school's CS club" is GOOD. "Wedding photography for small couples" is BAD if the student is 14 — they don't know any couples. "Senior portrait photography for the junior class" is GOOD.
 
-3. COMMIT, DON'T CLARIFY, WHEN TENSION IS PRESENT. If inputs are CONCRETE but contain a real tension (e.g., loves quiet but skilled at being loud, or three unrelated valid interests), DO NOT return needs_clarification. Pick the more teen-executable lane and acknowledge the tension in why_this_fits as a future-direction note. needs_clarification is ONLY for missing or generic information ("stuff," "helping people"), NOT for tension between real signals.
+3. COMMIT BY PICKING ONE LANE — NEVER BY BLENDING. If inputs are CONCRETE but contain tension (loves quiet but skilled at being loud, or three unrelated valid interests), DO NOT return needs_clarification AND DO NOT blend the lanes into a fake hybrid. Pick the SINGLE more teen-executable lane, build the idea entirely inside that one lane, and write ONE sentence in why_this_fits explicitly retiring the other lane(s) ("Your DJ skills are real but they fight your love of quiet — save those for parties, not this business"). FORCED HYBRIDS ARE WORSE THAN CLARIFICATION. needs_clarification is ONLY for missing or generic information ("stuff," "helping people"), NOT for tension between real signals.
 
 4. IDENTIFY DISTINCT THEMES FIRST. Look across all four circles. If interests point to 2-3 separate directions, treat them as separate. Pick ONE.
 
-5. NEVER combine TWO OR MORE unrelated interests, even partially. If a student lists nails, music, and anime, do NOT produce "anime-themed nails" or "music-themed nails" — pick ONE interest and ignore the others entirely. The other interests are still part of the student's life; they just are not part of THIS business.
+5. NEVER combine TWO OR MORE unrelated interests, even partially. If a student lists nails, music, and anime, do NOT produce "anime-themed nails" or "music-themed nails" — pick ONE interest and ignore the others entirely. This rule overrides rule 3: when forced to commit under tension, you commit by picking ONE clean lane, never by blending. The other interests are still part of the student's life; they just are not part of THIS business.
 
 6. ALREADY-RUNNING DETECTION. If the student's inputs reveal they are ALREADY doing this thing for money ("I already braid for $20-40," "I have 47 sales on Depop," "I tutor 3 kids at $15/hour"), do NOT invent a new business. Level up the existing one with ONE specific, concrete improvement (better booking, repeat-customer pricing, a tighter niche within what they already do). Anchor on what they actually already have.
 
@@ -508,7 +508,8 @@ Return a JSON object with exactly these fields:
 - niche: specific description of the business area, OR "needs_clarification" per rule 8
 - name: a SHORT (1-3 words), memorable brand name a teen would actually put on Instagram. NEVER use the format "[Name]'s [Service]". NEVER include "Studio," "Lab," "Academy," "Solutions," "Services," "Suite," "Consulting," "Co.," "Enterprises," "Media," "Shop," or "Agency" in the name. Think real teen brands: Press Pause, Drip District, Fade, Bonsai ER, Hot Sauce Club, Vault, Spoke, Burn Unit. The name should evoke the vibe, not describe the service. If you cannot think of a real brand name, use null and the student will name it themselves.
 - target_customer: specific description of who would pay, named per rule 2 (peers / parents of peers / neighbors / family).
-- revenue_model: brief sentence describing how they make money
+- revenue_model: brief sentence describing how they make money. If the student named a model that doesn't fit (e.g., "monthly retainers," "subscription," "creator deals") and you swapped to a teen-executable one, name the swap explicitly: "You said X, but for now Y will get you paid faster because…"
+- legal_note: a SHORT string (one sentence, can be empty "") flagging any real legal/regulatory constraint a teen needs to know about this specific idea. Examples: "Selling baked goods from home is fine in most US states under cottage food laws if you stay under the income cap and label allergens." OR "Cosmetology services on others' bodies legally require a license in most states — keep this to friends and don't advertise publicly." OR "Accepting money for fantasy sports picks crosses into unlicensed gambling in some states even between friends — keep it free and just for bragging rights." If no legal concern applies, return "".
 - why_this_fits: 2-3 sentences connecting their inputs in a way that feels like a discovery. Write like a 25-year-old founder talking to a 15-year-old, not like a LinkedIn post. Include one observation about their inputs they probably haven't connected themselves. FORBIDDEN PHRASES (do not use ANY of these): "perfect storm," "secret weapon," "secret sauce," "have you considered," "what most people don't realize," "leverage," "unlock," "synergy," "cracked the code," "natural arbitrage," "your superpower."`;
 
   const userMessage = `The student's name is ${p.studentName}${p.age ? ` (age ${p.age})` : ""}. Based on their Ikigai:
@@ -528,13 +529,18 @@ interface BusinessIdea {
   target_customer: string;
   revenue_model: string;
   why_this_fits?: string;
+  legal_note?: string;
 }
 
 async function callWithRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
-      return await fn();
+      // 60s hard timeout per call to avoid hung sockets
+      return await Promise.race([
+        fn(),
+        new Promise<T>((_, rej) => setTimeout(() => rej(new Error("call timeout 60s")), 60000)),
+      ]);
     } catch (e) {
       lastErr = e;
       const msg = e instanceof Error ? e.message : String(e);
@@ -581,6 +587,7 @@ async function synthesize(p: Persona): Promise<BusinessIdea | { error: string }>
         target_customer: parsed.target_customer,
         revenue_model: parsed.revenue_model,
         why_this_fits: parsed.why_this_fits,
+        legal_note: typeof parsed.legal_note === "string" ? parsed.legal_note : undefined,
       };
     }
     return { error: "Incomplete fields: " + JSON.stringify(parsed) };
@@ -622,6 +629,7 @@ AI-GENERATED IDEA:
 - Target Customer: ${idea.target_customer}
 - Revenue Model: ${idea.revenue_model}
 - Why This Fits: ${idea.why_this_fits ?? "(missing)"}
+- Legal Note: ${idea.legal_note && idea.legal_note.length > 0 ? idea.legal_note : "(none)"}
 
 CALIBRATION ANCHORS — score each 1-5:
 
@@ -641,9 +649,10 @@ CALIBRATION ANCHORS — score each 1-5:
    - 1: mashed two unrelated things together (e.g., "anime-themed nail beats")
 
 4. capital_required (can a teen start this with under $100, no license, no commercial space?):
-   - 5: under $100, no license, started from a bedroom
-   - 3: $100-300, or borderline license (food handler, etc.)
-   - 1: requires commercial kitchen, vehicle, license, $1000+, business insurance
+   - 5: under $100, no license, started from a bedroom — AND if any regulatory concern exists (food handling, cosmetology, money pools), the legal_note field acknowledges it specifically
+   - 3: $100-300, OR borderline license (food handler, etc.) AND legal_note acknowledges it
+   - 1: requires commercial kitchen, vehicle, license, $1000+, business insurance, OR legal_note is empty when food/regulated/money-handling is involved
+   IMPORTANT: If the idea touches food, cosmetology, gambling, or any money-handling between people, an EMPTY legal_note is a 1-2 score regardless of the idea's actual capital needs. The student needs to know.
 
 5. customer_realistic (is the target customer someone a teen can actually reach?):
    - 5: peers, parents of peers, neighbors, local community — people who already trust them
@@ -793,7 +802,7 @@ function effectiveTotal(run: Run): number | undefined {
 // ── Report ──
 function writeReport(results: Result[]) {
   const lines: string[] = [];
-  lines.push("# Ikigai Wizard Stress Eval — v3 (round 3 post-fix)");
+  lines.push("# Ikigai Wizard Stress Eval — v3 harness, round-4 prompt");
   lines.push("");
   lines.push(`Run: ${new Date().toISOString()}`);
   lines.push(`Personas: ${results.length}`);
@@ -802,7 +811,7 @@ function writeReport(results: Result[]) {
   lines.push(`Judge: ${JUDGE_MODEL} (cross-model, no self-preference bias)`);
   lines.push(`Max score: 35 (7 dimensions × 5)`);
   lines.push("");
-  lines.push("**Changes from v2:** customer reality check rule, commit-don't-clarify rule, already-running detection, family-business detection, risky pivot rule, expanded forbidden phrases. Rubric fix: needs_clarification runs use 5-dim subset scaled to /35 (refusal-as-correct cannot be specific). NEW success-guard bucket auto-fails any clarification on obviously-coherent inputs.");
+  lines.push("**Round 4 prompt deltas (vs v3 prompt):** rule 3 explicitly forbids forced hybrids when committing (rule 5 overrides rule 3); new legal_note output field surfaces regulatory constraints; revenue_model swap must be acknowledged when student-named model doesn't fit. Judge updated: empty legal_note on food/regulated/money-handling ideas auto-drops capital_required to 1-2.");
   lines.push("");
 
   // Bucket aggregates
@@ -913,6 +922,7 @@ function writeReport(results: Result[]) {
         lines.push(`- Customer: ${run.idea.target_customer}`);
         lines.push(`- Revenue: ${run.idea.revenue_model}`);
         lines.push(`- Why fits: ${run.idea.why_this_fits ?? "(missing)"}`);
+        lines.push(`- Legal note: ${run.idea.legal_note && run.idea.legal_note.length > 0 ? run.idea.legal_note : "(none)"}`);
       }
       if (run.score) {
         lines.push(
@@ -931,7 +941,7 @@ function writeReport(results: Result[]) {
     lines.push("");
   }
 
-  const reportPath = path.join(process.cwd(), "scripts/eval-ikigai-v3-report.md");
+  const reportPath = path.join(process.cwd(), "scripts/eval-ikigai-v4-report.md");
   writeFileSync(reportPath, lines.join("\n"));
   console.log(`\nReport: ${reportPath}`);
 }

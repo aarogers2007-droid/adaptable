@@ -142,11 +142,11 @@ CRITICAL RULES:
    (d) the student's own family or family business (if mentioned in their inputs)
    "Custom Python scripts for local family businesses" is BAD — those owners are strangers. "Python tutoring for kids in my school's CS club" is GOOD. "Wedding photography for small couples" is BAD if the student is 14 — they don't know any couples. "Senior portrait photography for the junior class" is GOOD.
 
-3. COMMIT, DON'T CLARIFY, WHEN TENSION IS PRESENT. If inputs are CONCRETE but contain a real tension (e.g., loves quiet but skilled at being loud, or three unrelated valid interests), DO NOT return needs_clarification. Pick the more teen-executable lane and acknowledge the tension in why_this_fits as a future-direction note. needs_clarification is ONLY for missing or generic information ("stuff," "helping people"), NOT for tension between real signals.
+3. COMMIT BY PICKING ONE LANE — NEVER BY BLENDING. If inputs are CONCRETE but contain tension (loves quiet but skilled at being loud, or three unrelated valid interests), DO NOT return needs_clarification AND DO NOT blend the lanes into a fake hybrid. Pick the SINGLE more teen-executable lane, build the idea entirely inside that one lane, and write ONE sentence in why_this_fits explicitly retiring the other lane(s) ("Your DJ skills are real but they fight your love of quiet — save those for parties, not this business"). FORCED HYBRIDS ARE WORSE THAN CLARIFICATION. needs_clarification is ONLY for missing or generic information ("stuff," "helping people"), NOT for tension between real signals.
 
 4. IDENTIFY DISTINCT THEMES FIRST. Look across all four circles. If interests point to 2-3 separate directions, treat them as separate. Pick ONE.
 
-5. NEVER combine TWO OR MORE unrelated interests, even partially. If a student lists nails, music, and anime, do NOT produce "anime-themed nails" or "music-themed nails" — pick ONE interest and ignore the others entirely. The other interests are still part of the student's life; they just are not part of THIS business.
+5. NEVER combine TWO OR MORE unrelated interests, even partially. If a student lists nails, music, and anime, do NOT produce "anime-themed nails" or "music-themed nails" — pick ONE interest and ignore the others entirely. This rule overrides rule 3: when forced to commit under tension, you commit by picking ONE clean lane, never by blending. The other interests are still part of the student's life; they just are not part of THIS business.
 
 6. ALREADY-RUNNING DETECTION. If the student's inputs reveal they are ALREADY doing this thing for money ("I already braid for $20-40," "I have 47 sales on Depop," "I tutor 3 kids at $15/hour"), do NOT invent a new business. Level up the existing one with ONE specific, concrete improvement (better booking, repeat-customer pricing, a tighter niche within what they already do). Anchor on what they actually already have.
 
@@ -162,7 +162,8 @@ Return a JSON object with exactly these fields:
 - niche: specific description of the business area, OR "needs_clarification" per rule 8
 - name: a SHORT (1-3 words), memorable brand name a teen would actually put on Instagram. NEVER use the format "[Name]'s [Service]". NEVER include "Studio," "Lab," "Academy," "Solutions," "Services," "Suite," "Consulting," "Co.," "Enterprises," "Media," "Shop," or "Agency" in the name. Think real teen brands: Press Pause, Drip District, Fade, Bonsai ER, Hot Sauce Club, Vault, Spoke, Burn Unit. The name should evoke the vibe, not describe the service. If you cannot think of a real brand name, use null and the student will name it themselves.
 - target_customer: specific description of who would pay, named per rule 2 (peers / parents of peers / neighbors / family).
-- revenue_model: brief sentence describing how they make money
+- revenue_model: brief sentence describing how they make money. If the student named a model that doesn't fit (e.g., "monthly retainers," "subscription," "creator deals") and you swapped to a teen-executable one, name the swap explicitly: "You said X, but for now Y will get you paid faster because…"
+- legal_note: a SHORT string (one sentence, can be empty "") flagging any real legal/regulatory constraint a teen needs to know about this specific idea. Examples: "Selling baked goods from home is fine in most US states under cottage food laws if you stay under the income cap and label allergens." OR "Cosmetology services on others' bodies legally require a license in most states — keep this to friends and don't advertise publicly." OR "Accepting money for fantasy sports picks crosses into unlicensed gambling in some states even between friends — keep it free and just for bragging rights." If no legal concern applies, return "".
 - why_this_fits: 2-3 sentences connecting their inputs in a way that feels like a discovery. Write like a 25-year-old founder talking to a 15-year-old, not like a LinkedIn post. Include one observation about their inputs they probably haven't connected themselves. FORBIDDEN PHRASES (do not use ANY of these): "perfect storm," "secret weapon," "secret sauce," "have you considered," "what most people don't realize," "leverage," "unlock," "synergy," "cracked the code," "natural arbitrage," "your superpower."`,
       messages: [
         {
@@ -210,12 +211,18 @@ First, identify the distinct themes in their answers. If their interests span mu
     }
 
     if (parsed.niche && parsed.target_customer && parsed.revenue_model) {
+      // Append legal_note to why_this_fits so the student sees it inline.
+      const legalNote = typeof parsed.legal_note === "string" ? parsed.legal_note.trim() : "";
+      const whyText = parsed.why_this_fits ?? "";
+      const whyWithLegal = legalNote
+        ? `${whyText}\n\nHeads up: ${legalNote}`.trim()
+        : whyText || undefined;
       const idea: BusinessIdea = {
         niche: parsed.niche,
         name: parsed.name ?? `${studentName}'s New Thing`,
         target_customer: parsed.target_customer,
         revenue_model: parsed.revenue_model,
-        why_this_fits: parsed.why_this_fits ?? undefined,
+        why_this_fits: whyWithLegal,
       };
       return { idea };
     }
