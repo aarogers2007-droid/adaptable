@@ -225,7 +225,14 @@ async function callWithRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> 
 }
 
 function extractJSON(text: string): unknown {
-  const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  // Strip code fences AND any leading/trailing prose around the JSON object
+  let clean = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+  // If there's extra prose before the first { or after the last }, slice it out
+  const first = clean.indexOf("{");
+  const last = clean.lastIndexOf("}");
+  if (first !== -1 && last !== -1 && last > first) {
+    clean = clean.slice(first, last + 1);
+  }
   return JSON.parse(clean);
 }
 

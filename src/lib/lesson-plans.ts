@@ -25,6 +25,7 @@ export interface LessonPlan {
   checkpoints: LessonCheckpoint[];
   completion_criteria: string; // What the AI evaluates for mastery
   personalization_hooks: string[]; // Which business_idea fields to reference
+  lesson_tags: string[]; // Topic tags matching knowledge_base.lesson_tags for RAG context
 }
 
 /**
@@ -60,6 +61,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student has connected their Ikigai to their personal WHY, understands the venture studio concept, and can articulate the belief behind their venture (not just the product)",
     personalization_hooks: ["niche", "name"],
+    lesson_tags: ["why", "purpose", "ikigai", "golden-circle", "getting-started", "mindset"],
   },
   {
     lesson_id: 2,
@@ -89,6 +91,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student can articulate who wants their product/service, why they're credible, and how people would pay. All three answers should be specific to their niche, not generic.",
     personalization_hooks: ["niche", "target_customer"],
+    lesson_tags: ["niche-validation", "validation", "product-market-fit", "lean-startup", "business-model"],
   },
   {
     lesson_id: 3,
@@ -118,6 +121,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student has identified at least one real competitor, articulated a specific differentiator, and identified an underserved angle for their business.",
     personalization_hooks: ["niche", "name", "target_customer"],
+    lesson_tags: ["competition", "differentiation", "niche-selection", "positioning"],
   },
   {
     lesson_id: 4,
@@ -147,6 +151,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student has created a vivid customer profile with a name, specific problem, current alternative, and compelling reason to switch.",
     personalization_hooks: ["niche", "name", "target_customer"],
+    lesson_tags: ["target-customer", "customer-personas", "jobs-to-be-done", "niche-selection", "value-proposition"],
   },
   // MODULE 2: Know Your Customer
   {
@@ -177,6 +182,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student understands The Mom Test framework, has crafted behavior-based questions, and has practiced interviewing AI customers in the sandbox, experiencing firsthand how question quality affects response quality.",
     personalization_hooks: ["niche", "name", "target_customer"],
+    lesson_tags: ["customer-interviews", "validation", "talking-to-users"],
     // Special flag: this lesson triggers the Interview Sandbox after checkpoint 2
   },
   {
@@ -207,6 +213,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student can distinguish genuine interest from polite noise, has identified a surprising insight, and connected it to a concrete change in their business approach.",
     personalization_hooks: ["niche", "name"],
+    lesson_tags: ["customer-interviews", "validation", "iteration", "pivoting", "growth-mindset"],
   },
   {
     lesson_id: 3,
@@ -236,6 +243,7 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student has chosen a specific price, backed it with competitor research, and understands what their pricing signals to customers.",
     personalization_hooks: ["niche", "name", "target_customer"],
+    lesson_tags: ["pricing", "set-your-price", "revenue-model", "pricing-confidence"],
   },
   {
     lesson_id: 4,
@@ -265,6 +273,443 @@ export const LESSON_PLANS: LessonPlan[] = [
     ],
     completion_criteria: "Student has identified specific channels, written a real pitch, and committed to a specific date to reach out.",
     personalization_hooks: ["niche", "name", "target_customer"],
+    lesson_tags: ["first-customers", "customer-acquisition", "marketing", "pitching", "sales"],
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 3: Build Your Brand
+  // ─────────────────────────────────────────────────────────────
+  {
+    lesson_id: 1,
+    module_id: 3,
+    title: "Brand Identity and Voice",
+    objective: "Student understands that brand is the gut feeling people have about their business, not the logo, and can describe the feeling {{business_name}} should leave behind",
+    opener: "{{name}}, here's a thing most first-time founders get wrong. Brand isn't your logo. Brand isn't your colors. Brand is the GUT FEELING someone has about {{business_name}} when they're not in the room. Jeff Bezos said that. So let me ask you — when someone tells their friend about {{business_name}}, what's the one feeling you want them to walk away with?",
+    checkpoints: [
+      {
+        id: "brand-1",
+        concept: "Brand as gut feeling, not visual identity",
+        question: "Forget logos for a second. If a customer of {{business_name}} described you to a friend in 5 words, what 5 words would you want them to use? Real teen words, not LinkedIn words.",
+        mastery_signal: "Student names 3-5 specific feeling/personality words that aren't generic ('professional', 'quality') but specific ('chill', 'fast', 'real')",
+      },
+      {
+        id: "brand-2",
+        concept: "Voice — how the business sounds in writing",
+        question: "Now write me one sentence that sounds like {{business_name}} talking. Like, if {{business_name}} sent a DM to a customer, what would the energy of the message be? Show me, don't tell me.",
+        mastery_signal: "Student writes a sentence with a recognizable voice — not generic 'we offer X services' corporate-speak",
+      },
+      {
+        id: "brand-3",
+        concept: "What the brand is NOT",
+        question: "Just as important — what does {{business_name}} NOT want to be? Name something other businesses in your space do that you'd never do. The 'not' tells us who you are.",
+        mastery_signal: "Student names a specific anti-pattern they're rejecting (e.g., 'I'm not gonna be the kind that takes 2 weeks to reply' or 'no fake hype')",
+      },
+    ],
+    completion_criteria: "Student has defined the gut-feeling words, written a sample of their brand voice, and named what they're explicitly not.",
+    personalization_hooks: ["niche", "name", "business_name", "target_customer"],
+    lesson_tags: ["branding", "brand-identity", "differentiation", "positioning"],
+  },
+  {
+    lesson_id: 2,
+    module_id: 3,
+    title: "Naming Your Business",
+    objective: "Student has tested 3 business names with real friends and chosen one that's memorable, ownable, and feels like them",
+    opener: "{{name}}, here's the truth about names. The name {{business_name}} is a placeholder. It might be the right name, it might not. Real teen brands like Press Pause, Drip District, Fade Lab — they're SHORT. They evoke a vibe. They don't describe what the business does. So let's find out if {{business_name}} is actually the name, or if there's something better waiting.",
+    checkpoints: [
+      {
+        id: "name-1",
+        concept: "Brainstorm 3-5 alternative names",
+        question: "Give me 3 to 5 other names you could use for this business. They should be SHORT — 1-3 words. They should not include the words Studio, Lab, Co, Solutions, Services, or Academy. Think feeling, not description.",
+        mastery_signal: "Student generates 3+ short, brandable names that don't describe the service literally",
+      },
+      {
+        id: "name-2",
+        concept: "The 24-hour name test",
+        question: "Pick your top 2 names from that list (including {{business_name}} if it's still in the running). Now here's the test — text them to 3 friends right now. Ask which one they remember tomorrow. Tell me which 2 you sent and who you sent them to.",
+        mastery_signal: "Student commits to specific names AND specific people to test with — not 'I'll think about it'",
+      },
+      {
+        id: "name-3",
+        concept: "Choosing with conviction",
+        question: "Whatever name you end up with, you need to be able to say it out loud without flinching. Practice saying 'Hi, I'm with [name]' three times right now, in your head. Which name doesn't make you cringe? That's the one.",
+        mastery_signal: "Student commits to one name with confidence-based reasoning",
+      },
+    ],
+    completion_criteria: "Student has 3+ candidate names, has committed to testing 2 of them with specific friends in the next 24 hours, and has selected a final name they can say out loud.",
+    personalization_hooks: ["niche", "name", "business_name"],
+    lesson_tags: ["naming", "branding", "visual-identity", "getting-started"],
+  },
+  {
+    lesson_id: 3,
+    module_id: 3,
+    title: "Designing Your First Impression",
+    objective: "Student has chosen 1 color, 1 font, and 1 visual element that represent {{business_name}} — the minimum viable visual identity",
+    opener: "{{name}}, here's the rule: pick 1 color and 1 font, and stop. Most first-time entrepreneurs spend 3 weeks on logos and never launch. Glossier built a billion-dollar brand with one shade of pink and Helvetica. So your job today is to PICK. One color. One font. One thing that's recognizably yours.",
+    checkpoints: [
+      {
+        id: "design-1",
+        concept: "Choosing one color",
+        question: "What ONE color is {{business_name}}? Not three colors, not a palette — one color. Tell me the color and one sentence on why it fits the gut-feeling words you picked in the last lesson.",
+        mastery_signal: "Student names one specific color and ties it to the brand feeling",
+      },
+      {
+        id: "design-2",
+        concept: "Choosing one font",
+        question: "Now ONE font. Hand-written, serif, or sans-serif? Don't tell me a font name yet — tell me which OF THOSE THREE feels right for {{business_name}} and why.",
+        mastery_signal: "Student picks one font category with reasoning that ties back to brand voice",
+      },
+      {
+        id: "design-3",
+        concept: "The first-impression test",
+        question: "Imagine someone sees {{business_name}} for the first time on Instagram. They have 2 seconds. What's the ONE thing they need to immediately understand about you? Not 5 things. One. What is it?",
+        mastery_signal: "Student picks one core message they want communicated in 2 seconds",
+      },
+    ],
+    completion_criteria: "Student has committed to 1 color, 1 font category, and 1 first-impression message — the minimum viable visual identity.",
+    personalization_hooks: ["business_name", "niche"],
+    lesson_tags: ["branding", "visual-identity", "customer-experience"],
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 4: Get Your First Customer
+  // ─────────────────────────────────────────────────────────────
+  {
+    lesson_id: 1,
+    module_id: 4,
+    title: "Zero-Budget Marketing",
+    objective: "Student has identified 3 specific zero-budget channels they will use to find their first customer this week",
+    opener: "{{name}}, you have $0. Good. Some of the best businesses in history started with $0 of marketing. The secret isn't a budget — it's showing up where your customer already is, with something they actually want. So let's get specific. Where are the people who would pay for {{business_name}} ALREADY hanging out, today, this week, for free?",
+    checkpoints: [
+      {
+        id: "zerom-1",
+        concept: "Identifying specific places customers gather",
+        question: "Where do your potential customers physically or digitally show up? I need 3 specific places. Not 'social media' — like 'the bus stop at 7am where the moms wait with their kids' or 'the discord for r/teenagers'. Specific.",
+        mastery_signal: "Student names 3 SPECIFIC places (named platforms, named locations) where their customer actually is",
+      },
+      {
+        id: "zerom-2",
+        concept: "Showing up authentically",
+        question: "For the most promising of those 3 places, what's the most natural, non-spammy thing you could DO there this week? Not 'promote my business' — what would help, entertain, or teach the people there?",
+        mastery_signal: "Student names a specific helpful action, not a sales pitch",
+      },
+      {
+        id: "zerom-3",
+        concept: "Setting the deadline",
+        question: "When this week are you doing it? Pick a day and a time. Block it like a real meeting. What's the day?",
+        mastery_signal: "Student commits to a specific day this week",
+      },
+    ],
+    completion_criteria: "Student has 3 specific channels, a non-promotional first action, and a committed date this week.",
+    personalization_hooks: ["business_name", "niche", "target_customer"],
+    lesson_tags: ["marketing", "first-customers", "customer-acquisition", "getting-started"],
+  },
+  {
+    lesson_id: 2,
+    module_id: 4,
+    title: "Social Media for a Service Business",
+    objective: "Student has a 30-day content plan with the 1-1-1 rule — work, customer story, behind-the-scenes — every week",
+    opener: "{{name}}, here's the cheat code for social media when you have a service business and zero followers. The 1-1-1 rule: every week, post ONE thing showing the work, ONE thing showing the customer, ONE thing showing the human behind the business. That's it. Three posts a week, 12 a month, every one of them landing a different message. Let's plan yours.",
+    checkpoints: [
+      {
+        id: "social-1",
+        concept: "The work post",
+        question: "What does 'showing the work' look like for {{business_name}}? Like, give me one specific post idea — what's in the photo or video?",
+        mastery_signal: "Student describes a specific 'show the work' post idea (before/after, time-lapse, finished product)",
+      },
+      {
+        id: "social-2",
+        concept: "The customer post",
+        question: "Now the customer post. You don't need 100 customers — you need ONE story. What's the first customer story you could tell? Even if your first customer is your cousin or your neighbor.",
+        mastery_signal: "Student identifies a real or near-future customer they could feature",
+      },
+      {
+        id: "social-3",
+        concept: "The behind-the-scenes post",
+        question: "And finally — the human post. People follow PEOPLE, not businesses. What's something about YOU that connects to {{business_name}}? Could be why you started, your setup, your morning routine, your weird obsession.",
+        mastery_signal: "Student names a personal element that humanizes the business",
+      },
+    ],
+    completion_criteria: "Student has 3 specific post ideas mapping to the 1-1-1 framework that they could shoot in the next 7 days.",
+    personalization_hooks: ["business_name", "niche", "name"],
+    lesson_tags: ["social-media", "content-marketing", "tiktok", "audience-building", "marketing"],
+  },
+  {
+    lesson_id: 3,
+    module_id: 4,
+    title: "Word of Mouth and Referrals",
+    objective: "Student has a specific word-of-mouth strategy — what they'll say to their first customer to make them tell 2 friends",
+    opener: "{{name}}, here's the boring truth about getting customers as a teen: your most powerful channel is the people who already know you. Not Instagram. Not TikTok. Mouths. So the question isn't 'how do I get followers' — it's 'how do I make my first customer love me so much they tell 2 people?'",
+    checkpoints: [
+      {
+        id: "wom-1",
+        concept: "The remarkable moment",
+        question: "What's ONE thing you can do for your first customer that's small for you but memorable for them? Free upgrade, handwritten thank-you, a tiny extra they didn't expect. Give me your idea.",
+        mastery_signal: "Student names one specific small-cost gesture that creates a moment to talk about",
+      },
+      {
+        id: "wom-2",
+        concept: "The ask",
+        question: "Most teens are scared to ask for referrals. Here's a script that works: 'If you know anyone else who needs this, I'd love it if you sent them my way.' That's it. Now write YOUR version of that line in your own voice — how would you actually say it?",
+        mastery_signal: "Student writes a natural-sounding referral ask in their own voice",
+      },
+      {
+        id: "wom-3",
+        concept: "The first 5 people you'll tell",
+        question: "Forget marketing for a second. Make a list of 5 specific people in your life who you trust enough to tell about {{business_name}} this week. Family doesn't count. Who are they?",
+        mastery_signal: "Student lists 5 specific named people from their existing network",
+      },
+    ],
+    completion_criteria: "Student has a remarkable-moment plan, a referral script in their own voice, and a list of 5 specific people they'll tell this week.",
+    personalization_hooks: ["business_name", "niche", "name"],
+    lesson_tags: ["customer-acquisition", "first-customers", "marketing", "customer-experience"],
+  },
+  {
+    lesson_id: 4,
+    module_id: 4,
+    title: "Writing Your First Pitch",
+    objective: "Student has a 30-second pitch for {{business_name}} they can say out loud without flinching, using a story structure not a feature list",
+    opener: "{{name}}, the 30-second pitch is the most underrated tool in your toolkit. It's not for investors. It's for the moment a friend's parent says 'so what are you up to lately?' and you have one chance to plant a seed. We're going to write yours using a 4-part structure: who it's for, what bugs them, what you do, what changes.",
+    checkpoints: [
+      {
+        id: "pitch-1",
+        concept: "Who and what bugs them",
+        question: "Start with this template: 'You know how [type of person] really wants [thing] but [problem]?' Fill it in for {{business_name}}. Make it sound like a real human said it, not a marketing slide.",
+        mastery_signal: "Student writes a specific, problem-first opener that sounds natural",
+      },
+      {
+        id: "pitch-2",
+        concept: "What you do, what changes",
+        question: "Now finish it: 'Well, I [what you do] so they can [what changes for them].' Same vibe. Specific, not corporate.",
+        mastery_signal: "Student completes the pitch with a specific solution and outcome",
+      },
+      {
+        id: "pitch-3",
+        concept: "The mirror test",
+        question: "Now read your full pitch out loud, twice. Did you flinch? Did anything sound forced? What would a real teen change about it?",
+        mastery_signal: "Student edits the pitch based on how it sounded out loud — looking for natural voice over polish",
+      },
+    ],
+    completion_criteria: "Student has a 4-part pitch in their own voice, has read it out loud twice, and made at least one edit for naturalness.",
+    personalization_hooks: ["business_name", "niche", "target_customer"],
+    lesson_tags: ["pitching", "storytelling", "elevator-pitch", "communication", "first-customers"],
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 5: Run the Numbers
+  // ─────────────────────────────────────────────────────────────
+  {
+    lesson_id: 1,
+    module_id: 5,
+    title: "Understanding Your Costs",
+    objective: "Student can list every cost involved in delivering one unit of {{business_name}}, including the trap most teens miss: their own time",
+    opener: "{{name}}, this is the lesson that decides whether {{business_name}} pays you back or quietly drains your time. We're going to count EVERY cost. And here's the trap most teens fall into: they forget to count their own hours. If you spend 12 hours making $100 of cookies, you made $8.33 an hour. That's below minimum wage. So let's start counting.",
+    checkpoints: [
+      {
+        id: "cost-1",
+        concept: "Counting hard costs (supplies, materials)",
+        question: "List every physical thing you need to deliver ONE unit of {{business_name}} (one session, one product, whatever). Be specific — the bottle of polish, the printer paper, the bus ride. Rough cost each.",
+        mastery_signal: "Student lists at least 3-5 specific cost items with rough numbers",
+      },
+      {
+        id: "cost-2",
+        concept: "Counting time as a cost",
+        question: "Now the part teens skip. How many MINUTES does it take to deliver one unit, including prep, the work itself, and follow-up? At minimum wage in your area (call it $15/hour for round numbers), what's that worth?",
+        mastery_signal: "Student honestly counts their time and converts to a dollar value",
+      },
+      {
+        id: "cost-3",
+        concept: "True total cost per unit",
+        question: "Add it up. Hard costs + time cost = the REAL cost of one unit. What's the number?",
+        mastery_signal: "Student arrives at a single total cost number that includes time",
+      },
+    ],
+    completion_criteria: "Student has listed hard costs, counted their own time, and arrived at a total per-unit cost figure.",
+    personalization_hooks: ["business_name", "niche"],
+    lesson_tags: ["financial-literacy", "costs", "unit-economics", "pricing"],
+  },
+  {
+    lesson_id: 2,
+    module_id: 5,
+    title: "Setting Profitable Prices",
+    objective: "Student has chosen a price that covers their full cost (including time) plus a real profit margin, AND can defend that price out loud",
+    opener: "{{name}}, you set a launch price back in module 2. Now let's see if it actually makes you money. We know your real cost from the last lesson. The rule from real bakeries and service businesses: charge 3-5x your cost. If you can't, you don't have a business — you have a hobby that loses money. Let's run the numbers.",
+    checkpoints: [
+      {
+        id: "ppp-1",
+        concept: "The 3x rule applied",
+        question: "Take the total cost from the last lesson (hard costs + time). Multiply by 3. That's your floor price — anything below that and you're losing money. What's the number?",
+        mastery_signal: "Student calculates the 3x floor price honestly",
+      },
+      {
+        id: "ppp-2",
+        concept: "Confidence to charge it",
+        question: "If your floor price is higher than the price you set in module 2, you've got two choices: charge more, or change the business so it costs less time. Which one feels right? And if it's 'charge more' — what's stopping you?",
+        mastery_signal: "Student honestly addresses the gap (or confirms their price is fine) and names any confidence barrier",
+      },
+      {
+        id: "ppp-3",
+        concept: "Defending the price",
+        question: "Practice this out loud: 'My rate is $___. Does that work for you?' Say it three times. Did it feel weird? What story can you tell yourself that makes it feel less weird?",
+        mastery_signal: "Student rehearses the price out loud and reframes the feeling",
+      },
+    ],
+    completion_criteria: "Student has calculated their floor price, confronted any pricing-confidence gap, and rehearsed defending the price out loud.",
+    personalization_hooks: ["business_name", "niche"],
+    lesson_tags: ["pricing", "pricing-confidence", "profit-margins", "unit-economics", "self-worth"],
+  },
+  {
+    lesson_id: 3,
+    module_id: 5,
+    title: "Reading Simple Financials",
+    objective: "Student has set up a 3-column money-tracking system (date, in, out, why) and committed to a 5-minute weekly review habit",
+    opener: "{{name}}, real talk: most teen businesses die from invisible bookkeeping. The owner has no idea if they're making or losing money because they never wrote it down. The fix is dumber than you think: a notebook or a Google Sheet with 4 columns. Date, in, out, why. That's it. No QuickBooks, no apps. Let's set it up.",
+    checkpoints: [
+      {
+        id: "fin-1",
+        concept: "Setting up the 4-column system",
+        question: "Open a Google Sheet (or grab a notebook) and make 4 columns: Date | In | Out | Why. Tell me when you've done it — and write your first row, even if it's $0 today.",
+        mastery_signal: "Student commits to creating the sheet and writes at least one row",
+      },
+      {
+        id: "fin-2",
+        concept: "The weekly review habit",
+        question: "Pick a day and time every week to spend 5 minutes reviewing the sheet. Sundays at 8pm? Friday after school? When are you doing it?",
+        mastery_signal: "Student commits to a specific recurring day and time",
+      },
+      {
+        id: "fin-3",
+        concept: "The two questions to ask each week",
+        question: "Every week, you ask yourself two questions when you review the sheet: (1) Am I making or losing money this week? (2) What's the biggest cost I could cut? Tell me back what those two questions are so I know it stuck.",
+        mastery_signal: "Student can repeat the two questions in their own words",
+      },
+    ],
+    completion_criteria: "Student has set up the 4-column tracking system, committed to a recurring review time, and internalized the two weekly questions.",
+    personalization_hooks: ["business_name"],
+    lesson_tags: ["financial-literacy", "bookkeeping", "tracking", "habit-building"],
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 6: Launch and Learn
+  // ─────────────────────────────────────────────────────────────
+  {
+    lesson_id: 1,
+    module_id: 6,
+    title: "Shipping Before You're Ready",
+    objective: "Student has committed to a specific 'launch' moment this week that's intentionally smaller than they want it to be",
+    opener: "{{name}}, this is the one. Reid Hoffman, who built LinkedIn, said: 'If you're not embarrassed by the first version of your product, you launched too late.' Most teen businesses die in the 'almost ready' stage. We're going to fix that. Today. What's the SMALLEST possible version of {{business_name}} you could put in front of a real human this week?",
+    checkpoints: [
+      {
+        id: "ship-1",
+        concept: "The minimum viable launch",
+        question: "Forget perfect. What's the smallest thing you could deliver to ONE real person in the next 7 days? Not the website, not the logo — the actual product or service, in its crappiest acceptable form. Describe it.",
+        mastery_signal: "Student describes a stripped-down deliverable that's intentionally not polished",
+      },
+      {
+        id: "ship-2",
+        concept: "Killing the perfectionism trap",
+        question: "What are you tempted to wait for before launching? List the things in your head that say 'just one more week and it'll be ready.' Be honest.",
+        mastery_signal: "Student names at least 2 specific perfectionism blockers",
+      },
+      {
+        id: "ship-3",
+        concept: "The one-person promise",
+        question: "Pick ONE specific person you'll deliver this MVL (minimum viable launch) to this week. Name them. Day of the week. Where. What you'll say.",
+        mastery_signal: "Student commits to a specific person, day, and opening line",
+      },
+    ],
+    completion_criteria: "Student has defined the smallest possible launch, named their perfectionism traps, and committed to one specific person and day.",
+    personalization_hooks: ["business_name", "niche", "name"],
+    lesson_tags: ["shipping", "getting-started", "mvp", "iteration", "constraints"],
+  },
+  {
+    lesson_id: 2,
+    module_id: 6,
+    title: "Handling Your First Customer",
+    objective: "Student has a clear protocol for what to do when a real person says yes — communication, delivery, follow-up",
+    opener: "{{name}}, let's pretend it just happened. Someone said yes to {{business_name}}. Real money is on the line. Most first-time founders fumble this exact moment. They get scared, they over-promise, they ghost. Today we're building your customer protocol so when it happens, you're ready.",
+    checkpoints: [
+      {
+        id: "first-1",
+        concept: "The yes-confirmation message",
+        question: "Customer says yes. What's the FIRST message you send them within an hour to confirm everything? Write the actual words.",
+        mastery_signal: "Student writes a specific confirmation message that re-states what was agreed and sets a clear next step",
+      },
+      {
+        id: "first-2",
+        concept: "Reliability under pressure",
+        question: "What could go wrong between now and delivery? List 2 things. For each one, what's your plan if it happens? (Hint: 'tell the customer immediately' is always part of the answer.)",
+        mastery_signal: "Student identifies 2 risks and has a 'tell the customer' plan for each",
+      },
+      {
+        id: "first-3",
+        concept: "The delivery moment",
+        question: "When you actually hand over the thing (or finish the service), what's the one extra small touch that turns this customer into someone who tells their friends? Bring back the remarkable-moment idea from module 4.",
+        mastery_signal: "Student names a specific small-cost extra touch tied to their brand",
+      },
+    ],
+    completion_criteria: "Student has a confirmation message, two risk-and-plan pairs, and a remarkable-moment for delivery.",
+    personalization_hooks: ["business_name", "niche", "name"],
+    lesson_tags: ["service-delivery", "customer-experience", "operations", "reliability"],
+  },
+  {
+    lesson_id: 3,
+    module_id: 6,
+    title: "Getting Feedback",
+    objective: "Student has a 3-question post-delivery feedback script that gets honest answers, not polite noise — and a plan to use what they learn",
+    opener: "{{name}}, the moment after the customer pays is the most valuable moment in your business. They're warm, they're open, and they have ONE honest opinion that will save you a hundred bad guesses. Most founders waste it. The Mom Test rule from module 2 still applies: don't ask 'how was it?', ask about specific behavior. Let's write your feedback script.",
+    checkpoints: [
+      {
+        id: "fb-1",
+        concept: "The behavior-based feedback question",
+        question: "Don't ask 'did you like it?' Ask something behavior-based instead. Try this format: 'What were you doing right before you booked this?' or 'Walk me through what happened when you used it the first time.' Write YOUR version of a behavior question for {{business_name}}.",
+        mastery_signal: "Student writes a specific, behavior-based feedback question",
+      },
+      {
+        id: "fb-2",
+        concept: "The improvement question",
+        question: "The second question is the gold one: 'If you could change ONE thing about this, what would it be?' Most customers will either say 'nothing' (politeness — keep digging) or give you the most valuable answer in your entire business. Write how you'd ask this.",
+        mastery_signal: "Student writes the question in their own voice and acknowledges the polite-deflection trap",
+      },
+      {
+        id: "fb-3",
+        concept: "Using the feedback",
+        question: "Imagine you got an honest answer that says 'the price felt high' or 'I wasn't sure when you'd deliver'. What would you ACTUALLY change? Pick one likely answer and tell me your response.",
+        mastery_signal: "Student commits to a concrete change they'd make in response to a specific likely feedback",
+      },
+    ],
+    completion_criteria: "Student has a 2-question feedback script and a pre-committed response to one likely answer.",
+    personalization_hooks: ["business_name", "niche"],
+    lesson_tags: ["customer-interviews", "iteration", "validation", "growth-mindset"],
+  },
+  {
+    lesson_id: 4,
+    module_id: 6,
+    title: "What to Do After Your First Sale",
+    objective: "Student understands the difference between celebrating one sale (great) and assuming success (dangerous), and has a plan for sale #2",
+    opener: "{{name}}, picture it. {{business_name}} just made its first real sale. Real money. Real customer. Now what? This is the moment most teen businesses either become real or become a one-time story. The difference is a single decision: do you treat sale #1 as a fluke or as a system? Today we make it a system.",
+    checkpoints: [
+      {
+        id: "after-1",
+        concept: "Celebrating without resting",
+        question: "First, the celebration is real. What are you going to do to actually CELEBRATE the first sale? (Tell someone, take a photo, mark it on a calendar — something that makes it count.) Then I want you to commit to ONE thing you'll do within 24 hours of the sale to set up sale #2.",
+        mastery_signal: "Student names a celebration AND a 24-hour follow-up action",
+      },
+      {
+        id: "after-2",
+        concept: "Repeat the playbook",
+        question: "Sale #1 was probably a person you knew. Sale #2 is the test. Who are 3 specific people who are NOT your close friends or family who could be customer #2? Be specific.",
+        mastery_signal: "Student names 3 specific people outside their immediate circle",
+      },
+      {
+        id: "after-3",
+        concept: "The one thing you'd do differently",
+        question: "Looking back at the whole journey from lesson 1 — the Ikigai, the niche, the customer, the price, the launch — what's ONE thing you'd do differently next time? This isn't a regret question, it's a wisdom question.",
+        mastery_signal: "Student identifies a specific learning that came from doing the work",
+      },
+    ],
+    completion_criteria: "Student has a celebration plan, a 24-hour next-step, three specific names for sale #2, and one wisdom takeaway.",
+    personalization_hooks: ["business_name", "niche", "name"],
+    lesson_tags: ["iteration", "growth", "scaling", "mindset", "growth-mindset"],
   },
 ];
 

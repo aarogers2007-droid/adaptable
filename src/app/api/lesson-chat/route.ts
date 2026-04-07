@@ -291,13 +291,19 @@ export async function POST(request: Request) {
     (cp) => checkpointsReached.includes(cp.id)
   );
 
-  // Get relevant knowledge for this lesson
+  // Get relevant knowledge for this lesson via the plan's lesson_tags.
+  // Try each tag in order; first one with results wins. This replaces the old
+  // module-X-lesson-Y lookup which silently returned nothing because the
+  // knowledge_base entries are tagged by topic, not by module-lesson coordinate.
   let knowledgeContext = "";
   try {
-    const lessonTag = `module-${moduleSequence}-lesson-${lessonSequence}`;
-    const knowledge = await getRelevantKnowledge(lessonTag, 2);
-    if (knowledge) {
-      knowledgeContext = `\n\nKNOWLEDGE (weave in naturally, don't dump):\n${knowledge}`;
+    const tags = plan.lesson_tags ?? [];
+    for (const tag of tags) {
+      const knowledge = await getRelevantKnowledge(tag, 2);
+      if (knowledge) {
+        knowledgeContext = `\n\nKNOWLEDGE (weave in naturally, don't dump):\n${knowledge}`;
+        break;
+      }
     }
   } catch { /* no knowledge base */ }
 
