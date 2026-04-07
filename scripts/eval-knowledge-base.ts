@@ -206,13 +206,22 @@ Return ONLY a JSON object:
 }`;
 
     try {
-      const result = await callOpus<Omit<CitationResult, "entry_id" | "entry_title">>(prompt, 3000);
+      const result = await callOpus<Partial<Omit<CitationResult, "entry_id" | "entry_title">>>(prompt, 3000);
+      // Defensive normalization: Opus sometimes omits zero-valued fields
+      // entirely. Coerce undefined → 0 so the aggregate sums don't NaN.
+      const normalized: Omit<CitationResult, "entry_id" | "entry_title"> = {
+        total_citations_found: result.total_citations_found ?? 0,
+        verified: result.verified ?? 0,
+        unverified: result.unverified ?? 0,
+        likely_hallucinated: result.likely_hallucinated ?? 0,
+        details: result.details ?? [],
+      };
       results.push({
         entry_id: entry.id,
         entry_title: entry.title,
-        ...result,
+        ...normalized,
       });
-      console.log(`✓=${result.verified} ?=${result.unverified} ✗=${result.likely_hallucinated}`);
+      console.log(`✓=${normalized.verified} ?=${normalized.unverified} ✗=${normalized.likely_hallucinated}`);
     } catch (e) {
       console.log(`X (${e instanceof Error ? e.message.slice(0, 40) : "fail"})`);
       results.push({

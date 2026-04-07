@@ -1,6 +1,6 @@
 # Knowledge Base Eval Report
 
-Run: 2026-04-07T21:37:28.115Z
+Run: 2026-04-07T22:41:26.854Z
 Tests: coverage gap, citation hallucination scan, cross-model quality re-eval
 Judge: claude-opus-4-6 (cross-model — entries written by Sonnet, judged by Opus)
 
@@ -12,15 +12,15 @@ Judge: claude-opus-4-6 (cross-model — entries written by Sonnet, judged by Opu
 - **0/22** lessons have ZERO KB coverage (silent RAG failure)
 
 ### Citations
-- **395** total citations across all entries
-- **140 (35%)** verified
-- **140 (35%)** unverified (may be real, can't confirm)
-- **115 (29%)** likely hallucinated — these need to be reviewed and either replaced or flagged
+- **178** total citations across all entries
+- **98 (55%)** verified
+- **57 (32%)** unverified (may be real, can't confirm)
+- **NaN (NaN%)** likely hallucinated — these need to be reviewed and either replaced or flagged
 
 ### Quality (cross-model Opus judge)
-- **Average score: 23.36/30** across 25 entries
-- **4** entries scored 26+/30 (strong)
-- **6** entries scored <22/30 (weak — candidates for regeneration)
+- **Average score: 21.64/30** across 25 entries
+- **0** entries scored 26+/30 (strong)
+- **14** entries scored <22/30 (weak — candidates for regeneration)
 
 ## Coverage Detail
 
@@ -55,337 +55,39 @@ Judge: claude-opus-4-6 (cross-model — entries written by Sonnet, judged by Opu
 
 Entries ordered by hallucination risk (most concerning first).
 
-### 🔴 The 30-Day Zero-Budget Social Media Sprint: A Step-by-Step Content Plan for Teen Entrepreneurs
-- Total citations: 20
-- Verified: 4 · Unverified: 3 · Likely hallucinated: 13
+### 🔴 Pricing Strategy Fundamentals for Teen Entrepreneurs
+- Total citations: 6
+- Verified: 4 · Unverified: 1 · Likely hallucinated: 1
 
 **Concerning citations:**
-- ? `Content creator Justin Welsh developed the 1-1-1 rule: post 1 piece showing your work process, 1 piece featuring a custo`
-  - Justin Welsh is a real creator and solopreneur, but the specific '1-1-1 rule' with this exact formulation is not a well-known framework attributable to him and may be fabricated or conflated.
-- ? `Welsh grew his personal brand to 500K+ followers and $2M annual revenue using this exact framework.`
-  - Justin Welsh has publicly claimed multi-million-dollar revenue and has a large LinkedIn following, but tying it specifically to the '1-1-1 rule' framework is not confirmable.
-- ✗ `Marketing expert Gary Vaynerchuk's data shows posting once daily for 30 days generates 340% more engagement than sporadi`
-  - Gary Vaynerchuk advocates for high-volume posting, but the specific '340% more engagement' statistic is not a recognized or verifiable claim from him.
-- ✗ `Social media strategist Jasmine Star's analysis of 50,000 small business interactions found that direct messages convert`
-  - Jasmine Star is a real social media strategist, but the specific claim of analyzing 50,000 interactions and the precise '10x' conversion figure is not a recognized or verifiable study from her.
-- ✗ `Teen jewelry maker Tiana Soto (@TianaMakesJewelry) got 4 paying customers in 30 days by responding to every story commen`
-  - There is no verifiable evidence that Tiana Soto or the handle @TianaMakesJewelry is a real person/account; this appears to be a fabricated illustrative example.
-- ✗ `TikTok growth expert Sean Cannell identified the top-performing hooks for teen audiences: 'Before/After' (87% completion`
-  - Sean Cannell is a real YouTube/video expert (Think Media), but he is primarily known as a YouTube expert, not a TikTok growth expert, and these specific completion rate percentages are not verifiable claims from him.
-- ✗ `Tiana Soto, 15, jewelry maker from Phoenix — 200 followers, 4 customers paying $15-45 each, $180 revenue in 30 days.`
-  - This appears to be a fabricated case study with specific but unverifiable details about a person who cannot be confirmed to exist.
-- ✗ `Marcus Thompson, 16, lawn care service in suburban Dallas — Got 15 neighbor inquiries through Instagram DMs, converted 8`
-  - This appears to be a fabricated illustrative example; no verifiable evidence of this specific teen entrepreneur or these specific results exists.
-- ✗ `Sofia Chen, 14, tutoring service in Vancouver — Got 50 DMs from classmates' parents, booked 12 tutoring sessions at $25/`
-  - This appears to be a fabricated illustrative example; no verifiable evidence of this specific teen entrepreneur or these specific results exists.
-- ✗ `"The algorithm doesn't care about your follower count. It cares about engagement rate and posting consistency. A 16-year`
-  - Justin Welsh does publish 'The Saturday Solopreneur' newsletter, but this specific quote with the reference to a 16-year-old is not a recognizable quote from him and appears fabricated for this content.
-- ✗ `"I made my first $1,000 online at 15 by DMing every single person who liked my posts. Comments are public performances. `
-  - Tiana Soto does not appear to be a verifiable public figure, and this quote appears to be entirely fabricated.
-- ? `The Instagram algorithm rewards consistent creators with better reach.`
-  - This is a widely repeated claim in social media marketing circles and is directionally plausible, but Instagram has not officially confirmed this as a specific algorithmic feature.
-- ✗ `Sofia Chen's post: 'Here's what I learned helping my friend raise her math grade from C to A' with screenshot proof.`
-  - This is part of the fabricated Sofia Chen case study with unverifiable specific details.
-- ✗ `Marcus Thompson used hooks like 'This yard transformation surprised everyone on the street.'`
-  - This is part of the fabricated Marcus Thompson case study.
-- ✗ `Tiana Soto shared customer wearing her jewelry at homecoming (Week 2 of the sprint).`
-  - This is part of the fabricated Tiana Soto case study with unverifiable specific details.
-- ✗ `Sean Cannell is a TikTok growth expert.`
-  - Sean Cannell is a real person known primarily as a YouTube growth expert (Think Media), not specifically as a TikTok growth expert; this characterization appears inaccurate.
+- ? `"Your problem isn't that your price is too high. Your problem is that you're not creating enough value." — Seth Godin`
+  - Seth Godin is a real marketing thought leader who discusses value and pricing, but this exact quote cannot be confidently traced to a specific published source and may be a paraphrase or misattribution.
+- ✗ `Imagine a teen offering lawn care who creates three packages: Basic ($30), Premium ($50), and Deluxe ($70). Most custome`
+  - While presented as a hypothetical, the claim that 'most customers choose Premium' is stated as fact; the decoy/compromise effect is real, but the specific assertion that most customers choose the middle tier is an oversimplification that doesn't always hold, and the specific price points are fabricated examples presented with an unqualified factual conclusion.
 
-### 🔴 The 5 Teen-Executable Business Models: From Dog Walking to TikTok Fame
-- Total citations: 18
-- Verified: 3 · Unverified: 4 · Likely hallucinated: 11
+### 🟡 Building a Strong Brand Identity as a Teen Entrepreneur
+- Total citations: 6
+- Verified: 5 · Unverified: 1 · Likely hallucinated: 0
 
 **Concerning citations:**
-- ✗ `Stripe Atlas data on small business formations shows service-based businesses have a 78% 12-month survival rate compared`
-  - Stripe Atlas focuses on incorporation services for startups and does not publish survival rate breakdowns by business type in this manner; these specific percentages are not recognizable.
-- ? `Harvard Business School's William Kerr found that introverted entrepreneurs succeed 40% more often in product and subscr`
-  - William Kerr is a real HBS professor who studies entrepreneurship, but the specific claim about introvert/extrovert success rates of 40% in these specific model categories is not a recognizable finding from his published work.
-- ✗ `Small Business Administration data shows businesses requiring under $1,000 initial investment have 65% higher survival r`
-  - The SBA publishes small business statistics but does not publish survival rate data specifically segmented by entrepreneurs under 20 with this specific threshold and percentage.
-- ✗ `Jason Cohen, founder of WP Engine, analyzed 500+ small businesses and found service (most unpredictable income), resell `
-  - Jason Cohen is the real founder of WP Engine and writes about SaaS/startups, but this specific analysis of 500+ small businesses with this exact taxonomy is not a recognizable claim from his known work.
-- ✗ `Rachel Roy Greenheart, age 16, started 'Pet Palace' dog walking service in Portland, Oregon, earning $1,500/month with 2`
-  - This person and business cannot be verified and reads like a fabricated illustrative example; the name also oddly echoes fashion designer Rachel Roy.
-- ✗ `Maya Patel, 15, sells handmade ceramic mugs on Etsy as 'Maya's Clay Creations', selling 40 mugs monthly at $25 each`
-  - This specific person and business cannot be verified and appears to be a fabricated illustrative example.
-- ? `Emma Chamberlain now earns $2M+ annually through sponsorships`
-  - Emma Chamberlain earns significant income (some estimates put it much higher than $2M), but the exact figure is not publicly confirmed and may be understated.
-- ✗ `Coffee Meets Bagel paid Emma Chamberlain $50K for one video in 2019`
-  - Coffee Meets Bagel is a dating app, not a typical Chamberlain sponsor; this specific sponsorship deal and amount are not recognizable and appear fabricated.
-- ? `97% of teen creators never monetize successfully`
-  - Various statistics about creator economy failure rates circulate, but this specific 97% figure for teen creators specifically is not from a verifiable source.
-- ✗ `Gymshark sold for $1.3 billion in 2021`
-  - Gymshark was not sold; in 2020 General Atlantic acquired a 21% stake valuing the company at approximately £1.3 billion, but Ben Francis retained ownership and the company was not 'sold.'
-- ✗ `@sneakerhead_jack on Instagram makes consistent $800/month buying/reselling limited sneakers`
-  - This specific Instagram account and earnings claim cannot be verified and appears to be a fabricated illustrative example.
-- ✗ `Isabella Dymalovski, 17, started 'Fresh Loaf Weekly' subscription service delivering artisan bread to 45 neighbors, gene`
-  - Isabella Dymalovski is a real Australian teen entrepreneur (known for Luv Ur Skin skincare), but 'Fresh Loaf Weekly' bread subscription is not associated with her and appears fabricated.
-- ✗ `Reid Hoffman, LinkedIn founder, said 'The best business for a teenager is one where you can fail fast, fail cheap, and l`
-  - Reid Hoffman is indeed LinkedIn's co-founder and advocates 'fail fast' philosophy, but this exact quote specifically addressing teenagers is not a recognizable quote from him.
-- ✗ `Melanie Perkins, Canva founder, said 'I started with dog walking because it taught me everything about business...'`
-  - Melanie Perkins is the real founder of Canva, but she is known for starting with a yearbook design company (Fusion Books), not dog walking; this quote appears fabricated.
-- ? `MrBeast (Jimmy Donaldson) said 'Ninety-seven percent of people trying to make money from content creation earn less than`
-  - MrBeast (Jimmy Donaldson) is a real creator who discusses creator economy dynamics, and this sentiment aligns with things he's said, but this exact quote with the 97% figure cannot be confirmed as his specific words.
+- ? `Imagine a teen who starts a tutoring service and positions their brand around 'peer-to-peer learning that actually makes`
+  - This is presented as a hypothetical example (signaled by 'Imagine'), so there is no factual claim to verify about a real person or business.
 
-### 🔴 Zero-Budget Branding: The 24-Hour Name Test and 1-Color Rule
-- Total citations: 20
-- Verified: 5 · Unverified: 7 · Likely hallucinated: 8
+### 🟡 Operations and Service Delivery Fundamentals for First-Time Small Businesses
+- Total citations: 3
+- Verified: 2 · Unverified: 1 · Likely hallucinated: undefined
 
 **Concerning citations:**
-- ? `Igor International's research on 2,000+ brand names shows invented names like 'Xerox' or 'Kodak' are remembered 3x bette`
-  - Igor International (now Igor Naming) is a real naming agency, but the specific '2,000+ brand names' study and the '3:1 recall' statistic cannot be confirmed from known publications.
-- ? `Lexicon Branding's analysis of Fortune 500 companies found that brands using just one signature color achieved higher re`
-  - Lexicon Branding is a real naming firm, but they specialize in naming, not color analysis; this specific study on Fortune 500 color recognition is not attributable to them.
-- ✗ `Igor Naming's 'overnight test' - text 3 friends your potential names, ask which they remember the next day - correlates `
-  - Igor Naming exists, but the specific '85% correlation with actual customer recall rates' claim and the formal 'overnight test' methodology with this statistic are not confirmable and appear fabricated.
-- ✗ `Lexicon Branding's phonetic analysis found that names ending in /li/ or /i/ sounds score 40% higher on 'approachable' ra`
-  - Lexicon Branding does study phonetics in naming, but the specific '40% higher approachable ratings' figure is not a known published finding, and examples like Swiffer and Febreze don't actually end in /li/ or /i/ sounds.
-- ✗ `Swiffer and Febreze as examples of names ending in /li/ sounds`
-  - Swiffer ends in an /ər/ sound and Febreze ends in /iːz/ — neither ends in /li/, contradicting the claim's own examples.
-- ✗ `Cluely (social polling app) got 10x more organic mentions on TikTok than 'Teen Opinion Tracker' within first month`
-  - There is no verifiable social polling app called 'Cluely' with this specific TikTok performance metric; this appears to be a fabricated example.
-- ? `Suno (AI music platform) chose one-word name over 'AI Music Generator Pro', saved $50k on trademark searches, gained 2M `
-  - Suno is a real AI music platform, but the specific claims about saving $50k on trademark searches, the rejected alternative name, and the 2M users in 6 months are unverifiable.
-- ? `Glossier used only pink color for 3 years, became $1.8B company before adding second color`
-  - Glossier is real and was valued at $1.8B in 2021, and pink is their signature color, but the claim they used 'only pink for 3 years before adding a second color' is an oversimplification that isn't precisely documented.
-- ? `David Placek said 'The best brand names are short, unique, and easy to say. If your grandmother can't pronounce it, your`
-  - While this sentiment aligns with Placek's known views on naming, the exact quote cannot be verified from a known source and may be paraphrased or fabricated.
-- ✗ `Igor Elbert as a person associated with Igor International naming research`
-  - Igor International (Igor Naming) was not founded by anyone named 'Igor Elbert'; the firm is associated with other principals, and this name appears fabricated.
-- ✗ `Igor Elbert said 'We've tested thousands of names. The ones that stick are either really short or have a great story. Ev`
-  - The person 'Igor Elbert' at Igor International does not appear to be a real individual, making this quote likely fabricated.
-- ? `Steve Manning associated with Igor International's 24-hour test methodology`
-  - Steve Manning is a real naming professional (associated with Igor International historically), but the specific '24-hour test methodology' attributed to him and this exact quote cannot be confirmed.
-- ✗ `Steve Manning said 'If three friends can't remember your name after one day, a thousand customers won't remember it afte`
-  - While Steve Manning is a real naming consultant, this specific quote cannot be traced to any known source and appears fabricated.
-- ? `Spotify and Shopify as examples of names ending in /i/ sounds that score higher on approachability`
-  - Spotify and Shopify are real companies with names ending in /i/ sounds, but the specific claim that this ending scores higher on approachability ratings is not confirmed by known research.
-- ✗ `Short, made-up names outperform descriptive ones by 3:1 in recall tests`
-  - This specific 3:1 ratio in recall tests is not traceable to any known published research and appears to be a fabricated statistic.
+- ? `A student who bakes custom cookies for school events creates a simple order form, sets clear deadlines (72 hours notice `
+  - This is presented as a hypothetical illustrative example (like the lawn care teen) rather than a specific named person or business, so there is no factual claim to verify or refute — marking as unverified since it's a generic scenario with specific operational details (72 hours) that aren't attributed to a real case.
 
-### 🔴 The 3-Column Money Tracking System: How Teen Entrepreneurs Track Every Dollar in 5 Minutes Per Week
-- Total citations: 20
-- Verified: 5 · Unverified: 7 · Likely hallucinated: 8
+### 🟡 Financial Literacy Fundamentals: Understanding Profit Margins, Costs, and Revenue for Teen Entrepreneurs
+- Total citations: 3
+- Verified: 2 · Unverified: 1 · Likely hallucinated: undefined
 
 **Concerning citations:**
-- ✗ `The 3-Column System was popularized by small business owner Dave Ramsey`
-  - Dave Ramsey is a well-known personal finance personality, not typically described as a 'small business owner' who popularized a '3-Column System'; his methods focus on personal budgeting (envelope system, baby steps), not a specific 3-column ledger.
-- ✗ `72% of successful small businesses use this system before hiring accountants, according to SCORE mentorship data`
-  - This specific 72% statistic attributed to SCORE is not verifiable and has the hallmarks of a fabricated statistic.
-- ? `Dan Ariely's behavioral economics research at Duke University shows people who physically write down financial transacti`
-  - Dan Ariely is a real behavioral economist at Duke who studies financial decision-making, but these specific percentages (12-18% less spending, 23% more saving) for physical writing vs. digital tracking cannot be confirmed as findings from his published research.
-- ? `Financial advisor Suze Orman recommends keeping every business receipt in a physical box or envelope`
-  - Suze Orman is a real financial advisor who has given receipt-keeping advice, but she is primarily a personal finance advisor; the specific 'shoebox receipt system' framing for business use is not a well-known Orman recommendation.
-- ? `15-year-old Moziah Bridges tracked his bow tie business Mo's Bows from $0 to $200,000 in revenue by age 16`
-  - Moziah Bridges and Mo's Bows are real, and he started young, but the specific claim of $200,000 in revenue by age 16 and the attribution to a 'shoebox receipt system' cannot be confirmed with these exact figures.
-- ? `Mike Michalowicz's research in 'Profit First' found entrepreneurs who spend 5 minutes weekly reviewing their numbers are`
-  - Mike Michalowicz and 'Profit First' are real, and the book advocates regular financial review, but the specific '3x more likely to be profitable' claim from 5-minute weekly reviews is not a verified finding from the book.
-- ✗ `Sunday 7pm works for 89% of teen entrepreneurs`
-  - This highly specific 89% statistic about teen entrepreneurs preferring Sunday 7pm has no identifiable source and appears fabricated.
-- ? `Hart Main started Mandles (candles for men) at age 13 using a composition notebook with three columns`
-  - Hart Main and ManCans (often called man candles) are real — he started around age 13, but the specific claim about a composition notebook with three columns is unverifiable.
-- ? `Hart Main grew to $1M+ revenue by age 18`
-  - Hart Main's candle business was successful, but the specific $1M+ revenue by age 18 figure cannot be confirmed.
-- ? `Alina Morse tracked Zollipops in Google Sheets starting at age 9`
-  - Alina Morse and Zollipops are real, and she started around age 7-9, but the specific Google Sheets tracking method is unverifiable.
-- ✗ `Teen reseller Jacob Komar tracks his sneaker flipping business with Mike Michalowicz's envelope system and made $40,000 `
-  - There is no widely known teen entrepreneur named Jacob Komar associated with sneaker flipping and the envelope system; this appears to be a fabricated example.
-- ✗ `"I kept every single receipt in a shoebox for two years. That shoebox taught me more about business than any class ever `
-  - Moziah Bridges is real and founded Mo's Bows, but this specific quote cannot be found in any known interview or source and appears to be fabricated.
-- ✗ `"When you physically write down what you spend, your brain processes it differently than swiping a card. It becomes real`
-  - Dan Ariely has discussed the psychology of spending and pain of paying, but this exact quote cannot be verified from his published works or interviews and appears to be a paraphrased fabrication presented as a direct quote.
-- ✗ `Hart Main's specific transaction example: Date 11/15/2010, Money In $20 (sold 4 candles), Money Out $12 (wax supplies), `
-  - This overly specific ledger entry with exact dates, amounts, and a named customer appears to be a fabricated illustrative example presented as factual.
-- ✗ `Alina Morse's specific transaction example: '3/12/2016 | $47.50 | $23.80 | Sold 95 lollipops at soccer game'`
-  - This highly specific ledger entry with exact date, amounts, and context appears to be a fabricated illustrative example presented as an actual record.
-
-### 🔴 Why Facts Don't Sell: Using Story Structure to Turn Your 15-Second Hallway Pitch Into Customer Gold
-- Total citations: 18
-- Verified: 5 · Unverified: 7 · Likely hallucinated: 6
-
-**Concerning citations:**
-- ? `Andy Raskin analyzed 100+ successful startup pitches and found the pattern: identify a shift in the world that creates w`
-  - Andy Raskin is a real pitch strategist known for his 'Greatest Sales Deck' article, and he does advocate a narrative structure about naming a shift in the world, but the specific claim of analyzing '100+ successful startup pitches' is not a well-known statistic attributed to him.
-- ? `Chip Heath's 'Made to Stick' research shows concrete details make stories 6x more memorable than abstract concepts.`
-  - Chip Heath and Dan Heath's 'Made to Stick' does emphasize concreteness as a key principle of sticky ideas, but the specific '6x more memorable' statistic is not a well-known finding from the book in that exact form.
-- ✗ `The teen baker who said 'I make cakes shaped like the kid's favorite thing - last week I made one shaped like a Switch c`
-  - This appears to be a fabricated illustrative example presented as if it were a real documented case with specific conversion statistics.
-- ✗ `Maya Chen, 16, Phoenix - went from 10% conversion to 60% conversion rate, $3,000 monthly revenue with her cookie busines`
-  - This reads as a fabricated example; there is no verifiable record of a specific teen entrepreneur named Maya Chen in Phoenix with these exact metrics.
-- ✗ `Marcus Thompson, 17, Detroit - tutoring business revenue increased from $200 to $1,200 monthly after changing his pitch`
-  - This reads as a fabricated example; there is no verifiable record of a specific teen entrepreneur named Marcus Thompson in Detroit with these exact metrics.
-- ? `Airbnb's original pitch deck used the Pixar story spine structure`
-  - Airbnb's original pitch deck is publicly known and did use narrative elements, but the specific claim that it followed the Pixar story spine format is an interpretive overlay, not a documented fact about how the deck was constructed.
-- ? `Airbnb raised $7.2 million Series A`
-  - Airbnb's Series A is often reported as $7.2 million (led by Greylock and Sequoia in 2009-2010), though some sources cite slightly different figures; the number is plausible but not precisely confirmable from a single authoritative source.
-- ? `"If you confuse, you lose. Customers don't buy the best products; they buy the ones they can understand the fastest." — `
-  - Donald Miller does use the phrase 'if you confuse, you'll lose' in his StoryBrand material, but the full quote as presented here may be a paraphrase or composite rather than an exact citation from the book.
-- ? `"The most powerful person in the world is the storyteller. The storyteller sets the vision, values, and agenda of an ent`
-  - This quote is widely attributed to Steve Jobs (reportedly from a 1994 internal Apple meeting), and Carmine Gallo's book is real, but whether this exact quote appears in that specific book and whether Steve Jobs said these exact words is not firmly verified.
-- ✗ `"Facts tell, but stories sell. Your customers' brains are wired to remember stories, not statistics." — Seth Godin, All `
-  - Seth Godin's 'All Marketers Are Liars' (later retitled 'All Marketers Tell Stories') is a real book, but this specific quote does not appear to be a recognized passage from it; the phrasing 'facts tell, but stories sell' is a common marketing aphorism not specifically attributed to Godin.
-- ? `Chip Heath wrote 'Made to Stick'`
-  - Chip Heath co-authored 'Made to Stick' with Dan Heath; attributing it solely to Chip Heath is incomplete but not entirely wrong.
-- ✗ `A teen's last student went from D+ to A- in 6 weeks (tutoring example in principles section)`
-  - This is presented as a real example with specific grades and timeframe but appears to be a fabricated illustration.
-- ✗ `Study group had a 90% pass rate (Pixar story spine example)`
-  - This specific statistic appears in a hypothetical example and is not attributed to any verifiable source or real case.
-
-### 🔴 Build Customer Personas From One Real Person You Know
-- Total citations: 14
-- Verified: 4 · Unverified: 4 · Likely hallucinated: 6
-
-**Concerning citations:**
-- ? `IDEO's Tim Brown advocates the 'design for one' principle - start with one specific person's needs rather than broad dem`
-  - Tim Brown is the former CEO of IDEO and advocates human-centered design, but the specific 'design for one' principle as a named concept attributed to him is not a well-documented phrase.
-- ✗ `Harvard Business School teaches the '5 person rule': if you can't name 5 real people who match your persona, it's a fant`
-  - There is no widely documented HBS teaching called the '5 person rule' for customer personas; this specific attribution appears fabricated.
-- ? `Revella's research with 100+ companies showed generic personas fail because they don't reveal buying triggers, success f`
-  - Revella has conducted extensive research on buyer personas and criticizes demographic-only personas, but the specific '100+ companies' figure is not readily confirmable.
-- ✗ `17-year-old Alex Chen built a $2,000/month tutoring business by starting with 'Marcus, a sophomore on my robotics team s`
-  - This reads as a fabricated illustrative example; there is no verifiable public record of this specific teen entrepreneur story with these exact details.
-- ? `Melanie Perkins started Canva by focusing on her specific persona: 'My university classmates who struggle with design so`
-  - Melanie Perkins did co-found Canva and her initial venture (Fusion Books) involved yearbook design, but the specific 'yearbook committee' persona framing and the quote are not verified as her own words.
-- ✗ `16-year-old Emma Rodriguez built a $500/month social media management service for 'Mrs. Peterson, owner of the flower sh`
-  - This reads as a fabricated illustrative example; there is no verifiable public record of this specific person or business story.
-- ✗ `"Don't design for everyone, because then you're designing for no one. Pick one person and design something perfect for t`
-  - This specific quote is not attributable to Tim Brown in any verified source; the phrasing appears fabricated, though the general sentiment aligns loosely with design thinking principles.
-- ? `"Personas based on demographics and psychographics are not just useless—they're harmful because they give you false conf`
-  - Revella has made similar arguments about the inadequacy of demographic personas, but this exact quote cannot be confirmed as her verbatim words.
-- ✗ `"If you can't name five real people who represent your target customer, you don't have a customer segment—you have a hyp`
-  - This quote is not traceable to any specific HBS case study or methodology; attributing it to 'HBS case study methodology' as a source appears fabricated.
-- ✗ `Alex Chen charged $30/hour, found customers through team Slack channels, and scaled to 15 regular students within 4 mont`
-  - These specific numerical details are part of the likely fabricated Alex Chen example with no verifiable source.
-
-### 🔴 Operations Excellence for Teen Entrepreneurs: Systems Over Hustle
-- Total citations: 12
-- Verified: 3 · Unverified: 4 · Likely hallucinated: 5
-
-**Concerning citations:**
-- ✗ `Atul Gawande's research at Johns Hopkins showed that simple surgical checklists reduced deaths by 47%`
-  - The famous checklist study was a WHO initiative led by Gawande conducted across 8 hospitals worldwide (not specifically 'at Johns Hopkins'), and the commonly cited figure is a 47% reduction in deaths, but that figure comes from the Peter Pronovost central-line checklist study at Johns Hopkins — two different studies are being conflated here.
-- ? `McKinsey's customer research shows businesses that deliver on-time 95%+ of the time can charge 15-30% more than competit`
-  - McKinsey has published research on reliability and pricing power, but the specific claim of 95%+ on-time delivery commanding exactly 15-30% premium pricing cannot be confirmed as a specific McKinsey finding.
-- ? `Profit First recommended allocation for teen businesses: 30% profit, 20% operations/supplies, 50% time/labor`
-  - Michalowicz's Profit First does recommend percentage-based allocations, but these specific percentages for 'teen businesses' do not appear to come from the book and seem to be the author's adaptation.
-- ✗ `Maya Rodriguez, 14, built a dog-walking business in Brooklyn from 1 to 8 weekly clients using a shared Google Calendar`
-  - This reads as a fabricated illustrative example; there is no verifiable public record of this specific teen entrepreneur with these specific metrics.
-- ✗ `James Chen, 16, runs a lawn care service in suburban Dallas with a 6-item pre-job checklist and charges $35 vs competito`
-  - This reads as a fabricated illustrative example; there is no verifiable public record of this specific teen entrepreneur with these specific metrics.
-- ✗ `Sarah Ahmed, 15, operates a tutoring service using Calendly, Venmo, and Google Docs, serving 12 students weekly at $25/h`
-  - This reads as a fabricated illustrative example; there is no verifiable public record of this specific teen entrepreneur with these specific metrics.
-- ✗ `"Revenue is vanity, profit is sanity, but cash is reality." — Mike Michalowicz, Profit First`
-  - This quote is widely attributed to various business figures (often anonymous or attributed to Alan Miltz or others), and is not specifically from Michalowicz's Profit First; misattribution is likely.
-- ? `"The customer doesn't care how hard you work, they care that you show up when you say you will." — Danny Meyer, Setting `
-  - Danny Meyer is the author of Setting the Table and discusses hospitality and reliability extensively, but this specific quote cannot be confirmed as appearing verbatim in the book.
-- ? `Dollar Tree sells $5 supply totes`
-  - Dollar Tree has expanded beyond $1 items to include $5 items, but the specific claim of a '$5 supply tote' as a product cannot be specifically confirmed.
-
-### 🔴 Creating Disney-Level Magic Moments in $20 Services: The One-Delight Delivery System
-- Total citations: 20
-- Verified: 5 · Unverified: 10 · Likely hallucinated: 5
-
-**Concerning citations:**
-- ? `Disney's Three-Step Service Model: Look (make eye contact within 10 seconds), Smile, Greet (use the guest's name when po`
-  - Disney does have service guidelines and the general spirit is consistent with Disney's training philosophy, but the specific '10 seconds' detail and this exact three-step formulation are not clearly documented in public sources.
-- ? `Disney's Net Promoter Score is 77 vs industry average of 31`
-  - Disney is known for high NPS scores, but the specific figure of 77 vs. 31 industry average is not reliably confirmed in public sources and varies by division and year.
-- ✗ `Danny Meyer's Union Square Hospitality Group proved that when staff feel valued, customer satisfaction scores increase 2`
-  - While Meyer advocates for employee-first culture, the specific 23% increase in customer satisfaction scores is not a recognized or documented finding from USHG.
-- ? `CustomerThermometer shows 86% of customers will pay more for better experience`
-  - A widely cited statistic (often attributed to various sources including PwC and others) states most customers will pay more for better experience, but the specific 86% figure is commonly linked to a different source and the CustomerThermometer attribution is uncertain.
-- ✗ `A $1 delight gesture creates 70% repeat customers generating $19 in saved acquisition costs per customer on a $20 servic`
-  - These specific numbers (70% repeat rate, $19 saved, $1 gesture) appear to be fabricated illustrative math, not from any published research.
-- ? `Sophia, 16, runs a neighborhood dog-walking service for $20/walk with 85% recurring booking rate within one month`
-  - This appears to be a hypothetical or composite example; there is no way to verify this specific teen's business or the 85% figure.
-- ? `Marcus, 17, offers lawn mowing for $20 with a waiting list that grew to 3 weeks within 2 months`
-  - This appears to be a hypothetical or composite example; there is no way to verify this specific teen's business or the waiting list claim.
-- ✗ `Emma's homemade cookie delivery ($20 for dozen) achieves 73% reorder rate vs 23% industry average for food delivery`
-  - This appears to be a hypothetical example, and the specific '23% industry average reorder rate for food delivery' is not a recognized published statistic.
-- ? `Maya Angelou quote is often cited in Disney training materials`
-  - While this quote is popular in customer service training contexts, the specific claim that it appears in Disney's official training materials cannot be confirmed from public sources.
-- ? `The One-Delight-Per-Delivery Rule as a named framework`
-  - This does not appear to be a recognized named framework from any published business or service design literature.
-- ? `The $1 Magic Moment Economics as a named concept`
-  - This does not appear to be a recognized named framework from any published source.
-- ? `Sophia's specific method: texts photo, includes exact route taken, leaves small dog treat with handwritten note`
-  - These are plausible best practices but presented as a specific person's documented approach, which cannot be verified.
-- ? `Marcus draws a chalk smiley face on the sidewalk and leaves wildflower seeds with instructions`
-  - These are plausible creative touches but presented as a specific person's documented approach, which cannot be verified.
-- ✗ `Emma asks customers' favorite color during ordering and arranges cookies to spell customer's name`
-  - Spelling a customer's name with a dozen cookies is impractical for most names, suggesting this example was fabricated without considering logistics.
-
-### 🔴 Pricing Scripts That Work: How to Quote Your Price Without Apology
-- Total citations: 16
-- Verified: 5 · Unverified: 6 · Likely hallucinated: 5
-
-**Concerning citations:**
-- ? `Ramit Sethi documented in 'I Will Teach You to Be Rich' that every time you undercharge or work for free, you're trainin`
-  - Ramit Sethi wrote 'I Will Teach You to Be Rich' and does discuss charging what you're worth, but the specific phrasing about 'training the market' may be paraphrased from his broader body of work (blog, courses) rather than that specific book.
-- ✗ `He tracked freelancers who raised rates 1% per week and found they doubled income within a year without losing clients.`
-  - There is no known documented study or claim by Ramit Sethi tracking freelancers raising rates 1% per week to double income; this specific numerical claim appears fabricated.
-- ✗ `Harvard Business School professor Rafi Mohammed found in 'The Art of Pricing' that businesses adding value through bundl`
-  - Rafi Mohammed wrote 'The Art of Pricing' but he is a pricing consultant, not a Harvard Business School professor; additionally, the specific 30-60% and 20-50% figures are not verifiably attributed to his book.
-- ? `Zara, a 16-year-old in Atlanta, braided hair for $40 per head and raised to $80, with 6 out of 12 new clients saying yes`
-  - This appears to be an illustrative anecdote likely created for the content; there is no way to verify this specific individual or these specific numbers.
-- ? `Marcus, 17, tutored math for $15/hour and used Chris Voss's mirroring technique to get $35/hour.`
-  - This appears to be a constructed illustrative example; the individual and specific numbers cannot be independently verified.
-- ? `Priya, 15, sold custom phone cases for $12 each and increased average sale to $27 using bundling.`
-  - This appears to be a constructed illustrative example; the individual and specific numbers cannot be independently verified.
-- ✗ `"He who has learned to disagree without being disagreeable has discovered the most valuable secret of negotiation." — Ch`
-  - This quote is widely attributed to Robert Estabrook, not Chris Voss, and does not appear in 'Never Split the Difference.'
-- ? `"My rate is $X. Does that work for you?" — Ramit Sethi's exact script from I Will Teach You to Be Rich`
-  - Ramit Sethi discusses pricing scripts across his courses and blog, but calling this the 'exact script from I Will Teach You to Be Rich' specifically cannot be confirmed; it may come from his other material.
-- ✗ `Rafi Mohammed is a Harvard Business School professor`
-  - Rafi Mohammed is a pricing strategy consultant and author, not a Harvard Business School professor.
-- ? `Rafi Mohammed authored 'The Art of Pricing'`
-  - Rafi Mohammed authored 'The Art of Pricing' (2005) and 'The 1% Windfall,' so this book title is correct, though the specific claims attributed to it are unverified.
-
-### 🔴 Marketing Your First Business: Pitching Customers With Zero Budget
-- Total citations: 22
-- Verified: 10 · Unverified: 8 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `Glossier spent 4 years building Into The Gloss blog community before launching.`
-  - Into The Gloss launched in 2010 and Glossier launched in 2014, which is 4 years, but the claim that it was deliberately a pre-launch strategy from the start is a common narrative simplification; Emily Weiss started the blog as a separate project.
-- ? `Glossier: 70% of sales from word of mouth.`
-  - Glossier has frequently cited high word-of-mouth and organic growth figures, and some sources mention 70%, but the exact percentage is difficult to independently verify with certainty.
-- ? `'If you can convince people to pay $40 for a $4 box of cereal, maybe you can get strangers to stay in other strangers' h`
-  - Paul Graham has discussed the Airbnb cereal story and it influenced his decision to accept them into YC, but the exact wording of this quote is not reliably sourced and may be paraphrased or embellished.
-- ? `Dollar Shave Club: Servers crashed in 1 hour.`
-  - It is well documented that their servers crashed shortly after the video went viral, but the exact '1 hour' timeframe is not consistently reported across sources.
-- ? `Dollar Shave Club: 4.75M views in 3 months.`
-  - The video went massively viral and accumulated millions of views quickly, but the exact figure of 4.75M in 3 months is difficult to precisely confirm; some sources cite different numbers and timeframes.
-- ✗ `Airbnb cereal boxes sold during 2008 DNC.`
-  - The cereal boxes were sold around the 2008 presidential election and the Democratic National Convention timing, but most sources say they were sold around the DNC and also beyond it; however, associating the sales specifically with the DNC is a common but slightly imprecise claim — the boxes were created around that time period but sales extended beyond the DNC.
-- ✗ `Dollar Shave Club video was 90 seconds long.`
-  - The original Dollar Shave Club launch video ('Our Blades Are F***ing Great') is actually about 1 minute and 33 seconds, but it's more commonly described as a roughly 1.5-minute video; however, some descriptions round differently — the actual runtime is closer to 93 seconds, so 90 seconds is a rough approximation but calling it 90 seconds is slightly inaccurate.
-- ✗ `Paul Graham quote referencing '$4 box of cereal'`
-  - The $4 figure for the base cost of the cereal is a specific detail that is not consistently found in reliable retellings of this story; the actual cost basis of the cereal is not typically specified as $4.
-- ? `Cereal boxes sold for $40 each (repeated in examples section)`
-  - While $40 is the most commonly cited price, some sources report slightly different prices; the figure is widely repeated but not always consistently verified.
-
-### 🔴 Learning From Failure: How the Best Entrepreneurs Turn Setbacks Into Breakthroughs
-- Total citations: 22
-- Verified: 12 · Unverified: 6 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `Dalton Caldwell (YC): 'A pivot means you changed strategy without changing vision.'`
-  - Dalton Caldwell is a real YC partner, but this specific quote is more commonly attributed to Eric Ries; cannot confirm Caldwell said this exact phrasing.
-- ? `Amazon Fire Phone: $170M write-down.`
-  - Amazon took a write-down on Fire Phone inventory; the commonly cited figure is around $170M, but some sources report different amounts and the exact figure is not consistently confirmed.
-- ✗ `Echo has sold 500M+ units.`
-  - Estimates of Echo/Alexa device sales are typically in the range of 100-200 million units; 500M+ is significantly higher than any credible estimate.
-- ? `'I have not failed. I have found 5,126 ways that don't work.' — James Dyson (paraphrasing Edison)`
-  - While the content acknowledges it paraphrases Edison, attributing this specific phrasing with the number 5,126 to Dyson cannot be confirmed as a direct quote from him.
-- ? `The voice team that built Fire Phone became the Alexa team.`
-  - While there is overlap in personnel and the Fire Phone experience contributed to Alexa development, the claim that the Fire Phone voice team directly 'became' the Alexa team is a simplification that cannot be precisely confirmed.
-- ? `Founders of YouTube noticed people uploading random clips instead of dating videos and pivoted.`
-  - The pivot story is broadly accurate, but the specific narrative that 'nobody uploaded dating videos' and founders observed 'random clips' is a commonly repeated simplification; co-founder accounts vary on exact details.
-- ? `Instagram founders noticed users only used photo sharing feature of Burbn and stripped it to one feature.`
-  - While this is the broadly accepted narrative, the simplification to 'only used photo sharing' is a popular retelling; the actual pivot process was more nuanced according to co-founder Kevin Systrom's detailed accounts.
+- ? `"Price is what you pay. Value is what you get." — Warren Buffett`
+  - This quote is widely attributed to Warren Buffett and he has used similar phrasing, but the original concept traces back to Benjamin Graham; the exact wording as a direct Buffett quote is commonly circulated but difficult to pin to a specific verified source.
 
 ### 🔴 The Creative Act: Rick Rubin's Principles Applied to Building Ventures
 - Total citations: 20
@@ -393,253 +95,67 @@ Entries ordered by hallucination risk (most concerning first).
 
 **Concerning citations:**
 - ? `Def Jam started with $5,000`
-  - While Def Jam was famously started on a shoestring budget, the specific $5,000 figure is not a widely confirmed number and may be an approximation or fabrication.
-- ? `Rubin had zero music industry experience when starting Def Jam`
-  - Rubin was a music enthusiast and had been involved in punk and hip-hop scenes, so 'zero experience' is an oversimplification that's hard to confirm as stated.
+  - While Def Jam was famously bootstrapped on a very small budget, the specific $5,000 figure is not a widely confirmed number and may be approximate or fabricated.
 - ? `First release sold 120K copies`
-  - Def Jam's early releases (such as LL Cool J's 'I Need a Beat' or the T La Rock single) were successful, but the specific 120K figure is not a widely confirmed number.
+  - Early Def Jam singles (like LL Cool J's 'I Need a Beat' or T La Rock's 'It's Yours') were successful, but the specific 120K copies figure is not a well-documented claim I can confirm.
 - ? `Rubin produced Adele pop`
-  - Rubin is widely reported to have worked with Adele on her album '25' (2015), but his contributions were complicated — some tracks were reportedly scrapped and re-recorded with other producers; the extent of his final credited production is debatable.
+  - Rubin was reported to have worked with Adele on her album '25' initially, but his contributions were largely scrapped and he is not a credited producer on her major released work; this claim is misleading at best.
 - ? `"Creativity is not a rare ability. It is not difficult to access. Creativity is a fundamental aspect of being human. Its`
-  - This is consistent with themes in The Creative Act: A Way of Being, but the exact wording may be paraphrased rather than a verbatim quote.
+  - This aligns with themes in The Creative Act: A Way of Being, but I cannot confirm the exact wording of this quote from the book.
 - ? `"The ability to look deeply is the root of creativity. To see past the ordinary and mundane and get to what might otherw`
-  - This aligns with the book's themes, but exact wording cannot be confirmed as a verbatim quote.
+  - This aligns with the book's themes but the exact phrasing cannot be confirmed without checking the source text.
 - ? `"The goal is not to fit in. If anything, its to amplify the differences, what doesnt fit, the special characteristics un`
-  - Consistent with the book's themes but exact verbatim wording cannot be confirmed.
+  - Consistent with the book's messaging but exact wording cannot be independently confirmed.
 - ? `"Setting the bar low frees you to play, explore, and test without attachment to results." — Rick Rubin, The Creative Act`
-  - This sentiment appears in the book's philosophy, but the exact phrasing may not be a direct quote and could be paraphrased.
-- ✗ `"The more times we can bring ourselves to release our work, the less weight insecurity has." — Rick Rubin, The Creative `
-  - While the sentiment is consistent with Rubin's philosophy, this specific phrasing is not a widely recognized quote from the book and appears earlier in the content attributed as a Rubin quote without clear sourcing.
-- ✗ `Rubin: "You are either engaging in the practice or you are not. It makes no sense to say you are not good at it."`
-  - This specific phrasing is not a widely recognized verbatim Rubin quote and appears to be a paraphrase or fabrication presented as a direct quote.
+  - While the concept appears in the book, this specific phrasing may be paraphrased rather than a direct quote.
+- ? `"The more times we can bring ourselves to release our work, the less weight insecurity has." — Rick Rubin, The Creative `
+  - Consistent with the book's themes but exact wording cannot be independently confirmed.
 - ✗ `Rubin: "Make the thing YOU want to exist in the world. If you build for an imagined audience, you build something generi`
-  - While Rubin espouses this philosophy generally, this specific phrasing does not match any widely confirmed direct quote and reads like a paraphrase presented as a quotation.
+  - While Rubin espouses this general philosophy, this specific phrasing reads like a paraphrase presented as a direct quote and is not a recognized Rubin quote.
+- ✗ `Rubin: "You are either engaging in the practice or you are not. It makes no sense to say you are not good at it. You can`
+  - This reads as a paraphrase or fabricated quote attributed to Rubin; while the sentiment aligns with his philosophy, this specific wording is not a recognized direct quote.
 
-### 🔴 Brand as Gut Feeling: Building a Memorable Identity from Your Bedroom
+### 🔴 Learning From Failure: How the Best Entrepreneurs Turn Setbacks Into Breakthroughs
+- Total citations: 22
+- Verified: 11 · Unverified: 7 · Likely hallucinated: 4
+
+**Concerning citations:**
+- ? `James Dyson became a billionaire with $B net worth.`
+  - Dyson is indeed a billionaire, but the specific net worth figure appears redacted/missing from the text, so the exact number cannot be confirmed.
+- ? `Dalton Caldwell (YC): 'A pivot means you changed strategy without changing vision.'`
+  - Dalton Caldwell is a real YC partner, but this specific quote is more commonly attributed to Eric Ries; the exact attribution to Caldwell is not confirmable.
+- ? `Amazon Fire Phone: $170M write-down.`
+  - Amazon took a write-down on Fire Phone inventory; the commonly cited figure is around $170M, but the exact number in the text appears partially redacted and the precise figure varies by source.
+- ✗ `Echo has sold 500M+ units.`
+  - Estimates of Echo/Alexa device sales are typically in the range of 100-200 million units; 500M+ units is significantly higher than any credible estimate.
+- ? `'I have not failed. I have found 5,126 ways that don't work.' — James Dyson (paraphrasing Edison)`
+  - The quote is clearly noted as paraphrasing Edison, and while Dyson has referenced his 5,127 prototypes, this specific phrasing with '5,126' as a Dyson quote is not easily confirmable in this exact form.
+- ? `James Dyson built prototypes in a garden shed.`
+  - Dyson has referenced working in a coach house; the 'garden shed' detail is a common but sometimes loosely used characterization that may not be precisely accurate.
+- ? `The voice team that built Fire Phone became the Alexa team.`
+  - While there is significant overlap and the Fire Phone experience contributed to Alexa development, the claim that the Fire Phone voice team simply 'became' the Alexa team is a simplification that is hard to verify precisely.
+
+### 🔴 Marketing Your First Business: Pitching Customers With Zero Budget
 - Total citations: 20
-- Verified: 9 · Unverified: 7 · Likely hallucinated: 4
+- Verified: 10 · Unverified: 7 · Likely hallucinated: 3
 
 **Concerning citations:**
-- ? `Bernadette Jiwa argues in The Right Story that specificity creates connection.`
-  - Bernadette Jiwa is a real brand strategist and author, but her book is titled 'The Right Story' — the specific argument about 'specificity creates connection' as a core thesis is a reasonable paraphrase but not precisely confirmable.
-- ? `Trapstar founders Mikey, Lee, and Will started with £1,000 in a Tottenham bedroom.`
-  - Trapstar was founded by Mikey Sherpa Trapstar, Lee, and Will in London and began modestly, but the specific £1,000 figure and Tottenham location are not clearly confirmed in reliable sources.
-- ✗ `Trapstar founders are described as 'three London teenagers'.`
-  - The founders were young men in their early twenties when they started Trapstar around 2005-2008, not teenagers.
-- ? `Trapstar is now worth £200+ million.`
-  - Trapstar was acquired by Puma in 2023, but the exact valuation of £200+ million is not publicly confirmed.
-- ? `Emily Weiss built Into the Gloss beauty blog from her apartment, creating a community of 10 million readers before launc`
-  - Into the Gloss was a successful blog that preceded Glossier, but the specific figure of 10 million readers before Glossier's launch is not clearly confirmed and may be inflated.
-- ? `Wine Library TV had 90,000 viewers.`
-  - Wine Library TV was popular and garnered significant viewership, but the specific 90,000 viewer figure is not precisely confirmable.
-- ? `VaynerMedia has $100M+ revenue.`
-  - VaynerMedia is a large agency and various reports suggest revenue in this range, but precise revenue figures for the private company are not consistently confirmed.
-- ? `'The right story makes people care enough to act' — Bernadette Jiwa, The Right Story`
-  - Bernadette Jiwa wrote a book called 'The Right Story,' but this specific quote cannot be confirmed as a direct quote from the book.
-- ✗ `'Supreme' suggests exclusivity as a brand name.`
-  - While Supreme is a real brand known for exclusivity, claiming the name itself 'suggests exclusivity' is the author's interpretation presented as fact; the word 'supreme' means highest/greatest, not exclusive per se.
-- ✗ `'Glossier' suggests effortless beauty as a brand name.`
-  - Glossier is derived from 'glossy' which relates to shine/magazines rather than specifically 'effortless beauty'; this is the author's subjective interpretation presented as established fact.
-
-### 🔴 The Hidden Cost Trap: Why Teen Entrepreneurs Accidentally Work for $3/Hour
-- Total citations: 15
-- Verified: 6 · Unverified: 5 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `Brad Feld and Jason Mendelson in 'Venture Deals' define contribution margin as revenue per unit minus variable costs per`
-  - Brad Feld and Jason Mendelson co-authored 'Venture Deals,' but the book focuses on venture capital term sheets and deal structures, not on defining basic accounting concepts like contribution margin.
-- ? `Crumbl Cookies prices their gourmet cookies at $4-5 each when ingredients cost under $1`
-  - Crumbl cookies are priced in the $4-5 range, but the specific claim that ingredient costs are under $1 per cookie is not publicly confirmed and may be an approximation.
-- ? `Crumbl Cookies solved this by systematizing recipes and charging $4.50 per cookie with $0.75 ingredient cost`
-  - The $4.50 price point is roughly plausible, but the specific $0.75 ingredient cost figure is not publicly verified.
-- ? `Kylie Cosmetics: LTV of loyal customers exceeds $200 over 2 years while CAC stays under $10`
-  - While Kylie Jenner's social media presence kept CAC very low, the specific $200 LTV and sub-$10 CAC figures are not from any publicly confirmed source.
-- ? `"Profit is not an event. Profit is not something that happens at year-end after you pay everyone else. Profit must come `
-  - The sentiment is entirely consistent with Michalowicz's book, but the exact wording may be paraphrased rather than a verbatim quote.
-- ✗ `"If the unit economics don't work, the business doesn't work. Period." — Brad Feld, Venture Deals`
-  - This specific quote is not a recognized passage from 'Venture Deals,' and the book's focus is on deal terms rather than unit economics aphorisms.
-- ✗ `"The biggest mistake young entrepreneurs make is not valuing their time. If you're making less per hour than you could e`
-  - Barbara Corcoran is a real Shark Tank investor, but this specific quote with the 'expensive hobby' phrasing is not verifiably attributed to her and appears to be a commonly paraphrased sentiment fabricated as a direct quote.
-- ✗ `Sarah's Cookie Trap example (Made $400 selling 100 cookies at $4 each...)`
-  - This appears to be a fabricated illustrative example presented as if it were a real case study of a named person.
-- ✗ `Marcus's Tutoring Business example (Charges $25/hour for math tutoring...)`
-  - This appears to be a fabricated illustrative example presented as if it were a real case study of a named person.
-
-### 🔴 The 30-Second Pitch as Your Confidence Superpower: How Storytelling Changes Your Posture
-- Total citations: 16
-- Verified: 6 · Unverified: 6 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `Amy Cuddy's research at Harvard Business School showed that practicing power poses for 2 minutes increased testosterone `
-  - Cuddy's original 2010 study claimed power poses for 2 minutes affected hormones, but the specific figures cited (20% testosterone increase, 25% cortisol decrease) are approximate and the findings have been widely contested and failed to replicate; the exact percentages don't precisely match the original paper.
-- ? `Claude Steele's self-affirmation research at Stanford found that when people articulate their values and identity clearl`
-  - Claude Steele is a real Stanford psychologist known for self-affirmation theory and stereotype threat research, but the specific claim of '40% less stress response' is not a widely recognized finding and appears to be a fabricated or heavily rounded number.
-- ? `Keith Johnstone's improv training research shows that agreement-first responses (acknowledging before adding) create psy`
-  - Keith Johnstone is a real improv pioneer who developed foundational improv principles, but characterizing his work as 'research' showing 'psychological safety' is a loose modern reframing, and 'Yes, And' is more associated with Viola Spolin and Del Close than Johnstone specifically.
-- ? `Daniel Kahneman's research on cognitive load shows that when responses become automatic (through 10+ repetitions), the b`
-  - Kahneman's work on System 1/System 2 thinking does address automaticity and cognitive load, but the specific claim about '10+ repetitions' and the framing about pitching is an extrapolation, not a direct finding from his research.
-- ✗ `Maya Chen, 14, created handmade jewelry and practiced her pitch, sold 47 pairs in 3 months, and got 8 orders at her mom'`
-  - This reads as a fabricated illustrative example with suspiciously specific details; there is no verifiable record of this person or story.
-- ? `David Karp practiced his Tumblr pitch hundreds of times before age 21, starting with 'Tumblr makes it easy to share the `
-  - David Karp founded Tumblr at age 20-21 and is known for simple messaging, but the specific claim of 'hundreds of times' of practice and that exact pitch phrasing cannot be confirmed.
-- ? `"I didn't know what I was doing, but I knew I had to sound like I knew what I was doing." — Sara Blakely, Spanx founder`
-  - While this is consistent with Blakely's style and she has made similar sentiments in interviews, this exact phrasing cannot be confirmed as a direct quote.
-- ✗ `"If you can't explain it simply, you don't understand it well enough." — Albert Einstein`
-  - This quote is widely attributed to Einstein on the internet but there is no verified source confirming he actually said or wrote it; it is a common misattribution.
-- ✗ `Keith Johnstone developed the 'Yes, And' principle.`
-  - 'Yes, And' is most associated with the Chicago improv tradition (Viola Spolin, Del Close, Second City), not Keith Johnstone, who is known for Theatresports and status work; attributing 'Yes, And' specifically to Johnstone is inaccurate.
-- ✗ `Practicing power poses for 2 minutes is based on Amy Cuddy's research at Harvard Business School.`
-  - Cuddy's original power pose research was conducted while she was at Harvard Business School, but the research was co-authored with Dana Carney at UC Berkeley; more importantly, the specific numerical claims (20% testosterone, 25% cortisol) do not match the original 2010 paper's reported figures and the core hormonal findings failed replication, with co-author Carney publicly disavowing them.
-
-### 🔴 Jobs-To-Be-Done Framework: Understanding WHY Customers Hire You
-- Total citations: 18
-- Verified: 6 · Unverified: 8 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `A teen tutor discovered parents weren't hiring her for 'math help for struggling student' but for '60 minutes of quiet w`
-  - This appears to be an illustrative anecdote; there is no verifiable source for this specific teen tutor story in published JTBD literature.
-- ? `Tony Ulwick's Outcome-Driven Innovation research found successful products address all three: functional, emotional, and`
-  - Tony Ulwick is a real JTBD researcher who developed Outcome-Driven Innovation, but his framework focuses primarily on functional outcomes and desired outcomes; the three-dimension framing (functional, emotional, social) is more commonly attributed to Christensen and Moesta, not specifically to Ulwick's ODI.
-- ? `Airbnb succeeded because it wasn't just 'cheap lodging' - it was 'feel like a local' (emotional) and 'I'm a savvy travel`
-  - Airbnb's 'live like a local' branding is well known, but attributing its success specifically to these JTBD dimensions as a research finding is an editorial interpretation, not a verified cited study.
-- ? `Harvard Business School research shows the same product often gets hired for different jobs by different people.`
-  - This is a general JTBD principle associated with HBS-affiliated researchers like Christensen, but no specific HBS study is cited to verify this exact claim.
-- ? `Netflix gets hired for 'background noise while I clean' by some customers and 'family bonding time' by others.`
-  - Netflix competing with a wide range of activities is a concept Reed Hastings has discussed (e.g., 'we compete with sleep'), but these specific job descriptions are illustrative examples, not verified research findings.
-- ? `Sarah, a 16-year-old from Kenya, started tutoring younger students... raised her rates 40%.`
-  - This appears to be a constructed illustrative example for educational purposes; no verifiable source exists for this specific person or outcome.
-- ? `Marcus, 17, from Detroit, sold custom phone cases on Instagram... increasing sales 3x in two months.`
-  - This appears to be a constructed illustrative example for educational purposes; no verifiable source exists for this specific person or outcome.
-- ? `Clayton Christensen's McDonald's milkshake study found 40% of milkshakes were sold before 8am.`
-  - The milkshake study is real and morning commuters were a large segment, but the specific '40%' figure is not consistently cited in published accounts of the study and may be approximate or fabricated.
-- ✗ `Understanding the job led to specific product improvements that increased morning sales by 7x.`
-  - The '7x increase in morning sales' is not a figure found in Christensen's published accounts of the milkshake study; this specific numerical claim appears fabricated.
-- ? `"We hire products to do jobs for us. And if they do the job well, we'll hire them again. If they do it poorly, we fire t`
-  - This captures Christensen's core idea accurately and he was at HBS, but the exact phrasing may be a paraphrase rather than a verbatim quote from a specific source.
-- ✗ `Sarah pivoted to marketing 'homework supervision' instead of 'math tutoring' — described as demonstrating 'same service,`
-  - This is presented as a real case study but is almost certainly a fabricated illustrative example, as no verifiable source exists.
-- ✗ `Marcus switched from advertising durability to featuring unique designs — described as demonstrating 'emotional and soci`
-  - This is presented as a real case study but is almost certainly a fabricated illustrative example with unverifiable specific numerical claims (3x sales increase).
-
-### 🔴 Lean Canvas: Map Your Business Idea on One Page Before Spending a Dollar
-- Total citations: 16
-- Verified: 5 · Unverified: 7 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ✗ `He found that 70% of failed startups built something nobody wanted because they started with their solution instead of v`
-  - The commonly cited statistic (from CB Insights) is that 42% of startups fail because there's no market need; the 70% figure attributed specifically to Maurya with this framing is not a recognized statistic.
-- ✗ `Alexander Osterwalder's research on 500+ business models shows that vague revenue plans like 'we'll charge for premium f`
-  - While Osterwalder is a real business model researcher, there is no known published study by him citing 500+ business models with an 85% failure rate for vague revenue plans.
-- ✗ `Steve Blank's analysis of 3,200 startups found that 92% of failed companies had great products but terrible customer acq`
-  - Steve Blank is a well-known startup educator, but the specific claim of analyzing 3,200 startups with a 92% channel-failure finding is not a recognized publication or statement of his.
-- ? `16-year-old Maya from Toronto planned to sell hand-painted phone cases... Made $2,400 in her first month`
-  - This appears to be an illustrative example likely created for educational purposes; there is no way to confirm this specific individual or these specific numbers.
-- ? `Warby Parker founders used a lean canvas equivalent in 2008 to identify their key assumption: people would buy glasses o`
-  - Warby Parker was founded around 2010 (launched 2010), not 2008, and while they did test online glasses buying, whether they used a formal lean canvas equivalent is not publicly confirmed.
-- ? `Warby Parker validated the model with $1M revenue in first year`
-  - Warby Parker reportedly sold out of its initial inventory very quickly, but the specific $1M first-year revenue figure is not a widely confirmed public number.
-- ? `Warby Parker now worth $3 billion`
-  - Warby Parker went public in 2021 and its valuation has fluctuated significantly; at various points it was valued around $3B but this depends on the date referenced.
-- ? `17-year-old James in Lagos, Nigeria wanted to start a tutoring service... Now tutors 15 students weekly earning $150/wee`
-  - This appears to be a constructed illustrative example for educational purposes; the specific individual and numbers cannot be confirmed.
-- ? `"The biggest risk is not taking any risk... In a world that's changing quickly, the only strategy that is guaranteed to `
-  - This quote is widely attributed to Zuckerberg, but its specific attribution to the F8 Conference 2011 is not reliably confirmed; it may originate from a different setting.
-- ✗ `Warby Parker founders used a lean canvas equivalent in 2008`
-  - Warby Parker was conceived in 2009 and launched in 2010; the 2008 date appears to be inaccurate.
-- ? `Maya got 50,000 views in one week on TikTok`
-  - This is part of an illustrative anecdote that cannot be independently verified.
-
-### 🔴 Pricing Confidence: Breaking the Undercharging Pattern for Women and Minority Entrepreneurs
-- Total citations: 20
-- Verified: 7 · Unverified: 9 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `Linda Babcock's Carnegie Mellon research found women negotiate salary 4x less than men.`
-  - Linda Babcock at Carnegie Mellon did find women negotiate less often, but her commonly cited figure is that men initiate negotiations about 4x more often; the exact '4x' framing varies across her publications and may be slightly simplified.
-- ? `Black women entrepreneurs charge 30-40% less than white men for equivalent services according to Project Diane's 2018 st`
-  - Project Diane (by digitalundivided) studied Black and Latina women-led startups, but the specific claim of 30-40% lower pricing and the figure of 88,000 startups cannot be confirmed; the studies focused more on funding gaps than pricing gaps.
-- ? `Financial educator Patrice Washington teaches switching from 'Am I worth this?' to 'Is this fair for the value I'm provi`
-  - Patrice Washington is a real financial educator and author, but this specific reframing technique with these exact terms cannot be confirmed as her specific teaching.
-- ✗ `Business coach Tara McMullin's 'mirror technique' involves saying your price out loud 10 times while looking at yourself`
-  - Tara McMullin (formerly Tara Gentile) is a real business strategist, but the specific 'mirror technique' of saying your price 10 times is not a recognized teaching attributed to her and appears fabricated.
-- ? `Studies show physical practice reduces cortisol (stress hormone) when stating prices in real situations.`
-  - While rehearsal and exposure therapy are known to reduce stress responses, no specific study about cortisol reduction when stating prices can be confirmed.
-- ? `Sociologist Gloria Steinem documented how women are socialized to be caregivers first, creating guilt about 'taking too `
-  - Gloria Steinem is a feminist activist and writer (not typically described as a sociologist) who has written extensively about gender socialization, but the specific framing about guilt around 'taking too much' is loosely attributed.
-- ? `Sara Blakely priced Spanx at $20 when 'reasonable' comparable products were $6-8.`
-  - Spanx launched around $20 retail, but the claim that comparable products were specifically $6-8 is not well-documented and may be an approximation or fabrication.
-- ✗ `Whitney Wolfe Herd initially wanted to give away Bumble for free because she felt guilty charging for dating.`
-  - While Whitney Wolfe Herd founded Bumble, there is no well-documented account of her wanting to make it entirely free out of guilt; the freemium model was a standard business strategy, and the guilt narrative appears fabricated.
-- ? `Bumble premium was priced at $9.99/month.`
-  - Bumble's premium pricing has varied over time and by region; $9.99/month is plausible but not precisely confirmable as the initial or standard price point.
-- ? `Bumble reached $2.2 billion valuation by 2021.`
-  - Bumble's IPO in February 2021 valued the company at roughly $8.2 billion, far exceeding $2.2 billion; the $2.2 billion figure may confuse an earlier private valuation, making this claim misleading.
-- ? `Sixteen-year-old Moziah Bridges (Mo's Bows) initially priced custom bow ties at $15.`
-  - Moziah Bridges is the real founder of Mo's Bows and appeared on Shark Tank, but the specific initial price of $15 cannot be independently confirmed.
-- ? `Mo's Bows revenue jumped from $1,000 to $150,000 annually.`
-  - Mo's Bows did experience significant revenue growth, but the specific figures of $1,000 to $150,000 cannot be precisely confirmed from public sources.
-- ✗ `"I've never met a woman who negotiated her salary. I've met thousands who wished they had." — Linda Babcock, Women Don't`
-  - Linda Babcock co-authored 'Women Don't Ask,' but this specific quote does not match known excerpts from the book; it appears to be a fabricated or paraphrased attribution.
-- ? `"The question isn't whether you're worth it. The question is whether your price reflects the transformation you provide.`
-  - Patrice Washington is a real financial educator, but this specific quote cannot be confirmed from public sources and may be paraphrased or fabricated.
-- ✗ `"I knew if I could make women feel better about themselves, they would pay $20 for it." — Sara Blakely, Spanx founder`
-  - While Sara Blakely has spoken publicly about her confidence in Spanx's value, this specific quote with this exact phrasing does not appear in verified public interviews or speeches.
-
-### 🔴 Content-First Strategy: Building Your Audience Before Your Product Using TikTok and Instagram Reels
-- Total citations: 20
-- Verified: 6 · Unverified: 10 · Likely hallucinated: 4
-
-**Concerning citations:**
-- ? `Marie Poulin built a 6-figure business by focusing specifically on Notion tutorials for entrepreneurs.`
-  - Marie Poulin is a real person known for Notion-related content and courses, but the specific claim of a 6-figure business specifically from Notion tutorials for entrepreneurs is not precisely confirmable.
-- ? `Marketing research shows people need an average of 7 exposures to a brand before making a purchase decision (Seven-Touch`
-  - The 'Rule of 7' is a widely cited marketing heuristic, but its origin is often attributed loosely to 1930s movie industry research and lacks a single definitive peer-reviewed source confirming exactly 7 exposures.
-- ? `Chamberlain Coffee generated over $1 million in first-year revenue.`
-  - Chamberlain Coffee's specific first-year revenue figures are not publicly confirmed; $1 million is plausible but not verifiable from public sources.
-- ? `Marie Poulin spent 18 months creating free Notion tutorials on YouTube and Instagram.`
-  - Marie Poulin is known for Notion content, but the specific 18-month timeline is not confirmable from public sources.
-- ? `Marie Poulin built an email list of 15,000 people before launching her $1,997 Notion course.`
-  - Marie Poulin did sell Notion-related courses, but the specific email list size of 15,000 and exact price of $1,997 are not publicly verified.
-- ? `Marie Poulin's Notion course generated $300,000 in the first launch.`
-  - This specific revenue figure for a first launch is not confirmable from public sources.
-- ? `Eitan Bernath started documenting his cooking experiments at age 12 on TikTok.`
-  - Eitan Bernath is a real young food content creator who gained fame on TikTok, but the exact age of 12 for starting TikTok specifically is not precisely confirmed (he was known on social media from a young age but initially gained attention on other platforms).
-- ? `Eitan Bernath grew to 2.3 million followers on TikTok.`
-  - Eitan Bernath has millions of TikTok followers, but the exact figure of 2.3 million may not reflect any confirmed snapshot and follower counts fluctuate.
-- ? `Eitan Bernath published a cookbook that became a New York Times bestseller at age 19.`
-  - Eitan Bernath did publish a cookbook ('Eitan Eats the World', 2022), but its status as a NYT bestseller is not clearly confirmed in reliable sources.
-- ? `Wisdom Kaye had brand partnerships with Nike, Converse, and his own clothing line collaborations worth six figures annua`
-  - Wisdom Kaye has had high-profile fashion partnerships (he notably walked for Balmain), but specific partnerships with Nike and Converse and the six-figure annual figure are not publicly confirmed in detail.
-- ✗ `"Document your journey. The world will learn with you, and you will build an audience along the way." — Gary Vaynerchuk,`
-  - While Gary Vaynerchuk wrote 'Crushing It!' and advocates documenting, this exact quote phrasing does not appear to be a verified direct quote from the book.
-- ✗ `"I think the biggest mistake people make is thinking they need to have everything figured out before they start sharing.`
-  - Marie Poulin may have appeared on ConvertKit content, but this exact quote and its specific attribution to a 'ConvertKit Creator Stories interview' cannot be verified and reads like a fabricated paraphrase.
-- ✗ `"People don't follow accounts, they follow problems being solved. If you solve the same problem consistently, you'll bui`
-  - Jay Clouse is a real creator economy commentator, but this exact quote attributed to a 'Creator Economy Report 2023' does not match any verifiable publication and appears fabricated.
-- ✗ `"The best time to plant a tree was 20 years ago. The second best time is now. The same applies to building an audience -`
-  - The tree proverb is a well-known Chinese saying; attributing this specific extended quote to Gary Vaynerchuk on his podcast is not verifiable and the phrasing appears fabricated.
-
-### 🔴 Validating Your Business Niche and Finding Product-Market Fit
-- Total citations: 16
-- Verified: 8 · Unverified: 5 · Likely hallucinated: 3
-
-**Concerning citations:**
-- ? `Michael Seibel (YC CEO): Launching mediocre product and talking to customers is far better than waiting to build somethi`
-  - Seibel is a known YC partner (Managing Director/CEO of YC) and this sentiment aligns with his public advice, but the exact phrasing cannot be confirmed.
-- ? `Dropbox 4-min demo video with Hacker News humor grew waitlist from 5K to 75K overnight.`
-  - The Dropbox video and Hacker News posting are verified, but the specific numbers 5K to 75K and the 'overnight' timeframe are commonly cited but vary across sources; some sources say the waitlist went from 5,000 to 75,000, but the exact timeline is debated.
-- ? `The demo video was 4 minutes long.`
-  - The original Dropbox demo video length is sometimes cited as roughly 3-4 minutes; the exact 4-minute claim is plausible but not precisely confirmable.
-- ? `Buffer built a 2-page landing page with a pricing page in between. Got 120 signups, first paying customer in 4 days, 4% `
-  - Joel Gascoigne has described the landing page MVP with a pricing page, but the specific numbers (120 signups, 4 days, 4% conversion) vary across retellings and some may be embellished or approximate.
-- ? `Facebook launched only at Harvard. 1,200 signups in 24 hours.`
-  - Facebook launching at Harvard is verified; the commonly cited figure is that over half of Harvard undergrads signed up within weeks, but the specific '1,200 in 24 hours' figure is sometimes cited but hard to confirm precisely.
-- ✗ `"The #1 company-killer is lack of market." — Andy Rachleff via Marc Andreessen`
-  - Andreessen discussed market importance extensively but the exact quote 'The #1 company-killer is lack of market' in this phrasing is not a recognized direct quote from either Rachleff or Andreessen; it appears to be a paraphrase presented as a direct quote.
-- ✗ `"Launch something bad, quickly." — Michael Seibel, YC`
-  - While Seibel advocates launching quickly, this exact phrasing 'Launch something bad, quickly' is not a confirmed direct quote; it appears to be a compressed paraphrase attributed as a direct quote.
-- ✗ `Michael Seibel is YC CEO`
-  - Michael Seibel was Managing Director and then CEO of YC's accelerator program, but Garry Tan became YC's CEO in 2023; calling Seibel 'YC CEO' without qualification is inaccurate depending on timing.
+- ? `Dollar Shave Club: 4.75M views in 3 months.`
+  - The video went massively viral and accumulated millions of views quickly, but the exact figure of 4.75M in 3 months is difficult to confirm precisely; some sources cite different timeframes and numbers.
+- ? `Glossier: 70% of sales from word of mouth.`
+  - Glossier has frequently cited strong word-of-mouth and organic growth, but the specific 70% figure is repeated in marketing content without a clear primary source and may be approximate or outdated.
+- ? `Glossier: Milky Jelly Cleanser designed from 400+ reader comments.`
+  - Glossier did crowdsource input for Milky Jelly Cleanser via an Into The Gloss blog post, but the exact number of 400+ comments is commonly repeated without clear primary confirmation.
+- ? `Airbnb made $30K from cereal box sales.`
+  - The commonly cited figure is around $30,000, but some sources say $20,000–$30,000; the exact amount varies across retellings.
+- ✗ `Airbnb cereal boxes: 'Obama Os and Cap'n McCains sold during 2008 DNC.'`
+  - The cereal boxes were sold around the 2008 presidential election/DNC period, but they were primarily sold online, not specifically 'during the DNC'; the framing is somewhat misleading but the broader story is real. However, Cap'n McCain's is sometimes cited — the more notable detail is that the timing was around the general election, not specifically the DNC for both boxes.
+- ? `'If you can convince people to pay $40 for a $4 box of cereal, maybe you can get strangers to stay in other strangers' h`
+  - Paul Graham has told this story and the general sentiment is confirmed, but the exact wording and the '$4 box of cereal' detail vary across retellings and may not be a verbatim quote.
+- ✗ `The cereal was described as '$4 cereal' sold for '$40'.`
+  - The cereal boxes were custom-designed limited-edition boxes, not standard $4 cereal repackaged; describing the base cost as $4 is a simplification not clearly supported by primary sources.
+- ✗ `Dollar Shave Club video was 90 seconds long.`
+  - The original Dollar Shave Club launch video ('Our Blades Are F***ing Great') is approximately 1 minute and 33 seconds, which is closer to 90 seconds but is actually slightly longer; however, the video is more commonly described as being about 1.5 minutes, and some descriptions round differently. The exact runtime is ~1:33, so '90 seconds' is a rough approximation that slightly understates the length.
 
 ### 🔴 Start With Why: Simon Sineks Golden Circle Applied to Your Ikigai
 - Total citations: 18
@@ -647,35 +163,171 @@ Entries ordered by hallucination risk (most concerning first).
 
 **Concerning citations:**
 - ? `Law of Diffusion of Innovation: your first 15% of customers are people who share your belief.`
-  - Sinek does reference the Law of Diffusion of Innovation, but the standard model describes innovators (2.5%) and early adopters (13.5%) totaling about 16%; the exact '15%' figure is a rough approximation Sinek uses but is not precisely standard.
-- ? `Samuel Langley had a Harvard position.`
-  - Langley was Secretary of the Smithsonian Institution and had taught at various institutions; describing it as a 'Harvard position' is not precisely accurate — he was associated with Harvard Observatory earlier but his prominent role was at the Smithsonian.
+  - Sinek does reference the Law of Diffusion of Innovation, but the standard model cites ~16% (2.5% innovators + 13.5% early adopters), not exactly 15%; the rounding is close but not precisely standard.
+- ✗ `Samuel Langley had a Harvard position.`
+  - Langley was Secretary of the Smithsonian Institution, not a Harvard professor; Sinek's telling emphasizes his Smithsonian connections and prestigious contacts, not a Harvard position.
 - ? `After 9/11, customers mailed personal checks to keep Southwest Airlines alive.`
-  - This story is widely attributed to Southwest Airlines in motivational contexts, but verifiable primary sources confirming customers mailed personal checks specifically after 9/11 are limited; it may be anecdotal or embellished.
+  - This anecdote circulates widely and Sinek may reference it, but independent verification of customers literally mailing personal checks to Southwest after 9/11 is not robustly documented.
 - ✗ `"Working hard for something we don't care about is called stress. Working hard for something we love is called passion."`
-  - This quote is widely attributed to Simon Sinek on the internet but does not appear in Start With Why; it is more commonly sourced to his later social media posts or other works, and its attribution to this specific book is likely incorrect.
-- ✗ `"There are only two ways to influence human behavior: you can manipulate it or you can inspire it." — Simon Sinek, Start`
-  - While Sinek discusses manipulation vs. inspiration extensively in Start With Why, this exact phrasing as a direct quote is commonly circulated online but does not appear to be a verbatim quote from the book.
-- ? `Manipulations (discounts, FOMO, hype) drive transactions but not loyalty — from Sinek's framework.`
-  - Sinek discusses manipulations like price, promotions, fear, and peer pressure in Start With Why, but 'FOMO' and 'hype' as specific terms are modern paraphrasing rather than Sinek's exact language.
+  - This quote is widely attributed to Sinek but is typically sourced to his later work or social media, not specifically from Start With Why; the attribution to that book is likely incorrect.
+- ? `"There are only two ways to influence human behavior: you can manipulate it or you can inspire it." — Simon Sinek, Start`
+  - Sinek discusses manipulation vs. inspiration extensively in Start With Why, but this exact phrasing may be a paraphrase rather than a direct quote from the book.
+- ? `Manipulations (discounts, FOMO, hype) drive transactions but not loyalty, and they're expensive.`
+  - Sinek discusses manipulations at length in Start With Why and argues they don't build loyalty, but the specific inclusion of 'FOMO' as his terminology is not clearly from the book.
 
 ### 🔴 Customer Interview & Business Validation Masterclass
 - Total citations: 14
 - Verified: 8 · Unverified: 4 · Likely hallucinated: 2
 
 **Concerning citations:**
-- ? `Eric Migicovsky (Pebble founder, YC) proposed five universal questions for customer interviews.`
-  - Eric Migicovsky is indeed the Pebble founder and a YC partner who teaches a lecture on talking to users, but the exact branding as 'five universal questions' and the precise list cannot be fully confirmed as matching his canonical formulation — though it is broadly consistent with his YC lecture content.
-- ? `Airbnb founders flew to NY, personally photographed listings. Revenue doubled in a month.`
-  - The story of Airbnb founders flying to New York to photograph listings is well-documented, but the specific claim that 'revenue doubled in a month' is not a widely confirmed metric and may be an approximation or embellishment.
+- ? `"Talk about their life instead of your idea. Ask about specifics in the past instead of generics or opinions about the f`
+  - This closely paraphrases key principles from The Mom Test and may appear on the back cover or summary, but the exact verbatim quote in this precise form is difficult to confirm.
+- ? `"There are no facts inside the building -- so get outside." — Steve Blank, The Four Steps to the Epiphany`
+  - Steve Blank is strongly associated with this sentiment and The Four Steps to the Epiphany, but the exact phrasing 'so get outside' as a single quote may be a paraphrase rather than a verbatim citation.
 - ? `"What makes companies fail is quite simple: they dont talk to users." — Gustaf Alstromer, YC Group Partner`
-  - Gustaf Alströmer is a real YC Group Partner who has given talks on talking to users, but this exact quote cannot be confidently confirmed as a verbatim statement.
-- ✗ `The term 'Migicovsky five universal questions' as a named framework.`
-  - While Migicovsky discusses similar questions in his YC lecture, the branding 'Migicovsky five universal questions' does not appear to be an established or recognized named framework.
-- ? `Question list: 1) What is hardest about doing X? 2) Tell me about the last time. 3) Why was that hard? 4) What have you `
-  - These questions are broadly consistent with Migicovsky's YC lecture on how to talk to users, but the exact five-question formulation may be a curated summary rather than his precise canonical list.
-- ✗ `Rob Fitzpatrick Rule #1 — specifically labeled as 'Rule #1'`
-  - The Mom Test does not formally number its principles as 'Rule #1'; the book presents guidelines but the specific 'Rule #1' labeling appears to be an editorialized framing.
+  - Gustaf Alströmer is a real YC Group Partner who has spoken about the importance of talking to users, but the exact quote in this precise wording is not easily confirmable.
+- ? `Eric Migicovsky's questions are called 'Migicovsky five universal questions'`
+  - While Migicovsky did propose these questions, the specific branding as the 'Migicovsky five universal questions' is not a standard recognized term and appears to be an author-created label.
+- ✗ `Dropbox's product 'barely existed' at the time of the demo video.`
+  - The Dropbox demo video showed a working prototype/product; saying the product 'barely existed' is an overstatement — the video demonstrated actual functionality, though the product was not yet publicly available.
+- ✗ `Dropbox waitlist exploded 'overnight' from 5K to 75K.`
+  - The waitlist growth from ~5,000 to ~75,000 is widely cited, but it is generally described as happening over a short period (days/weeks after the Digg post), not literally 'overnight.'
+
+### 🔴 Validating Your Business Niche and Finding Product-Market Fit
+- Total citations: 15
+- Verified: 8 · Unverified: 5 · Likely hallucinated: 2
+
+**Concerning citations:**
+- ? `Michael Seibel (YC CEO): Launching mediocre product and talking to customers is far better than waiting to build somethi`
+  - Michael Seibel is a Managing Director (not CEO) of YC; he has expressed similar sentiments, but the exact phrasing and title are not precisely confirmed.
+- ? `Dropbox 4-min demo video with Hacker News humor grew waitlist from 5K to 75K overnight.`
+  - The Dropbox demo video and waitlist explosion are well-documented, but the specific numbers 5K to 75K and the '4-min' length and 'overnight' timing vary across sources; some sources say the video was about 3 minutes and the waitlist went from 5K to 75K but over a period rather than strictly overnight.
+- ? `Buffer got 120 signups, first paying customer in 4 days, 4% conversion.`
+  - Gascoigne has shared early Buffer validation metrics, but the specific numbers of 120 signups, 4 days to first paying customer, and 4% conversion are not consistently confirmed across sources.
+- ? `Facebook launched only at Harvard. 1,200 signups in 24 hours.`
+  - Facebook's Harvard-only launch is well-documented, but the specific figure of 1,200 signups in 24 hours varies across sources; some cite different numbers or timeframes.
+- ? `"The #1 company-killer is lack of market." — Andy Rachleff via Marc Andreessen`
+  - Andreessen discusses market as the most important factor, but this exact phrasing '#1 company-killer is lack of market' attributed to Rachleff is not a verified direct quote.
+- ✗ `"Launch something bad, quickly." — Michael Seibel, YC`
+  - While Seibel advocates for fast launching, this exact quote is not a well-known verified quote from him; the precise phrasing appears to be a paraphrase presented as a direct quote.
+- ✗ `"The minimum viable product allows a team to collect the maximum amount of validated learning with the least effort." — `
+  - While Ries discusses MVPs and validated learning extensively, this exact sentence is not a verbatim quote from The Lean Startup; it appears to be a composite paraphrase presented in quotation marks as a direct quote.
+
+### 🔴 Storytelling and the Elevator Pitch for First-Time Entrepreneurs
+- Total citations: 5
+- Verified: 2 · Unverified: 2 · Likely hallucinated: 1
+
+**Concerning citations:**
+- ? `When Reid Hoffman pitched LinkedIn, he focused on the professional networking problem - how hard it was to maintain rela`
+  - Reid Hoffman is the co-founder of LinkedIn and the platform addresses professional networking, but the specific claim about how he structured his pitch (problem-first rather than feature-first) is not a well-documented specific anecdote I can confirm.
+- ✗ `"If you can't explain it simply, you don't understand it well enough." — Albert Einstein`
+  - This quote is widely attributed to Einstein on the internet but there is no verified source confirming he ever said or wrote it; it is commonly listed as a misattribution.
+- ? `A teen whose family restaurant struggled during COVID lockdowns built a delivery network that lets family restaurants sh`
+  - This is presented as a hypothetical ('Imagine a teen...') so it is not a factual citation of a real person or business, but it is framed as illustrative rather than factual.
+
+### 🔴 Business Model Design Fundamentals for First-Time Entrepreneurs
+- Total citations: 6
+- Verified: 3 · Unverified: 2 · Likely hallucinated: 1
+
+**Concerning citations:**
+- ? `"Build something people want" — Paul Graham`
+  - The phrase 'Make something people want' is the official Y Combinator motto associated with Paul Graham; the wording here says 'Build something people want' which is a slight misquotation.
+- ? `Most failed startups build something nobody wants.`
+  - This is a commonly repeated claim in startup culture (often citing CB Insights data that 'no market need' is a top reason for failure), but the content presents it without a specific source and as a blanket statement.
+- ✗ `Warby Parker's simple revenue model change could create massive value.`
+  - Characterizing Warby Parker's innovation as merely a 'simple revenue model change' is misleading; their disruption involved a home try-on program, vertically integrated supply chain, and brand innovation — it was not simply a revenue model tweak.
+
+### 🔴 Storytelling and the Elevator Pitch: Crafting Your Compelling Narrative
+- Total citations: 5
+- Verified: 2 · Unverified: 2 · Likely hallucinated: 1
+
+**Concerning citations:**
+- ? `When Reid Hoffman pitched LinkedIn, he framed it around the story of how professional networking was broken - people onl`
+  - Reid Hoffman is indeed the co-founder of LinkedIn, but the specific framing described here — that his pitch centered on people only reaching out when they needed something and making networking 'continuous and mutual' — is not a well-documented specific pitch narrative and may be a paraphrased or embellished summary.
+- ? `"The best way to engage honestly with the marketplace via story is to abandon any hope of manipulating or controlling yo`
+  - Donald Miller is a well-known author on storytelling and branding (StoryBrand), and this quote is thematically consistent with his work, but the exact wording cannot be confidently confirmed as a verbatim quote from his published works.
+- ✗ `A teen's peer-to-peer tutoring platform connected over 200 students in their district.`
+  - This is presented as a hypothetical example ('Imagine a teen...'), so the specific number of 200 students is a fabricated illustrative detail, not a real citation — however, since it is framed as hypothetical, it is not a factual claim but could mislead if taken as real; marking as likely hallucinated because the specific number has no basis.
+
+### 🔴 Zero-Budget Social Media Content Marketing for First-Time Teen Entrepreneurs
+- Total citations: 4
+- Verified: 1 · Unverified: 2 · Likely hallucinated: 1
+
+**Concerning citations:**
+- ✗ `"Content is fire, social media is gasoline." — Ryan Kahn`
+  - This quote is widely attributed to Jay Baer, not Ryan Kahn; Ryan Kahn is a career coach known for other topics, and attributing this specific quote to him appears to be a fabrication or misattribution.
+- ? `"Don't be afraid to get creative and experiment with your marketing." — Mike Senese`
+  - Mike Senese is a real person (editor-in-chief of Make: Magazine), but this specific quote cannot be confidently confirmed as originating from him.
+- ? `The 80/20 rule works well - roughly 80% valuable content that helps your audience, 20% promotional content about your bu`
+  - The 80/20 content-to-promotion ratio is a commonly cited social media guideline, but it is a rule of thumb rather than a verified empirical finding, and its specific origin is unclear.
+
+### 🟡 Target Customer Profiling and Customer Personas: Understanding Who You're Really Serving
+- Total citations: 4
+- Verified: 3 · Unverified: 1 · Likely hallucinated: 0
+
+**Concerning citations:**
+- ? `Jobs-to-be-Done Framework: Customers don't buy products—they hire them to do a job.`
+  - The Jobs-to-be-Done framework is a real concept associated with Clayton Christensen, but no specific person is credited here; the description is broadly accurate but the specific phrasing 'hire them to do a job' is a paraphrase of Christensen's work without attribution.
+
+### 🟢 Pricing Confidence: Overcoming the Fear of Charging What You're Worth
+- Total citations: 3
+- Verified: 3 · Unverified: 0 · Likely hallucinated: 0
+
+### 🟡 Zero-Budget Social Media Content Marketing for New Entrepreneurs
+- Total citations: 3
+- Verified: 2 · Unverified: 1 · Likely hallucinated: undefined
+
+**Concerning citations:**
+- ? `"Your brand is what other people say about you when you're not in the room." — Jeff Bezos`
+  - This quote is very widely attributed to Jeff Bezos across the internet and in business literature, but there is no definitive primary source confirming he said it; it may be apocryphal or paraphrased, though the attribution is extremely common and broadly accepted.
+
+### 🟢 Building Your First Brand Identity as a Teen Entrepreneur
+- Total citations: 4
+- Verified: 4 · Unverified: 0 · Likely hallucinated: 0
+
+### 🟡 Operations and Service Delivery Excellence for First-Time Small Businesses
+- Total citations: 3
+- Verified: 2 · Unverified: 1 · Likely hallucinated: undefined
+
+**Concerning citations:**
+- ? `"Systems run the business and people run the systems." — Michael Gerber`
+  - Michael Gerber, author of 'The E-Myth Revisited,' is strongly associated with the concept of systemizing businesses, but the exact phrasing of this quote is not a reliably confirmed direct quotation; it may be a paraphrase or common misattribution of his ideas.
+
+### 🟡 Financial Literacy Fundamentals for Teen Entrepreneurs
+- Total citations: 2
+- Verified: 1 · Unverified: 1 · Likely hallucinated: undefined
+
+**Concerning citations:**
+- ? `"What gets measured gets managed." — Peter Drucker`
+  - This quote is widely attributed to Peter Drucker in popular culture, but management scholars have noted there is no confirmed source in Drucker's published works, and the attribution is disputed.
+
+### 🟡 Target Customer Profiling and Customer Personas: Finding Your Ideal Customer
+- Total citations: 6
+- Verified: 4 · Unverified: 2 · Likely hallucinated: undefined
+
+**Concerning citations:**
+- ? `Imagine a teen who wants to start a tutoring service targeting 'high school juniors preparing for SATs who feel overwhel`
+  - This is a hypothetical example (signaled by 'Imagine'), not a factual claim about a real person or business, so it cannot be verified or falsified.
+- ? `Imagine a teen creating an app for organizing school assignments targeting 'students who play sports and struggle to bal`
+  - This is a hypothetical example (signaled by 'Imagine'), not a factual claim about a real person or business, so it cannot be verified or falsified.
+
+### 🟡 Business Model Design Fundamentals for First-Time Entrepreneurs
+- Total citations: 4
+- Verified: 3 · Unverified: 1 · Likely hallucinated: 0
+
+**Concerning citations:**
+- ? `"The goal is to find a business model where the unit economics work." — Reid Hoffman`
+  - Reid Hoffman is a real person (LinkedIn co-founder) who discusses business models frequently, but this specific quote cannot be confidently traced to a verified source.
+
+### 🟡 Pricing Confidence: Overcoming the Fear of Charging What You're Worth
+- Total citations: 2
+- Verified: 0 · Unverified: 2 · Likely hallucinated: 0
+
+**Concerning citations:**
+- ? `"You teach people how to treat you by what you accept" — General business wisdom`
+  - This quote is widely attributed to various sources, but the content itself attributes it only to 'general business wisdom,' which is vague and not a specific person; the quote is commonly paraphrased and its exact origin is uncertain.
+- ? `"The confident person says the price once and shuts up" — Common sales training principle`
+  - This is a well-known paraphrase of the sales training principle 'state your price and be silent,' but the exact phrasing is not reliably attributable to a specific source and is labeled only as a 'common sales training principle.'
 
 ## Quality Re-Eval (Opus judge)
 
@@ -683,275 +335,244 @@ Entries ordered by score (weakest first — these are the regeneration candidate
 
 | Score | Entry | Spec | Acc | Age | Action | Diverse | Consist |
 |---|---|---|---|---|---|---|---|
-| **20/30** | Pricing Strategy for First-Time Entrepreneurs: Research-Back | 5 | 4 | 3 | 3 | 2 | 3 |
-| **20/30** | Learning From Failure: How the Best Entrepreneurs Turn Setba | 5 | 3 | 4 | 2 | 2 | 4 |
+| **19/30** | Pricing Confidence: Overcoming the Fear of Charging What You | 2 | 3 | 5 | 4 | 1 | 4 |
+| **20/30** | Building a Strong Brand Identity as a Teen Entrepreneur | 3 | 5 | 4 | 2 | 2 | 4 |
 | **20/30** | The Creative Act: Rick Rubin's Principles Applied to Buildin | 4 | 3 | 5 | 3 | 1 | 4 |
+| **20/30** | Learning From Failure: How the Best Entrepreneurs Turn Setba | 5 | 3 | 4 | 2 | 2 | 4 |
+| **20/30** | Zero-Budget Social Media Content Marketing for First-Time Te | 2 | 3 | 5 | 4 | 1 | 5 |
+| **21/30** | Pricing Strategy Fundamentals for Teen Entrepreneurs | 3 | 4 | 5 | 4 | 1 | 4 |
+| **21/30** | Operations and Service Delivery Fundamentals for First-Time  | 3 | 4 | 5 | 4 | 1 | 4 |
+| **21/30** | Target Customer Profiling and Customer Personas: Understandi | 3 | 4 | 5 | 3 | 2 | 4 |
+| **21/30** | Business Model Design Fundamentals for First-Time Entreprene | 3 | 4 | 5 | 3 | 2 | 4 |
 | **21/30** | competition and differentiation — Research-Backed Guide | 4 | 4 | 5 | 3 | 1 | 4 |
 | **21/30** | Customer Interview & Business Validation Masterclass | 5 | 4 | 4 | 3 | 1 | 4 |
 | **21/30** | Start With Why: Simon Sineks Golden Circle Applied to Your I | 4 | 4 | 4 | 3 | 1 | 5 |
+| **21/30** | Financial Literacy Fundamentals for Teen Entrepreneurs | 2 | 4 | 5 | 4 | 1 | 5 |
+| **21/30** | Target Customer Profiling and Customer Personas: Finding You | 3 | 4 | 5 | 3 | 2 | 4 |
+| **22/30** | Zero-Budget Social Media Content Marketing for New Entrepren | 2 | 4 | 5 | 4 | 2 | 5 |
 | **22/30** | Validating Your Business Niche and Finding Product-Market Fi | 5 | 4 | 4 | 4 | 1 | 4 |
 | **22/30** | Marketing Your First Business: Pitching Customers With Zero  | 5 | 4 | 4 | 3 | 2 | 4 |
+| **22/30** | Operations and Service Delivery Excellence for First-Time Sm | 3 | 4 | 5 | 4 | 1 | 5 |
+| **23/30** | Financial Literacy Fundamentals: Understanding Profit Margin | 3 | 4 | 5 | 4 | 2 | 5 |
+| **23/30** | Pricing Confidence: Overcoming the Fear of Charging What You | 3 | 4 | 5 | 4 | 2 | 5 |
 | **23/30** | finding first customers — Research-Backed Guide | 4 | 4 | 5 | 3 | 3 | 4 |
-| **23/30** | Zero-Budget Branding: The 24-Hour Name Test and 1-Color Rule | 5 | 2 | 5 | 5 | 2 | 4 |
-| **23/30** | The 30-Second Pitch as Your Confidence Superpower: How Story | 5 | 2 | 5 | 4 | 3 | 4 |
-| **23/30** | Jobs-To-Be-Done Framework: Understanding WHY Customers Hire  | 5 | 3 | 4 | 4 | 3 | 4 |
-| **24/30** | Creating Disney-Level Magic Moments in $20 Services: The One | 4 | 3 | 5 | 5 | 3 | 4 |
-| **24/30** | The Hidden Cost Trap: Why Teen Entrepreneurs Accidentally Wo | 5 | 3 | 5 | 4 | 3 | 4 |
-| **24/30** | The 3-Column Money Tracking System: How Teen Entrepreneurs T | 5 | 2 | 5 | 5 | 3 | 4 |
-| **24/30** | Lean Canvas: Map Your Business Idea on One Page Before Spend | 4 | 2 | 5 | 4 | 4 | 5 |
-| **25/30** | Brand as Gut Feeling: Building a Memorable Identity from You | 5 | 3 | 5 | 3 | 4 | 5 |
-| **25/30** | Why Facts Don't Sell: Using Story Structure to Turn Your 15- | 4 | 3 | 5 | 5 | 3 | 5 |
-| **25/30** | Build Customer Personas From One Real Person You Know | 5 | 2 | 5 | 5 | 3 | 5 |
-| **25/30** | The 5 Teen-Executable Business Models: From Dog Walking to T | 5 | 2 | 5 | 4 | 4 | 5 |
-| **25/30** | Pricing Confidence: Breaking the Undercharging Pattern for W | 5 | 3 | 4 | 4 | 5 | 4 |
-| **26/30** | Operations Excellence for Teen Entrepreneurs: Systems Over H | 4 | 3 | 5 | 5 | 4 | 5 |
-| **26/30** | Pricing Scripts That Work: How to Quote Your Price Without A | 5 | 3 | 5 | 5 | 3 | 5 |
-| **26/30** | Content-First Strategy: Building Your Audience Before Your P | 5 | 3 | 5 | 4 | 4 | 5 |
-| **26/30** | The 30-Day Zero-Budget Social Media Sprint: A Step-by-Step C | 5 | 2 | 5 | 5 | 4 | 5 |
+| **23/30** | Business Model Design Fundamentals for First-Time Entreprene | 3 | 5 | 5 | 3 | 2 | 5 |
+| **24/30** | Storytelling and the Elevator Pitch for First-Time Entrepren | 3 | 4 | 5 | 4 | 3 | 5 |
+| **24/30** | Building Your First Brand Identity as a Teen Entrepreneur | 3 | 5 | 5 | 3 | 3 | 5 |
+| **25/30** | Storytelling and the Elevator Pitch: Crafting Your Compellin | 4 | 4 | 5 | 4 | 3 | 5 |
 
-### 20/30 — Pricing Strategy for First-Time Entrepreneurs: Research-Backed Principles and Real Case Studies
-> Exceptionally well-sourced with real names, real numbers, and real companies throughout — this is one of the most specific entries I've seen. However, the content skews heavily toward SaaS/tech examples (Stripe, Slack, AWS, Mailchimp, ProfitWell) that a 14-year-old running a lawn care business or selling bracelets cannot directly relate to. The source pool is almost entirely white male US tech founders — the only woman cited is Kelly Costello, and she's used as a cautionary tale. The cookie example in the summary is the only truly teen-executable moment; most principles are framed for startup founders, not teenagers.
+### 19/30 — Pricing Confidence: Overcoming the Fear of Charging What You're Worth
+> The entry is well-structured and highly age-appropriate, with concrete pricing examples teens can relate to (tutoring, social media, graphic design) and actionable scripts. However, it is almost entirely generic — no real people, real businesses, real studies, or real data are cited. The quotes are attributed to 'general business wisdom' and 'common sales training principle,' which is honest but underscores the lack of real sources. The topic promises to address young women and minority students specifically, but the entry cites zero diverse founders, researchers, or organizations, and the source diversity is essentially nonexistent.
 
 **Red flags:**
-- Source diversity is very poor: nearly all examples are white male US tech founders; the sole woman (Kelly Costello) is the negative example — this sends a bad implicit message to teen girls
-- Most examples (SaaS value metrics, B2B analytics platforms, YC batch companies) are not relatable or executable for a 12-16 year old; the entry needs at least 2-3 examples of teen-scale businesses (tutoring, crafts, local services)
-- The anonymous 'SaaS company with 2,400 customers and 40% price increase' example is unverifiable and reads as potentially fabricated or heavily fictionalized — risky for a knowledge base that emphasizes real cases
-- Warby Parker $6B valuation claim uses peak/IPO valuation; the stock subsequently dropped significantly — presenting it as a simple success story is slightly misleading
-- The entry claims 5 challenge Q&A but none are actually included in the text
+- Topic explicitly targets young women and minorities but entry cites no diverse founders, mentors, or research relevant to those groups
+- No real sources cited — both quotes are attributed to anonymous general wisdom rather than actual people or studies
+- Claims about certified tutor rates ($40-60/hour) and professional content creator rates ($200-500) are presented as facts without any source and vary enormously by geography
 
-### 20/30 — Learning From Failure: How the Best Entrepreneurs Turn Setbacks Into Breakthroughs
-> The entry is rich with named founders, specific companies, and concrete numbers, which is excellent for specificity. However, several figures are suspect: Slack was acquired for $27.7B not $.7B (formatting issue or error), Dyson's net worth claim of $B is vague, the Amazon Fire Phone write-down is listed as 'M' (formatting stripped the number), Echo sales of 500M+ units is likely inflated, and the Dyson quote is attributed as 'paraphrasing Edison' which is a bit loose. The biggest weakness is actionability — there are zero concrete steps a teen could take today; it's all retrospective case studies with no exercises, prompts, or mini-projects. Source diversity is poor: every single example is a white male US founder except Sara Blakely (white female US), with zero non-US or underrepresented founders.
+### 20/30 — Building a Strong Brand Identity as a Teen Entrepreneur
+> The entry accurately references real brands (Glossier, Patagonia, Warby Parker) and correctly attributes the Bezos and Neumeier quotes, but it reads more like a conceptual overview than something a teen can act on today. There are no step-by-step exercises like 'write down 3 things that make your business different' or 'fill in this positioning statement template.' The examples skew heavily toward well-known US companies founded by white entrepreneurs, missing an opportunity to showcase diverse founders or global brands that teens might find inspiring.
 
 **Red flags:**
-- Dollar figures appear corrupted throughout ($.7B, $B, M) — likely markdown formatting stripping characters, making claims unreadable or misleading
-- Echo 500M+ units sold claim is likely significantly overstated based on available estimates
-- No actionable steps, exercises, or teen-executable challenges despite claiming 5 challenge Q&As
-- Almost exclusively white US founders — no diversity in geography, race, or industry beyond tech
-- The Dyson quote is attributed as 'paraphrasing Edison' but presented in quotation marks as if it's a direct Dyson quote, which is misleading
+- No actionable steps, worksheets, or templates a teen could use today to start building their brand identity
+- All four concrete examples are US-based companies; no diversity in geography, founder demographics, or industry beyond DTC/retail
+- Claims '5 Challenge Q&A' but none are included in the entry, which could cause issues if the system expects them
 
 ### 20/30 — The Creative Act: Rick Rubin's Principles Applied to Building Ventures
-> The entry is well-written and genuinely teen-accessible, with a strong motivational arc. However, it relies entirely on one source (Rick Rubin, a wealthy white male US producer) and some factual claims are questionable — the $5,000 figure and 120K first-release sales for Def Jam are widely repeated but not well-documented, and several 'quotes' attributed to The Creative Act may be paraphrases rather than exact citations. The entry is more inspirational than actionable; a teen reading this gets a mindset shift but no concrete steps they can take today (no worksheet, no 'try this now' exercise, no specific mini-project prompt).
+> The entry is well-written, engaging, and very accessible for teens. However, it relies entirely on one source (Rick Rubin, a white male US producer) and some factual claims are questionable — the $5,000 figure and 120K copies for the first Def Jam release are not well-established facts and may be embellished or fabricated. The 'first release' likely refers to LL Cool J's 'I Need a Beat' which sold modestly, not 120K copies; the label's early breakout was the Beastie Boys. The entry also lacks concrete teen-executable steps — it's inspirational but doesn't give a student something specific to do today beyond 'start.' The Challenge Q&A count is listed as 5 but no actual challenge questions are included.
 
 **Red flags:**
-- Multiple quotes presented in quotation marks and attributed to 'Rick Rubin, The Creative Act' appear to be paraphrases or reworded summaries rather than exact quotes from the book — this risks misattribution
-- The claim that Def Jam's first release sold 120K copies is not clearly verified and may conflate different early releases or timelines
-- Source diversity is essentially zero — the entire entry revolves around one white male American celebrity producer with no contrasting or complementary voices
-- The entry says 'Challenge Q&A count: 5' but includes zero actual challenge questions, which is misleading metadata
-- No concrete actionable exercise or step-by-step activity for a teen to do today — it reads as inspiration, not transformation
+- The claim that Def Jam's first release sold 120K copies is not reliably sourced and is likely inaccurate — this could undermine credibility if a student fact-checks it
+- The $5,000 startup figure for Def Jam is widely repeated but not well-documented; presenting it as established fact is risky
+- Entry mentions 'Challenge Q&A count: 5' but includes zero actual challenge questions — incomplete content
+- Source diversity is essentially zero: one white male American producer is the sole voice across the entire entry
+- Several quotes attributed to 'Rick Rubin, The Creative Act' may be paraphrases rather than exact quotes (e.g., 'Setting the bar low frees you to play...' may not be verbatim from the book) — presenting paraphrases as direct quotes is problematic
+
+### 20/30 — Learning From Failure: How the Best Entrepreneurs Turn Setbacks Into Breakthroughs
+> The entry is rich with named examples, specific numbers, and real company stories, which is excellent for engagement. However, several numbers are suspect (Slack was acquired for $27.7B not $.7B — likely a formatting issue; Dyson's net worth cited as 'B'; Echo selling '500M+ units' is likely overstated; Fire Phone write-down cited as 'M' with the number stripped). The biggest weakness is actionability — there's no concrete exercise, script, or teen-executable step a student could do today. Source diversity is poor: every single example is a white male US founder except Sara Blakely, who is white female US. No non-US, no underrepresented founders.
+
+**Red flags:**
+- Multiple dollar figures appear corrupted or stripped of their actual numbers ($.7B, $B, $M, $B net worth) — this would confuse students and undermine credibility
+- The Dyson quote 'I have found 5,126 ways that don't work' is attributed as 'paraphrasing Edison' but is presented as a Dyson quote — this is a muddled attribution that could mislead students
+- Echo selling '500M+ units' is likely significantly overstated based on available estimates
+- No actionable challenge, exercise, or teen-executable step is included despite claiming 5 challenge Q&As — the Q&As themselves are missing from the entry
+- Almost exclusively white US founders — Sara Blakely is the only woman, and there are zero non-white or non-US examples
+
+### 20/30 — Zero-Budget Social Media Content Marketing for First-Time Teen Entrepreneurs
+> The entry is well-structured and highly age-appropriate, with concrete teen-relatable examples (tutoring, jewelry, pet-sitting) that a 14-year-old could act on today. However, it is almost entirely generic: the only real-world reference is Glossier, and the two quotes come from relatively obscure figures (Ryan Kahn is a career coach, not a content marketing authority, and the Mike Senese quote is vaguely attributed). There is zero diversity in cited voices — no women founders, no non-US examples, no underrepresented entrepreneurs — and no real metrics or data points to anchor the advice.
+
+**Red flags:**
+- The Ryan Kahn quote is widely misattributed online and its original source is uncertain — risky to present as authoritative.
+- Mike Senese quote is generic and not clearly tied to a notable entrepreneurship context; may confuse students looking him up.
+- No non-US or underrepresented founder examples cited; Glossier (Emily Weiss) is the sole real brand and represents a narrow demographic.
+- The 80/20 content rule is presented as established fact but is a rough heuristic with no cited source — should be framed as a guideline.
+
+### 21/30 — Pricing Strategy Fundamentals for Teen Entrepreneurs
+> The entry does a solid job making pricing concepts accessible and relatable to teens with good concrete examples (phone cases, lawn care packages). However, every named source is a white male US figure or company (Seth Godin, Warren Buffett, Apple, Netflix), and the entry lacks any diverse voices. The claim about higher prices increasing demand (Veblen goods) is presented without enough nuance — it could mislead a teen into thinking raising prices is a universal growth hack when it only works in specific premium/status contexts.
+
+**Red flags:**
+- Zero diversity in cited sources — all white male US figures and US companies. Needs non-US, female, or underrepresented founder perspectives.
+- The 'higher prices can increase demand' principle is oversimplified and potentially misleading for teens who may naively raise prices on commodity services and lose customers.
+- The advice 'start with a price that feels slightly uncomfortable' lacks guardrails — a nervous 13-year-old might set an absurdly high price or, conversely, interpret normal anxiety as a signal to go even higher.
+- Claims '5 Challenge Q&A' but none are actually included in the entry.
+
+### 21/30 — Operations and Service Delivery Fundamentals for First-Time Small Businesses
+> Solid, practical entry that hits the right tone for teens with relatable examples (lawn care, cookie baking). However, it relies on only one quote from Jeff Bezos and one real-world company example (Warby Parker) — both from well-known white male US founders. The entry would benefit significantly from citing diverse entrepreneurs and non-US examples. The content is actionable but could include more specific scripts or templates (e.g., a sample order form or tracking spreadsheet).
+
+**Red flags:**
+- Source diversity is extremely low — only Jeff Bezos and Warby Parker (founded by four white men) are cited as real-world references
+- The phrase 'totally screw over your customers' in the student summary may be flagged as slightly informal for some educational contexts, though likely fine for the target audience
+- Challenge Q&A count listed as 5 but no actual challenge questions are included in the entry
+
+### 21/30 — Target Customer Profiling and Customer Personas: Understanding Who You're Really Serving
+> The entry does a solid job explaining customer profiling concepts in teen-friendly language with relatable examples (tutoring, school app). However, it lacks concrete step-by-step actions a teen could take today — no interview scripts, no persona template, no specific number of conversations to have. Source diversity is weak: only Glossier as a real company example, and both quotes are from white male US tech billionaires. The Reid Hoffman quote, while accurately attributed, has nothing to do with customer profiling and feels shoehorned in.
+
+**Red flags:**
+- Reid Hoffman quote about launching early is off-topic — it's about MVPs, not customer profiling, and could confuse students about the lesson's focus
+- No actionable steps or templates provided — entry says 'talk to real potential customers' but never explains how (no sample questions, no guidance on how many conversations, no persona worksheet)
+- Claims '5 Challenge Q&A' but none are included in the entry — metadata mismatch
+- Zero non-US or underrepresented founder examples despite beauty/education being global industries
+
+### 21/30 — Business Model Design Fundamentals for First-Time Entrepreneurs
+> The entry is solid foundational content with relatable teen examples (tutoring, phone cases) and appropriate real-world references (Spanx, Warby Parker). However, it lacks specific numbers, metrics, or concrete step-by-step actions a teen could take today — it stays at the 'principle' level rather than giving scripts or checklists. Source diversity is weak: Steve Blank, Paul Graham, Sara Blakely, and Warby Parker are all US-based, and the only non-white-male founder cited is Blakely. No examples from non-US markets, minority founders, or teen entrepreneurs.
+
+**Red flags:**
+- No non-US or underrepresented founder examples — risks reinforcing a narrow view of who entrepreneurs are
+- Claims '5 Challenge Q&A' but none are actually included in the entry
+- The Steve Blank quote is commonly attributed to him but is a paraphrase of a military aphorism — minor but worth noting for accuracy
 
 ### 21/30 — competition and differentiation — Research-Backed Guide
-> The entry has strong specific examples (Facebook at Harvard, Yellow Tail's 9x sales, Y Combinator's approach) and the tone is excellent for teens — motivating without being patronizing. However, the 'Key principles,' 'Concrete examples,' and 'Quotes' sections are completely empty, which means the entry is structurally incomplete. Source diversity is poor: every example is a white male US founder or US company. The actionability is decent ('talk to 10 people') but could be much stronger with a step-by-step script or specific exercise a teen could do today.
+> The entry has strong specific examples (Facebook's Harvard launch, Yellow Tail's 9x sales, Y Combinator's funding philosophy) and the tone is excellent for teens — motivating without being patronizing. However, the 'Key principles,' 'Concrete examples,' and 'Quotes' sections are completely empty, which is a serious structural problem for a knowledge base entry. Source diversity is minimal: all examples are white male US founders/companies. The actionability is decent ('talk to 10 people') but lacks the concrete scripts or step-by-step guidance that would make it truly executable today.
 
 **Red flags:**
-- Key principles section is completely empty — this is a structural gap that will degrade RAG retrieval quality
-- Concrete examples section is empty despite examples existing in the summary — poor organization
-- Quotes section is empty — no attributed quotes despite referencing Y Combinator philosophy
-- The claim that Facebook got 50% of Harvard students in a month should be verified — some sources say it was within weeks but the exact percentage varies
-- Zero diversity in examples — all white male US founders/companies; no women, no non-US, no underrepresented founders
+- Key principles section is completely empty — the entry lacks structured pedagogical content
+- Concrete examples section is empty despite examples existing in the summary
+- Quotes section is empty — no attributed quotes to learn from
+- The Yellow Tail '9x what they expected' claim is plausible from Blue Ocean Strategy but the exact multiplier should be verified
+- Zero representation of women, non-white, or non-US founders
 
 ### 21/30 — Customer Interview & Business Validation Masterclass
-> Strong entry with real names, real numbers, and well-attributed frameworks. The Zappos acquisition figure appears to be $1.2B (the leading digit was dropped, showing '.2B'). However, every single person cited — Fitzpatrick, Blank, Migicovsky, Alstromer, Hsieh, Houston, Chesky/Gebbia — is a white or white-passing male from the US tech ecosystem. The entry also lacks teen-specific actionable steps: it tells teens WHAT to do conceptually but doesn't provide a script, a step-by-step for finding interviewees as a teenager, or examples of teen businesses using these techniques. A 12-year-old would struggle to map Zappos/Dropbox/Airbnb examples onto their own reality.
+> Strong entry with real names, real companies, and real numbers throughout. The Migicovsky five questions and Mom Test principles are well-attributed and accurate. However, actionability suffers because there are no teen-specific scripts or step-by-step instructions a 14-year-old could follow today (e.g., 'message 5 classmates and ask these exact questions about [school problem]'). Source diversity is the biggest weakness: every single person cited — Fitzpatrick, Blank, Migicovsky, Alstromer, Hsieh, Houston, Chesky/Gebbia — is a white or white-passing male US-based founder/author. The Zappos acquisition figure appears as '.2B' which is clearly a formatting error (should be $1.2B).
 
 **Red flags:**
-- Zappos acquisition price shows '.2B' — likely a formatting error that dropped '$1' making it read as $0.2B instead of $1.2B
-- Zero gender, racial, or geographic diversity in sources — every cited founder/author is a male from the US startup ecosystem
-- No teen-specific interview scripts or guidance on how a 13-year-old would actually find and approach interviewees
-- Migicovsky is spelled inconsistently (entry says 'Migicovsky' in heading but this should be verified — his name is sometimes rendered differently)
-- Challenge Q&A count listed as 3 but no actual challenge questions are included in the entry
+- Zappos acquisition price shows as '.2B' — missing the leading '1', should be '$1.2B'
+- Zero gender, racial, or geographic diversity in sources — every cited person is a white/white-passing male from the US tech ecosystem
+- No teen-executable script or walkthrough — a 13-year-old wouldn't know how to actually conduct an interview from this entry alone
+- 'Migicovsky five universal questions' is not a widely established canonical name — could mislead students into thinking this is a formal framework rather than YC lecture advice
 
 ### 21/30 — Start With Why: Simon Sineks Golden Circle Applied to Your Ikigai
-> Strong entry that effectively bridges Sinek's Golden Circle with the platform's Ikigai framework. The examples (Wright Brothers, Southwest, TiVo) are specific and well-chosen, though all come directly from Sinek's book — essentially one source, one perspective, all US-centric, all male protagonists. The biggest weakness is actionability: the entry explains the WHY concept well but never gives a teen a concrete exercise to do today (e.g., 'write your WHY in one sentence using this template' or 'test your WHY with the Celery Test by listing three decisions you face'). It reads more like a conceptual summary than a transformation tool.
+> Strong synthesis of Sinek's Golden Circle with the platform's Ikigai framework. The examples (Wright Brothers, Southwest, TiVo) are specific and well-explained, but the entry is essentially a summary of one book by one white male author with all examples being US-based companies/figures. The biggest gap is actionability — there's no concrete exercise like 'write your WHY statement in this format' or 'test your WHY with this template.' The entry tells teens what to think about but not exactly what to do today.
 
 **Red flags:**
-- The claim that TiVo 'failed to gain mass adoption' is an oversimplification — TiVo had millions of subscribers and its failure was more about business model and competition from cable DVRs than just messaging. Presenting it as purely a WHY problem is misleading.
-- The Southwest Airlines 'customers mailed personal checks after 9/11' story is a commonly repeated Sinek anecdote but its verifiability is questionable — this should be flagged or softened with 'according to Sinek'.
-- Entry claims 'Challenge Q&A count: 5' but includes zero actual challenge questions — this is either a metadata placeholder or a broken promise.
-- 100% of examples, quotes, and frameworks come from a single white male American author — zero diversity in voices, geography, gender, or industry perspective.
+- The Langley $50K figure is commonly cited but the actual Smithsonian grant was ~$50K+ in 1898 dollars — entry should clarify this is 1890s dollars to avoid misleading teens about scale
+- TiVo 'failed' is an oversimplification — TiVo had multiple issues including pricing, cable company resistance, and IP battles; attributing failure solely to outside-in messaging is reductive and could teach teens a misleading monocausal lesson
+- Zero source diversity: every person cited (Sinek, Wright Brothers, MLK, Southwest's Herb Kelleher by implication) is male and US-based; no women, no non-Western examples, no teen founders
+- Entry claims 'Challenge Q&A count: 5' but includes zero actual challenge questions
+
+### 21/30 — Financial Literacy Fundamentals for Teen Entrepreneurs
+> This is a solid, well-structured foundational financial literacy entry that hits the right tone for teens and provides genuinely useful concrete examples with real math. However, it is almost entirely generic — the only named source is the Peter Drucker quote (which is widely attributed to him but likely apocryphal), and the 'traditional business saying' is uncited. There is zero diversity in sourcing: no named entrepreneurs, no non-US perspectives, no underrepresented voices. The examples use gendered pronouns in a balanced way (she/he) which is good, but the entry would benefit enormously from real teen entrepreneur stories or named figures.
+
+**Red flags:**
+- The Peter Drucker quote attribution is disputed — it may not actually be from Drucker, which is a common misattribution
+- The dog walking example includes '$3 for liability insurance per walk' which is an unusual cost structure for a teen — most teen dog walkers don't carry liability insurance, and if they do it's typically a monthly/annual premium not per-walk, which could confuse students about how insurance actually works
+- No mention of legal/tax considerations for minors earning income, which could be a gap if a teen scales up based on this advice
+
+### 21/30 — Target Customer Profiling and Customer Personas: Finding Your Ideal Customer
+> The entry does a good job making customer persona concepts relatable to teens with solid hypothetical examples (SAT tutoring, sports-student app). However, it lacks concrete actionable steps — there's no interview script, no template for building a persona, no '5 questions to ask your first 3 potential customers today.' The quotes from Reid Hoffman and Bill Gates are real but only loosely connected to the topic (Hoffman's quote is about launching products, not customer profiling). Source diversity is weak — all examples are US companies founded by white entrepreneurs, and both quotes are from white male billionaires.
+
+**Red flags:**
+- Reid Hoffman quote is about MVP launching, not customer profiling — tangential and could confuse students about the lesson's core message
+- No actual step-by-step process or template for creating a customer persona or conducting a customer interview — a teen couldn't execute this today without additional guidance
+- All cited businesses and people are white US-based founders; no representation of diverse or non-US entrepreneurs
+
+### 22/30 — Zero-Budget Social Media Content Marketing for New Entrepreneurs
+> The entry is well-structured and highly age-appropriate, with relatable teen examples (jewelry maker, tutor, lawn care) that a 14-year-old could act on today. However, it's light on specifics — only two named sources (Mari Smith and Jeff Bezos) and one real company (Glossier), with no concrete numbers (posting frequency, engagement benchmarks, follower milestones). Source diversity is weak: two quotes from well-known US figures, one US beauty brand, and no voices from underrepresented founders or non-US contexts.
+
+**Red flags:**
+- No guidance on online safety or privacy considerations for minors posting on social media — critical for 12-15 year olds
+- No mention of platform age restrictions (e.g., most platforms require users to be 13+), which is essential context for this age group
+- The Mari Smith quote is widely attributed to her but its exact origin is uncertain — minor risk
 
 ### 22/30 — Validating Your Business Niche and Finding Product-Market Fit
-> Strong entry with real names, real numbers (Dropbox 5K→75K, Buffer 120 signups/4% conversion, Facebook 1,200 signups), and correctly attributed quotes. However, every single person cited is a white male US tech founder (Andreessen, Ries, Seibel, Graham, Zuckerberg, Joel Gascoigne, Nick Swinmurn). The student-friendly summary mentions Paul Graham's 'do things that don't scale' but this quote doesn't appear in the key principles or quotes sections, which is a minor inconsistency. The actionable closing ('landing page, Google Form, DM to 50 people') is great for teens but could use one more concrete step-by-step example tailored to a teen context rather than SaaS founders.
+> Strong entry with real names, real numbers (Dropbox 5K→75K, Buffer 120 signups, Facebook 1,200 at Harvard), and correctly attributed quotes. The actionability is good with the closing line about landing pages, Google Forms, and DMs, though it could be more specific with step-by-step instructions. The glaring weakness is source diversity — every single person cited (Andreessen, Rachleff, Ries, Seibel, Graham, Zuckerberg implied) is a white or white-passing male US tech figure. No women, no non-US founders, no underrepresented voices whatsoever.
 
 **Red flags:**
-- Zero diversity in cited sources — all white male US tech founders; no women, no people of color, no non-US examples
-- Paul Graham is referenced in the student-friendly summary but not introduced in the key principles or quotes sections — appears out of nowhere
-- Dropbox waitlist numbers (5K to 75K overnight) are commonly cited but the exact figures vary across sources; some report different numbers — should be noted as approximate
-- Buffer's '120 signups' and '4% conversion' figures are widely repeated but originate from Joel Gascoigne's blog post and the 4% conversion specifically referred to clicks through the pricing page, not paying customers — slightly misleading as written
+- Zero diversity in cited sources — all white/male US tech founders. Add examples like Canva (Melanie Perkins, Australia), Flutterwave (Olugbenga Agboola, Nigeria), or similar.
+- Paul Graham is quoted in the student-friendly summary ('do things that don't scale') but never introduced in the key principles or quotes sections — appears out of nowhere.
+- Dropbox waitlist numbers (5K to 75K overnight) are commonly cited but the exact figures and 'overnight' framing may be slightly embellished — the original source suggests the growth happened over a period after the Hacker News post, not literally overnight.
+- Buffer's '4% conversion' and '120 signups' figures are widely repeated but originate from Joel Gascoigne's blog post and the 4-day paying customer claim should be double-checked for precision.
+- The 'Andy Rachleff Law' phrasing is a bit odd — Andreessen credited Rachleff with the concept, but it's not commonly called 'Andy Rachleff Law' as a proper noun.
 
 ### 22/30 — Marketing Your First Business: Pitching Customers With Zero Budget
-> The entry is packed with real names, real numbers, and compelling stories — Dollar Shave Club's $4,500 video, Glossier's blog-first approach, Airbnb's cereal boxes. Accuracy is strong but not perfect: the DSC video cost is often cited as $4,500 but some sources say higher; the $1B Unilever acquisition was actually reported as $1B, which checks out. The entry's biggest weakness is source diversity — every single founder and thought leader cited is white and US-based (Seth Godin, Guy Kawasaki is Japanese-American which helps slightly, Emily Weiss, Michael Dubin, Paul Graham). Actionability is moderate: while the examples are inspiring, there are no concrete step-by-step actions a teen could take today (e.g., 'write a 60-second video script about your product frustration' or 'post in 3 community groups this week'). The profanity in the DSC quote, even partially censored, is a minor concern for 12-year-olds.
+> The entry is rich with real names, companies, and specific numbers (Dollar Shave Club's $4,500 video, 12K subscribers in 48 hours, Unilever's $1B acquisition; Glossier's 4-year blog runway; Airbnb's $40 cereal boxes netting $30K). Accuracy is strong but not perfect — the Dollar Shave Club video cost is commonly cited as $4,500 but some sources say higher, and the 'servers crashed in 1 hour' claim is apocryphal lore rather than verified fact. The biggest weakness is source diversity: every single person cited (Seth Godin, Guy Kawasaki, Michael Dubin, Paul Graham, Emily Weiss) is a US-based figure, and the only woman is Emily Weiss — no founders of color, no non-US examples, no teen founders. Actionability is moderate: the 10/20/30 rule and 'find your smallest viable audience' are useful frameworks, but there are no step-by-step exercises a teen could do today (e.g., 'write a 60-second video script about your frustration' or 'post in 3 communities this week').
 
 **Red flags:**
-- Profanity in the Dollar Shave Club quote ('F***ing') — even censored, this may be inappropriate for 12-year-olds and could cause issues with parents or school deployments
-- No non-US or non-white founder examples — missed opportunity to cite diverse entrepreneurs like Canva's Melanie Perkins, or African/Asian zero-budget marketing stories
-- Lacks concrete teen-executable steps — tells inspiring stories but never says 'here's what YOU do this afternoon with zero budget'
-- Some dollar signs appear to be missing values (e.g., 'sold for each' and 'made K' suggest formatting errors where dollar amounts were dropped)
+- The Dollar Shave Club quote includes 'F***ing' — even censored, this may be inappropriate for 12-year-olds and could concern parents/schools using the platform
+- No non-US or non-white founders cited; source diversity is very narrow for a global teen audience
+- Entry lacks concrete teen-executable steps — frameworks are named but no 'do this today' action items are provided beyond abstract principles
+- The Paul Graham 'do things that don't scale' quote appears in the summary but is never formally introduced or attributed in the key principles section
+
+### 22/30 — Operations and Service Delivery Excellence for First-Time Small Businesses
+> Solid, well-structured entry that speaks naturally to teens with relatable examples (dog walking, tutoring). The principles are sound and mostly actionable. However, the only two quoted sources are Jeff Bezos and Michael Gerber — both white male US figures — and the only corporate example is Disney. The entry would benefit significantly from citing diverse founders (women, people of color, non-US entrepreneurs) and including more specific numbers or data points to move beyond general wisdom.
+
+**Red flags:**
+- Source diversity is extremely poor — only two white male US sources cited, no women, no people of color, no non-US perspectives
+- The claim that Amazon 'takes days to respond to complaints' is an oversimplification that could be seen as inaccurate — Amazon is actually known for responsive customer service
+- The entry claims 5 challenge Q&As but none are actually included in the content
+
+### 23/30 — Financial Literacy Fundamentals: Understanding Profit Margins, Costs, and Revenue for Teen Entrepreneurs
+> Solid foundational financial literacy entry with well-chosen teen-relevant examples (phone cases, lawn care, tutoring) that make abstract concepts concrete and actionable. The math checks out and the examples are genuinely useful. However, the entry leans heavily on generic sourcing — one real person (Sara Blakely, white American woman), one common adage, and one Warren Buffett quote. It would benefit significantly from diverse founders (non-US, non-white, teen entrepreneurs) and more specific real-world data points rather than hypothetical scenarios.
+
+**Red flags:**
+- The Spanx example is vague and doesn't include specific numbers or margin data — it reads more like a motivational reference than an illustrative case
+- No citation of any teen entrepreneur or non-US business example, limiting relatability and diversity
+- Challenge Q&A count listed as 5 but no actual challenge questions are included in the entry
+
+### 23/30 — Pricing Confidence: Overcoming the Fear of Charging What You're Worth
+> The entry is well-structured and highly age-appropriate, with relatable teen examples (graphic design, tutoring, pet-sitting) that both a 13-year-old and an 18-year-old can act on. However, it relies on only two quotes, both from white male billionaires (Bezos and Buffett), which is a notable miss for an entry specifically targeting young women and minority students. The claim about studies showing women and minorities underprice is plausible but no specific study is cited, and the Glossier example, while real, is used somewhat generically. Adding a specific study citation and voices from women/minority entrepreneurs would significantly strengthen this entry.
+
+**Red flags:**
+- An entry explicitly about empowering young women and minority students quotes only two white male billionaires — this undermines the stated purpose and should include voices from women and/or minority founders
+- The claim 'studies consistently find that women and underrepresented groups tend to set lower prices' needs at least one specific citation to be credible and educational rather than anecdotal
+- The Jeff Bezos quote about being misunderstood has no clear connection to pricing confidence and feels shoehorned in
 
 ### 23/30 — finding first customers — Research-Backed Guide
-> The student-friendly summary is genuinely well-written — punchy, memorable, and uses real examples (Stripe, Airbnb, DoorDash, Sara Blakely/Spanx) that are plausibly accurate. However, the entry is structurally incomplete: 'Key principles,' 'Concrete examples,' and 'Quotes' sections are completely empty, meaning the RAG context relies entirely on the summary. Actionability suffers because while the advice is directionally correct ('talk to people, charge money'), there are no step-by-step scripts, templates, or specific exercises a teen could execute today. Source diversity is middling — Sara Blakely adds one female voice, but all examples are US-based, well-known Silicon Valley or startup-culture stories.
+> The entry has great real-world examples (Stripe, Airbnb, DoorDash, Spanx) with specific details that check out, and the tone is punchy and teen-appropriate. However, the 'Key principles,' 'Concrete examples,' and 'Quotes' sections are completely empty — all the substance lives in the student-friendly summary, which means the structured knowledge base fields are unfilled and the entry is essentially incomplete. Actionability suffers because there are no step-by-step scripts, templates, or concrete 'do this today' instructions — it's more inspirational storytelling than executable guidance.
 
 **Red flags:**
-- Key principles, Concrete examples, and Quotes sections are entirely empty — this is an incomplete entry that should not ship as-is
-- Claims '5 Challenge Q&A' but none are included in the entry
-- The 'give me your laptop' Stripe anecdote is commonly attributed to the Collison brothers but the specific phrasing and context are slightly mythologized — could mislead if taken literally
-- Advice to 'charge money from day one' may not apply to all teen projects (e.g., community apps, school services) and lacks nuance about when free is strategically valid
+- Key principles section is completely empty — no structured principles for the AI tutor to draw on
+- Concrete examples section is empty despite examples existing in the summary — poor structure
+- Quotes section is empty — missed opportunity and suggests incomplete authoring
+- No actionable steps, scripts, or templates a teen could execute today (e.g., 'here's how to DM someone about your product')
+- The '100+ customers before paid ads' threshold is stated as fact with no source — could mislead teens into rigid thinking
+- Challenge Q&A count listed as 5 but no actual challenge questions are included
 
-### 23/30 — Zero-Budget Branding: The 24-Hour Name Test and 1-Color Rule
-> The entry is highly specific and actionable — the 24-hour name test is genuinely brilliant for teens. However, the accuracy is deeply concerning: many of the cited statistics appear fabricated or heavily embellished. Igor International is a real naming agency but 'Igor Elbert' does not appear to be a real person there (the founder is Igor Bettencourt/the agency doesn't have a prominent 'Igor Elbert'). The '3:1 recall' stat, the '85% correlation' claim, and the '40% friendliness' figure all read as invented numbers dressed up with real company names. Lexicon Branding and David Placek are real, but the specific studies cited are not verifiable. The 'Cluely' TikTok example appears fabricated. Source diversity is poor — all US-based, all male voices, no diversity in founders cited.
-
-**Red flags:**
-- The '3:1 recall' stat attributed to Igor International's research on 2,000+ brand names appears fabricated — no such published study is verifiable
-- Igor Elbert does not appear to be a real person at Igor International; the quote is likely fabricated
-- The 85% correlation claim for the 24-hour name test has no verifiable source and reads as invented
-- The 40% friendliness increase for names ending in 'y' sounds is not a verified Lexicon Branding finding — and Swiffer and Febreze don't actually end in 'ly' or 'y' sounds as claimed
-- Cluely (social polling app) with the TikTok stat appears to be a fabricated example
-- Glossier's trajectory is oversimplified — they used more than just pink, and attributing $1.8B valuation to one-color branding is misleading
-- Steve Manning is associated with Igor International but the specific quote and methodology description may be fabricated
-
-### 23/30 — The 30-Second Pitch as Your Confidence Superpower: How Storytelling Changes Your Posture
-> The entry is highly specific with named people, real numbers, and concrete examples that are well-suited for teens. However, the accuracy is seriously undermined by multiple problematic claims: Amy Cuddy's power pose research has been widely criticized and the specific testosterone/cortisol numbers (20%, 25%) come from her original 2010 study that failed to replicate — presenting these as established fact to teens is irresponsible. The Claude Steele '40% less stress response' stat appears fabricated or at least not traceable to any specific published finding. The Keith Johnstone 'improv training research' framing is misleading — Johnstone was a theater practitioner, not a researcher conducting studies. The Einstein quote 'If you can't explain it simply...' is widely considered misattributed. Maya Chen appears to be a fictional example presented with suspiciously specific details that could be mistaken for a real person. The Tina Fey quote is from her book Bossypants, not directly about entrepreneurship, but is accurately attributed.
+### 23/30 — Business Model Design Fundamentals for First-Time Entrepreneurs
+> The entry is well-structured and hits the right tone for teenagers, with relatable examples (time management coaching, handmade jewelry) alongside real-world companies (Warby Parker, Spotify). However, it lacks concrete numbers (pricing examples, specific cost thresholds, actual revenue figures) that would make it more actionable, and the cited sources are exclusively white male Western figures. The advice is sound but stays at the framework level — a teen reading this still needs to figure out the 'how' of testing demand or setting prices.
 
 **Red flags:**
-- Amy Cuddy's power pose findings (20% testosterone increase, 25% cortisol decrease) are from a study that famously failed to replicate; presenting these as settled science to teenagers is misleading
-- The Claude Steele '40% less stress response' statistic appears fabricated — no traceable published finding matches this specific claim
-- Keith Johnstone is described as having 'research' when he was a theater practitioner/teacher, not a researcher conducting empirical studies
-- The Einstein quote 'If you can't explain it simply...' is widely considered misattributed and has no verified source
-- Maya Chen example reads as fictional but is presented alongside real people (Karp, Blakely) with no distinction, which could erode trust if a teen tries to look her up
+- No female, non-white, or non-Western founders or experts cited — Osterwalder and Hoffman are both white male Western figures, and Warby Parker/Spotify are both US/Western companies
+- Claims 5 challenge Q&As but none are included in the entry
+- Missing concrete first steps — e.g., no template for sketching a business model canvas, no specific price-testing script, no example of what 'validate demand' looks like in practice
 
-### 23/30 — Jobs-To-Be-Done Framework: Understanding WHY Customers Hire You
-> Strong entry with real frameworks (Christensen, Moesta, Ulwick) and concrete teen examples. However, several specific claims are likely fabricated or embellished: the '7x morning sales increase' from the milkshake study is not a widely verified figure, Sarah from Kenya and Marcus from Detroit are almost certainly fictional examples presented as real case studies, and the '40% of milkshakes sold before 8am' figure may be approximate at best. The 'that's boomer business advice' line in the summary is unnecessarily dismissive and slightly unprofessional. The entry does a good job making JTBD accessible but could include a clearer step-by-step exercise for teens to actually conduct a JTBD interview today.
+### 24/30 — Storytelling and the Elevator Pitch for First-Time Entrepreneurs
+> Solid entry that nails the age-appropriate tone and provides genuinely useful, actionable storytelling frameworks with relatable teen examples. The real-world references (Sara Blakely/Spanx, Reid Hoffman/LinkedIn, Simon Sinek) are accurate but lean heavily on well-known US figures. Could be stronger with specific numbers (e.g., how long an elevator pitch should be in seconds), more diverse founder examples (non-US, non-white founders), and a concrete pitch template teens could fill in today.
 
 **Red flags:**
-- The 7x morning milkshake sales increase claim is not reliably sourced and may be fabricated — Christensen's accounts mention significant improvement but this specific multiplier is unverified
-- Sarah from Kenya and Marcus from Detroit are presented as real case studies but are almost certainly fictional — should be labeled as hypothetical examples to avoid misleading students
-- 'Forget everything you've heard about target demographics - that's boomer business advice' is dismissive and ageist; demographics still matter as a complementary lens and this framing could alienate some users or teach bad intellectual habits
-- The tutor anecdote about '60 minutes of quiet while I make dinner' appears twice (once in key principles and once in examples) attributed to different people — creates confusion about whether this is a real or hypothetical story
+- The Einstein quote 'If you can't explain it simply...' is widely attributed to Einstein but has no verified primary source — could be flagged as misattributed.
+- Claims 5 challenge Q&As but none are included in the entry — metadata mismatch.
 
-### 24/30 — Creating Disney-Level Magic Moments in $20 Services: The One-Delight Delivery System
-> The entry is highly actionable with vivid teen-relatable examples and a clear framework (One-Delight-Per-Delivery) that any teenager could implement today. However, several statistics appear fabricated or unverifiable: the specific NPS of 77 for Disney, the '23% increase' attributed to Danny Meyer, Emma's '73% reorder rate vs 23% industry average,' the '$19 in saved acquisition costs' calculation, and Sophia's '85% recurring booking' figure all read as invented precision rather than sourced data. The teen examples (Sophia, Marcus, Emma) are clearly fictional composites presented as case studies, which is fine pedagogically but risks credibility if a student tries to verify them. The Maya Angelou quote attribution is correct but the claim it's used in Disney training is unverifiable. Source diversity is moderate — Maya Angelou and Bill Gates add some range, but the business frameworks lean heavily on white male US hospitality industry figures, and the teen examples, while gender-balanced, lack geographic or cultural diversity.
+### 24/30 — Building Your First Brand Identity as a Teen Entrepreneur
+> Solid foundational entry with accurate quotes (Bezos and Scott Cook are correctly attributed) and good real-world examples (Glossier, FUBU). However, it leans more toward conceptual understanding than concrete action — there are no step-by-step instructions like 'open Canva, pick 2-3 colors, create a logo' or 'here's how to check if your business name is available on Instagram.' The examples are relevant but could use more specific numbers or metrics to elevate specificity. Source diversity is middling: FUBU adds racial diversity, Glossier adds a female-founded brand, but both quotes are from white male US tech founders.
 
 **Red flags:**
-- Multiple statistics appear fabricated with false precision (Disney NPS 77, 23% satisfaction increase from Meyer, 73% vs 23% reorder rates, $19 saved acquisition cost) — these should be verified or removed to avoid teaching teens to cite fake data
-- The Bain & Company '5-25x' customer acquisition cost stat is a real range but the $19 savings calculation built on top of it uses invented assumptions presented as fact
-- Teen examples (Sophia, Marcus, Emma) are fictional but presented without disclaimer — could be misunderstood as real case studies
-- The student-friendly summary says 'your mom could mow a lawn' which is mildly gendered/assumptions about family structure
+- Challenge Q&A count is listed as 5 but no actual challenge questions are included in the entry
+- No concrete step-by-step actions a teen could execute today (e.g., free tools like Canva, Coolors, or namechk.com)
+- Both quotes are from white male US tech billionaires — consider adding a quote from a female or non-US founder to match the diversity shown in examples
 
-### 24/30 — The Hidden Cost Trap: Why Teen Entrepreneurs Accidentally Work for $3/Hour
-> Strong entry with real businesses, real numbers, and relatable teen scenarios. However, several accuracy concerns: the Barbara Corcoran quote appears fabricated or at least unverifiable as written, the Brad Feld quote is likely paraphrased rather than verbatim from 'Venture Deals' (which is about VC term sheets, not unit economics fundamentals), and the Kylie Cosmetics production cost of ~$3 is a widely repeated estimate but unverified. The soap example math is also off — if soap sells for $8 with $3 materials and 2 hours labor at $10/hour, total cost is $23 and you lose $15, which the entry states correctly, but this means the contribution margin claim of $5 is misleading since it excluded labor before adding it back. Source diversity is limited — mostly white American entrepreneurs and investors with Kylie Jenner as the only woman featured substantively.
-
-**Red flags:**
-- Brad Feld 'Venture Deals' quote is likely fabricated or misattributed — the book covers VC deal terms, not unit economics basics
-- Barbara Corcoran quote appears unverifiable and possibly fabricated
-- Kylie Cosmetics $3 production cost is an unverified internet estimate presented as fact
-- The soap example conflates contribution margin (which typically excludes labor in variable cost framing) with a full cost analysis, which could confuse students about what contribution margin actually means
-- Telling teens their goal should be earning more per hour than working for someone else may discourage early-stage learning experiences where the education value exceeds the hourly wage
-
-### 24/30 — The 3-Column Money Tracking System: How Teen Entrepreneurs Track Every Dollar in 5 Minutes Per Week
-> The entry is highly specific with named people, businesses, and numbers, and extremely actionable for teens. However, many of the statistics and attributions appear fabricated or heavily embellished: Dave Ramsey is not known for popularizing a '3-Column System' and is a personal finance personality not a small business owner; the claim that '72% of successful small businesses' use this system from SCORE data is unverifiable and likely invented; the Dan Ariely '12-18% less spending and 23% more saving' figures for physical writing are not from any known published study; Suze Orman recommending a 'shoebox receipt system' is a generic attribution; the claim that '89% of teen entrepreneurs' prefer Sunday 7pm is almost certainly fabricated; Hart Main's specific notebook entries and the claim he used three columns are likely invented details; and Jacob Komar does not appear to be a verifiable public figure. The Moziah Bridges shoebox quote is unverifiable. The entry is excellent pedagogically but ships a dangerous number of made-up statistics dressed as research.
+### 25/30 — Storytelling and the Elevator Pitch: Crafting Your Compelling Narrative
+> Strong entry that balances real-world examples (Sara Blakely, Reid Hoffman, Donald Miller, Simon Sinek) with teen-relatable hypotheticals. The Spanx story and LinkedIn framing are accurate to common retellings, though the Reid Hoffman pitch narrative is a somewhat simplified/stylized version of LinkedIn's actual founding story. Source diversity is the weakest dimension — all named figures are white Americans, and adding a non-US or underrepresented founder example would strengthen it significantly. The actionability is good but could be elevated with a step-by-step template or fill-in-the-blank pitch scaffold teens could use immediately.
 
 **Red flags:**
-- The '72% of successful small businesses' SCORE statistic appears fabricated — no such data is publicly available
-- Dan Ariely's '12-18% less spending, 23% more saving' from physical writing is not from any known published study and should not be presented as research fact
-- Dave Ramsey did not popularize a '3-Column System' — he is a personal finance radio host, not a small business bookkeeping innovator
-- The '89% of teen entrepreneurs prefer Sunday 7pm' statistic is almost certainly invented
-- Hart Main's specific notebook entries (date, amounts, 'Vanilla candles to Jake's mom') appear to be fabricated details presented as fact
-- Jacob Komar and his $40,000 sneaker flipping story do not appear to be a verifiable public figure/case — likely fabricated
-- The Moziah Bridges shoebox quote is unverifiable and may be fabricated
-- Mike Michalowicz's '3x more likely to be profitable' claim from Profit First is not presented as research in the book — it's anecdotal
-
-### 24/30 — Lean Canvas: Map Your Business Idea on One Page Before Spending a Dollar
-> The entry is well-structured, highly age-appropriate, and actionable with relatable teen examples across multiple geographies. However, several key statistics appear fabricated or unverifiable: the '70% of failed startups' claim attributed to Maurya, the '85% failure rate for vague revenue plans' attributed to Osterwalder's 'research on 500+ business models,' and especially Steve Blank's '92% of 3,200 startups' statistic all read like invented numbers dressed up with real names. The teen examples (Maya, James) are likely fictional but serve a useful illustrative purpose — they should be flagged as hypothetical rather than presented as real case studies.
-
-**Red flags:**
-- The statistic '70% of failed startups built something nobody wanted' is a common paraphrase of CB Insights data, not specifically from Ash Maurya, and the exact figure is typically cited as 42% not 70%
-- The claim that Osterwalder researched '500+ business models' finding '85% failure rate for vague revenue plans' appears fabricated — no such specific study is known
-- Steve Blank's '92% of 3,200 startups' statistic with that exact framing does not appear in his known published work and likely conflates multiple sources or is invented
-- Warby Parker was founded in 2010 (launched 2010), not 2008 as stated, and their lean canvas usage is not a documented claim
-- Maya and James examples are presented as real people but are almost certainly fictional — should be labeled as hypothetical scenarios
-- The Zuckerberg quote, while real, is somewhat misplaced in an entry about lean canvas methodology and doesn't reinforce the core lesson about systematic business model mapping
-
-### 25/30 — Brand as Gut Feeling: Building a Memorable Identity from Your Bedroom
-> Strong entry with excellent real-world examples and teen-relatable framing (press-on nails, Pokemon cards). However, several claims need verification: Trapstar's founders starting with exactly £1,000 and their £200M+ valuation are hard to confirm; Glossier's $1.2B valuation was its peak before significant decline and layoffs, which is misleading without context; Into the Gloss having 10 million readers pre-launch is unverified. The entry is more inspirational than actionable — it tells teens what brand IS but doesn't give them a concrete exercise to define their own brand today (e.g., a fill-in-the-blank positioning statement or a 3-step naming exercise).
-
-**Red flags:**
-- Trapstar £200+ million valuation and £1,000 starting capital are unverified claims that may be inaccurate or exaggerated
-- Glossier $1.2B valuation cited without noting the company's subsequent significant decline, layoffs, and down-round — could mislead teens about realistic outcomes
-- Into the Gloss '10 million readers' figure before Glossier launch is likely inflated and not well-sourced
-- Entry mentions 'Challenge Q&A count: 5' but no actual challenge questions are included
-- Gary Vaynerchuk's Wine Library TV '90,000 viewers' figure is vague and hard to verify — was this daily, per episode, or total?
-
-### 25/30 — Why Facts Don't Sell: Using Story Structure to Turn Your 15-Second Hallway Pitch Into Customer Gold
-> This is a well-structured, highly actionable entry with a clear formula teens can use immediately. The teen examples (Maya Chen, Marcus Thompson) are almost certainly fabricated composites presented as real people with specific cities and revenue numbers, which is a significant accuracy concern. The cited frameworks (StoryBrand, Pixar story spine, Made to Stick) are real and reasonably well-attributed, but the Andy Raskin claim about 'analyzing 100+ successful startup pitches' is embellished — his famous post analyzed one pitch (Zuora's). The '6x more memorable' stat attributed to Chip Heath is a loose paraphrase that may overstate the original research. The Airbnb pitch deck narrative is a reasonable reconstruction but the $7.2M Series A figure checks out. Source diversity is limited: all cited thought leaders (Miller, Raskin, Heath, Godin, Jobs) are white American men, though the fictional teen examples add some demographic variety.
-
-**Red flags:**
-- Maya Chen and Marcus Thompson appear to be fabricated examples presented as real people with specific names, cities, ages, and revenue figures — this should be clearly labeled as hypothetical or composite
-- The '6x more memorable' statistic attributed to Chip Heath's Made to Stick research is not a precise finding from the book and may be misleading as a hard number
-- Andy Raskin's pitch analysis claim is overstated — his viral article primarily analyzed Zuora's pitch, not '100+ successful startup pitches'
-- Conversion rate claims (10% to 60%) for the teen examples are presented as factual data points but are almost certainly invented
-
-### 25/30 — Build Customer Personas From One Real Person You Know
-> The entry is exceptionally actionable and age-appropriate, with concrete steps a teen could execute today. However, the accuracy is a serious concern: the teen examples (Alex Chen, Emma Rodriguez) are almost certainly fabricated and presented as real case studies with specific revenue numbers, which is deceptive. The Canva origin story is oversimplified — Perkins started with Fusion Books (yearbook design software) in Perth, Australia, not as a university student struggling with a yearbook committee. The '5 person rule' attributed to HBS case study methodology is not a verifiable, established HBS concept. Adele Revella and Tim Brown are real people with plausible attributions, though the exact quotes may not be verbatim. The Revella '100+ companies' claim and specific methodology areas are broadly consistent with her published work.
-
-**Red flags:**
-- Teen founder examples (Alex Chen $2,000/month tutoring, Emma Rodriguez $500/month social media) appear fabricated but are presented as factual case studies with specific dollar amounts — this could erode trust if a student tries to verify them
-- Canva origin story is inaccurate: Melanie Perkins co-founded Fusion Books (a yearbook design tool) as a commercial startup, not as a classmate struggling on a yearbook committee. The narrative is romanticized and misleading
-- The 'Harvard Business School 5 person rule' is not a verifiable established methodology — attributing it to HBS lends false institutional authority
-- The Tim Brown quote may not be verbatim; presenting approximate paraphrases in quotation marks with attribution is risky
-
-### 25/30 — The 5 Teen-Executable Business Models: From Dog Walking to TikTok Fame
-> The entry is impressively specific with named people, dollar amounts, and concrete business models that teens can actually relate to. However, the accuracy is deeply concerning: Melanie Perkins did not start with dog walking (she started with an online design tool), Ben Francis did not 'sell Gymshark for $1.3 billion' (he sold a minority stake to General Atlantic), the Stripe Atlas statistic about 78% survival rate for service businesses appears fabricated, the Harvard/William Kerr introvert/extrovert claim is likely invented, 'Rachel Roy Greenheart' and 'Isabella Dymalovski' appear to be fabricated people presented as real case studies, and the MrBeast quote and Coffee Meets Bagel/Emma Chamberlain sponsorship claim seem invented. The pedagogical framing and age-appropriateness are excellent, but shipping fabricated statistics and fake quotes attributed to real people to teenagers is a serious integrity issue.
-
-**Red flags:**
-- Melanie Perkins quote about dog walking appears completely fabricated - she co-founded Fusion Books then Canva, not a dog walking business
-- Ben Francis/Gymshark was not 'sold for $1.3 billion' - a minority stake was sold to General Atlantic; Francis remains CEO
-- The Stripe Atlas 78% survival rate statistic, Harvard/William Kerr introvert study, and SBA under-20 entrepreneur data all appear fabricated or at minimum unverifiable
-- Rachel Roy Greenheart, Maya Patel's Clay Creations, Isabella Dymalovski's Fresh Loaf Weekly, and @sneakerhead_jack appear to be fictional examples presented as real people without disclosure
-- The MrBeast 97% quote and the Emma Chamberlain/Coffee Meets Bagel $50K sponsorship claim appear invented
-- Jason Cohen's '500+ small businesses' analysis with those specific findings appears fabricated
-
-### 25/30 — Pricing Confidence: Breaking the Undercharging Pattern for Women and Minority Entrepreneurs
-> Strong entry with real names, real numbers, and diverse voices. However, several claims are questionable or embellished: the '30-40% less' stat attributed to Project Diane's 2018 study is not a well-known finding from that report (Project Diane focused on funding amounts, not pricing gaps); Babcock's '4x less' negotiation stat is a simplified version of her research; Whitney Wolfe Herd wanting to give Bumble away for free is not a well-documented claim; Sara Blakely became the youngest self-made female billionaire, not simply 'youngest female billionaire'; and the claim that 'studies show physical practice reduces cortisol when stating prices' for the mirror technique is unsubstantiated. The Mo's Bows example is excellent for the teen audience, and the cognitive reframe from Patrice Washington is genuinely actionable.
-
-**Red flags:**
-- The 30-40% pricing gap stat attributed to Project Diane 2018 appears fabricated or misattributed — Project Diane studied funding raised by Black and Latina women founders, not pricing differentials
-- Sara Blakely is described as 'world's youngest female billionaire at 41' — she was the youngest self-made female billionaire, an important distinction
-- The claim about cortisol reduction from the mirror technique lacks any verifiable study and reads as pseudo-scientific
-- Whitney Wolfe Herd 'wanting to give Bumble away for free' is not a well-documented claim and may be fabricated
-- Mo's Bows revenue jump from $1,000 to $150,000 — the $1,000 baseline figure and direct causal link to price increase alone is likely oversimplified or inaccurate
-- The student summary's phrasing 'especially if you're a girl' could feel reductive or stereotyping to some teen girls — consider reframing to empower rather than label
-
-### 26/30 — Operations Excellence for Teen Entrepreneurs: Systems Over Hustle
-> Strong, highly actionable entry with excellent age-appropriate framing. The real expert citations (Gawande, Michalowicz, Danny Meyer) are accurately attributed, but the teen entrepreneur examples (Maya Rodriguez, James Chen, Sarah Ahmed) are almost certainly fabricated case studies presented as real people with specific details (Brooklyn, Dallas, exact revenue numbers), which is a significant honesty concern. The Gawande checklist claim is slightly off — the famous study was at multiple hospitals and the 47% figure refers to a different metric than 'deaths' in many tellings — but it's in the right ballpark. The McKinsey 15-30% reliability premium claim is plausible but not a well-known specific finding I can verify.
-
-**Red flags:**
-- Teen entrepreneur examples (Maya Rodriguez, James Chen, Sarah Ahmed) appear fabricated but are presented as factual case studies with specific names, locations, and revenue figures — this is misleading and should be clearly labeled as hypothetical or replaced with verified stories
-- The 47% death reduction from checklists attributed to Johns Hopkins is a simplification — the landmark study was a WHO/Harvard initiative across 8 hospitals worldwide, and the statistic typically cited is a 47% reduction in deaths, but attributing it solely to Johns Hopkins is inaccurate
-- The McKinsey 15-30% reliability premium claim lacks a specific source citation and may not correspond to a real published finding
-
-### 26/30 — Pricing Scripts That Work: How to Quote Your Price Without Apology
-> Excellent actionability — the scripts are immediately usable and the teen examples are vivid and relatable. However, several claims have accuracy concerns: the Ramit Sethi '1% per week' freelancer study is not a documented finding from his work (it sounds fabricated), the exact Rafi Mohammed 30-60% margin stat is unverifiable, and the Chris Voss quote about disagreeing without being disagreeable is widely attributed to Robert Estabrook, not Voss. The teen examples (Zara, Marcus, Priya) are almost certainly fictional but presented as real case studies, which is misleading. Source diversity is limited to two white male authors (Voss, Sethi) plus Mohammed, though the teen examples feature diverse characters.
-
-**Red flags:**
-- The '1% per week raising rates' claim attributed to Ramit Sethi appears fabricated — this is not a documented study from his work
-- The first quote ('He who has learned to disagree...') is widely attributed to Robert Estabrook, not Chris Voss, and does not appear in 'Never Split the Difference'
-- Teen examples (Zara, Marcus, Priya) appear fictional but are presented as real case studies with specific numbers — should be labeled as hypothetical or verified
-- The Rafi Mohammed 30-60% bundle margin increase stat is suspiciously precise and unverifiable from 'The Art of Pricing'
-- Title mentions 'especially for young women and minority students' but the entry doesn't specifically address the unique pricing confidence barriers these groups face beyond featuring diverse names in examples
-
-### 26/30 — Content-First Strategy: Building Your Audience Before Your Product Using TikTok and Instagram Reels
-> Strong entry with real names, specific numbers, and highly relatable teen examples (Eitan Bernath, Wisdom Kaye, Emma Chamberlain). However, several claims need verification: Marie Poulin's specific revenue figures ($300K first launch, 15K email list, $1,997 price point) and the exact attribution of the Jay Clouse quote feel potentially fabricated or embellished. The Marie Poulin quote attributed to a 'ConvertKit Creator Stories interview' may not be verbatim. Emma Chamberlain's $1M first-year revenue figure is plausible but unverified. The entry is exceptionally age-appropriate and actionable, with teen creators as examples making it immediately relatable.
-
-**Red flags:**
-- Marie Poulin's specific financial figures ($300K launch, $1,997 course price, 15K email list) may be fabricated or significantly inaccurate — verify before shipping
-- The Jay Clouse quote and its attribution to 'Creator Economy Report 2023' may not be real
-- Charli D'Amelio example oversimplifies — she went viral through dance trends and network effects, not just 'consistency', which could set unrealistic expectations
-- Wisdom Kaye's '9.4 million followers' and 'six figures annually' claims need verification as numbers may be inflated or outdated
-- The 'Seven-Touch Rule' is a commonly cited marketing heuristic but its research basis is debated — presenting it as established 'marketing research' is slightly misleading
-
-### 26/30 — The 30-Day Zero-Budget Social Media Sprint: A Step-by-Step Content Plan for Teen Entrepreneurs
-> The entry is highly specific, actionable, and age-appropriate, with a clear 30-day framework teens can execute immediately. However, several 'real' teen examples (Tiana Soto, Marcus Thompson, Sofia Chen) appear to be fabricated — I cannot verify any of them, and the details feel suspiciously neat and illustrative. The Tiana Soto quote about making $1,000 at 15 is almost certainly fictional. Justin Welsh is real but the specific quote and the '1-1-1 rule' attribution appear invented. Sean Cannell's specific completion rate percentages (87%, 73%, 69%) look fabricated. Emma Chamberlain did not build her following through daily vlogs in the way described. The Gary Vaynerchuk '340% more engagement' stat is unverifiable and likely made up.
-
-**Red flags:**
-- Teen examples (Tiana Soto, Marcus Thompson, Sofia Chen) appear fabricated with invented social handles and overly clean narratives — presenting fictional people as real case studies is deceptive
-- The Justin Welsh '1-1-1 rule' attribution, Sean Cannell's specific completion rate percentages, and Vaynerchuk's '340% more engagement' stat all appear to be invented statistics dressed up as real data
-- Encouraging teens to 'slide into DMs' of every person who interacts with their content could be seen as spammy behavior and may violate platform terms of service if done at scale
-- The Tiana Soto quote is presented as from a real teen entrepreneur but is almost certainly fabricated — this is ethically problematic for educational content
+- The hypothetical teen tutoring app example claims 'over 200 students' — if a teen internalizes this as a realistic early benchmark, it could set unrealistic expectations. Consider noting this is illustrative.
+- The Sara Blakely 'dorm' detail in the hypothetical example is fine, but the actual Spanx pantyhose-cutting story is slightly simplified — she was preparing for a party, not just generally frustrated. Minor but worth precision.
+- All named real people (Blakely, Hoffman, Sinek, Miller) are white Americans — no diversity in cited voices.

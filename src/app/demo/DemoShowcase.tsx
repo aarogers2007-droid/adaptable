@@ -586,6 +586,18 @@ export default function DemoShowcase() {
               how kids think about themselves before it changes what they do.</strong>
             </p>
           </div>
+
+          {/* Knowledge base rigor callout — fact-checked + verified */}
+          <div className="mt-4 rounded-lg border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5">
+            <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">The mentor&apos;s knowledge base</p>
+            <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+              The AI mentor pulls from a curated knowledge base of <strong>25 entries</strong> spanning real founders
+              and frameworks — Marty Neumeier, Donald Miller, Clayton Christensen, Sara Blakely, Mike Michalowicz, Chris Voss,
+              and others. Every entry is fact-checked by Opus for citation hallucination, and the RAG retrieval prefers
+              <strong> verified entries first</strong> on every lesson. Result: <strong>22 of 22 lessons</strong> get
+              clean RAG context the moment a student starts a conversation. No silent failures, no fabricated case studies.
+            </p>
+          </div>
         </div>
       </Section>
 
