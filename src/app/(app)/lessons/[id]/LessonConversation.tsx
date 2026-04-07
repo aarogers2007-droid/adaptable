@@ -755,13 +755,14 @@ export default function LessonConversation({
 
             {/* Suggested responses (appear after 30s idle) */}
             {showSuggestions && suggestions.length > 0 && !nudge && (
-              <div className="mb-3 flex flex-wrap gap-2">
+              <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Suggested responses">
                 <span className="text-xs text-[var(--text-muted)] self-center mr-1">Stuck?</span>
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
                     onClick={() => useSuggestion(s)}
-                    className="chip-cascade rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors"
+                    aria-label={`Use suggestion: ${s}`}
+                    className="chip-cascade rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
                     style={{ animationDelay: `${i * 200}ms` }}
                   >
                     {s}
@@ -785,7 +786,8 @@ export default function LessonConversation({
                   placeholder="What are you thinking?"
                   rows={1}
                   autoFocus
-                  className="lesson-input flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none transition-all"
+                  aria-label="Your response to the lesson question"
+                  className="lesson-input flex-1 resize-none rounded-xl border border-[var(--border-strong)] px-4 py-3 text-base outline-none transition-all focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
                   style={{ maxHeight: "150px", overflow: "auto" }}
                 />
                 <VoiceInput
@@ -798,7 +800,8 @@ export default function LessonConversation({
                 <button
                   type="submit"
                   disabled={!input.trim() || loading}
-                  className="rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-40 transition-colors"
+                  aria-label="Send your response"
+                  className="rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-40 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
                 >
                   Send
                 </button>
