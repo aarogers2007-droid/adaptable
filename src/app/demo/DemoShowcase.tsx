@@ -155,7 +155,7 @@ export default function DemoShowcase() {
                 className="mt-1 text-sm text-[var(--text-muted)]"
                 style={{ fontFamily: '"Times New Roman", Times, serif' }}
               >
-                Built for Cristal and the VentureLab team.
+                Built for VentureLab.
               </p>
             </div>
           </article>
