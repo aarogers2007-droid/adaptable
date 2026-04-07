@@ -98,6 +98,49 @@ export async function alertContentFlag(
 }
 
 /**
+ * Fire a CRITICAL crisis alert. Called from lesson-chat when
+ * crisis-detection identifies a self-harm/suicidal/abuse signal.
+ *
+ * Bypasses deduplication — every crisis signal creates an alert.
+ */
+export async function alertCrisis(
+  supabase: SupabaseClient,
+  studentId: string,
+  crisisType: string,
+  matchedText: string,
+  flaggedMessage: string,
+  feature: string,
+) {
+  // Find the student's class
+  const { data: enrollment } = await supabase
+    .from("class_enrollments")
+    .select("class_id")
+    .eq("student_id", studentId)
+    .limit(1)
+    .single();
+
+  if (!enrollment) return;
+
+  // Insert without deduplication — every crisis signal must surface
+  await supabase.from("teacher_alerts").insert({
+    class_id: enrollment.class_id,
+    student_id: studentId,
+    alert_type: "content_flag",
+    severity: "urgent",
+    message: `URGENT: Student may be in crisis. Type: ${crisisType}. Please check in immediately.`,
+    context: {
+      crisis_type: crisisType,
+      matched_phrase: matchedText.slice(0, 100),
+      surrounding_message: flaggedMessage.slice(0, 500),
+      feature,
+      timestamp: new Date().toISOString(),
+      requires_immediate_attention: true,
+    },
+    acknowledged: false,
+  });
+}
+
+/**
  * Fire an emotional concern alert. Called from lesson-chat when
  * the AI detects sustained negative emotional states.
  *

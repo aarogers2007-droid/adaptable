@@ -33,6 +33,63 @@ export async function POST(request: Request) {
     return Response.json({ error: contentCheck.reason }, { status: 400 });
   }
 
+  // ML moderation layer — catches what regex misses (subtle toxicity, coded language)
+  // Falls back to safe:true on failure so it never blocks legitimate students
+  const { moderateContentML } = await import("@/lib/ml-moderation");
+  const mlCheck = await moderateContentML(message);
+  if (!mlCheck.safe) {
+    import("@/lib/teacher-alerts").then(({ alertContentFlag }) =>
+      alertContentFlag(supabase, user.id, message, mlCheck.category ?? "ml-flagged", "lesson-chat")
+    ).catch(() => {});
+    return Response.json({ error: "That message couldn't be sent. Try rephrasing." }, { status: 400 });
+  }
+
+  // Crisis detection — runs after moderation
+  // If detected: fire URGENT teacher alert AND return a supportive
+  // response with crisis resources. The lesson continues — we don't
+  // abandon the student, but we make sure they hear "talk to someone".
+  const { detectCrisis, getCrisisResponse } = await import("@/lib/crisis-detection");
+  const crisisCheck = detectCrisis(message);
+  if (crisisCheck.detected) {
+    // Get student name for the response
+    const { data: nameData } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+    const firstName = (nameData?.full_name as string | undefined)?.split(" ")[0] ?? "Hey";
+
+    // Fire URGENT teacher alert (non-blocking)
+    import("@/lib/teacher-alerts").then(({ alertCrisis }) =>
+      alertCrisis(
+        supabase,
+        user.id,
+        crisisCheck.type ?? "hopelessness",
+        crisisCheck.matchedPattern ?? "",
+        message,
+        "lesson-chat"
+      )
+    ).catch((err) => console.error("[crisis] alert failed:", err));
+
+    // Return the supportive response immediately as a complete SSE stream
+    const supportiveText = getCrisisResponse(firstName);
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: supportiveText })}\n\n`));
+        controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
+  }
+
   if (!progressId || typeof progressId !== "string") {
     return new Response("Missing progressId", { status: 400 });
   }

@@ -14,13 +14,18 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Fetch profile, lessons, progress, and latest check-in in parallel
-  const [profileRes, lessonsRes, progressRes, checkinRes] = await Promise.all([
+  // Fetch profile, lessons, progress, latest check-in, and class settings in parallel
+  const [profileRes, lessonsRes, progressRes, checkinRes, enrollmentRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
     supabase.from("mentor_checkins").select("*").eq("student_id", user.id).order("created_at", { ascending: false }).limit(1),
+    supabase.from("class_enrollments").select("class_id, classes(streaks_enabled)").eq("student_id", user.id).limit(1).single(),
   ]);
+
+  // Class-level settings — teacher can disable streaks for the whole class
+  const classData = enrollmentRes.data as { classes: { streaks_enabled?: boolean } | null } | null;
+  const streaksEnabled = classData?.classes?.streaks_enabled ?? true;
 
   const profile = profileRes.data as unknown as Profile | null;
   if (!profile?.business_idea) redirect("/onboarding");
@@ -140,7 +145,7 @@ export default async function DashboardPage() {
               <p className="text-sm text-[var(--text-muted)]">
                 {completed} of {total} milestones completed
               </p>
-              {streak > 0 && (
+              {streaksEnabled && streak > 0 && (
                 <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 ${streak >= 7 ? "streak-badge-hot" : "streak-badge"}`}>
                   <span className="text-base">🔥</span>
                   <span className="text-[var(--accent)] flex items-baseline gap-1">

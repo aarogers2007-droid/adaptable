@@ -34,7 +34,7 @@ export default async function InstructorDashboardPage() {
   // Get classes: org_admins see all classes in their org, instructors see their own
   let classQuery = supabase
     .from("classes")
-    .select("id, name, description, instructor_id")
+    .select("id, name, description, instructor_id, streaks_enabled")
     .order("created_at", { ascending: true });
 
   if (profile.role === "org_admin" && profile.org_id) {
@@ -471,6 +471,7 @@ export default async function InstructorDashboardPage() {
       alerts: classAlerts,
       analytics,
       flags,
+      streaksEnabled: (cls as { streaks_enabled?: boolean }).streaks_enabled ?? true,
     });
   }
 

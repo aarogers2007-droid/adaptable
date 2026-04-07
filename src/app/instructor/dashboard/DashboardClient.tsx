@@ -13,6 +13,7 @@ import type { StudentRow } from "./StudentTable";
 import type { FeedItem } from "./LiveFeed";
 import type { AnalyticsData } from "./ClassAnalytics";
 import FollowUpPanel from "./FollowUpPanel";
+import ClassSettings from "./ClassSettings";
 import type { TeacherAlert } from "@/lib/types";
 
 export interface ClassFlag {
@@ -35,6 +36,7 @@ export interface ClassData {
   alerts: (TeacherAlert & { student_name: string })[];
   analytics: AnalyticsData;
   flags: ClassFlag[];
+  streaksEnabled: boolean;
 }
 
 interface DashboardClientProps {
@@ -42,7 +44,7 @@ interface DashboardClientProps {
   totalLessons: number;
 }
 
-type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics";
+type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics" | "settings";
 
 export default function DashboardClient({ classes, totalLessons }: DashboardClientProps) {
   const [activeClassIdx, setActiveClassIdx] = useState(0);
@@ -68,6 +70,7 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
     { key: "alerts", label: "Alerts", count: activeClass?.alerts.length },
     { key: "followups", label: "Follow-ups", count: activeFlags.length },
     { key: "analytics", label: "Analytics" },
+    { key: "settings", label: "Settings" },
   ];
 
   return (
@@ -255,6 +258,14 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
 
                 {activeSubTab === "analytics" && (
                   <ClassAnalytics data={activeClass.analytics} />
+                )}
+
+                {activeSubTab === "settings" && (
+                  <ClassSettings
+                    classId={activeClass.id}
+                    className={activeClass.name}
+                    initialStreaksEnabled={activeClass.streaksEnabled}
+                  />
                 )}
               </div>
             )}
