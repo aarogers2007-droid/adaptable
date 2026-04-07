@@ -2,7 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Retrieve relevant knowledge for a given topic/question.
- * Uses lesson tag matching first, then falls back to semantic search.
+ *
+ * VERIFIED-FIRST RETRIEVAL: prefers entries with verified=true (the 9
+ * citation-clean originals). Only falls back to unverified entries when
+ * no verified entries exist for the lesson tag. This protects production
+ * from the 29% citation hallucination rate found in the 16 entries seeded
+ * by the 2-agent pipeline on 2026-04-07. See scripts/eval-knowledge-base.ts.
+ *
+ * Once Option B (regeneration with strict no-fabrication prompt) lands and
+ * those entries are re-marked verified=true, the fallback path becomes
+ * cosmetic and the production retrieval is fully clean.
  */
 export async function getRelevantKnowledge(
   lessonTag: string,
@@ -10,14 +19,29 @@ export async function getRelevantKnowledge(
 ): Promise<string> {
   const supabase = await createClient();
 
-  // Tag-based retrieval (fast, precise)
-  const { data: tagResults } = await supabase
+  // Pass 1: verified entries only — citation-clean originals
+  let { data: tagResults } = await supabase
     .from("knowledge_base")
     .select(
       "title, key_principles, concrete_examples, quotes, student_friendly_summary, challenge_qa"
     )
     .contains("lesson_tags", [lessonTag])
+    .eq("verified", true)
     .limit(limit);
+
+  // Pass 2: fall back to ANY entries if no verified hits exist for this tag.
+  // This is "better than empty context" while the unverified entries wait
+  // to be regenerated.
+  if (!tagResults || tagResults.length === 0) {
+    const { data: fallback } = await supabase
+      .from("knowledge_base")
+      .select(
+        "title, key_principles, concrete_examples, quotes, student_friendly_summary, challenge_qa"
+      )
+      .contains("lesson_tags", [lessonTag])
+      .limit(limit);
+    tagResults = fallback;
+  }
 
   if (!tagResults || tagResults.length === 0) {
     return "";
