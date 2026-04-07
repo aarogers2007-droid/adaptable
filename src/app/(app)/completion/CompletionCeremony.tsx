@@ -20,6 +20,23 @@ interface CeremonyProps {
     monetization: string;
   } | null;
   onComplete: () => void;
+  /**
+   * When true (default), the ceremony shows the four Ikigai answer labels
+   * around the circles during the reveal scene. When false, the circles
+   * appear and animate without any text labels — pure visual reveal.
+   *
+   * AJ's call (2026-04-08): cleaner is better. Default: false.
+   */
+  showAnswerLabels?: boolean;
+  /**
+   * Demo mode: skip the founder's letter, "Program Complete", diploma, and
+   * mentor farewell scenes entirely. Start directly on the Ikigai reveal,
+   * play through the gravitational collapse + business name reveal, then
+   * auto-call onComplete. Used by the /demo page.
+   *
+   * Default: false (real students get the full ceremony).
+   */
+  demoMode?: boolean;
 }
 
 type Scene = "letter" | "complete" | "reveal" | "diploma" | "farewell";
@@ -30,8 +47,10 @@ export default function CompletionCeremony({
   businessNiche,
   ikigai,
   onComplete,
+  showAnswerLabels = false,
+  demoMode = false,
 }: CeremonyProps) {
-  const [activeScene, setActiveScene] = useState<Scene>("letter");
+  const [activeScene, setActiveScene] = useState<Scene>(demoMode ? "reveal" : "letter");
   const [exitingScene, setExitingScene] = useState<Scene | null>(null);
   const [letterPhase, setLetterPhase] = useState<"hidden" | "p1" | "p2" | "sig" | "reading" | "fading">("hidden");
   const [revealedCircles, setRevealedCircles] = useState<number[]>([]);
@@ -73,56 +92,63 @@ export default function CompletionCeremony({
     [activeScene]
   );
 
-  // ─── SCENE 1 → 3: FOUNDER'S LETTER → COMPLETE → REVEAL ───
+  // ─── MAIN SEQUENCE ───
   // Runs ONCE on mount. Must not depend on activeScene, or self-transitions
   // below would cancel the sequence mid-flight via the cleanup.
+  // In demoMode: skips the letter and "Program Complete" scenes entirely
+  // and starts directly on the Ikigai reveal.
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
-      await sleep(PHI * BASE);
-      if (cancelled) return;
-      setLetterPhase("p1"); // "Dear [name],"
+      // ── Skip the founder's letter + Program Complete scenes in demo mode ──
+      if (!demoMode) {
+        await sleep(PHI * BASE);
+        if (cancelled) return;
+        setLetterPhase("p1"); // "Dear [name],"
 
-      await sleep(2.618 * BASE);
-      if (cancelled) return;
-      setLetterPhase("p2"); // Main text
+        await sleep(2.618 * BASE);
+        if (cancelled) return;
+        setLetterPhase("p2"); // Main text
 
-      await sleep(4.236 * BASE);
-      if (cancelled) return;
-      setLetterPhase("sig"); // Signature
+        await sleep(4.236 * BASE);
+        if (cancelled) return;
+        setLetterPhase("sig"); // Signature
 
-      await sleep(4.236 * BASE);
-      if (cancelled) return;
-      setLetterPhase("fading"); // Dissolve all
+        await sleep(4.236 * BASE);
+        if (cancelled) return;
+        setLetterPhase("fading"); // Dissolve all
 
-      await sleep(3.236 * BASE); // Hold darkness
+        await sleep(3.236 * BASE); // Hold darkness
 
-      if (cancelled) return;
-      // Transition to Program Complete
-      setExitingScene("letter");
-      await sleep(618);
-      if (cancelled) return;
-      setActiveScene("complete");
-      setExitingScene(null);
+        if (cancelled) return;
+        // Transition to Program Complete
+        setExitingScene("letter");
+        await sleep(618);
+        if (cancelled) return;
+        setActiveScene("complete");
+        setExitingScene(null);
 
-      // Hold "Program Complete"
-      await sleep(PHI * PHI * PHI * BASE);
+        // Hold "Program Complete"
+        await sleep(PHI * PHI * PHI * BASE);
 
-      if (cancelled) return;
-      setExitingScene("complete");
-      await sleep(PHI * BASE);
-      if (cancelled) return;
-      setActiveScene("reveal");
-      setExitingScene(null);
+        if (cancelled) return;
+        setExitingScene("complete");
+        await sleep(PHI * BASE);
+        if (cancelled) return;
+        setActiveScene("reveal");
+        setExitingScene(null);
+      }
 
-      // Ikigai reveal sequence
-      await sleep(BASE);
+      // ── REVEAL SCENE — runs in both modes ──
+      await sleep(demoMode ? 0.5 * BASE : BASE);
 
       for (let i = 0; i < 4; i++) {
         if (cancelled) return;
         setRevealedCircles((prev) => [...prev, i]);
         await sleep(PHI * BASE);
+        // Answer labels only show when showAnswerLabels is true; the state still
+        // updates here so the gating in JSX behaves predictably.
         if (cancelled) return;
         setRevealedAnswers((prev) => [...prev, i]);
         await sleep(BASE);
@@ -158,9 +184,11 @@ export default function CompletionCeremony({
       // Wait for name + glow to settle
       await sleep(PHI * PHI * BASE);
 
-      // "This came from who you are."
-      if (cancelled) return;
-      setOriginVisible(true);
+      // "This came from who you are." — skip in demo mode (cleaner / no text dump)
+      if (!demoMode) {
+        if (cancelled) return;
+        setOriginVisible(true);
+      }
 
       // Circles return as ghosts
       await sleep(PHI * BASE);
@@ -169,7 +197,16 @@ export default function CompletionCeremony({
 
       await sleep(PHI * PHI * BASE);
       if (cancelled) return;
-      setImInVisible(true);
+
+      // Demo mode auto-completes after the reveal — no "I'M IN" button,
+      // no diploma, no farewell. Just the moment, then back to the demo scroll.
+      if (demoMode) {
+        await sleep(PHI * BASE); // Let the name breathe
+        if (cancelled) return;
+        onComplete();
+      } else {
+        setImInVisible(true);
+      }
     })();
 
     return () => {
@@ -261,15 +298,17 @@ export default function CompletionCeremony({
         <div className="ceremony-ambient-glow" />
 
         <div className="ceremony-ik-wrap">
-          {/* Answer labels */}
-          {["a1", "a2", "a3", "a4"].map((cls, i) => (
-            <div
-              key={cls}
-              className={`ceremony-ik-answer ${cls} ${revealedAnswers.includes(i) ? "visible" : ""}`}
-            >
-              {answers[i]}
-            </div>
-          ))}
+          {/* Answer labels — hidden by default for a cleaner reveal.
+              Pass showAnswerLabels={true} to bring them back. */}
+          {showAnswerLabels &&
+            ["a1", "a2", "a3", "a4"].map((cls, i) => (
+              <div
+                key={cls}
+                className={`ceremony-ik-answer ${cls} ${revealedAnswers.includes(i) ? "visible" : ""}`}
+              >
+                {answers[i]}
+              </div>
+            ))}
 
           {/* Four circles — collapse inward, then return as ghosts */}
           {["c1", "c2", "c3", "c4"].map((cls, i) => (

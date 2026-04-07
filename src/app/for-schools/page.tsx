@@ -340,12 +340,12 @@ export default function ForSchoolsPage() {
             >
               Sign In
             </Link>
-            <a
-              href="#request-demo"
+            <Link
+              href="/demo"
               className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] hover:scale-[1.03] active:scale-[0.98] transition-all duration-150"
             >
-              Request a Demo
-            </a>
+              See the Demo
+            </Link>
           </div>
           {/* Mobile nav */}
           <div className="flex items-center gap-4 md:hidden">
@@ -355,12 +355,12 @@ export default function ForSchoolsPage() {
             >
               Sign In
             </Link>
-            <a
-              href="#request-demo"
+            <Link
+              href="/demo"
               className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] transition-colors"
             >
               Demo
-            </a>
+            </Link>
           </div>
         </div>
       </nav>
@@ -389,12 +389,12 @@ export default function ForSchoolsPage() {
                 ))}
               </div>
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <a
-                  href="#request-demo"
+                <Link
+                  href="/demo"
                   className="rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] active:scale-[0.98] transition-all duration-150"
                 >
-                  Request a Demo
-                </a>
+                  See the Demo
+                </Link>
                 <Link
                   href="/standards"
                   className="rounded-lg border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
@@ -628,7 +628,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Request a Demo CTA — dark teal with amber button */}
+      {/* See the Demo CTA — dark teal with amber button */}
       <section id="request-demo" className="bg-[var(--bg)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
           <div className="rounded-xl bg-[var(--primary-dark)] p-12 text-center">
@@ -636,21 +636,19 @@ export default function ForSchoolsPage() {
               See It in Action
             </h2>
             <p className="mx-auto mt-3 max-w-[500px] text-base text-white/80">
-              30-minute walkthrough with your team. We'll show you the student
-              experience, the instructor dashboard, and answer every question.
+              A self-guided walkthrough of the full student experience — Ikigai discovery,
+              the AI mentor, the instructor dashboard, the parent view, and the graduation
+              ceremony. Everything a student or teacher would touch, in one scroll.
             </p>
             <div className="mt-8">
-              <a
-                href="mailto:demo@adaptable.app?subject=Demo%20Request%20-%20Adaptable%20for%20Schools"
+              <Link
+                href="/demo"
                 className="inline-flex rounded-lg bg-[var(--accent)] px-8 py-3 text-base font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-all duration-150"
                 style={{ boxShadow: "0 0 20px rgba(245, 158, 11, 0.35), 0 0 60px rgba(245, 158, 11, 0.1)" }}
               >
-                Request a Demo
-              </a>
+                See the Demo
+              </Link>
             </div>
-            <p className="mt-4 text-sm text-white/60">
-              Or email us directly at demo@adaptable.app
-            </p>
           </div>
         </div>
       </section>

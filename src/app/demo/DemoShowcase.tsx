@@ -63,6 +63,7 @@ export default function DemoShowcase() {
         businessName={STUDIO_BLOOM.name}
         businessNiche={STUDIO_BLOOM.niche}
         ikigai={IKIGAI}
+        demoMode={true}
         onComplete={() => {
           setCeremonyDone(true);
           setShowCeremony(false);
@@ -529,21 +530,18 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
-      {/* ═══ 8. COMPLETION CEREMONY — REAL COMPONENT ═══ */}
-      <Section label="The Finish Line" title="Completion Ceremony" description="When a student completes all 22 lessons across the six modules, they experience a multi-scene ceremony: the founder's letter, their Ikigai re-revealed, a formal diploma, and a personal farewell from their AI mentor.">
+      {/* ═══ 8. THE REVEAL — Ikigai → gravitational collapse → business name ═══ */}
+      <Section label="The Moment" title="The Business Name Reveal" description="When a student completes the program, the four Ikigai circles collapse into one gravitational point — and the business they built with the AI emerges from it. This is the same animation real students see, stripped to its essential moment. Press play to watch.">
         <div className="mx-auto max-w-[500px] text-center">
-          <p className="text-base text-[var(--text-secondary)] leading-relaxed mb-8">
-            This uses the ACTUAL ceremony component from the platform — the same one students experience. Click below to watch the full sequence.
-          </p>
           <button
             onClick={() => { setShowCeremony(true); setCeremonyDone(false); }}
             className="rounded-lg bg-[var(--accent)] px-8 py-3 text-base font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-colors"
             style={{ boxShadow: "0 0 20px rgba(245, 158, 11, 0.35), 0 0 60px rgba(245, 158, 11, 0.1)" }}
           >
-            Experience the Ceremony
+            {ceremonyDone ? "Watch again" : "Watch the reveal"}
           </button>
           {ceremonyDone && (
-            <p className="mt-4 text-sm text-[var(--success)] font-medium">Ceremony complete. That&apos;s what every student experiences.</p>
+            <p className="mt-4 text-sm text-[var(--text-muted)] font-medium">That&apos;s the moment. Real students see it after lesson 22.</p>
           )}
         </div>
       </Section>
