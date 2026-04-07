@@ -477,39 +477,43 @@ export default function DemoShowcase() {
       </Section>
 
       {/* ═══ THE NUMBERS — measured outcomes ═══ */}
-      <Section label="The Numbers" title="Measured Like an ML Team, Not an Ed-Tech Course" description="We don't ship AI mentoring on vibes. Every prompt change is graded against a stress test of 144 simulated student personas, judged by an independent model. Here's what the latest run shows.">
+      <Section label="The Numbers" title="Measured Like an ML Team, Not an Ed-Tech Course" description="We don't ship AI mentoring on vibes. Every prompt change is graded against a stress test of simulated student personas, judged by an independent model. Here's what the latest full run shows.">
         <div className="mx-auto max-w-[720px]">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
               <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Self-confidence</p>
-              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">+1.00</p>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">Average gain on a 5-point scale. &ldquo;Could YOU personally start a business someday?&rdquo;</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">+1.15</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Average gain on a 5-point scale. &ldquo;Could YOU personally start a business someday?&rdquo; <strong>100% of simulated students gained.</strong></p>
             </div>
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
               <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Understanding</p>
-              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">+1.48</p>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">Average gain on a 5-point scale. &ldquo;Do you actually GET what running a business means?&rdquo;</p>
-            </div>
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
-              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Transformation rate</p>
-              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">87%</p>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">Of simulated students were genuinely moved by the wizard, per the independent judge.</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">+1.53</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Average gain on a 5-point scale. &ldquo;Do you actually GET what running a business means?&rdquo; <strong>100% of simulated students gained.</strong></p>
             </div>
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
               <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Alien → Accessible</p>
-              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">95%</p>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">Flipped from &ldquo;business is something other people do&rdquo; to &ldquo;this could be me.&rdquo;</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">97%</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Flipped from &ldquo;business is something other people do&rdquo; to &ldquo;this could be me.&rdquo; 58 of 60 simulated students.</p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Decisively moved</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">70%</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Independent Opus judge verdict: 42 of 60 simulated students were unambiguously moved by the wizard. The remaining 30% were partially moved. Zero were not moved at all.</p>
             </div>
           </div>
           <div className="mt-6 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-5">
             <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">How we measure</p>
             <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
-              60 simulated student journeys, 20 personas across 3 motivation levels.
-              Synthesizer: Claude Sonnet. Judge: Claude Opus 4.6 (cross-model — eliminates self-preference bias).
-              4 rounds of prompt iteration, 144 stress-tested personas, every commit measured.
+              60 simulated student journeys, 20 personas across 3 motivation levels (low/medium/high), spanning coherent
+              cases, multi-track interests, slang/ESL voices, age 12 and age 18 boundaries, and students who
+              already run a small business. Synthesizer: Claude Sonnet. Judge: Claude Opus 4.6 (cross-model
+              — eliminates self-preference bias). 4 rounds of prompt iteration, 144 stress-tested personas
+              in the wizard quality eval, every commit measured.
+            </p>
+            <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed">
               These are simulated upper bounds, not real-teen rates — but the SHAPE of the result is the
-              strongest signal in education we&apos;ve ever measured: when the wizard works, it changes
-              how kids think about themselves before it changes what they do.
+              strongest signal in education we&apos;ve ever measured: <strong>when the wizard works, it changes
+              how kids think about themselves before it changes what they do.</strong>
             </p>
           </div>
         </div>

@@ -285,13 +285,14 @@ async function callAgentJSON<T>(
         : "\n\nFINAL ATTEMPT: You MUST return valid parseable JSON. No markdown. No prose. No code fences. Just the JSON object starting with { and ending with }. Escape any internal quotes inside string values.";
 
     try {
-      const params: Parameters<typeof anthropic.messages.create>[0] = {
-        model,
-        max_tokens: maxTokens,
-        messages: [{ role: "user", content: userMessage + reminder }],
-      };
-      if (systemPrompt) params.system = systemPrompt;
-      const res = await callWithRetry(() => anthropic.messages.create(params));
+      const res = await callWithRetry(() =>
+        anthropic.messages.create({
+          model,
+          max_tokens: maxTokens,
+          system: systemPrompt || undefined,
+          messages: [{ role: "user", content: userMessage + reminder }],
+        })
+      );
       const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
       return extractJSON(text) as T;
     } catch (e) {
