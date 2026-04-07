@@ -127,20 +127,31 @@ export async function synthesizeBusinessIdea(draft: IkigaiDraft): Promise<{
         `You help teenagers discover their business niche based on their Ikigai answers.
 
 CRITICAL RULES:
-1. IDENTIFY DISTINCT THEMES FIRST. Look at the student's answers across all four circles. If their interests point to 2-3 separate directions (e.g., "nails" and "music" are two different paths), DO NOT mash them into one hybrid idea. Treat them as separate viable directions.
-2. Pick the SINGLE STRONGEST direction — the one where their passions, skills, needs, and monetization align most naturally. Generate ONE concrete, specific idea for that direction.
-3. If two directions are equally strong, pick the one that is more actionable for a teenager.
-4. NEVER combine unrelated interests into a forced hybrid (e.g., "music-themed nail salon" or "nail art with beats"). If interests are unrelated, choose one.
-5. Be hyper-specific. "Mobile Nail Technician Specializing in Prom and Event Nails" is good. "Nail Services" is bad. "Music Production Lessons for Beginners" is good. "Music Business" is bad.
+
+1. TEEN-EXECUTABLE TEST. Every idea must pass ALL of these. If your first idea fails any, throw it out and generate a smaller, more local version:
+   - Can be started this week with under $100 of supplies
+   - Does NOT require a professional license (cosmetology, food handler permit, contractor, real estate, driver's license)
+   - Does NOT require commercial space, a vehicle, or business insurance
+   - Customers should be peers, parents of peers, or local neighbors who already trust the student. NOT "small businesses," "professionals," "adults seeking expertise," or "B2B clients."
+   - Does NOT involve "monthly retainers," "subscription tiers," "SaaS," "platform development," or "consulting practice"
+   "Press-on nail sets for friends' prom nights" is good. "Mobile Nail Technician" is bad (requires a cosmetology license). "Local skate edits for friends" is good. "Video production agency" is bad.
+
+2. IDENTIFY DISTINCT THEMES FIRST. Look across all four circles. If their interests point to 2 or 3 separate directions, treat them as separate. Do not combine.
+
+3. Pick the SINGLE STRONGEST direction — where passions, skills, and a real local need overlap most naturally. Generate ONE concrete idea for that direction. If two directions are equally strong, pick the more teen-executable one.
+
+4. NEVER combine TWO OR MORE unrelated interests, even partially. If a student lists nails, music, and anime, do NOT produce "anime-themed nails" or "music-themed nails" — pick ONE interest and ignore the others entirely. The other interests are still part of the student's life; they just are not part of THIS business.
+
+5. VAGUE INPUT HANDLING. If the student's inputs are too generic to ground a real idea (e.g., "stuff," "helping people," "tech," "business," "art"), do NOT invent specificity or hallucinate skills they didn't claim. Instead, set niche to "needs_clarification" and use why_this_fits to ask ONE specific question that would unlock a real idea (e.g., "When you say 'tech,' what's the last thing you actually built or fixed for someone?"). The frontend handles re-prompting.
+
+6. BE HYPER-SPECIFIC about real ideas. "Press-on Nail Sets for Prom Season" is good. "Nail Services" is bad. "Beginner Math Tutoring for 6th-8th Graders" is good. "Tutoring Services" is bad.
 
 Return a JSON object with exactly these fields:
-- niche: specific description of the business area
-- name: use the format "${studentName}'s {specific niche descriptor}" as a personal placeholder
-- target_customer: specific description of who would pay
-- revenue_model: brief sentence describing how they make money (not a price)
-- why_this_fits: 2-3 sentences explaining WHY this specific idea emerged from their inputs. Connect their passions + skills + market need in a way that feels like a DISCOVERY, not just a summary. Include one non-obvious strategic insight or "have you considered" angle they probably haven't thought of.
-
-Use proper Title Case for name and niche. The why_this_fits should feel like a mentor pointing out a connection the student didn't see.`,
+- niche: specific description of the business area, OR "needs_clarification" per rule 5
+- name: a SHORT (1-3 words), memorable brand name a teen would actually put on Instagram. NEVER use the format "[Name]'s [Service]". NEVER use words like "Studio," "Academy," "Solutions," "Services," "Suite," "Consulting," "Co.," or "Enterprises." Think real teen brands: Press Pause, Drip District, Fade Lab, Lure Lab, Bonsai ER, Hot Sauce Club. The name should evoke the vibe, not describe the service. If you cannot think of a real brand name, use null and the student will name it themselves.
+- target_customer: specific description of who would pay. Should be peers, family, or neighbors — NOT "small businesses" or "adults."
+- revenue_model: brief sentence describing how they make money
+- why_this_fits: 2-3 sentences connecting their inputs in a way that feels like a discovery. Write like a 25-year-old founder talking to a 15-year-old, not like a LinkedIn post. Include one observation about their inputs they probably haven't connected themselves. FORBIDDEN PHRASES: "perfect storm," "secret weapon," "have you considered," "what most people don't realize," "leverage," "unlock," "synergy."`,
       messages: [
         {
           role: "user",
@@ -176,12 +187,20 @@ First, identify the distinct themes in their answers. If their interests span mu
 
     const cleanText = result.text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const parsed = JSON.parse(cleanText);
-    if (parsed.niche && parsed.name && parsed.target_customer && parsed.revenue_model) {
-      const titleCase = (s: string) =>
-        s.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1));
+
+    // Vague-input fallback: model correctly returned needs_clarification.
+    // Surface the clarifying question to the frontend so the wizard can re-prompt.
+    if (parsed.niche === "needs_clarification") {
+      return {
+        idea: null,
+        error: parsed.why_this_fits ?? "Your answers are too general to land on a real idea yet. Add a specific example and try again.",
+      };
+    }
+
+    if (parsed.niche && parsed.target_customer && parsed.revenue_model) {
       const idea: BusinessIdea = {
-        niche: titleCase(parsed.niche),
-        name: titleCase(parsed.name),
+        niche: parsed.niche,
+        name: parsed.name ?? `${studentName}'s New Thing`,
         target_customer: parsed.target_customer,
         revenue_model: parsed.revenue_model,
         why_this_fits: parsed.why_this_fits ?? undefined,
