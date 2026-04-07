@@ -368,6 +368,14 @@ export default function CurriculumAlignmentPage() {
               specific standards for easy reference during curriculum reviews and
               procurement.
             </p>
+            <div className="mt-4 max-w-[800px] rounded-lg border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-4">
+              <p className="text-sm font-semibold text-[var(--primary)]">Showing alignment for Modules 1–2 (foundational lessons)</p>
+              <p className="mt-1 text-sm text-[var(--text-secondary)] leading-relaxed">
+                Modules 3–6 (Build Your Brand, Get Your First Customer, Run the Numbers,
+                Launch and Learn — 14 additional lessons) are in active standards-alignment
+                review. Full mapping document available on request for procurement reviews.
+              </p>
+            </div>
           </header>
 
           {/* Framework legend */}

@@ -146,10 +146,10 @@ export default function DemoShowcase() {
           <div className="stagger-enter mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5" style={{ animationDelay: "100ms" }}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-semibold text-[var(--text-primary)]">Your Progress</span>
-              <span className="text-xs text-[var(--text-muted)]">5 of 8 lessons</span>
+              <span className="text-xs text-[var(--text-muted)]">14 of 22 lessons</span>
             </div>
             <div className="h-2 rounded-full bg-[var(--bg-muted)]">
-              <div className="h-2 rounded-full progress-shimmer" style={{ width: "62.5%", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
+              <div className="h-2 rounded-full progress-shimmer" style={{ width: "63.6%", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
             </div>
           </div>
 
@@ -157,8 +157,8 @@ export default function DemoShowcase() {
           <div className="stagger-enter mt-4 rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5 flex items-center justify-between" style={{ animationDelay: "200ms" }}>
             <div>
               <p className="text-xs font-medium text-[var(--primary)]">Continue Learning</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">Lesson 6: What Did You Learn?</p>
-              <p className="text-xs text-[var(--text-muted)]">Module 2 &middot; Customer Discovery</p>
+              <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">Lesson: Setting Profitable Prices</p>
+              <p className="text-xs text-[var(--text-muted)]">Module 5 &middot; Run the Numbers</p>
             </div>
             <span className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white">Continue →</span>
           </div>
@@ -298,7 +298,7 @@ export default function DemoShowcase() {
       </Section>
 
       {/* ═══ 5. BUSINESS PLAN — Using real CSS patterns ═══ */}
-      <Section label="The Output" title="Auto-Assembled Business Plan" description="Students never 'write a business plan.' It assembles itself from their decisions and conversations across all 8 lessons.">
+      <Section label="The Output" title="Auto-Assembled Business Plan" description="Students never 'write a business plan.' It assembles itself from their decisions and conversations across all 22 lessons.">
         <div className="mx-auto max-w-[620px]">
           <div className="space-y-6">
             {[
@@ -427,7 +427,7 @@ export default function DemoShowcase() {
             <div>
               <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">{ELSA.name}</h3>
               <p className="text-xs text-[var(--text-muted)]">Ms. Davis&apos;s Entrepreneurship &middot; Period 3</p>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">5 of 8 lessons complete</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">14 of 22 lessons complete</p>
             </div>
           </div>
           <div className="p-5 border-b border-[var(--border)]">
@@ -458,7 +458,7 @@ export default function DemoShowcase() {
       </Section>
 
       {/* ═══ 8. COMPLETION CEREMONY — REAL COMPONENT ═══ */}
-      <Section label="The Finish Line" title="Completion Ceremony" description="When a student completes all 8 lessons, they experience a multi-scene ceremony: the founder's letter, their Ikigai re-revealed, a formal diploma, and a personal farewell from their AI mentor.">
+      <Section label="The Finish Line" title="Completion Ceremony" description="When a student completes all 22 lessons across the six modules, they experience a multi-scene ceremony: the founder's letter, their Ikigai re-revealed, a formal diploma, and a personal farewell from their AI mentor.">
         <div className="mx-auto max-w-[500px] text-center">
           <p className="text-base text-[var(--text-secondary)] leading-relaxed mb-8">
             This uses the ACTUAL ceremony component from the platform — the same one students experience. Click below to watch the full sequence.
@@ -476,20 +476,103 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
+      {/* ═══ THE NUMBERS — measured outcomes ═══ */}
+      <Section label="The Numbers" title="Measured Like an ML Team, Not an Ed-Tech Course" description="We don't ship AI mentoring on vibes. Every prompt change is graded against a stress test of 144 simulated student personas, judged by an independent model. Here's what the latest run shows.">
+        <div className="mx-auto max-w-[720px]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Self-confidence</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">+1.00</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Average gain on a 5-point scale. &ldquo;Could YOU personally start a business someday?&rdquo;</p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Understanding</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">+1.48</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Average gain on a 5-point scale. &ldquo;Do you actually GET what running a business means?&rdquo;</p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Transformation rate</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">87%</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Of simulated students were genuinely moved by the wizard, per the independent judge.</p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Alien → Accessible</p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold leading-none text-[var(--text-primary)]">95%</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Flipped from &ldquo;business is something other people do&rdquo; to &ldquo;this could be me.&rdquo;</p>
+            </div>
+          </div>
+          <div className="mt-6 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-5">
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">How we measure</p>
+            <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+              60 simulated student journeys, 20 personas across 3 motivation levels.
+              Synthesizer: Claude Sonnet. Judge: Claude Opus 4.6 (cross-model — eliminates self-preference bias).
+              4 rounds of prompt iteration, 144 stress-tested personas, every commit measured.
+              These are simulated upper bounds, not real-teen rates — but the SHAPE of the result is the
+              strongest signal in education we&apos;ve ever measured: when the wizard works, it changes
+              how kids think about themselves before it changes what they do.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* ═══ THE PARTNERSHIP — for VentureLab specifically ═══ */}
+      <Section label="The Partnership" title="What Adaptable Becomes Inside VentureLab" description="VentureLab has spent years showing kids what entrepreneurship can be. Adaptable solves the part that's always been the hardest.">
+        <div className="mx-auto max-w-[720px] space-y-6">
+          <div className="rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-6">
+            <p className="text-base leading-relaxed text-[var(--text-primary)]">
+              Most teen entrepreneurship education assumes the student already has an idea.
+              The hardest moment in a 14-year-old&apos;s entrepreneurial journey isn&apos;t building
+              the business — it&apos;s the blank page before the business exists. <strong>Adaptable
+              solves the blank page.</strong>
+            </p>
+            <p className="mt-4 text-base leading-relaxed text-[var(--text-primary)]">
+              The Ikigai wizard takes a kid who has never thought about business and gives them
+              a real, specific, executable idea in 10 minutes — grounded in what they already
+              love and what they&apos;re already good at. Then 22 conversation-style lessons
+              break entrepreneurship down into pieces a teenager can actually hold in their head,
+              one at a time, in their own words.
+            </p>
+            <p className="mt-4 text-base leading-relaxed text-[var(--text-primary)]">
+              It&apos;s not a course. It&apos;s not a textbook. It&apos;s not another platform that
+              assumes the student already has an idea. It&apos;s the missing first step — and
+              it&apos;s the only place that talks to a kid the way a real founder would.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">The leverage</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+                Same teachers, same schools, same global reach — with a tool that gets every
+                student to &ldquo;I have an idea I actually want to build&rdquo; before lesson one.
+              </p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">The multiplier</p>
+              <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+                A 1:1 AI mentor for every student — not as a replacement for VentureLab&apos;s
+                educators, but as the always-on first conversation that makes their work matter
+                more.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
       {/* ═══ CLOSING ═══ */}
       <section className="flex flex-col items-center justify-center min-h-[50vh] px-6 py-20 text-center border-t border-[var(--border)]">
         <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">Built for VentureLab</p>
         <h2 className="mt-3 font-[family-name:var(--font-display)] text-[40px] font-bold text-[var(--text-primary)]">This is Adaptable.</h2>
-        <p className="mt-4 max-w-[440px] text-base text-[var(--text-secondary)] leading-relaxed">
-          No platform has ever streamlined the entrepreneurial process for students like this. We are the first. And the work speaks for itself.
+        <p className="mt-4 max-w-[480px] text-base text-[var(--text-secondary)] leading-relaxed">
+          The blank page is the hardest part of starting anything. We solved it for teens. Now let&apos;s figure out what we build together.
         </p>
         <div className="mt-8 flex gap-4">
-          <Link href="/for-schools" className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors">
-            Bring This to Your Students
-          </Link>
-          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="rounded-lg border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors">
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors">
             Back to Top
           </button>
+          <Link href="/for-schools" className="rounded-lg border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors">
+            See the institutional brief
+          </Link>
         </div>
       </section>
     </main>

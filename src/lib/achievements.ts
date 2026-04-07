@@ -82,11 +82,11 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: "launch-ready",
     name: "Launch Ready",
-    description: "Completed all 8 lessons",
+    description: "Completed every lesson",
     category: "building",
     icon: "🎓",
     tiers: ["gold"],
-    tierDescriptions: { gold: "Completed all 8 lessons — you are launch ready!" },
+    tierDescriptions: { gold: "Completed every lesson across all 6 modules — you are launch ready!" },
   },
 
   // ── Engagement Habits ──
@@ -133,7 +133,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     tierDescriptions: {
       bronze: "Journaled 3 business decisions",
       silver: "Journaled 6 business decisions",
-      gold: "Journaled all 8 business decisions",
+      gold: "Journaled a business decision in every lesson of the program",
     },
   },
   {
@@ -157,11 +157,11 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: "full-sweep",
     name: "Full Sweep",
-    description: "Passed every checkpoint across all 8 lessons",
+    description: "Passed every checkpoint across the entire program",
     category: "depth",
     icon: "🏆",
     tiers: ["gold"],
-    tierDescriptions: { gold: "Passed every checkpoint across all 8 lessons" },
+    tierDescriptions: { gold: "Passed every checkpoint across all 22 lessons — masterclass complete" },
   },
 
   // ── Social / Competitive ──
@@ -442,7 +442,7 @@ export async function checkAndAwardAchievements(
     award("price-is-right", "gold");
   }
 
-  // Launch Ready — completed all 8 lessons
+  // Launch Ready — completed every lesson
   if (lessons.length > 0 && completedProgress.length >= lessons.length) {
     award("launch-ready", "gold");
   }
@@ -515,7 +515,7 @@ export async function checkAndAwardAchievements(
     }
   }
 
-  // Full Sweep — all checkpoints across all 8 lessons
+  // Full Sweep — all checkpoints across all 22 lessons
   if (lessons.length > 0 && completedProgress.length >= lessons.length) {
     const allHaveCheckpoints = completedProgress.every((p) => {
       const reached = ((p.artifacts?.checkpoints_reached as string[]) ?? []);

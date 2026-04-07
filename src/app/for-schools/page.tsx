@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const STATS = [
   { value: "1:1", label: "Every student gets a personal AI mentor" },
-  { value: "8", label: "Lessons, standards-aligned and checkpoint-gated" },
+  { value: "22", label: "Lessons across 6 modules, checkpoint-gated and AI-mentored" },
   { value: "4", label: "National frameworks mapped per lesson" },
   { value: "2", label: "Languages with full safety coverage (English, Spanish)" },
 ];
@@ -17,27 +17,39 @@ const STATS = [
 const JOURNEY_STEPS = [
   {
     number: "01",
-    title: "Discover Their Why",
+    title: "Find Your Niche",
     description:
-      "Students complete an interactive Ikigai discovery to find the intersection of what they love, what they're good at, what the world needs, and what can be paid for. This becomes the foundation of their business.",
+      "Students complete an interactive Ikigai discovery to find the intersection of what they love, what they're good at, what the world needs, and what can be paid for. The wizard generates one specific, teen-executable business idea — grounded in who they actually are.",
   },
   {
     number: "02",
-    title: "Validate the Idea",
+    title: "Know Your Customer",
     description:
-      "Through guided research on competition, target customers, and market need, students learn to think critically about whether their idea solves a real problem. No hand-waving, real analysis.",
+      "An AI-powered Customer Interview Sandbox lets students practice asking open-ended questions to realistic customer personas before conducting real interviews. They learn to extract honest signal instead of polite noise — and they set their first launch price with reasoning, not guesswork.",
   },
   {
     number: "03",
-    title: "Talk to Customers",
+    title: "Build Your Brand",
     description:
-      "An AI-powered Customer Interview Sandbox lets students practice asking open-ended questions to four realistic customer personas before conducting real interviews.",
+      "Students define their brand voice, choose a memorable name with a 24-hour test from real friends, and design the minimum viable visual identity — one color, one font, one first impression. Branding without three weeks of logo paralysis.",
   },
   {
     number: "04",
-    title: "Build the Plan",
+    title: "Get Your First Customer",
     description:
-      "Students synthesize everything into a pricing strategy, customer acquisition plan, and final pitch. Every artifact they produce feeds into an auto-assembled business plan.",
+      "Zero-budget marketing, the 1-1-1 social media rule, the word-of-mouth playbook, and a 30-second pitch students can say out loud without flinching. Every lesson ends with a specific committed action this week.",
+  },
+  {
+    number: "05",
+    title: "Run the Numbers",
+    description:
+      "Students count every cost — including the trap most teens miss, their own time. They calculate a profitable floor price and rehearse defending it. They set up a 4-column money tracker they can run in 5 minutes a week.",
+  },
+  {
+    number: "06",
+    title: "Launch and Learn",
+    description:
+      "The smallest possible launch this week. The customer protocol when someone says yes. The behavior-based feedback script. The first-sale celebration and the plan for sale #2. The bridge from simulation to a real business.",
   },
 ];
 
@@ -60,7 +72,7 @@ const AI_FEATURES = [
   {
     title: "Content Moderation Built In",
     description:
-      "Input and output moderation in 10 languages filters inappropriate content before it reaches students. Prompt injection attempts are blocked. Every AI interaction is logged and auditable.",
+      "Two-layer moderation (regex pattern matching + ML classifier) filters inappropriate input AND output before it reaches students. Crisis detection runs in parallel with full English coverage and Spanish patches; multi-language LLM coverage is in active development. Prompt injection attempts are blocked. Every AI interaction is logged and auditable.",
   },
 ];
 
@@ -133,7 +145,7 @@ const SAFETY_ITEMS = [
 const FAQ: { q: string; a: string }[] = [
   {
     q: "Is this just ChatGPT with a business theme?",
-    a: "No. Adaptable uses a structured 8-lesson curriculum with checkpoints, mastery signals, and completion criteria. The AI follows lesson plans written by educators. Students can't skip ahead without demonstrating understanding. It's closer to a Socratic tutor than a chatbot.",
+    a: "No. Adaptable uses a structured 22-lesson curriculum across 6 modules — from finding a niche through launching the first sale — with checkpoints, mastery signals, and completion criteria. The AI follows lesson plans written by educators. Students can't skip ahead without demonstrating understanding. It's closer to a Socratic tutor than a chatbot.",
   },
   {
     q: "What devices do students need?",
@@ -141,7 +153,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How long does the curriculum take?",
-    a: "The 8 core lessons are designed for a 2-4 week unit, depending on class schedule. Most students spend 20-40 minutes per lesson. Teachers control the pacing.",
+    a: "The 22 lessons are designed for a full semester unit, though teachers can run the first two modules (8 lessons) as a 4-6 week intro. Most students spend 20-40 minutes per lesson. Teachers control the pacing.",
   },
   {
     q: "Can students cheat by asking the AI for answers?",
@@ -149,7 +161,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What if a student writes something inappropriate?",
-    a: "Content moderation runs on every input and output in 10 languages. Flagged content triggers an instant teacher alert. The teacher decides the response.",
+    a: "Two layers of moderation run on every input AND every output: a fast regex pattern check, then an ML classifier as a second opinion. Crisis detection runs in parallel and bypasses deduplication so every safety signal surfaces. Flagged content triggers a real-time email alert to the instructor (not just a dashboard row), and the teacher decides the response. Full English coverage; Spanish patches in place; broader multi-language LLM coverage is the next safety milestone.",
   },
   {
     q: "Do teachers need training to use this?",
@@ -421,7 +433,7 @@ export default function ForSchoolsPage() {
             The Student Journey
           </h2>
           <p className="mt-2 max-w-[600px] text-base text-[var(--text-secondary)]">
-            Four stages. Eight lessons. One real business at the end.
+            Six modules. 22 lessons. One real business at the end.
           </p>
 
           <div className="relative mt-12 max-w-[640px] space-y-10">
