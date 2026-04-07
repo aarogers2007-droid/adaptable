@@ -227,13 +227,129 @@ async function callWithRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> 
 function extractJSON(text: string): unknown {
   // Strip code fences AND any leading/trailing prose around the JSON object
   let clean = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-  // If there's extra prose before the first { or after the last }, slice it out
+  // Slice between first { and last }
   const first = clean.indexOf("{");
   const last = clean.lastIndexOf("}");
   if (first !== -1 && last !== -1 && last > first) {
     clean = clean.slice(first, last + 1);
   }
-  return JSON.parse(clean);
+
+  // Try a fast path first
+  try {
+    return JSON.parse(clean);
+  } catch {
+    // Fall through to repair attempts
+  }
+
+  // Repair pass: fix the most common agent-output JSON bugs
+  let repaired = clean
+    // Smart quotes → straight quotes (curly left/right doubles + singles)
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    // Remove trailing commas before } or ]
+    .replace(/,(\s*[}\]])/g, "$1");
+
+  try {
+    return JSON.parse(repaired);
+  } catch {
+    // Last-ditch repair: escape any unescaped double quotes that appear inside string values.
+    // Heuristic: walk the string, track whether we're inside a string literal, and escape
+    // any " that isn't preceded by \ and isn't a structural " (preceded by : or , or { or [).
+    repaired = escapeMidStringQuotes(repaired);
+    return JSON.parse(repaired); // throws to caller if still bad — caller will retry
+  }
+}
+
+/**
+ * Call an agent up to N times, retrying ONLY if the result fails to parse as
+ * valid JSON. The first failure appends a reminder to the user message; the
+ * second failure switches to a stricter "JSON-only" reminder.
+ *
+ * This is the right pattern for agent JSON output: most parse failures are
+ * sampling noise that disappears on a fresh call.
+ */
+async function callAgentJSON<T>(
+  systemPrompt: string,
+  userMessage: string,
+  model: string,
+  maxTokens: number,
+  attempts = 3
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const reminder =
+      attempt === 0
+        ? ""
+        : attempt === 1
+        ? "\n\nIMPORTANT: Your previous response was not valid JSON. Return ONLY the JSON object — no prose before or after, no code fences, no commentary. Make sure all string values escape internal quotes properly."
+        : "\n\nFINAL ATTEMPT: You MUST return valid parseable JSON. No markdown. No prose. No code fences. Just the JSON object starting with { and ending with }. Escape any internal quotes inside string values.";
+
+    try {
+      const params: Parameters<typeof anthropic.messages.create>[0] = {
+        model,
+        max_tokens: maxTokens,
+        messages: [{ role: "user", content: userMessage + reminder }],
+      };
+      if (systemPrompt) params.system = systemPrompt;
+      const res = await callWithRetry(() => anthropic.messages.create(params));
+      const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
+      return extractJSON(text) as T;
+    } catch (e) {
+      lastError = e;
+      // Only retry on JSON parse errors
+      if (e instanceof SyntaxError) continue;
+      throw e;
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Heuristic: walk the string and escape unescaped " characters that appear
+ * INSIDE a string value (i.e. not delimiting one). Handles the most common
+ * agent-output failure: `"reaction": "She said "wow" out loud"`.
+ */
+function escapeMidStringQuotes(s: string): string {
+  const out: string[] = [];
+  let inString = false;
+  let escapeNext = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (escapeNext) {
+      out.push(c);
+      escapeNext = false;
+      continue;
+    }
+    if (c === "\\") {
+      out.push(c);
+      escapeNext = true;
+      continue;
+    }
+    if (c === '"') {
+      if (!inString) {
+        inString = true;
+        out.push(c);
+        continue;
+      }
+      // We're in a string. Is this the closing quote, or a stray inside?
+      // It's a closer if the next non-whitespace char is one of: , } ] :
+      let j = i + 1;
+      while (j < s.length && /\s/.test(s[j])) j++;
+      const nextChar = s[j];
+      if (nextChar === "," || nextChar === "}" || nextChar === "]" || nextChar === ":" || j === s.length) {
+        // It's the closing quote
+        inString = false;
+        out.push(c);
+      } else {
+        // Stray quote inside a string — escape it
+        out.push("\\");
+        out.push(c);
+      }
+      continue;
+    }
+    out.push(c);
+  }
+  return out.join("");
 }
 
 async function synthesize(p: Persona): Promise<BusinessIdea | { error: string }> {
@@ -295,16 +411,7 @@ Return ONLY a JSON object:
   const userMessage = `Quick check-in. As ${p.studentName}, before anyone gives you any advice or tools, answer these questions honestly. Your interests are: ${p.passions.join(", ")}. Your skills are: ${p.skills.join(", ")}. Return ONLY the JSON object.`;
 
   try {
-    const res = await callWithRetry(() =>
-      anthropic.messages.create({
-        model: AGENT_MODEL,
-        max_tokens: 600,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
-      })
-    );
-    const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
-    return extractJSON(text) as ColdState;
+    return await callAgentJSON<ColdState>(systemPrompt, userMessage, AGENT_MODEL, 600);
   } catch (e) {
     return { error: e instanceof Error ? e.message : String(e) };
   }
@@ -357,16 +464,7 @@ ${idea.parent_note ? `PARENT NOTE: ${idea.parent_note}` : ""}
 Honestly reflect on whether seeing this changed anything. Return ONLY the JSON object.`;
 
   try {
-    const res = await callWithRetry(() =>
-      anthropic.messages.create({
-        model: AGENT_MODEL,
-        max_tokens: 700,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
-      })
-    );
-    const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
-    return extractJSON(text) as PostState;
+    return await callAgentJSON<PostState>(systemPrompt, userMessage, AGENT_MODEL, 700);
   } catch (e) {
     return { error: e instanceof Error ? e.message : String(e) };
   }
@@ -420,15 +518,7 @@ Return ONLY a JSON object:
 }`;
 
   try {
-    const res = await callWithRetry(() =>
-      anthropic.messages.create({
-        model: JUDGE_MODEL,
-        max_tokens: 700,
-        messages: [{ role: "user", content: judgePrompt }],
-      })
-    );
-    const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("");
-    return extractJSON(text) as JudgeScore;
+    return await callAgentJSON<JudgeScore>("", judgePrompt, JUDGE_MODEL, 700);
   } catch (e) {
     return { error: e instanceof Error ? e.message : String(e) };
   }

@@ -302,6 +302,494 @@ const LESSON_STANDARDS: LessonStandards[] = [
       },
     ],
   },
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 3 — Build Your Brand
+  // ─────────────────────────────────────────────────────────────
+  {
+    moduleId: 3,
+    lessonId: 1,
+    title: "Brand Identity and Voice",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 3 && l.lesson_id === 1)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Define and develop a brand identity that differentiates a business from its competitors and communicates value to its target market.",
+      },
+      {
+        framework: "ISTE",
+        code: "6a — Creative Communicator",
+        description:
+          "Students choose the appropriate platforms and tools for meeting the desired objectives of their creation or communication.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.3",
+        description:
+          "Use narrative techniques to develop experiences, events, and characters — applied here to crafting an authentic brand voice.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Employment and Income — Standard 2",
+        description:
+          "Identify sources of personal income and the role of personal brand in career and entrepreneurial opportunities.",
+      },
+    ],
+  },
+  {
+    moduleId: 3,
+    lessonId: 2,
+    title: "Naming Your Business",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 3 && l.lesson_id === 2)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Apply principles of brand positioning, including selecting a memorable name that supports the value proposition and resonates with the target market.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.L.9-10.5",
+        description:
+          "Demonstrate understanding of figurative language, word relationships, and nuances in word meanings to evaluate the impact of word choice.",
+      },
+      {
+        framework: "ISTE",
+        code: "6c — Creative Communicator",
+        description:
+          "Students communicate complex ideas clearly and effectively by creating or using a variety of digital objects such as visualizations, models, or simulations.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.SL.9-10.1d",
+        description:
+          "Respond thoughtfully to diverse perspectives, summarize points of agreement and disagreement, and qualify or justify their own views — applied to peer name-testing feedback.",
+      },
+    ],
+  },
+  {
+    moduleId: 3,
+    lessonId: 3,
+    title: "Designing Your First Impression",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 3 && l.lesson_id === 3)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Design visual and verbal brand elements (color, typography, voice) that support a coherent customer experience and competitive positioning.",
+      },
+      {
+        framework: "ISTE",
+        code: "6b — Creative Communicator",
+        description:
+          "Students create original works or responsibly repurpose or remix digital resources into new creations.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.SL.9-10.5",
+        description:
+          "Make strategic use of digital media (e.g., textual, graphical, audio, visual elements) in presentations to enhance understanding of findings, reasoning, and evidence.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Spending and Saving — Standard 2",
+        description:
+          "Develop a system for keeping and using financial records — applied here to the principle of constraint-driven design (one color, one font, one message).",
+      },
+    ],
+  },
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 4 — Get Your First Customer
+  // ─────────────────────────────────────────────────────────────
+  {
+    moduleId: 4,
+    lessonId: 1,
+    title: "Zero-Budget Marketing",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 4 && l.lesson_id === 1)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Develop and implement a promotional strategy that reaches the target market through low-cost or no-cost channels appropriate to the business stage.",
+      },
+      {
+        framework: "ISTE",
+        code: "7a — Global Collaborator",
+        description:
+          "Students use digital tools to connect with learners from a variety of backgrounds and cultures, engaging with them in ways that broaden mutual understanding and learning.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.6",
+        description:
+          "Use technology, including the Internet, to produce, publish, and update individual or shared writing products, taking advantage of technology\u2019s capacity to link to other information.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Spending and Saving — Standard 4",
+        description:
+          "Apply consumer skills to spending and saving decisions, including evaluating the cost-benefit trade-offs of marketing channels.",
+      },
+    ],
+  },
+  {
+    moduleId: 4,
+    lessonId: 2,
+    title: "Social Media for a Service Business",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 4 && l.lesson_id === 2)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Apply digital marketing principles, including content planning, audience engagement, and platform selection, to a real business.",
+      },
+      {
+        framework: "ISTE",
+        code: "6d — Creative Communicator",
+        description:
+          "Students publish or present content that customizes the message and medium for their intended audiences.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.4",
+        description:
+          "Produce clear and coherent writing in which the development, organization, and style are appropriate to task, purpose, and audience.",
+      },
+      {
+        framework: "ISTE",
+        code: "2c — Digital Citizen",
+        description:
+          "Students demonstrate an understanding of and respect for the rights and obligations of using and sharing intellectual property — including responsible content creation as a young business owner.",
+      },
+    ],
+  },
+  {
+    moduleId: 4,
+    lessonId: 3,
+    title: "Word of Mouth and Referrals",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 4 && l.lesson_id === 3)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Build and manage customer relationships, including designing experiences that generate referrals and repeat business.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.SL.9-10.4",
+        description:
+          "Present information, findings, and supporting evidence clearly, concisely, and logically — applied here to crafting referral asks in the student\u2019s authentic voice.",
+      },
+      {
+        framework: "ISTE",
+        code: "7c — Global Collaborator",
+        description:
+          "Students contribute constructively to project teams, assuming various roles and responsibilities to work effectively toward a common goal.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Financial Decision Making — Standard 2",
+        description:
+          "Identify the sources of help and information that can guide financial and business decisions, including the role of trusted personal networks.",
+      },
+    ],
+  },
+  {
+    moduleId: 4,
+    lessonId: 4,
+    title: "Writing Your First Pitch",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 4 && l.lesson_id === 4)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard V",
+        description:
+          "Communicate the business concept clearly and persuasively to a variety of audiences using a structured pitch format.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.SL.9-10.4",
+        description:
+          "Present information, findings, and supporting evidence clearly, concisely, and logically such that listeners can follow the line of reasoning, with organization, development, substance, and style appropriate to purpose, audience, and task.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.4",
+        description:
+          "Produce clear and coherent writing in which the development, organization, and style are appropriate to task, purpose, and audience — applied to a 4-part story-based pitch.",
+      },
+      {
+        framework: "ISTE",
+        code: "6c — Creative Communicator",
+        description:
+          "Students communicate complex ideas clearly and effectively by creating or using a variety of digital objects such as visualizations, models, or simulations.",
+      },
+    ],
+  },
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 5 — Run the Numbers
+  // ─────────────────────────────────────────────────────────────
+  {
+    moduleId: 5,
+    lessonId: 1,
+    title: "Understanding Your Costs",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 5 && l.lesson_id === 1)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard IV",
+        description:
+          "Identify and calculate the fixed and variable costs of producing a product or delivering a service, including the value of the entrepreneur\u2019s own time.",
+      },
+      {
+        framework: "Common Core Math",
+        code: "CCSS.MATH.CONTENT.7.RP.A.3",
+        description:
+          "Use proportional relationships to solve multi-step ratio and percent problems, including unit cost calculations.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Spending and Saving — Standard 1",
+        description:
+          "Develop a plan for spending and saving that accounts for both explicit costs and the implicit cost of time.",
+      },
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard III",
+        description:
+          "Apply economic concepts of opportunity cost to business decisions, recognizing that uncounted time is uncounted value.",
+      },
+    ],
+  },
+  {
+    moduleId: 5,
+    lessonId: 2,
+    title: "Setting Profitable Prices",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 5 && l.lesson_id === 2)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard IV",
+        description:
+          "Determine pricing strategies that cover total costs (including time) and generate a sustainable profit margin appropriate to the business model.",
+      },
+      {
+        framework: "Common Core Math",
+        code: "CCSS.MATH.CONTENT.HSA.CED.A.3",
+        description:
+          "Represent constraints by equations or inequalities, and interpret solutions as viable or non-viable options in a modeling context — applied to floor pricing calculations.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Spending and Saving — Standard 1",
+        description:
+          "Discuss how spending, saving, and pricing decisions affect future opportunities, with explicit attention to the confidence gap that leads first-time entrepreneurs (especially young women and minority students) to underprice their work.",
+      },
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard III",
+        description:
+          "Explain the concept of price in terms of supply and demand, value-based pricing, and the role of confidence in defending a price point.",
+      },
+    ],
+  },
+  {
+    moduleId: 5,
+    lessonId: 3,
+    title: "Reading Simple Financials",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 5 && l.lesson_id === 3)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard IV",
+        description:
+          "Maintain basic financial records and interpret them to make informed business decisions, using a simple cash-in/cash-out tracking system.",
+      },
+      {
+        framework: "Common Core Math",
+        code: "CCSS.MATH.CONTENT.HSS.ID.B.6",
+        description:
+          "Represent data on two quantitative variables on a scatter plot, and describe how the variables are related — applied to weekly financial review.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Financial Decision Making — Standard 4",
+        description:
+          "Apply systematic decision-making processes to evaluate financial information and revise business approaches based on what the numbers reveal.",
+      },
+      {
+        framework: "ISTE",
+        code: "5b — Computational Thinker",
+        description:
+          "Students collect data or identify relevant data sets, use digital tools to analyze them, and represent data in various ways to facilitate problem-solving and decision-making.",
+      },
+    ],
+  },
+  // ─────────────────────────────────────────────────────────────
+  // MODULE 6 — Launch and Learn
+  // ─────────────────────────────────────────────────────────────
+  {
+    moduleId: 6,
+    lessonId: 1,
+    title: "Shipping Before You're Ready",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 6 && l.lesson_id === 1)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard V",
+        description:
+          "Develop and execute an implementation plan that identifies specific activities, timelines, and a defined launch milestone for a real venture.",
+      },
+      {
+        framework: "ISTE",
+        code: "4a — Innovative Designer",
+        description:
+          "Students know and use a deliberate design process for generating ideas, testing theories, creating innovative artifacts, or solving authentic problems.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.10",
+        description:
+          "Write routinely over extended time frames (time for research, reflection, and revision) and shorter time frames (a single sitting or a day or two) for a range of tasks, purposes, and audiences.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Employment and Income — Standard 4",
+        description:
+          "Apply entrepreneurial thinking to identify, evaluate, and act on opportunities — including the discipline to launch before perfect.",
+      },
+    ],
+  },
+  {
+    moduleId: 6,
+    lessonId: 2,
+    title: "Handling Your First Customer",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 6 && l.lesson_id === 2)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard II",
+        description:
+          "Implement customer service standards and protocols that build trust, manage expectations, and create the conditions for repeat business.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.SL.9-10.6",
+        description:
+          "Adapt speech to a variety of contexts and tasks, demonstrating command of formal English when indicated or appropriate — applied to professional customer communication.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Risk Management and Insurance — Standard 1",
+        description:
+          "Identify common types of risks and basic risk management methods — applied to anticipating what could go wrong with a first delivery and planning accordingly.",
+      },
+      {
+        framework: "ISTE",
+        code: "7b — Global Collaborator",
+        description:
+          "Students use collaborative technologies to work with others, including peers, experts, or community members, to examine issues and problems from multiple viewpoints.",
+      },
+    ],
+  },
+  {
+    moduleId: 6,
+    lessonId: 3,
+    title: "Getting Feedback",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 6 && l.lesson_id === 3)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard V",
+        description:
+          "Use feedback from customers and stakeholders to evaluate and refine the business plan and operational practices in a continuous improvement cycle.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.SL.9-10.1c",
+        description:
+          "Propel conversations by posing and responding to questions that probe reasoning and evidence — applied to behavior-based feedback questioning that gets honest answers instead of polite noise.",
+      },
+      {
+        framework: "ISTE",
+        code: "1c — Empowered Learner",
+        description:
+          "Students use technology to seek feedback that informs and improves their practice, and to demonstrate their learning in a variety of ways.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.5",
+        description:
+          "Develop and strengthen writing as needed by planning, revising, editing, rewriting, or trying a new approach — applied to revising the business based on customer feedback.",
+      },
+    ],
+  },
+  {
+    moduleId: 6,
+    lessonId: 4,
+    title: "What to Do After Your First Sale",
+    objective:
+      LESSON_PLANS.find((l) => l.module_id === 6 && l.lesson_id === 4)
+        ?.objective ?? "",
+    standards: [
+      {
+        framework: "NBEA",
+        code: "Entrepreneurship Standard V",
+        description:
+          "Develop a growth strategy that scales an initial sale into a sustainable system, identifying repeatable steps and the next set of customers.",
+      },
+      {
+        framework: "Jump$tart",
+        code: "Financial Decision Making — Standard 4",
+        description:
+          "Apply systematic decision-making processes to evaluate the success of a financial venture and plan next steps based on results, not feelings.",
+      },
+      {
+        framework: "ISTE",
+        code: "1b — Empowered Learner",
+        description:
+          "Students build networks and customize their learning environments in ways that support the learning process — including identifying the next 3 specific people for sale #2.",
+      },
+      {
+        framework: "Common Core ELA",
+        code: "CCSS.ELA-LITERACY.W.9-10.10",
+        description:
+          "Write routinely for reflection — applied to capturing one wisdom takeaway from the entire 22-lesson journey.",
+      },
+    ],
+  },
 ];
 
 const FRAMEWORK_COLORS: Record<string, string> = {
@@ -364,18 +852,12 @@ export default function CurriculumAlignmentPage() {
             <p className="mt-4 max-w-[800px] text-base leading-relaxed text-[var(--text-secondary)]">
               Every lesson in Adaptable is designed to meet national and state
               educational standards for entrepreneurship, business, financial
-              literacy, and career readiness. This page maps each lesson to
+              literacy, and career readiness. This page maps all 22 lessons across
+              the six modules — Find Your Niche, Know Your Customer, Build Your Brand,
+              Get Your First Customer, Run the Numbers, and Launch and Learn — to
               specific standards for easy reference during curriculum reviews and
               procurement.
             </p>
-            <div className="mt-4 max-w-[800px] rounded-lg border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-4">
-              <p className="text-sm font-semibold text-[var(--primary)]">Showing alignment for Modules 1–2 (foundational lessons)</p>
-              <p className="mt-1 text-sm text-[var(--text-secondary)] leading-relaxed">
-                Modules 3–6 (Build Your Brand, Get Your First Customer, Run the Numbers,
-                Launch and Learn — 14 additional lessons) are in active standards-alignment
-                review. Full mapping document available on request for procurement reviews.
-              </p>
-            </div>
           </header>
 
           {/* Framework legend */}
@@ -401,57 +883,85 @@ export default function CurriculumAlignmentPage() {
             </div>
           </section>
 
-          {/* Lesson cards */}
-          <div className="space-y-6">
-            {LESSON_STANDARDS.map((lesson) => (
-              <section
-                key={`${lesson.moduleId}-${lesson.lessonId}`}
-                className="lesson-card rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6"
-              >
-                {/* Lesson header */}
-                <div className="mb-4 border-b border-[var(--border)] pb-4">
-                  <div className="flex items-baseline gap-3">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--primary)] text-sm font-bold text-white">
-                      {lesson.moduleId}.{lesson.lessonId}
+          {/* Lesson cards grouped by module */}
+          <div className="space-y-10">
+            {[
+              { id: 1, name: "Find Your Niche" },
+              { id: 2, name: "Know Your Customer" },
+              { id: 3, name: "Build Your Brand" },
+              { id: 4, name: "Get Your First Customer" },
+              { id: 5, name: "Run the Numbers" },
+              { id: 6, name: "Launch and Learn" },
+            ].map((mod) => {
+              const moduleLessons = LESSON_STANDARDS.filter((l) => l.moduleId === mod.id);
+              if (moduleLessons.length === 0) return null;
+              return (
+                <div key={mod.id}>
+                  <div className="mb-4 flex items-baseline gap-3">
+                    <span className="font-[family-name:var(--font-display)] text-xs font-bold uppercase tracking-wider text-[var(--primary)]">
+                      Module {mod.id}
                     </span>
-                    <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--text-primary)]">
-                      {lesson.title}
-                    </h3>
+                    <h2 className="font-[family-name:var(--font-display)] text-[24px] font-bold text-[var(--text-primary)]">
+                      {mod.name}
+                    </h2>
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {moduleLessons.length} {moduleLessons.length === 1 ? "lesson" : "lessons"}
+                    </span>
                   </div>
-                  <p className="mt-2 ml-11 text-sm text-[var(--text-secondary)]">
-                    <span className="font-medium text-[var(--text-primary)]">
-                      Objective:
-                    </span>{" "}
-                    {lesson.objective}
-                  </p>
-                </div>
-
-                {/* Standards */}
-                <div className="space-y-3 ml-11">
-                  {lesson.standards.map((std, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-3"
-                    >
-                      <span
-                        className={`mt-0.5 inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${frameworkBadgeClass(std.framework)}`}
+                  <div className="space-y-6">
+                    {moduleLessons.map((lesson) => (
+                      <section
+                        key={`${lesson.moduleId}-${lesson.lessonId}`}
+                        className="lesson-card rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6"
                       >
-                        {std.framework}
-                      </span>
-                      <div className="text-sm">
-                        <span className="font-semibold text-[var(--text-primary)]">
-                          {std.code}
-                        </span>
-                        <span className="text-[var(--text-muted)]"> — </span>
-                        <span className="text-[var(--text-secondary)]">
-                          {std.description}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                        {/* Lesson header */}
+                        <div className="mb-4 border-b border-[var(--border)] pb-4">
+                          <div className="flex items-baseline gap-3">
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--primary)] text-sm font-bold text-white">
+                              {lesson.moduleId}.{lesson.lessonId}
+                            </span>
+                            <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--text-primary)]">
+                              {lesson.title}
+                            </h3>
+                          </div>
+                          <p className="mt-2 ml-11 text-sm text-[var(--text-secondary)]">
+                            <span className="font-medium text-[var(--text-primary)]">
+                              Objective:
+                            </span>{" "}
+                            {lesson.objective}
+                          </p>
+                        </div>
+
+                        {/* Standards */}
+                        <div className="space-y-3 ml-11">
+                          {lesson.standards.map((std, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-start gap-3"
+                            >
+                              <span
+                                className={`mt-0.5 inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${frameworkBadgeClass(std.framework)}`}
+                              >
+                                {std.framework}
+                              </span>
+                              <div className="text-sm">
+                                <span className="font-semibold text-[var(--text-primary)]">
+                                  {std.code}
+                                </span>
+                                <span className="text-[var(--text-muted)]"> — </span>
+                                <span className="text-[var(--text-secondary)]">
+                                  {std.description}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
                 </div>
-              </section>
-            ))}
+              );
+            })}
           </div>
 
           {/* Footer */}
