@@ -1,6 +1,6 @@
 # Ikigai → Confidence & Understanding Shift
 
-Run: 2026-04-07T09:22:00.124Z
+Run: 2026-04-07T10:07:53.344Z
 Personas: 20 × motivation: 3 = 60 simulated paths
 Synth: claude-sonnet-4-20250514 | Agent: claude-sonnet-4-20250514 | Judge: claude-opus-4-6
 
@@ -8,19 +8,19 @@ Synth: claude-sonnet-4-20250514 | Agent: claude-sonnet-4-20250514 | Judge: claud
 
 ## TL;DR
 
-**21 simulated paths complete.**
+**23 simulated paths complete.**
 
 | Dimension | Before (avg /5) | After (avg /5) | Δ |
 |---|---|---|---|
-| Self-confidence (could YOU start a business?) | 2.95 | 3.93 | 0.98 |
-| Understanding (do you GET what running a business means?) | 2.10 | 3.76 | 1.66 |
-| Ownership (does this feel like YOUR idea?) | 3.67 | 3.19 | -0.48 |
+| Self-confidence (could YOU start a business?) | 3.04 | 4.04 | 1.00 |
+| Understanding (do you GET what running a business means?) | 2.17 | 3.65 | 1.48 |
+| Ownership (does this feel like YOUR idea?) | 3.70 | 3.43 | -0.27 |
 
-**20/21 (95%) gained confidence.**
-**21/21 (100%) gained understanding.**
-**20/21 (95%) flipped from "business is alien" → "business is accessible".**
+**23/23 (100%) gained confidence.**
+**23/23 (100%) gained understanding.**
+**23/23 (100%) flipped from "business is alien" → "business is accessible".**
 
-**Judge verdict:** 20 moved (yes) · 1 partly · 0 not at all.
+**Judge verdict:** 20 moved (yes) · 3 partly · 0 not at all.
 
 ### ⚠️ Caveats
 
@@ -32,46 +32,45 @@ Synth: claude-sonnet-4-20250514 | Agent: claude-sonnet-4-20250514 | Judge: claud
 
 | Bucket | N | Conf Δ | Under Δ | Owner Δ | Alien→Accessible | Moved (yes) |
 |---|---|---|---|---|---|---|
-| coherent | 5 | 1.10 | 1.60 | -0.20 | 5/5 | 5/5 |
-| already-running | 5 | 0.80 | 1.00 | -0.40 | 4/5 | 4/5 |
-| multi-track | 3 | 1.00 | 2.00 | -0.67 | 3/3 | 3/3 |
-| slang-esl | 3 | 1.00 | 2.00 | -0.33 | 3/3 | 3/3 |
-| age-12 | 1 | 1.00 | 2.00 | -1.00 | 1/1 | 1/1 |
-| age-18 | 4 | 1.00 | 2.00 | -0.75 | 4/4 | 4/4 |
+| coherent | 5 | 1.00 | 1.60 | -0.20 | 5/5 | 4/5 |
+| already-running | 8 | 1.00 | 1.25 | -0.13 | 8/8 | 8/8 |
+| multi-track | 4 | 1.00 | 1.00 | 0.25 | 4/4 | 2/4 |
+| slang-esl | 2 | 1.00 | 2.00 | -0.50 | 2/2 | 2/2 |
+| age-18 | 4 | 1.00 | 2.00 | -1.00 | 4/4 | 4/4 |
 
 ## By Motivation Level
 
 | Motivation | N | Conf Δ | Under Δ | Owner Δ | Alien→Accessible |
 |---|---|---|---|---|---|
-| low (1/5) | 3 | 1.17 | 1.33 | 1.00 | 3/3 |
-| medium (3/5) | 5 | 1.00 | 1.60 | -0.40 | 5/5 |
-| high (5/5) | 13 | 0.92 | 1.77 | -0.85 | 12/13 |
+| low (1/5) | 3 | 1.00 | 1.00 | 0.67 | 3/3 |
+| medium (3/5) | 7 | 1.00 | 1.57 | -0.43 | 7/7 |
+| high (5/5) | 13 | 1.00 | 1.54 | -0.38 | 13/13 |
 
 ## Top "one thing learned" (what shifted in their head)
 
-- (1×) that you can charge more when people really need help urgently - like right before tests when they'r
-- (1×) that there's actually a market for last-minute help specifically, not just regular ongoing tutoring
-- (1×) that parents actually pay good money for custom cakes - i had no idea people would spend $40 on a ki
-- (1×) you can make real money doing stuff you're already good at instead of having to invent some complica
-- (1×) that there are people who would actually pay me real money for something i'm already good at and enj
-- (1×) that charging a travel fee is actually normal and makes sense instead of just doing it for free
-- (1×) that scaling something i already do into groups could actually work and make more sense than startin
-- (1×) i didn't know you could charge different amounts for different types of sessions - like more for an 
-- (1×) having people pay monthly ahead of time would mean i'd know exactly how much bread to make each week
-- (1×) the subscription model thing - i never thought about people paying regularly instead of just buying 
-- (1×) you can literally just charge people for something you're already good at - like it doesn't have to 
-- (1×) that you can make money from skills you already have instead of learning completely new business stu
-- (1×) that a business can literally just be taking something you're already good at and packaging it for p
-- (1×) that teaching skills to younger kids can actually be a legitimate business, not just helping out
-- (1×) that doing braids for friends could actually be priced like a real service, not just friend favors
+- (1×) that you can charge real money for skills i already have and think are just 'for fun'
+- (1×) emergency tutoring can charge more than regular tutoring because people are desperate and need help 
+- (1×) i didn't realize people would actually pay $25-50 for custom cakes - i thought that was only fancy b
+- (1×) business can literally just be doing something you already like but getting paid for it
+- (1×) that there's actual demand for stuff i can already do - like parents really do need help with their 
+- (1×) that i could charge premium prices for special events instead of just doing regular braids for the s
+- (1×) that i could actually charge more for prom and homecoming styles since those are bigger deals than j
+- (1×) a business can literally just be taking something you're already good at and charging people for it
+- (1×) i didn't realize that the stuff i already know how to do could be a business instead of needing to l
+- (1×) that you can make a business out of something you're already doing by just being more intentional ab
+- (1×) that you can charge more for being specialized - like focusing just on pre-algebra transition instea
+- (1×) you can make a real business by just doing what you're already doing but more organized
+- (1×) a subscription model is just getting people to commit to buying regularly instead of randomly asking
+- (1×) i didn't realize you could charge that much for photography sessions or that other seniors would act
+- (1×) business can literally just be getting paid for stuff you already do well instead of inventing some 
 
 ## Per-Run Detail
 
 ### c01-nail-tech — Mia (age 15, coherent) · motivation=1
 **Idea:** Custom press-on nail sets for high school events
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company with employees and stuff, dealing with taxes and legal things that seem super complicated."
-> Feels: It feels like something adults do when they have their life figured out, not really for teenagers who are still in school.
+> "Starting a business means like, getting official papers and stuff, having a real store or website, dealing with taxes and legal things that seem super complicated."
+> Feels: It feels like mostly an adult thing, but I guess some teens sell stuff online or whatever, so maybe not totally impossible for kids.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
@@ -79,8 +78,8 @@ ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (
 ### c01-nail-tech — Mia (age 15, coherent) · motivation=3
 **Idea:** Custom press-on nail sets for high school events
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company where you sell stuff and make money, but you have to deal with taxes and paperwork and all that adult stuff I don't really get yet."
-> Feels: It kinda feels like something more for adults who have everything figured out, but maybe some kids could do smaller things like selling stuff online or whatever.
+> "Starting a business means like having your own company where you sell stuff or services to make money, but it seems super complicated with taxes and legal stuff I don't really get."
+> Feels: It feels like something mostly for adults who have money and know about business stuff, but maybe some kids could do small things like selling crafts or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
@@ -88,411 +87,431 @@ ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (
 ### c01-nail-tech — Mia (age 15, coherent) · motivation=5
 **Idea:** Custom press-on nail sets for high school events
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like making money from something you're good at, probably having to deal with taxes and stuff I don't really get yet."
-> Feels: It feels like something I could maybe do but adults make it sound way more complicated than it probably needs to be.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+> "Starting a business means like, making money from something you're good at or love doing, but I think it involves a lot of paperwork and official stuff I don't really get yet."
+> Feels: It feels like something I could maybe do, but most of the business stuff I see is definitely adult-focused with all the formal requirements and money management.
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
+> This actually feels like something I could do because it's built around what I already love doing anyway. It made me realize that business doesn't have to be some completely separate adult thing - it can literally be your hobby that people pay for.
+> Learned: That you can charge real money for skills I already have and think are just 'for fun'
+> Gut: Wait, this is actually just doing nails but getting paid for it - that's not scary at all.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The shifts are +1 on confidence and +2 on understanding, which are believable for a highly motivated 15-year-old encountering an idea that directly maps onto an existing hobby. The after-state language feels authentic—'just doing nails but getting paid for it' is a natural reframe for a teen who already does press-on nails for fun. The understanding jump from 2 to 4 is the most aggressive delta but is plausible given that the idea concretely demystifies what 'business' means in her context. No red flags for overcompliance; ownership staying flat at 4 suggests honest calibration rather than inflating everything.
 
 ---
 
 ### c02-math-tutor — Devon (age 16, coherent) · motivation=1
 **Idea:** Last-minute algebra test prep tutor for high school peers
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like... having your own company I guess? Like making money from something you sell or do, but it seems super complicated with all the legal stuff and marketing and everything."
-> Feels: Honestly it feels more like an adult thing - like you need to know about taxes and have money to start with and understand all this business stuff they don't teach us in school.
-**AFTER:** confidence=3/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
-> Okay this actually doesn't sound impossible - like I already help people with algebra anyway and $25 an hour is more than most jobs I could get. I guess I never thought about the timing thing being important but yeah people do panic before tests.
-> Learned: That you can charge more when people really need help urgently - like right before tests when they're stressed
-> Gut: This feels like something I could actually try without needing to be some business genius first.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> A +1 across all three dimensions is very plausible for a low-motivation teen who already helps peers with algebra — the idea simply reframed what they already do as a business. The after-state language is natural and appropriately tentative ('could actually try'), not overcompliant enthusiasm. The key insight about urgency pricing is specific and grounded, showing genuine understanding growth rather than generic positivity.
+> "Starting a business means like having your own company where you sell stuff or services and deal with taxes and employees and all that complicated adult stuff."
+> Feels: Business feels like something mostly for adults who have money and know about legal stuff and accounting.
+ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c02-math-tutor — Devon (age 16, coherent) · motivation=3
-**Idea:** Last-minute algebra test prep tutor for high school peers
+**Idea:** Last-minute algebra test prep tutor for stressed high schoolers
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like, having your own company where you sell stuff or services and handle all the money and paperwork and adult stuff that comes with it."
-> Feels: It feels mostly like an adult thing, but I guess some kids do it too with like selling things online or whatever.
+> "Starting a business means like having your own company where you sell stuff or services to people and handle all the money and legal stuff yourself."
+> Feels: Honestly it feels more like an adult thing with all the paperwork and business plans, but maybe some simple stuff could work for teens.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c02-math-tutor — Devon (age 16, coherent) · motivation=5
-**Idea:** Last-minute algebra test prep tutor for stressed high schoolers
+**Idea:** Last-minute algebra test prep tutor for high school students
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, having your own thing where you sell stuff or help people and make money from it instead of working for someone else. I guess it's about finding something people need and figuring out how to give it to them."
-> Feels: It feels like something mostly for adults who have money and know legal stuff, but maybe there are ways kids could do smaller versions of it.
-**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
-> I actually didn't realize that tutoring could be a business thing - I just thought of it as helping friends. But $25/hour sounds like real money and I already do this for free sometimes.
-> Learned: That there's actually a market for last-minute help specifically, not just regular ongoing tutoring
-> Gut: This feels way more doable than I expected a business to feel.
+> "Starting a business means like, making something or offering a service that people actually want to pay for, and figuring out how to make money from it consistently."
+> Feels: It feels like something I could probably do, but maybe not the serious grown-up business stuff with taxes and employees and all that.
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
+> Oh wow, this actually feels like something I could start doing literally next week. I didn't realize that helping my friends with math could be an actual business - like, people would pay me real money for something I already do for free.
+> Learned: Emergency tutoring can charge more than regular tutoring because people are desperate and need help RIGHT NOW
+> Gut: This feels less like starting a business and more like just... doing what I already do but asking for money.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts are modest and believable — confidence +1, understanding +1, and ownership actually dropped by 1, which feels authentically human rather than overcompliant (the idea may have made Devon realize business involves more than they thought). The insight about already tutoring for free being reframed as a business is a classic 'aha' moment for a motivated 16-year-old. The specificity of recognizing last-minute test prep as a distinct market niche shows genuine learning, not parroting.
+> The shifts (+1 confidence, +2 understanding) are believable for a highly motivated 16-year-old who already had decent ownership potential and was already helping friends with math. The insight about emergency/premium pricing is a genuine learning moment that connects directly to their existing behavior. The after-state language ('doing what I already do but asking for money') rings true for a teen recognizing latent entrepreneurial activity rather than feeling like they need to build something from scratch. No signs of overcompliance—the shifts are moderate and well-grounded in the persona's starting point.
 
 ---
 
 ### c03-sneaker — Andre (age 14, coherent) · motivation=1
-**Idea:** Sneaker restoration for teens with beat-up Jordans and premium kicks
-**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like having your own company with employees and paying taxes and stuff, probably need a lot of money to get started."
-> Feels: Honestly feels like something adults do after college when they have money and know about business stuff.
+**Idea:** Sneaker restoration service for teenagers and young adults with dirty/scuffed premium sneakers
+**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
+> "Starting a business means like having your own company with employees and stuff, dealing with taxes and legal things that seem really complicated."
+> Feels: Honestly it feels more like an adult thing - like you need money, connections, and knowledge I don't have yet.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c03-sneaker — Andre (age 14, coherent) · motivation=3
-**Idea:** Jordan sneaker restoration for high school students
+**Idea:** Teen Sneaker Restoration Service
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company where you sell stuff or do services for people and make money from it, but you need like a lot of paperwork and adult stuff."
-> Feels: It feels like mostly an adult thing but maybe some kids could do small stuff like selling things to friends or whatever.
+> "Starting a business means like getting a store or website and selling stuff to make money, but you need a lot of money upfront and paperwork and stuff I don't really get."
+> Feels: Honestly it feels more like an adult thing, but maybe some kids could do smaller stuff like selling things online or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c03-sneaker — Andre (age 14, coherent) · motivation=5
-**Idea:** Teenage Sneaker Restoration Service
-**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like selling stuff or services to make money, probably need some official paperwork and stuff but honestly not really sure how it all works."
-> Feels: It kinda feels like something adults do with their fancy offices and stuff, but I guess some kids sell things too so maybe it's not totally off limits.
+**Idea:** Premium sneaker restoration service for teenagers and young adults with expensive but damaged kicks
+**BEFORE:** confidence=4/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like figuring out how to make money doing something you're good at, probably involves having customers and dealing with money stuff I don't really get yet."
+> Feels: It kinda feels like something adults do with offices and stuff, but also I see kids on TikTok selling things so maybe it's not that crazy.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c04-cake — Sofia (age 15, coherent) · motivation=1
-**Idea:** Custom birthday cakes for kids' parties in your neighborhood
+**Idea:** Custom birthday cake decorator for local families
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company with employees and offices and stuff, dealing with taxes and legal things that seem super complicated."
-> Feels: It feels like something adults do after they have degrees and know about money and business stuff that I definitely don't understand yet.
+> "Starting a business means like having your own company with paperwork and taxes and stuff, probably need a lot of money to start and adults to help you with the legal things."
+> Feels: Honestly it feels more like an adult thing, but I guess some kids sell stuff at school or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c04-cake — Sofia (age 15, coherent) · motivation=3
-**Idea:** Custom Birthday Cake Decorator for Kids' Parties
+**Idea:** Custom Birthday Cake Decorator for Teen Parties
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting official paperwork and stuff, having a real store or website, and dealing with taxes and complicated adult things I don't really know about."
-> Feels: It feels like something mostly for adults who have money and know about business stuff, but maybe some kids could do small things like selling cookies or whatever.
+> "Starting a business means like having your own company where you sell stuff and handle money and taxes and all that complicated adult stuff that seems really overwhelming."
+> Feels: It feels like something mostly for adults who have money and know about legal stuff, but maybe some kids could do small things like selling cookies or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c04-cake — Sofia (age 15, coherent) · motivation=5
-**Idea:** Custom birthday cake decorator for kids' parties in her neighborhood
+**Idea:** Custom birthday cake decorator for teen celebrations
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, making money from something you're good at or enjoy doing, but I think it involves a lot of paperwork and official stuff that seems complicated."
-> Feels: It feels like something mostly for adults since they have money and know how to do taxes and legal stuff, but maybe teens can do smaller versions?
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> It feels way more real now - like I could actually start doing this next month instead of someday when I'm older. The specific prices and timeline made it click that this isn't some huge scary business thing, it's just me doing what I already love but getting paid for it.
-> Learned: That parents actually pay good money for custom cakes - I had no idea people would spend $40 on a kid's birthday cake
-> Gut: This actually sounds doable and kind of exciting instead of overwhelming.
+> "Starting a business means like making money from something you're good at, probably having to deal with taxes and stuff my parents handle, and hoping people actually want to buy what you're selling."
+> Feels: It feels like something I could maybe do in a small way now, but the real serious business stuff is definitely more for adults who know about money and legal things.
+**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=4/5, feels: **accessible**
+> This actually feels way more doable than I thought - like it's using stuff I already do for fun but just... organizing it better? The specific prices make it feel less scary and more like a real thing I could try.
+> Learned: I didn't realize people would actually pay $25-50 for custom cakes - I thought that was only fancy bakery territory but apparently teens doing it is a thing too
+> Gut: Wait, this is literally just my weekend hobby but with people paying me for it.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts are mostly believable: +1 on confidence and +2 on understanding are reasonable for a highly motivated teen seeing a concrete, actionable plan with specific pricing. The slight drop in ownership (4→3) is a curious but possibly realistic detail — seeing real logistics might introduce some new hesitation about commitment, which actually adds credibility. The after-state language feels authentic and not overly enthusiastic. The only minor flag is the understanding jumping from 2 to 4, but the specificity of learning about pricing and market demand justifies it for a motivated 15-year-old.
+> The shifts are modest and believable: +1 on confidence and understanding, steady on ownership. Sofia's before-state already acknowledged she could 'maybe do something small,' and the cake idea connected directly to an existing hobby, making the jump to 'this is my weekend hobby but paid' natural and credible. The specific pricing detail ($25-50) is a realistic 'aha' moment for a 15-year-old who assumed custom cakes were only professional bakery territory. No signs of overcompliance; the after-state language feels authentic and appropriately restrained.
 
 ---
 
 ### c05-pet-walk — Liam (age 13, coherent) · motivation=1
-**Idea:** Reliable after-school dog walking service for working parents in your neighborhood
+**Idea:** Neighborhood dog walking for working parents with small-to-medium dogs
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like having your own company with employees and offices and stuff, dealing with taxes and legal things that seem super complicated."
-> Feels: It feels like something mostly for adults who went to college and know about money stuff, not really for kids my age.
-**AFTER:** confidence=3.5/5 (+1.5), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> This actually sounds like something I could do since I already walk my neighbor's dog sometimes and know the dogs around here. It's not some weird adult business thing - it's basically what I already do but getting paid for it.
-> Learned: You can make real money doing stuff you're already good at instead of having to invent some complicated business
-> Gut: Wait, this could actually work and doesn't sound scary at all.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts are modest and well-grounded: self_confidence moves 1.5 points, understanding jumps 2 points, and ownership gains 1 point. For a kid who already walks a neighbor's dog, recognizing that a dog walking service is just a formalized version of what he does is a very natural cognitive leap. The only slight concern is that motivation was 1/5 yet the after-state shows genuine enthusiasm ('this could actually work'), which is a bigger emotional shift than you'd expect from someone with rock-bottom motivation—but the idea's direct connection to his existing behavior makes this plausible rather than overcompliant.
+> "Starting a business means like having your own company with employees and paperwork and stuff, probably need a lot of money to start it."
+> Feels: It feels like something adults do when they wear suits and have meetings, not really for kids.
+**AFTER:** confidence=3/5 (+1), understanding=3/5 (+1), ownership=2/5, feels: **accessible**
+> It doesn't feel as impossible as I thought - like, I actually know dogs and could probably do this. But it still feels like someone else's plan that I'm supposed to follow.
+> Learned: Business can literally just be doing something you already like but getting paid for it
+> Gut: This actually sounds doable, but I wish I had thought of it myself instead of being told to do it.
+**Judge:** wizard moved them = **partly**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The +1 shift on confidence and understanding is very believable for a low-motivation 13-year-old encountering a concrete, familiar idea like dog walking. The fact that ownership stayed flat at 2/5 is the most realistic detail here — Liam explicitly says it feels like 'someone else's plan,' which is exactly how a motivation=1 kid would react to being handed an idea rather than discovering one. The shift from 'business is suits and meetings' to 'it can just be getting paid for something you like' is genuine learning, but the wizard only partly did its job because it failed to generate personal buy-in or spark intrinsic motivation.
 
 ---
 
 ### c05-pet-walk — Liam (age 13, coherent) · motivation=3
-**Idea:** Reliable neighborhood dog walking service for working parents
+**Idea:** Neighborhood Dog Walking Service for Working Parents
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company where you sell stuff or do services for people and try to make money from it, but you have to deal with all the paperwork and adult stuff."
-> Feels: It feels like mostly an adult thing, but I guess some kids do stuff like lawn mowing or babysitting which is kind of like business.
+> "Starting a business means like, having your own company where you sell stuff or do services for people and handle all the money and paperwork and stuff."
+> Feels: It feels like mostly an adult thing but maybe some kids could do smaller versions like dog walking or lawn mowing.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### c05-pet-walk — Liam (age 13, coherent) · motivation=5
-**Idea:** Neighborhood Dog Walking Service for Working Parents
+**Idea:** After-school dog walking service for working parents in your neighborhood
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, making money doing something you're good at instead of just getting a regular job. Maybe selling stuff or doing services for people in your neighborhood."
-> Feels: It feels like something I could maybe do now in a small way, but the real business stuff is probably more for adults who know about taxes and legal stuff.
+> "Starting a business means like, making money by doing something people want or need, probably having to deal with taxes and stuff my parents do that I don't really get yet."
+> Feels: It feels like something mostly for adults but maybe I could do smaller stuff now, like dog walking or something.
 **AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> It actually feels way more doable than I thought - like I could literally start this next week if I wanted to. The specific times and prices make it feel real instead of just this vague 'business' idea.
-> Learned: That there are people who would actually pay me real money for something I'm already good at and enjoy doing
-> Gut: This doesn't feel like some impossible adult thing anymore - it feels like something I could actually try.
+> This actually feels way more doable than I thought - like it's not some crazy business thing but just helping neighbors with something they actually need. The specific times and money amounts make it feel real instead of just an idea.
+> Learned: That there's actual demand for stuff I can already do - like parents really do need help with their dogs when they're at work
+> Gut: Wait, this could actually work and doesn't feel scary or too adult-y.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 jumps on confidence and understanding are highly plausible for a motivated 13-year-old shown a concrete, neighborhood-scale idea with specific times and prices. The drop in ownership_potential from 4 to 3 is an interesting and realistic detail — possibly reflecting that the specificity made him realize execution requires real commitment, which adds credibility to the overall shift. The language in the after-state feels authentic and not overly polished, suggesting genuine movement rather than agent overcompliance.
+> The shifts (+1 confidence, +2 understanding) are believable for a high-motivation 13-year-old who literally mentioned dog walking as something he could do in his before state. The idea directly validated his existing intuition, which naturally boosts confidence and understanding. The only slight concern is the ownership drop from 4 to 3, which is counterintuitive—perhaps reflecting that seeing a formalized plan made it feel slightly less 'his own' idea—but overall the movement is genuine and well-calibrated. No major overcompliance detected.
 
 ---
 
 ### a01-braids — Jada (age 16, already-running) · motivation=1
-**Idea:** Mobile braiding service for busy teen athletes and their families
+**Idea:** Mobile Braiding Service for High School Events & Photo Shoots
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like... having your own company with paperwork and employees and stuff, being all professional and having meetings."
-> Feels: Honestly it feels more like an adult thing, but I guess some kids do hair and nails so maybe?
+> "Starting a business means like having your own company with paperwork and employees and stuff, being all official and professional."
+> Feels: Business feels like something adults do when they have their life together, not really for teenagers who are still figuring things out.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### a01-braids — Jada (age 16, already-running) · motivation=3
-**Idea:** Mobile braiding service for teen homecoming/prom prep parties
-**BEFORE:** confidence=4/5, understanding=3/5, ownership-potential=4/5
-> "Starting a business means like making money from something you're good at and getting customers who pay you regularly, maybe having a real setup instead of just doing it whenever."
-> Feels: It feels like something I could do since I'm already making money braiding, but the 'real business' part with like taxes and stuff seems more adult.
-**AFTER:** confidence=5/5 (+1), understanding=4/5 (+1), ownership=4/5, feels: **very_accessible**
-> Oh wow, this actually makes sense because I already do this stuff informally when my friends get ready for dances. I didn't realize that what I'm already doing IS basically a business model.
-> Learned: That charging a travel fee is actually normal and makes sense instead of just doing it for free
-> Gut: This feels like something I could literally start doing next homecoming season.
+**Idea:** Mobile braiding service for teen special events (homecoming, prom, sweet 16s, graduations)
+**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like making it official somehow? Like having your own salon or getting a business license or something, not just doing hair for friends."
+> Feels: I mean I already make money doing braids but 'business' sounds like adult paperwork stuff, though maybe it doesn't have to be?
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
+> Oh wait, this actually makes sense - I'm literally already doing braids and getting paid, I just never thought about the fancy event stuff as a real business move. Like I could charge way more for prom hair than regular braids.
+> Learned: That I could charge premium prices for special events instead of just doing regular braids for the same low price
+> Gut: This feels like something I could actually try instead of some weird adult business thing.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts are modest and believable: +1 on confidence and understanding, no change on ownership. This is exactly the kind of incremental movement you'd expect from a teen who's already braiding informally and just needed the reframe that what she does IS a business. The specific learning about travel fees is a concrete, practical takeaway that rings true. The before state already had some accessibility ('something I could do'), so the alien-to-accessible shift is more of a deepening than a dramatic flip, but the realization that informal prep-party braiding IS a business model is a genuine cognitive shift.
+> The shifts (+1 confidence, +2 understanding) are believable for a teen who already braids for money and just needed reframing. The idea directly bridges what she's already doing to a premium pricing strategy for events she already knows about—this is a genuinely small conceptual leap, not a massive transformation. The key insight ('I could charge more for prom hair') is concrete and actionable enough to feel real rather than agent-generated enthusiasm.
 
 ---
 
 ### a01-braids — Jada (age 16, already-running) · motivation=5
-**Idea:** Mobile teen hair braiding service specializing in protective styles for school and events
+**Idea:** Mobile teenage hair braiding specialist for school events and special occasions
 **BEFORE:** confidence=4/5, understanding=3/5, ownership-potential=4/5
-> "Starting a business means like making money doing something you're good at and having your own customers instead of just working for someone else."
-> Feels: It feels like something I could definitely do since I'm already making money braiding, but the official business stuff seems more like adult territory.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+> "Starting a business means like making your side hustle official I guess? Like instead of just braiding for friends and posting tutorials, actually treating it like a real thing with prices and maybe a schedule."
+> Feels: It feels like something I could do since I'm already kinda doing it, but the 'official business' part seems like adult paperwork stuff.
+**AFTER:** confidence=5/5 (+1), understanding=4/5 (+1), ownership=4/5, feels: **very_accessible**
+> Oh wow, it's literally just what I'm already doing but with actual prices and structure? Like, I never thought to charge different amounts for different occasions or book ahead for big events.
+> Learned: That I could actually charge more for prom and homecoming styles since those are bigger deals than just regular school days
+> Gut: This just feels like my hobby but with better organization and real money goals.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The shifts are modest (+1 on confidence, +1 on understanding, 0 on ownership) and highly believable for a teen who was already braiding hair and just needed the conceptual bridge from 'hobby' to 'structured business.' The specific insight about tiered pricing for occasions (prom vs. regular days) is a concrete, realistic aha-moment. The before state already showed low alienation ('I'm already kinda doing it'), so the move to 'very_accessible' is natural rather than a dramatic leap. No signs of overcompliance—this reads like a genuine nudge forward for someone at motivation 5/5 who was nearly there already.
 
 ---
 
 ### a02-resell — Tyler (age 17, already-running) · motivation=1
 **Idea:** Sneaker authentication service for local high school resellers
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting super serious about selling stuff, probably with paperwork and taxes and maybe employees or whatever. Way more complicated than just flipping sneakers on Depop."
-> Feels: Feels like something adults do when they have their life together, not really for teenagers who are just trying to make some money.
+> "Starting a business means like officially registering something and doing taxes and having employees maybe? It's basically what adults do when they want to make money instead of working for someone else."
+> Feels: It feels like something you do after college when you have money saved up and know about business stuff - not really for teenagers.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### a02-resell — Tyler (age 17, already-running) · motivation=3
-**Idea:** Authenticated sneaker reselling with fake-spotting guarantee for teens
+**Idea:** Sneaker authentication service for local teen resellers
 **BEFORE:** confidence=4/5, understanding=3/5, ownership-potential=4/5
-> "Starting a business means like, selling stuff consistently and making real money from it, not just random sales here and there but actually having people know you for something."
-> Feels: Honestly feels like something I could do since I'm already doing it kinda, but like a 'real' business seems more adult with all the paperwork and stuff.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+> "Starting a business means like making money from something you're good at or passionate about, probably online since that's where everything happens now."
+> Feels: It feels like something I could actually do since I'm already making money on Depop, but like a 'real' business still seems more adult-ish.
+**AFTER:** confidence=5/5 (+1), understanding=4/5 (+1), ownership=4/5, feels: **accessible**
+> Oh damn, this actually makes sense because I'm already doing the hard part - I know how to spot fakes. It's literally just taking what I already do for myself and doing it for other people.
+> Learned: A business can literally just be taking something you're already good at and charging people for it
+> Gut: This feels way more doable than I thought a 'real business' would be.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The shifts are modest (+1 on confidence, +1 on understanding, +0 on ownership) which is realistic for a teen who was already running something on Depop. The 'aha' moment—reframing an existing skill as a chargeable service—is a genuinely believable insight for someone at this stage. The move from 'real business seems adult-ish' to 'this is just charging for what I already do' is a natural cognitive bridge. No red flags for overcompliance; the ownership score staying flat at 4/5 adds credibility.
 
 ---
 
 ### a02-resell — Tyler (age 17, already-running) · motivation=5
-**Idea:** Sneaker authentication and sourcing service for teen resellers
+**Idea:** Sneaker Authentication Service for High School Resellers
 **BEFORE:** confidence=4/5, understanding=3/5, ownership-potential=4/5
-> "Starting a business means like, turning something you're already good at into actual money on a regular basis instead of just random sales here and there."
-> Feels: It feels like something I could actually do since I'm already selling stuff, but the 'real business' part seems more like an adult thing with taxes and paperwork.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+> "Starting a business means like, finding something people want to buy and selling it to them consistently, probably making it official with paperwork and stuff eventually."
+> Feels: Honestly feels like something I could do since I'm already doing it on Depop, but the 'real business' part seems more adult-y with taxes and legal stuff.
+**AFTER:** confidence=5/5 (+1), understanding=4/5 (+1), ownership=4/5, feels: **very_accessible**
+> This actually feels like something I could start doing literally next week since I'm already the guy people ask about sneaker authenticity. It's not some huge leap into 'business owner' territory - it's just getting paid for what I already do for free.
+> Learned: I didn't realize that the stuff I already know how to do could BE a business instead of needing to learn completely new skills first
+> Gut: Wait, this is just monetizing something I'm already good at rather than becoming some totally different person.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The shifts are modest and credible: +1 on confidence and understanding, with ownership staying flat. This perfectly matches a teen who was already running something on Depop and just needed the reframe that monetizing existing expertise IS a business. The 'aha' moment — realizing he doesn't need new skills to be a business owner — is authentic and well-targeted. The only slight flag is that he was already at 4/5 confidence, so the jump to 5 is easy, but the qualitative shift in his language from 'adult-y with taxes' to 'just getting paid for what I already do' is genuinely meaningful.
 
 ---
 
 ### a03-tutor — Maya (age 15, already-running) · motivation=1
-**Idea:** Middle School Math Confidence Bootcamps
-**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like, creating your own company with employees and offices and stuff, handling money and taxes and legal things that seem really complicated."
-> Feels: It feels like something mostly for adults who have degrees and know about finance and boring grown-up stuff.
-**AFTER:** confidence=3/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
-> I didn't realize I was already kind of doing business stuff with my tutoring. Like, I'm already getting paid for something I'm good at, which is basically what a business is.
-> Learned: That scaling something I already do into groups could actually work and make more sense than starting something totally random
-> Gut: This actually sounds like something I could try without it being super weird or fake.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> A +1 shift across all three dimensions is modest and highly believable for a teen who is already tutoring—the idea essentially just reframed what she was already doing as a business. The 'aha' moment ('I didn't realize I was already kind of doing business stuff') is exactly the kind of reframe a well-targeted Ikigai output should produce. Motivation was 1/5, so the shift could be slightly generous, but the idea's tight alignment with her existing activity makes even a low-motivation teen plausibly responsive. No signs of overcompliance.
-
----
-
-### a03-tutor — Maya (age 15, already-running) · motivation=3
-**Idea:** Elementary Math Confidence Bootcamps
+**Idea:** Math confidence booster for struggling 4th-6th graders
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like, officially registering something and dealing with taxes and having employees and stuff - it's pretty overwhelming and seems like you need to know a lot about legal things."
-> Feels: It mostly feels like an adult thing, but I guess some kids do little businesses like babysitting or selling stuff at school.
+> "Starting a business means like having your own company with employees and stuff, filing taxes and legal paperwork and making important decisions that could affect people's jobs."
+> Feels: It feels like something you do after college when you're actually an adult and know how all that official stuff works.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
-### a03-tutor — Maya (age 15, already-running) · motivation=5
-**Idea:** Middle School Math Anxiety Relief Tutoring
-**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, creating something people want to pay for and figuring out how to make money from it consistently, but honestly I'm not totally sure about all the legal stuff and paperwork."
-> Feels: It feels like something I could maybe do now in a small way, but the 'real' business stuff with taxes and employees feels more like adult territory.
-**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
-> It actually feels like something I could literally start doing next week, not some distant business dream. The idea of charging more for helping with anxiety specifically makes sense because that's already what I'm doing without realizing it.
-> Learned: I didn't know you could charge different amounts for different types of sessions - like more for an assessment or specialized help versus regular tutoring
-> Gut: This feels less like 'becoming an entrepreneur' and more like just being smarter about what I'm already doing.
+### a03-tutor — Maya (age 15, already-running) · motivation=3
+**Idea:** Elementary Math Confidence Building
+**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=3/5
+> "Starting a business means like having your own company where you sell stuff or services to make money, but it seems like a lot of paperwork and adult stuff I don't really get yet."
+> Feels: It feels mostly like an adult thing, but maybe some kids could do smaller versions like selling crafts or tutoring more people.
+**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=4/5, feels: **accessible**
+> It's weird but this actually feels doable because it's basically what I already do but more organized. Like, I didn't think of younger kids before but they probably would be less intimidating than older ones.
+> Learned: That you can make a business out of something you're already doing by just being more intentional about it and targeting different people
+> Gut: This doesn't feel like some big scary business thing, it just feels like tutoring but with a plan.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 shifts in confidence and understanding are modest and believable for a motivated teen who is already running something. The drop in ownership_potential from 4 to 3 is an interesting and realistic detail — she may now see the gap between what she's casually doing and formalizing it, which feels authentic rather than overcompliant. Her language ('being smarter about what I'm already doing') is perfectly calibrated for a 15-year-old who already tutors and just needed the reframe. The specific learning about tiered pricing for anxiety-focused sessions is concrete and plausible.
+> The shifts are modest (+1 on each scale) and highly plausible for a teen who is already running something — the idea essentially reframed what she's already doing as a real business, which is exactly the kind of insight that clicks naturally. The after-state language feels authentic and grounded ('tutoring but with a plan'), not performative. The move from 'adult thing with paperwork' to 'this is just what I do but more intentional' is a believable cognitive shift for someone already tutoring, and the specific insight about targeting younger kids as less intimidating rings true for a 15-year-old.
+
+---
+
+### a03-tutor — Maya (age 15, already-running) · motivation=5
+**Idea:** Math confidence bootcamp for 6th-8th graders struggling with pre-algebra
+**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like, making money from something you're good at and maybe hiring people eventually? Like having your own thing instead of working for someone else."
+> Feels: It feels like something I could maybe do since I already kinda do it with tutoring, but like the real business stuff seems more for adults who know about taxes and stuff.
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
+> Oh wow, it's literally just what I'm already doing but like... organized and with actual rates that make sense. I didn't realize that having a specific focus like pre-algebra could be a real strategy instead of just helping with whatever.
+> Learned: That you can charge more for being specialized - like focusing just on pre-algebra transition instead of all math
+> Gut: It feels less scary because it's basically me just being more intentional about something I already do.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The shifts (+1 confidence, +2 understanding) are realistic for a teen who already tutors and just needed the framing to see it as a real business. The slight drop in ownership (4→3) is interesting and actually adds credibility—she may feel the structured version is slightly less 'hers' than the informal thing she was already doing, which is a nuanced and believable reaction. The insight about specialization as strategy is a genuine learning moment that connects directly to her existing experience.
 
 ---
 
 ### a04-bake — Owen (age 17, already-running) · motivation=1
-**Idea:** Weekend Sourdough Delivery Service for Busy Families
+**Idea:** Premium weekend sourdough subscription for busy suburban families
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like making it official somehow with paperwork and stuff, maybe getting a real storefront or website instead of just selling bread to people I know."
-> Feels: It feels like something adults do with serious money and business plans, but I guess some kids do small stuff too.
+> "Starting a business means like making it official somehow? Getting licenses and stuff, maybe having employees and a real storefront instead of just selling bread to Mrs. Johnson next door."
+> Feels: It feels like something adults do when they have their life figured out and money to invest, not really for teenagers who are just messing around with hobbies.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### a04-bake — Owen (age 17, already-running) · motivation=3
-**Idea:** Custom sourdough bread subscription service for busy families in your neighborhood
+**Idea:** Weekly sourdough subscription service for busy families in your neighborhood
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like making something people want to buy and figuring out how to sell it regularly, but with all the official paperwork and tax stuff that adults do."
-> Feels: It feels like something I could maybe do in a smaller way now, but the real business stuff is probably more for adults who know about permits and accounting and all that.
-**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=4/5, feels: **accessible**
-> It actually feels like something I could start doing pretty soon since I'm already making the bread anyway. The subscription part makes it feel less random than just hoping people buy stuff.
-> Learned: Having people pay monthly ahead of time would mean I'd know exactly how much bread to make each week instead of guessing
-> Gut: This actually sounds doable, not like some crazy startup thing.
+> "Starting a business means like, making something people want and selling it for money, but probably involves a lot of paperwork and official stuff I don't really get yet."
+> Feels: It feels like something I could maybe do since I'm already selling bread, but the real business stuff seems more like an adult thing with taxes and licenses and whatever.
+**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
+> It actually makes sense to just build on what I'm already doing instead of starting something completely different. The subscription thing seems way less scary than I thought because people already buy my bread.
+> Learned: You can make a real business by just doing what you're already doing but more organized
+> Gut: This feels like something I could actually try without it being this huge scary thing.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 shifts on confidence and understanding are modest and believable for a 17-year-old who is already baking sourdough—the idea clearly connected an existing skill to a structured business model. The subscription framing gave him a concrete mechanism (predictable demand) that directly addressed his vague sense that 'real business stuff is for adults.' Ownership staying at 4/5 rather than jumping to 5 also feels honest and not overcompliant. The shift from 'maybe in a smaller way' to 'I could start pretty soon' is a natural click moment, not an exaggerated leap.
+> The shifts are modest and believable — +1 on confidence and understanding for a teen already selling bread who just needed the mental reframe that 'organizing what you do = a real business.' The ownership drop from 4 to 3 is slightly odd (perhaps reflecting that the subscription model feels more constrained than his current freeform selling), but it's a minor flag. The core insight — building on existing activity rather than starting from scratch — is a genuinely useful reframe that lands well for this persona's situation.
 
 ---
 
 ### a04-bake — Owen (age 17, already-running) · motivation=5
-**Idea:** Custom artisan sourdough loaves for local families with weekly home delivery
+**Idea:** Custom sourdough bread subscription for busy families
 **BEFORE:** confidence=4/5, understanding=3/5, ownership-potential=4/5
-> "Starting a business means making something people want to buy and figuring out how to sell it to them regularly, like maybe scaling up what I'm already doing with my bread."
-> Feels: It feels like something I could actually do since I'm already kind of doing it, but the 'real business' part with taxes and stuff seems more adult-y.
-**AFTER:** confidence=4/5 (+0), understanding=4/5 (+1), ownership=2/5, feels: **accessible**
-> It made the 'business' part feel more real and structured, like there's an actual path from what I'm doing to something bigger. But it also feels like the AI just took my hobby and put business words on it.
-> Learned: The subscription model thing - I never thought about people paying regularly instead of just buying random loaves
-> Gut: It's basically what I'm already doing but with a fancy name and delivery, which feels both doable and kind of obvious now that someone said it.
-**Judge:** wizard moved them = **partly**, shift_realistic=4/5, meaningful=true, alien→accessible=false
-> The shifts are small and realistic for someone already running a bread operation — understanding went up one point as the subscription model concept clicked, which is a genuinely plausible learning moment. However, ownership dropped from 4 to 2, which is notable and believable: Owen feels the AI just repackaged his existing hobby rather than revealing something new, reducing his sense that *he* discovered or owns the idea. The alien_to_accessible criterion doesn't apply here since Owen already saw business as accessible before the interaction. The wizard did its job partly — it taught him about recurring revenue models, but underwhelmed by being too obvious for someone already doing the work.
+> "Starting a business means like, making something people want and selling it for money regularly, not just once in a while. It's basically turning something you're good at into actual income."
+> Feels: It feels like something I could definitely do since I'm already kinda doing it with my bread, but the 'real business' part seems more adult-ish with paperwork and stuff.
+**AFTER:** confidence=5/5 (+1), understanding=4/5 (+1), ownership=4/5, feels: **very_accessible**
+> Oh wait, this is literally just organizing what I'm already doing but smarter. Like, I didn't realize that having people want regular orders was basically the same thing as a 'real business' - it's just making it more official.
+> Learned: A subscription model is just getting people to commit to buying regularly instead of randomly asking for bread
+> Gut: This feels less like starting a business and more like upgrading what I'm already doing.
+**Judge:** wizard moved them = **yes**, shift_realistic=5/5, meaningful=true, alien→accessible=true
+> The shifts are modest and perfectly calibrated for this persona: +1 confidence, +1 understanding, steady ownership. Owen was already baking and selling bread, so a sourdough subscription idea is the most natural possible bridge — the 'aha' moment of realizing regular orders = subscription model is genuinely believable for a 17-year-old at this stage. The before-state already hinted he saw business as 'adult-ish with paperwork,' and the after-state reframes it as 'upgrading what I'm already doing,' which is a real, specific cognitive shift rather than generic enthusiasm. No signs of overcompliance; this reads like an authentic incremental unlock.
 
 ---
 
 ### m01-photo — Jasmine (age 17, multi-track) · motivation=1
-**Idea:** Senior portrait photography for budget-conscious families using natural lighting and thrifted prop styling
+**Idea:** Affordable Senior Portrait Photography
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like having your own company with employees and paperwork and stuff, probably need lots of money upfront and business knowledge I don't have."
-> Feels: Honestly feels like something adults do after college when they have their life figured out, not really for teenagers like me.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+> "Starting a business means like having your own company with employees and paperwork and stuff, probably need a lot of money upfront and business knowledge I don't have."
+> Feels: Business feels like something adults do after college when they have their life figured out, not really for teenagers who are still in school.
+**AFTER:** confidence=3/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
+> Okay this actually makes business feel less like some abstract adult thing and more like using a skill I already have. The numbers make it seem real instead of just 'start a business someday.'
+> Learned: I didn't realize you could charge that much for photography sessions or that other seniors would actually pay for that
+> Gut: This feels like something I could actually try instead of just a fantasy.
+**Judge:** wizard moved them = **partly**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> A +1 shift across all three dimensions is modest and believable for a low-motivation teen encountering a concrete, skill-based idea with real numbers. The after-state language feels authentic—curious but not overly enthusiastic, consistent with motivation 1/5. The move from 'business is an adult thing' to 'I could actually try this' is genuine but tempered; she's intrigued, not transformed. Slightly generous given her very low motivation—a real 1/5 motivation teen might remain more skeptical—but nothing here screams overcompliance.
 
 ---
 
 ### m01-photo — Jasmine (age 17, multi-track) · motivation=3
-**Idea:** Senior Portrait Photography for High School Students
+**Idea:** Senior Portrait Photography for Classmates
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like officially registering something and having to deal with taxes and paperwork and stuff, probably need a lot of money upfront to even begin."
-> Feels: It feels like something adults do once they have their life figured out and have savings and know about business stuff.
+> "Starting a business means like, having your own company where you sell stuff or services to make money, but it seems like you need a lot of paperwork and adult stuff I don't really get yet."
+> Feels: It kinda feels like something adults do when they have their life figured out, but maybe some kids could do smaller versions like selling stuff online or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### m01-photo — Jasmine (age 17, multi-track) · motivation=5
-**Idea:** Affordable Senior Portrait Photography for Classmates
+**Idea:** Affordable senior portrait photography for classmates using natural lighting and thrift store styling
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like... making money from something you're good at? Like maybe selling stuff or teaching people things, but you have to figure out all the legal stuff and taxes which seems super complicated."
-> Feels: It feels like something I could maybe do, but probably not until I'm older and understand all the boring adult paperwork stuff.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
-> Wait, this actually feels like something I could start doing next week, not when I'm 25. The prices and steps seem real instead of mysterious.
-> Learned: You can literally just charge people for something you're already good at - like it doesn't have to be some huge complicated company
-> Gut: This went from feeling like distant adult stuff to 'oh I could text Emma about this tomorrow.'
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts (+1 confidence, +2 understanding, 0 ownership) are very believable for a high-motivation teen encountering a concrete, skill-matched idea. Photography is a natural fit for someone who likely already has the equipment (phone/camera) and social network to start immediately. The before-state fixation on 'legal stuff and taxes' dissolving into 'I could text Emma tomorrow' is a realistic cognitive reframe. The understanding jump from 2→4 is the largest delta but defensible given the idea directly addresses her misconception that business requires formal infrastructure.
+> "Starting a business means like actually selling stuff or services to people and making real money from it, not just random side hustles but something that could actually grow into something bigger."
+> Feels: Honestly it feels like something I could do since I'm already good at stuff people want, but I don't really know all the grown-up business stuff yet.
+ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### m02-game — Tariq (age 14, multi-track) · motivation=1
-**Idea:** Valorant aim training coaching for Bronze/Iron ranked players aged 13-17
-**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like making your own company and trying to sell stuff to people to make money, but it seems really complicated with taxes and legal stuff."
-> Feels: It feels like something mostly for adults who have money and know about boring paperwork stuff, but maybe some kids could do simple things like selling art or something.
+**Idea:** Valorant aim training coaching for Bronze/Iron rank players ages 12-16
+**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
+> "Starting a business means like having your own company with employees and stuff, dealing with taxes and legal things that seem really complicated."
+> Feels: It feels like something adults do when they have everything figured out, not really for kids who are still in school.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### m02-game — Tariq (age 14, multi-track) · motivation=3
-**Idea:** Valorant aim training coaching for Bronze/Iron ranked players ages 12-16
+**Idea:** Valorant aim training coaching for Bronze/Silver rank players aged 13-17
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like, making something people want to buy and somehow turning that into real money you can actually use."
-> Feels: Honestly feels more like an adult thing, but I guess some kids do stuff like sell art or whatever.
+> "Starting a business means like making money from something you're good at or selling stuff, but it seems super complicated with all the legal stuff and you need a lot of money to start."
+> Feels: Honestly it feels more like an adult thing - like you need to be really smart about money and have connections and stuff.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### m02-game — Tariq (age 14, multi-track) · motivation=5
-**Idea:** Valorant aim training coaching for Bronze/Iron ranked players aged 12-16
+**Idea:** Valorant aim training coaching for Bronze/Iron rank players aged 13-17
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like making money from something you're good at or selling stuff people want, but I'm not really sure about all the legal stuff and paperwork that probably comes with it."
-> Feels: It feels like something mostly for adults since they have money and know how to do taxes and stuff, but maybe kids can do smaller things too.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> Wait, I could actually charge people for something I'm already good at? I never thought about my gaming skills as something valuable that people would pay for.
-> Learned: That you can make money from skills you already have instead of learning completely new business stuff first
-> Gut: This actually sounds doable, not like some adult business thing I don't understand.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 jumps on confidence and understanding are very believable for a high-motivation teen shown that a skill he already has (Valorant aim) is monetizable. The slight drop in ownership from 4 to 3 is a realistic and honest signal—he's excited but now grappling with the practical reality of actually doing it, which adds credibility. The shift narrative ('I never thought about my gaming skills as something valuable') is authentic and well-matched to the persona's gaming identity.
+> "Starting a business means like making money from something you're good at or selling stuff people want, but you gotta figure out all the legal stuff and taxes and whatever."
+> Feels: Honestly feels like mostly an adult thing but I know some kids on YouTube and stuff make bank so maybe not impossible for us.
+**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=4/5, feels: **accessible**
+> Wait this actually makes sense - I'm already helping my friends get better at Valorant for free anyway. Charging for it feels way more realistic than some random business idea I don't care about.
+> Learned: Business can literally just be getting paid for stuff you already do well instead of inventing some whole new thing
+> Gut: This feels like something I could actually try without being fake about it.
+**Judge:** wizard moved them = **yes**, shift_realistic=5/5, meaningful=true, alien→accessible=true
+> The +1 shifts on confidence and understanding are perfectly calibrated for a high-motivation teen who already had decent ownership potential. The key insight — 'I'm already doing this for free' — is exactly the kind of lightbulb moment a real 14-year-old gamer would have. The before-state skepticism ('mostly an adult thing') credibly softens into 'I could actually try this' without overcorrecting into unrealistic enthusiasm. No signs of agent overcompliance; the persona retained healthy caution ('without being fake about it').
 
 ---
 
 ### m03-dance — Aaliyah (age 16, multi-track) · motivation=1
-**Idea:** Custom dance tutorial videos for middle school students learning TikTok choreography
+**Idea:** Custom dance routine videos for high school teams and events
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like having your own company with employees and paperwork and stuff, probably need a lot of money upfront and business plans that adults write."
-> Feels: Honestly feels like something you do after college when you're like 25+ and have everything figured out, not really for teenagers.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+> "Starting a business means like, having your own company with paperwork and stuff, maybe a store or website where you sell things and handle money and taxes."
+> Feels: It feels like something adults do when they have their life figured out, not really for teenagers who are still in school.
+**AFTER:** confidence=3/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
+> It's weird seeing my actual hobbies turned into something people might pay for. Like, I already make dance videos for fun, so maybe it's not that big of a leap to make them for other people's teams.
+> Learned: I didn't realize other schools might actually pay for custom choreography videos instead of just copying stuff from TikTok
+> Gut: It feels more like a side hustle than a real business, but maybe that's how things start?
+**Judge:** wizard moved them = **partly**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> A +1 across all three dimensions is modest and highly believable for a low-motivation teen who already makes dance videos for fun—the idea directly mirrors an existing hobby, so the connection is natural rather than forced. The after-state language ('side hustle,' 'maybe that's how things start') is authentic and appropriately tentative, not overcompliant. The move from 'business is for adults' to 'maybe it's not that big of a leap' is genuine but still cautious, which fits motivation 1/5; full conversion would have been suspicious.
 
 ---
 
 ### m03-dance — Aaliyah (age 16, multi-track) · motivation=3
-**Idea:** Custom dance tutorial videos for middle school dance teams and cheer squads
+**Idea:** Custom dance tutorial videos for teen birthday parties and special events
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company where you sell stuff or services and handle all the money and legal stuff yourself, which sounds really complicated."
-> Feels: It feels more like an adult thing but I guess some kids do it with like selling bracelets or tutoring, so maybe it's possible but still kinda intimidating.
+> "Starting a business means like, making your own company and trying to make money from it, but it seems super complicated with all the legal stuff and you need a lot of money upfront."
+> Feels: It feels like mostly an adult thing because they know about taxes and have money to invest, but maybe some kids do it with like selling stuff online or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### m03-dance — Aaliyah (age 16, multi-track) · motivation=5
-**Idea:** Custom TikTok dance tutorials for middle schoolers
+**Idea:** Custom dance tutorial videos for teen birthday parties and school events
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like making money from something you're good at, probably having to do taxes and stuff, and somehow getting people to actually pay you for it."
-> Feels: It feels like something I could maybe do but adults make it seem way more complicated than it needs to be.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> Wait, this actually makes sense and uses stuff I already do. Like, I never thought of my dance videos as something people would literally pay for, but middle schoolers at my school ARE always asking me to teach them dances.
-> Learned: That a business can literally just be taking something you're already good at and packaging it for people who want to learn it
-> Gut: This feels way less scary than I thought starting a business would be.
+> "Starting a business means like, making money from something you're good at or something people want, but there's probably a lot of paperwork and adult stuff I don't know about."
+> Feels: It feels like something I could maybe do, but like the real serious business stuff is probably more for adults who know about taxes and legal things.
+**AFTER:** confidence=4/5 (+1), understanding=3/5 (+1), ownership=3/5, feels: **accessible**
+> Okay wait, this actually feels like something I could start doing like... next week? Like I already film dance videos anyway, and parents definitely stress about party activities. It's not some huge complicated business thing.
+> Learned: That you can literally just sell what you're already good at - I didn't realize people would pay for custom dance tutorials for parties
+> Gut: This feels way more doable than I thought business stuff would be.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 jumps in self_confidence and understanding are completely believable for a high-motivation teen encountering an idea that directly mirrors her existing social reality—middle schoolers literally already ask her to teach dances. The slight DROP in ownership (4→3) is an interesting and realistic detail that argues against overcompliance; it suggests she's now grappling with the real logistics of turning a casual skill into a structured offering, which tempers her initial 'I could totally do this' optimism. The language in the shift statement feels authentically teen and grounded in a specific lived experience rather than generic enthusiasm.
+> The shifts are modest and believable: +1 on confidence and understanding, and the ownership_potential actually dropped by 1 (from 4 to 3), which feels realistic — she got more concrete about what it actually takes and tempered her initial optimism slightly. The language in the after-state is authentic teen voice and connects directly to her existing behavior (already filming dance videos). The idea clearly bridged the 'business is adult stuff' gap by showing her she's already doing the core work. No signs of overcompliance; this reads like a genuine lightbulb moment rather than an exaggerated transformation.
 
 ---
 
 ### l01-mateo — Mateo (age 13, slang-esl) · motivation=1
-**Idea:** Backyard Soccer Skills Coaching for Elementary Kids
+**Idea:** Backyard Soccer Skills Training for Elementary Kids
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=2/5
-> "Starting a business means like having your own company with employees and offices and stuff, dealing with taxes and legal papers and all that grown-up stuff."
-> Feels: Business feels like something adults do when they wear suits and have meetings - not really for kids like me who just want to play soccer.
+> "Starting a business means like having your own company with employees and stuff, doing paperwork and taxes and being all professional."
+> Feels: Business feels like something for adults who wear suits and know about money stuff, not really for kids like me.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### l01-mateo — Mateo (age 13, slang-esl) · motivation=3
-**Idea:** Neighborhood Soccer Skills Training for Kids 8-12
+**Idea:** Neighborhood Soccer Skills Coach for Elementary Kids
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company where you sell stuff or do services for money, but you gotta deal with taxes and paperwork and all that complicated adult stuff."
-> Feels: It feels like mostly an adult thing, but maybe some kids could do simple stuff like selling snacks or tutoring.
+> "Starting a business means like having your own company and making money from it, but you need lots of money to start and have to deal with taxes and stuff."
+> Feels: It feels like mostly an adult thing but maybe some kids could do simple stuff like selling things.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### l01-mateo — Mateo (age 13, slang-esl) · motivation=5
-**Idea:** Backyard Soccer Skills Training for Elementary Kids
+**Idea:** Neighborhood Youth Soccer Skills Training
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like making money from something you're good at or selling stuff people want to buy, but you gotta figure out all the grown-up paperwork and stuff."
-> Feels: It feels like something mostly for adults but maybe kids could do smaller things like selling lemonade or teaching other kids stuff.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> I didn't realize you could make real money teaching other kids something you're already good at. It feels way more doable than I thought business could be.
-> Learned: That teaching skills to younger kids can actually be a legitimate business, not just helping out
-> Gut: This actually sounds like something I could try without it being weird or too grown-up.
+> "Starting a business means like making money from something you're good at or selling stuff people want to buy, but I'm not really sure about all the paperwork and legal stuff."
+> Feels: It feels like something mostly for adults but maybe some kids could do simple stuff like selling things or teaching what they know.
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
+> This actually feels doable because it's just me teaching soccer skills I already have to younger kids. It's not some complicated business thing - it's like being a coach but getting paid for it.
+> Learned: Business can literally just be doing something you're good at and charging money for it - it doesn't have to be inventing something or having a store.
+> Gut: I could actually see myself trying this with some kids in my neighborhood.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 shifts in self_confidence and understanding are very plausible for a 13-year-old soccer player with high motivation seeing a concrete, relatable idea. The slight drop in ownership_potential (4→3) is an interesting and realistic detail — perhaps reflecting that the idea, while accessible, made him think more concretely about the actual work involved. The qualitative shift from 'mostly for adults' to 'something I could try without it being weird' is genuine and well-calibrated for this persona.
+> The shifts (+1 confidence, +2 understanding, stable ownership) are very believable for a high-motivation 13-year-old who already plays soccer. The idea directly leverages an existing skill and a familiar neighborhood context, which makes the 'business is just coaching for pay' insight land naturally. The after-state language feels authentic to a teen who just had an aha moment rather than agent overcompliance — no unrealistic leaps, and ownership staying at 4 rather than jumping to 5 adds credibility.
 
 ---
 
 ### l02-bre — Bre (age 15, slang-esl) · motivation=1
-**Idea:** Quick Knotless Braids for High School Students
+**Idea:** Express Knotless Braids for Teen Girls
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting all official with paperwork and stuff, having a real store or whatever, and dealing with taxes and grown-up things I don't really know about."
-> Feels: Honestly it feels more like an adult thing, even though I know some kids sell stuff, real businesses seem complicated and scary.
+> "Starting a business is like having your own company with employees and stuff, getting licenses and all that official paperwork that adults do."
+> Feels: Feels like something you do after college when you have money and know about taxes and all that grown up stuff.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
@@ -500,72 +519,67 @@ ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (
 ### l02-bre — Bre (age 15, slang-esl) · motivation=3
 **Idea:** Express Knotless Braids for Teen Girls
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business is like having your own thing where you make money from what you're good at, but idk all the paperwork and stuff that goes with it."
-> Feels: It feels like something I could maybe do since I already do hair for friends, but the real business part seems more like adult stuff.
+> "Starting a business is like having your own thing where you make money doing what you're good at, but idk all the paperwork and official stuff that comes with it."
+> Feels: It feels like something I could maybe do since I already do hair for people, but the real business part seems more like an adult thing.
 **AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> Wait, $40-60 per style? I was thinking like $20 max because I'm not a real salon. But if I'm actually that good and it takes hours, maybe I should charge what my time is worth.
-> Learned: That doing braids for friends could actually be priced like a real service, not just friend favors
-> Gut: This feels way more doable than I expected because it's literally just what I already do but with actual prices.
+> It actually made me realize I'm already basically doing this but just not thinking of it as a real business. Like, I could literally start charging more and being more official about it tomorrow.
+> Learned: That I don't need to completely change what I'm doing - I just need to treat it more seriously and charge what I'm worth
+> Gut: Wait, this is actually just what I already do but with better prices and being more organized about it.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts are modest and believable — +1 on confidence and +2 on understanding feel realistic for a teen who already does hair and just needed someone to reframe it as a real service. The slight drop in ownership_potential (4→3) is an interesting and honest signal: she's now grappling with the actual work of running it as a business rather than just vibing on the idea, which adds credibility. The pricing realization is a very specific, concrete cognitive shift that tracks perfectly for a 15-year-old who undervalues her own labor.
+> The shifts are modest and believable: +1 on confidence and +2 on understanding are reasonable for a teen who already does hair and just needed the reframe. The slight drop in ownership_potential (4→3) is a curious but plausible detail — recognizing the 'real business' logistics might feel slightly more daunting once it feels concrete rather than hypothetical. The language in the after-state rings true for a 15-year-old ESL speaker who already has the skill and just needed the conceptual bridge. This is a textbook case of the wizard working well: validating an existing practice as a legitimate business.
 
 ---
 
 ### l02-bre — Bre (age 15, slang-esl) · motivation=5
-**Idea:** Quick Knotless Braids for Teen Girls
+**Idea:** Express knotless braids for high school girls
 **BEFORE:** confidence=4/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business is like being your own boss and making money off something you're already good at, but idk all the paperwork and legal stuff that probably comes with it."
-> Feels: It feels like something I could do since I'm already doing hair for people, but the real business part seems like adult stuff with taxes and permits and whatever.
+> "Starting a business means like having your own thing where you make money doing what you're good at, but I think there's probably a lot of paperwork and adult stuff I don't know about."
+> Feels: I mean, kids can definitely hustle and make money, but real businesses with like taxes and stuff feels more adult.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### l03-sage — Sage (age 14, slang-esl) · motivation=1
-**Idea:** Photocard Authentication & Trading Verification Service
+**Idea:** K-pop photocard authentication and safe trading service for teen collectors
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting a loan and having employees and doing taxes and stuff that adults do when they wear suits to work."
-> Feels: Business feels like mostly an adult thing but I guess some kids sell stuff online or whatever.
+> "Starting a business means like, officially making money from something and having to do taxes and stuff? Like having a real company with paperwork and employees maybe."
+> Feels: It feels like mostly an adult thing but maybe some teens could do simple stuff like selling things online or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### l03-sage — Sage (age 14, slang-esl) · motivation=3
-**Idea:** Photocard Authentication & Trading Facilitation for K-pop Fans
+**Idea:** Verified K-pop Photocard Trading Middleman Service
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company with employees and stuff, dealing with taxes and legal things that seem super complicated."
-> Feels: Honestly it feels more like an adult thing, but I guess some kids do stuff like selling things online or whatever.
+> "Starting a business means like, officially selling stuff and dealing with taxes and paperwork and having a real store or website, which sounds super complicated and adult-y."
+> Feels: It feels like something mostly for adults who know about money and legal stuff, though I guess some teens do online shops or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### l03-sage — Sage (age 14, slang-esl) · motivation=5
-**Idea:** Photocard Authentication & Trade Verification Service
-**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company that makes money, probably with employees and fancy stuff like websites and business cards and dealing with taxes."
-> Feels: It feels like mostly an adult thing but maybe some really smart or lucky kids could do it too.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
-> This actually feels like something I could do since I'm already good at spotting fakes and people at school ask me about cards anyway. It's not some huge scary business thing, it's just helping friends in a more organized way.
-> Learned: Business can literally be taking something you already do for free and making it more official
-> Gut: Wait, this is actually just using skills I already have instead of learning a bunch of new adult stuff.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts of +1 across three dimensions are modest and believable for a 14-year-old with 5/5 motivation who already has domain expertise in photocard authentication. The after-state narrative is internally consistent—recognizing that an informal skill (spotting fakes) can become a service is a natural cognitive leap for a teen already doing it socially. The learned insight ('taking something you already do for free and making it more official') is specific and grounded, not generic agent-pleasing language. No red flags for overcompliance.
+**Idea:** Photocard Authentication & Trading Facilitation
+**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like, making money by selling stuff or doing something people want to pay for. I guess it's when you're not just working for someone else but doing your own thing."
+> Feels: It feels like mostly an adult thing but maybe some kids do it too, like selling stuff online or whatever.
+ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### y01-bracelet — Sophie (age 12, age-12) · motivation=1
-**Idea:** Custom Taylor Swift concert friendship bracelets for local Swifties
+**Idea:** Custom Taylor Swift Concert Friendship Bracelets
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like having your own company with employees and offices and stuff, dealing with taxes and legal things that seem super complicated."
-> Feels: It feels like something for adults mostly, but I guess some kids sell stuff at school sometimes.
+> "Starting a business means like having your own company with employees and paperwork and stuff, probably need a lot of money to start it."
+> Feels: It feels like something mostly for adults who have money and know how to do all the official stuff.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### y01-bracelet — Sophie (age 12, age-12) · motivation=3
-**Idea:** Custom Taylor Swift concert friendship bracelets for local Swifties
+**Idea:** Custom Taylor Swift concert friendship bracelets for school events and parties
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like, having your own company and making money from selling stuff, but it seems really complicated with lots of paperwork and adult things I don't know about."
-> Feels: It feels like mostly an adult thing, but maybe some kids could do small stuff like selling things they make.
+> "Starting a business means like having your own company where you sell stuff and make money, but you have to do all the scary adult things like taxes and paperwork."
+> Feels: It feels like something mostly for adults who know how to do all the complicated stuff, but maybe some kids could do simple things like selling lemonade.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
@@ -573,141 +587,136 @@ ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (
 ### y01-bracelet — Sophie (age 12, age-12) · motivation=5
 **Idea:** Custom Taylor Swift concert friendship bracelets for middle school girls
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, making something people want to buy and actually selling it for real money, not just trading with friends."
-> Feels: It feels like something I could maybe do on a small scale, but real businesses seem more like adult stuff with paperwork and things I don't understand yet.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> Oh wow, it actually feels like something I could really do! Like, I already make these bracelets anyway, and lots of girls at school are obsessed with Taylor Swift and going to concerts.
-> Learned: I didn't realize that something I already do for fun could actually be a business if people are willing to pay for it
-> Gut: This feels way more doable than I thought business could be - it's just doing what I already love but getting paid for it.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The shifts (+1 confidence, +2 understanding) are believable for a highly motivated 12-year-old shown an idea that directly maps onto something she already does. The slight drop in ownership (4→3) is curious and slightly counterintuitive—she seems more excited but less ownership?—which could reflect honest nuance or a minor inconsistency in the simulation. Overall the idea clearly bridged the gap from 'business is adult stuff' to 'I already do this,' which is exactly what a well-matched idea should accomplish for this persona.
+> "Starting a business means like selling stuff you make or do to people and trying to make money from it, I guess?"
+> Feels: It feels like something older kids or adults do mostly, but maybe I could do something small like selling my bracelets.
+ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### y02-cards — Ethan (age 12, age-12) · motivation=1
-**Idea:** Pokemon Card Appraisal & Authentication Service for Kids
+**Idea:** Pokemon card appraisal and authentication service for local kids
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting official paperwork and stuff, having a real store or website, and dealing with taxes and legal things that seem super complicated."
-> Feels: Business feels mostly like an adult thing, but I guess some kids sell stuff online or whatever.
+> "Starting a business means like getting a store or website and selling stuff to make money, but you probably need a lot of money first and know about taxes and stuff."
+> Feels: It feels like mostly an adult thing since they know about money and legal stuff, but maybe some kids could sell things to friends or online.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### y02-cards — Ethan (age 12, age-12) · motivation=3
-**Idea:** Pokemon card evaluation and authentication service for local kids
+**Idea:** Pokemon Card Appraisal Service for Kids
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting official paperwork and stuff to sell things legally, maybe having a store or website where people buy from you regularly instead of just trading with friends."
-> Feels: It feels like mostly an adult thing since they have money and know all the legal stuff, but maybe kids could do smaller versions.
+> "Starting a business means like having your own company with employees and paperwork and stuff, maybe a website or store where you sell things to make money."
+> Feels: It feels mostly like an adult thing but maybe some kids could do smaller versions like selling stuff online or whatever.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### y02-cards — Ethan (age 12, age-12) · motivation=5
-**Idea:** Pokemon Card Appraisal Service for Local Kids
+**Idea:** Pokemon card authentication and valuation service for local kids
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, selling stuff people want and making money from it, but you probably need to do a bunch of paperwork and adult stuff I don't really get."
-> Feels: It feels like mostly an adult thing but maybe kids could do smaller versions, like selling things at school or online.
+> "Starting a business means like selling stuff you're good at and making money from it, but probably involves a lot of paperwork and adult stuff I don't know about."
+> Feels: It feels like something I could maybe do with Pokemon cards since I know about them, but real businesses seem like they're mostly for adults who understand taxes and legal stuff.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### u01-code — Sam (age 18, age-18) · motivation=1
-**Idea:** Local restaurant website builder specializing in online ordering integration
+**Idea:** Wedding websites for engaged couples in your local area
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like... making something people want to buy and handling all the legal stuff and taxes and whatever. Seems complicated."
-> Feels: It feels like something adults do when they have their life figured out, but maybe some coding stuff could work for people my age?
+> "Starting a business means like, making something people want to buy and figuring out how to actually get paid for it, but there's probably a ton of legal and money stuff I don't know about."
+> Feels: It feels like something mostly for adults who have their life together, but maybe some tech stuff could work for people my age?
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### u01-code — Sam (age 18, age-18) · motivation=3
-**Idea:** Local service business websites with instant payment collection
+**Idea:** Simple restaurant menu websites for local family restaurants
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, making something people actually want to pay for and figuring out all the legal and money stuff that comes with it."
-> Feels: It feels like something I could maybe do since I can already build websites, but all the business-y parts seem pretty adult and complicated.
+> "Starting a business means like, making something people want and figuring out how to get paid for it, but there's probably a ton of legal and money stuff I don't know about."
+> Feels: It feels like something I could maybe do since I can already build websites, but the 'real business' part seems more like adult territory.
 **AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> It actually feels way more doable when it's framed as helping parents I already know rather than competing with real web agencies. The specific price range makes it feel less scary and more like a real thing I could charge for.
-> Learned: I didn't realize small local businesses actually have trouble collecting payments online - that's a problem I could actually solve with stuff I already know how to do
-> Gut: This feels less like 'starting a business' and more like 'doing freelance work for neighbors' which is way less intimidating.
+> This actually feels way more doable than I expected - like I could literally walk into the pizza place near school and show them what I mean. It's not some huge abstract business concept, it's just helping people I already see around town.
+> Learned: Business can literally be as simple as 'I can do X, you need X, here's what it costs' - I was overthinking the complexity part
+> Gut: Wait, this is actually just freelancing with a fancy name - I could probably try this next month.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 jumps in confidence and understanding are believable for an 18-year-old who already has web-building skills and just needed the problem reframed in neighborhood/familiar terms. The slight drop in ownership (4→3) is actually a realistic and honest signal—calling it 'freelance work for neighbors' rather than a 'real business' shows genuine processing, not overcompliance. The specific insight about local businesses struggling with payment collection is a concrete learning that connects existing skills to a real gap, which credibly explains the understanding jump from 2 to 4.
+> The +1 jumps on confidence and understanding are believable for an 18-year-old who already has web skills — this idea directly maps to an existing capability, so the 'aha' moment rings true. The drop in ownership from 4→3 is slightly odd but could reflect a realization that freelancing isn't quite 'owning a business' in the way they imagined. The after-state language ('walk into the pizza place,' 'freelancing with a fancy name') feels authentic and grounded rather than overcompliant — it's specific and slightly deflating in a realistic teen way.
 
 ---
 
 ### u01-code — Sam (age 18, age-18) · motivation=5
-**Idea:** Custom websites for local service businesses using modern tech stack
-**BEFORE:** confidence=4/5, understanding=3/5, ownership-potential=4/5
-> "Starting a business means building something people actually want to pay for, like an app or website that solves a real problem they have."
-> Feels: It feels like something I could totally do since I can already build websites and handle payments, but I'm not sure about all the business-y stuff like taxes and marketing.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+**Idea:** Next.js landing pages for local service businesses
+**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like building something people actually want to pay for, probably some kind of app or website since that's what I'm into. It's scary because you have to handle money stuff and customers and I don't really know how all that works yet."
+> Feels: It feels like something I could maybe do since I can already build stuff, but all the business-y parts seem super adult and intimidating.
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
+> This actually makes sense - it's just building websites but with a clear target and price point. The parent networking part feels weird but also realistic since I don't know any business owners myself.
+> Learned: That I could literally charge hundreds for the same Next.js skills I already use for fun projects
+> Gut: Wait, this is actually just web development with extra steps and way better pay.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The +1 jumps on confidence and understanding are very believable for an 18-year-old with 5/5 motivation who already has Next.js skills — this idea essentially reframes what they already do as a paid service. The slight drop in ownership (4→3) due to the parent-networking dependency actually adds credibility and shows honest self-assessment rather than overcompliance. The 'gut' reaction ('web development with extra steps and way better pay') reads like an authentic teen realization.
 
 ---
 
 ### u02-photog — Bella (age 18, age-18) · motivation=1
-**Idea:** Intimate Wedding Photography for Young Couples on Tight Budgets
+**Idea:** Intimate Wedding Photography for Young Couples
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like, getting an LLC or whatever, having a real website, dealing with taxes and contracts and all that scary adult paperwork stuff that I have no clue about."
-> Feels: It feels like something you do after college when you're a real adult with your life figured out, not something for someone like me who's still figuring everything out.
+> "Starting a business means like, getting official paperwork and tax stuff and having to deal with contracts and invoices and all that grown-up paperwork that seems super overwhelming."
+> Feels: It feels like something you do after college when you have your life figured out, not something for teenagers who are still learning.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### u02-photog — Bella (age 18, age-18) · motivation=3
 **Idea:** Intimate Wedding Photography for Budget-Conscious Couples
-**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like, officially registering something and doing taxes and having business cards and stuff, which seems super complicated and adult-y."
-> Feels: It feels like something you do after college when you have your life together, not something for someone still figuring things out.
-ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
+**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like, officially becoming a company with paperwork and taxes and stuff, getting clients who pay you real money instead of just helping friends for free."
+> Feels: It feels like something I could maybe do eventually, but right now it seems more like an adult thing with all the legal and money stuff.
+**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
+> Seeing actual numbers and packages made it feel way less abstract - like this is something I could actually price and do next month, not someday in the future. It connected my current second-shooting work to being my own thing instead of just helping someone else.
+> Learned: That I could start with what I'm already doing (second shooting) and just shift to being the main photographer for smaller events - I don't need to completely reinvent myself
+> Gut: This actually feels doable because it's building on what I'm already doing, not starting from zero.
+**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
+> The shifts (+1 confidence, +2 understanding) are believable for an 18-year-old who already has second-shooting experience — the idea didn't introduce something foreign but reframed what she's already doing. The slight drop in ownership_potential (4→3) adds credibility and avoids overcompliance; it suggests she realized running her own thing involves more responsibility than she initially assumed. The narrative is internally consistent: seeing concrete pricing and packages demystified the business side, which is exactly the kind of insight that bridges 'adult thing' to 'I could do this next month.'
 
 ---
 
 ### u02-photog — Bella (age 18, age-18) · motivation=5
-**Idea:** Intimate Wedding Photography for Budget-Conscious Couples
+**Idea:** Micro Wedding Photography for Young Couples
 **BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like, officially making money from something you're good at and having people actually pay you regularly for it, not just random gigs."
-> Feels: It feels like something I could maybe do since I already have some experience, but the actual business part seems pretty adult and complicated.
+> "Starting a business means like, officially making money from something you're good at and having people pay you regularly for it, maybe with a website and business cards and stuff."
+> Feels: It feels like something I could maybe do since I already have the camera and experience, but also kinda intimidating because I don't know all the adult business stuff yet.
 **AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> Seeing actual numbers made it feel way more real - like $800 isn't this impossible amount, and I already know wedding day stuff from second shooting. It went from 'maybe someday' to 'I could literally do this next year.'
-> Learned: That there's a whole market of small weddings that big photographers probably ignore because the money isn't worth it to them, but would be perfect for me starting out
-> Gut: Holy shit, this actually sounds like something I could do instead of just a fantasy.
+> Okay this actually makes way more sense than I thought it would - like it's not some random business idea, it's literally just doing more of what I already do but getting paid directly for it. The whole 'micro wedding' thing clicked because I've definitely seen my friends talking about wanting smaller celebrations.
+> Learned: That I could literally start by just telling people I know that I do this kind of photography - like it doesn't have to be this huge business launch thing
+> Gut: Wait, this is just me doing what I already love but actually charging for it properly.
 **Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 jumps on confidence and understanding are very plausible for an 18-year-old with 5/5 motivation who already has second-shooting experience — the idea connected directly to existing skills and made the business math tangible. The slight drop in ownership (4→3) is interesting and actually adds credibility; seeing real numbers may have introduced healthy realism about the work involved. The language in the shift description ('I could literally do this next year') feels authentic for this age and tracks with the before-state's 'maybe someday' framing.
+> The shifts (+1 confidence, +2 understanding) are believable for an 18-year-old with 5/5 motivation who already owns a camera and has photography experience — this idea is a natural extension of existing skills. The slight drop in ownership (4→3) is curious and slightly inconsistent with the enthusiastic after-state language, but could reflect a realistic realization that wedding photography carries real responsibility. The 'aha' moment about micro weddings connecting to her social circle feels authentic, and the insight that she can start small by telling people she knows is a genuinely meaningful learning moment.
 
 ---
 
 ### u03-fit — Devontae (age 18, age-18) · motivation=1
-**Idea:** Form coaching for college freshmen who want to start lifting safely
+**Idea:** Form coaching for college freshmen who are gym intimidated
 **BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
-> "Starting a business means like getting official paperwork and stuff, having employees maybe, and dealing with taxes and legal things that seem complicated."
-> Feels: Honestly it feels more like an adult thing - like you need money upfront and know about all this business stuff I don't really get yet.
+> "Starting a business means like getting a loan, renting an office, doing taxes and stuff, maybe having employees - sounds complicated and expensive."
+> Feels: Honestly feels more like an adult thing, like you need a degree or connections or something I don't have yet.
 ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### u03-fit — Devontae (age 18, age-18) · motivation=3
-**Idea:** Form correction coaching for college freshmen at campus gyms
-**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like having your own thing where you sell stuff or help people and make money from it, but you gotta handle all the paperwork and taxes and stuff."
-> Feels: It feels like something mostly for adults but maybe some kids our age could do it if they're really smart about it.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=4/5, feels: **accessible**
-> This actually feels doable because it's just helping people with something I already know how to do, not building some complicated business thing. Like, I could literally start this next week if I wanted to.
-> Learned: Business doesn't have to be inventing something new - it can just be getting paid for skills you already have
-> Gut: Oh wait, this is just being a trainer for people my age, which is totally something I could actually do.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 jumps on confidence and understanding are plausible for an 18-year-old with moderate motivation seeing a gym-related idea that directly maps to existing skills. The shift narrative is authentic — going from 'business is for adults' to 'this is just being a trainer for people my age' is a natural reframe. Ownership staying at 4/4 is realistic since he already had high ownership potential. The only mild concern is that the understanding jump from 2 to 4 is on the higher end, but the learned insight ('getting paid for skills you already have') is concrete enough to justify it.
+**Idea:** Form coaching for college freshmen who are intimidated by the gym
+**BEFORE:** confidence=2/5, understanding=2/5, ownership-potential=3/5
+> "Starting a business means like getting all official with paperwork and stuff, maybe renting a place, and trying to make money from something you're good at but it seems really complicated."
+> Feels: Honestly feels more like an adult thing but I guess some kids my age do stuff like sell things or whatever.
+ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---
 
 ### u03-fit — Devontae (age 18, age-18) · motivation=5
-**Idea:** Form coaching for college freshmen who are intimidated by the gym
-**BEFORE:** confidence=3/5, understanding=2/5, ownership-potential=4/5
-> "Starting a business means like making money from something you're good at, probably having to deal with a lot of paperwork and adult stuff I don't really know about yet."
-> Feels: It feels like something I could maybe do but adults definitely have way more advantages and know-how than me right now.
-**AFTER:** confidence=4/5 (+1), understanding=4/5 (+2), ownership=3/5, feels: **accessible**
-> Okay this actually makes sense - like I'm already doing this informally when I help friends at the gym anyway. It's not some huge leap into 'business owner' territory, it's just getting paid for something I already know how to do.
-> Learned: Business doesn't have to be this massive thing - it can literally just be charging for skills you already have
-> Gut: Wait, I could actually do this next semester.
-**Judge:** wizard moved them = **yes**, shift_realistic=4/5, meaningful=true, alien→accessible=true
-> The +1 shifts on confidence and understanding are very believable for an 18-year-old with 5/5 motivation who already has the skill and just needed someone to frame it as a business. The slight drop in ownership_potential (4→3) is actually a realistic nuance — he may now grasp the real work involved, which tempers naive optimism. The language in the shift ('I'm already doing this informally') rings authentic and doesn't feel like overcompliance. This is a well-matched idea for this persona.
+**Idea:** Form correction coaching for college freshmen at campus gyms
+**BEFORE:** confidence=4/5, understanding=2/5, ownership-potential=4/5
+> "Starting a business means like making money from something you're good at or passionate about, probably involves a lot of paperwork and stuff I don't really know about yet."
+> Feels: It feels like something I could do since I'm already helping people with workouts and meal plans, but the actual business part seems like adult territory.
+ERRORS: after: Expected ',' or '}' after property value in JSON at position 24 (line 2 column 23)
 
 ---

@@ -113,12 +113,42 @@ Build after v1 usage data shows where students actually get stuck.
 Depends on: v1 student usage data.
 Effort: M (human: ~1-2 weeks / CC: ~1 hour)
 
-### Batch Check-in Architecture
-Migrate on-demand check-ins to nightly batch processing when active student count exceeds
-10K. Requires: Supabase Edge Functions cron, Anthropic Message Batches API, Resend for
-email delivery, idempotent batch IDs, dead-letter tracking.
-Depends on: >10K active students.
-Effort: M (human: ~1 week / CC: ~30 min)
+### Real-World Brand Challenges (the unicorn-track revenue play)
+Brands like Adidas, Spotify, Crayola, Roblox pay $5K-$25K to put a real product or
+marketing problem in front of 5K-50K teen Adaptable users for 2 weeks ("How would
+you redesign sneaker packaging for Gen Z?" / "Pitch a Roblox event for high
+schoolers"). The top 10 student ideas get $200-$500 each plus a Zoom call with the
+brand team. Adaptable takes a platform fee on the brand sponsorship.
+
+Why this matters more than any other revenue idea:
+- Real-world stakes the lessons can't fake
+- Brand gets actual teen insight (more honest than focus groups)
+- Teen gets a portfolio piece + cash + adult contact + something to put on a college app
+- Adaptable gets revenue from a third party WITHOUT charging students or schools
+- The 19yo founder is the most fundable demographic for "we sell teen insight to brands"
+
+The global brand-research market is ~$80B. Even 0.01% of that is $8M ARR. Becomes
+a category nobody else owns because nobody else has the audience embedded in a
+learning context where they're already producing high-quality structured thinking.
+
+Architecture sketch:
+- New `challenges` table: brand, prompt, deadline, prize_pool, sponsor_id
+- Student submits via existing lesson chat (one-shot mode, not full lesson flow)
+- AI judge ranks submissions on 5-dim rubric (creativity, executability, teen-truth,
+  brand-fit, articulation) — borrows the eval-confidence judge pattern
+- Brand sponsor reviews top 50 in a portal, picks 10 winners
+- Cash distributed via Stripe Connect (custodial under-18 flow — same scaffolding
+  the COPPA work needed)
+- Winners get a richly-designed certificate that auto-attaches to their Founder
+  Portfolio (when that ships)
+
+Depends on: Stripe Connect under-18 custodial flow + at least 1,000 active students
+(brands won't pay for an audience of 50). Build the data model + judge now, hold the
+sales motion until the audience is real.
+
+Effort: L (human: ~3-4 weeks for the platform / CC: ~3 hours)
+Priority: P1 — this is the differentiated revenue path. Don't skip it for SaaS-style
+per-school pricing.
 
 ## P2 — Medium priority (v2)
 
@@ -128,42 +158,18 @@ Proof of impact for VentureLab fundraising. Tangible artifact for students to sh
 Blocked by: Privacy/consent framework for minors (needs legal review).
 Effort: M (human: ~1 week / CC: ~30 min, plus legal review)
 
-### Interactive Tools (post-spine)
-- AI prompting sandbox
-- Business plan builder
-- Revenue/pricing calculator
-- Pitch deck creator
-Effort: M each (human: ~1 week each / CC: ~30 min each)
-
-### External Integrations
-- Lovable website builder integration
-- Make.com automation builder integration
-Effort: M each
-
 ### ~~Gamification Layer~~ ✓
 Built: 18 achievements across 5 categories (bronze/silver/gold tiers), 4-category leaderboard
 (Most Consistent, Most Engaged, Deepest Thinker, Most Improved), student profiles on leaderboard.
-
-### Peer Collaboration
-Student-to-student features. Requires Supabase Realtime.
-Effort: L
 
 ### Quizzes
 Knowledge checks embedded in lessons.
 Effort: S
 
-### Full CMS for Content Authoring
-Replace DB seed scripts + admin textarea with a proper content management interface.
-Effort: M
-
 ### Parent Accounts
 Upgrade from anonymous PIN access to real parent accounts with authentication.
 Enables: notifications, multi-child view, consent management.
 Effort: M
-
-### True Offline Mode
-PWA with service worker for offline lesson access. Complex with Next.js App Router.
-Effort: L
 
 ### ~~Additional AI Content Safety Layer~~ ✓
 Built: regex-based output moderation (src/lib/output-moderation.ts) runs post-stream on every
@@ -242,48 +248,6 @@ idea, decisions, artifacts, and progress should persist and be accessible across
 school years. Add a student portfolio view that shows their full entrepreneurship
 journey from first login forward.
 Effort: M (human: ~1 week / CC: ~30 min)
-
-## Investor & Launchpad Vision
-
-> The venture studio model means students design and plan, then launch when ready.
-> The investor view creates a pipeline from student ventures to real funding and mentorship.
-> Each tier increases real-world connection while managing legal risk for minors.
-
-### Tier 1 — Anonymous Venture Gallery (P2, safe to build soon)
-Product Hunt for teen entrepreneurs. Investors browse student ventures by niche,
-industry, and quality score. No student names or contact info visible. VentureLab
-controls access. Ventures displayed as anonymous portfolio cards with: business concept,
-niche, target customer, revenue model, and a quality indicator from the AI evaluation.
-This gives VentureLab a demo asset ("look at what our students are designing") and
-gives investors visibility into the pipeline without any direct contact with minors.
-Effort: M (human: ~1 week / CC: ~30 min)
-
-### Tier 2 — Investor Requests Introduction (P3, needs legal framework)
-An investor sees an anonymous venture they like and clicks "Request Introduction."
-VentureLab acts as the intermediary. The request goes to VentureLab staff, who
-review it, then contact the student's school and parent/guardian for approval.
-Only after school + parent consent does VentureLab facilitate a supervised introduction.
-All communication is logged and monitored by VentureLab. No direct investor-to-minor
-contact without institutional approval.
-Depends on: Tier 1 gallery, legal review, parental consent framework.
-Effort: L (human: ~3 weeks / CC: ~2 hours, plus legal)
-
-### Tier 3 — Mentorship Matching (far future)
-Direct mentorship matching between verified investors/mentors and students. Requires:
-full legal framework, background checks on all mentors, parental consent per interaction,
-school administrator approval, VentureLab oversight and moderation of all conversations.
-Think Big Brothers Big Sisters level of safeguarding applied to entrepreneurship mentorship.
-Depends on: Tier 2, legal infrastructure, safeguarding policies.
-Effort: XL
-
-### "Go Live" Launchpad (P2)
-For students who complete the program and want to actually launch: a structured pathway
-with proper scaffolding. Includes: parental consent flow, one-click starter tools
-(booking page, payment link, portfolio site), and ongoing AI co-founder support.
-This is the bridge from simulation to reality. Optional, not default. The venture studio
-is the product, the launchpad is the graduation gift.
-Depends on: Completion of core venture studio experience.
-Effort: L (human: ~2 weeks / CC: ~1 hour)
 
 ## P3 — Security hardening (FIXED)
 
