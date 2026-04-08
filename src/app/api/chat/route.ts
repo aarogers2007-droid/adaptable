@@ -96,6 +96,29 @@ export async function POST(request: Request) {
     return new Response("Missing or invalid message (max 5000 characters)", { status: 400 });
   }
 
+  // ── Easter egg: nettspend ──
+  // If the user types "nettspend" (case-insensitive), the AI mentor responds
+  // with a single line. Doesn't burn rate limits, doesn't hit the API,
+  // doesn't touch the conversation history. Just a small moment.
+  if (/\bnettspend\b/i.test(message)) {
+    const easterText = '"The greatest rapper alive." — AJ Rogers';
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: easterText })}\n\n`));
+        controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
+  }
+
   // Content moderation
   const { moderateContent } = await import("@/lib/content-moderation");
   const contentCheck = moderateContent(message);
