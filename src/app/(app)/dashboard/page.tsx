@@ -122,37 +122,37 @@ export default async function DashboardPage() {
       <AppNav isAdmin={profile.role === "org_admin"} studentName={profile.full_name || profile.email || undefined} />
 
       <div className="mx-auto max-w-[1200px] px-6 py-8">
-        {/* Business Hero */}
-        <section className="stagger-enter rounded-xl border border-[var(--border)] bg-[var(--bg)] p-8" style={{ animationDelay: "0ms" }}>
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="font-[family-name:var(--font-display)] text-[48px] font-bold leading-[1.1] tracking-tight">
+        {/* Business Hero — tightened. Heading scales down on mobile so the
+            Continue CTA below stays above the fold on a 375x812 iPhone. */}
+        <section className="stagger-enter rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 sm:p-8" style={{ animationDelay: "0ms" }}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-[family-name:var(--font-display)] text-[32px] sm:text-[40px] md:text-[48px] font-bold leading-[1.1] tracking-tight break-words">
                 {name}
               </h1>
-              <p className="mt-1 text-[var(--text-secondary)]">
+              <p className="mt-1 text-sm sm:text-base text-[var(--text-secondary)] line-clamp-2">
                 {niche} for {target_customer}
-              </p>
-              <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                {revenue_model}
               </p>
             </div>
             <Link
               href="/onboarding"
-              className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              className="shrink-0 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             >
               Edit
             </Link>
           </div>
-          <div className="mt-6">
+          <div className="mt-5">
             <div className="h-2 rounded-full bg-[var(--bg-muted)]">
               <div
                 className="h-2 rounded-full bg-[var(--primary)] transition-all duration-500 progress-shimmer"
                 style={{ width: `${percentage}%` }}
               />
             </div>
-            <div className="mt-2 flex items-center justify-between">
-              <p className="text-sm text-[var(--text-muted)]">
-                {completed} of {total} milestones completed
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <p className="text-xs sm:text-sm text-[var(--text-muted)]">
+                {completed === 0
+                  ? `Just getting started · ${total} milestones ahead`
+                  : `${completed} of ${total} milestones complete`}
               </p>
               {streaksEnabled && streak > 0 && (
                 <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 ${streak >= 7 ? "streak-badge-hot" : "streak-badge"}`}>
@@ -166,11 +166,6 @@ export default async function DashboardPage() {
             </div>
           </div>
         </section>
-
-        {/* Tester feedback box — friends/family user testing 2026-04-09 */}
-        <div className="stagger-enter mt-4" style={{ animationDelay: "30ms" }}>
-          <FeedbackBox />
-        </div>
 
         {/* All lessons complete */}
         {!nextLesson && completedCount === lessons.length && lessons.length > 0 && (
@@ -202,8 +197,35 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Current Lesson CTA */}
-        {nextLesson && (
+        {/* Current Lesson CTA — first-time users (0 completed) get a hero
+            treatment with a personalized welcome and a strong CTA button.
+            Returning users get the compact version. Per Opus UX review:
+            "make 'Continue' significantly more prominent for users with 0
+            progress; the hierarchy doesn't scream 'do this first'." */}
+        {nextLesson && completed === 0 && (
+          <Link
+            href={`/lessons/${nextLesson.id}`}
+            className="stagger-enter mt-4 block rounded-xl border-2 border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 p-6 sm:p-8 hover:from-[var(--primary)]/10 hover:to-[var(--primary)]/15 transition-colors group"
+            style={{
+              animationDelay: "100ms",
+              boxShadow: "0 0 20px rgba(13, 148, 136, 0.15), 0 0 60px rgba(13, 148, 136, 0.05)",
+            }}
+          >
+            <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">
+              Start Here
+            </p>
+            <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-bold text-[var(--text-primary)] leading-tight">
+              Hey {profile.full_name?.split(" ")[0] ?? "there"}, let&apos;s get {name} off the ground.
+            </h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              {nextLesson.module_name} &middot; Lesson {nextLesson.lesson_sequence} &middot; {nextLesson.title}
+            </p>
+            <span className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-6 py-3 text-base font-semibold text-white group-hover:bg-[var(--primary-dark)] transition-colors">
+              Start Lesson 1 →
+            </span>
+          </Link>
+        )}
+        {nextLesson && completed > 0 && (
           <Link
             href={`/lessons/${nextLesson.id}`}
             className="stagger-enter mt-4 block rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 hover:border-[var(--primary)] transition-colors group"
@@ -276,8 +298,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Secondary sections */}
-        <div className="stagger-enter mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" style={{ animationDelay: "300ms" }}>
+        {/* Secondary sections — Niche Resources only renders when populated
+            (empty state was creating a dead card per Opus UX review). */}
+        <div
+          className={`stagger-enter mt-4 grid grid-cols-1 gap-4 ${profile.niche_recommendations ? "md:grid-cols-2" : ""}`}
+          style={{ animationDelay: "300ms" }}
+        >
           <Link
             href="/chat"
             className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 hover:border-[var(--primary)] transition-colors"
@@ -286,27 +312,23 @@ export default async function DashboardPage() {
               Ask AI Guide
             </h3>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Get answers about {name}. Try: "How do I find my first customers?"
+              Get answers about {name}. Try: &ldquo;How do I find my first customers?&rdquo;
             </p>
             <span className="mt-3 inline-block text-sm font-semibold text-[var(--primary)]">
               Start conversation →
             </span>
           </Link>
 
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
-            <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-              Niche Resources
-            </h3>
-            {profile.niche_recommendations ? (
+          {profile.niche_recommendations && (
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
+              <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold">
+                Niche Resources
+              </h3>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
                 {(profile.niche_recommendations as unknown[]).length} businesses like yours to study.
               </p>
-            ) : (
-              <p className="mt-2 text-sm text-[var(--text-muted)]">
-                Resources will appear after you complete a few lessons.
-              </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Achievements */}
@@ -315,6 +337,14 @@ export default async function DashboardPage() {
             newlyAwarded={newlyAwarded}
             earned={earnedDisplay}
           />
+        </div>
+
+        {/* Tester feedback box — friends/family user testing window. Moved
+            from above-the-fold to below the achievements per Opus UX review:
+            it was competing with the Continue Lesson CTA for first-time
+            students and pushing the primary action below the fold. */}
+        <div className="stagger-enter mt-4" style={{ animationDelay: "350ms" }}>
+          <FeedbackBox />
         </div>
       </div>
     </main>

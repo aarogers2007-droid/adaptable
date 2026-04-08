@@ -14,11 +14,26 @@ export async function POST(request: Request) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return new Response("Unauthorized", { status: 401 });
+  if (!user) {
+    console.error("[lesson-chat] 401 — no user");
+    return new Response("Unauthorized", { status: 401 });
+  }
 
-  const { message, lessonId, moduleSequence, lessonSequence, progressId } = await request.json();
+  const requestBody = await request.json();
+  const { message, lessonId, moduleSequence, lessonSequence, progressId } = requestBody;
+  console.log("[lesson-chat] req from", user.id, {
+    msgLen: typeof message === "string" ? message.length : "(not string)",
+    lessonId,
+    moduleSequence,
+    lessonSequence,
+    progressId,
+    hasOrigin: !!request.headers.get("origin"),
+    hasReferer: !!request.headers.get("referer"),
+    ua: request.headers.get("user-agent")?.slice(0, 60),
+  });
 
   if (!message || typeof message !== "string" || message.length > 5000) {
+    console.error("[lesson-chat] 400 — invalid message", { type: typeof message, len: typeof message === "string" ? message.length : -1 });
     return new Response("Invalid message", { status: 400 });
   }
 
@@ -140,28 +155,49 @@ export async function POST(request: Request) {
 
   // Atomic rate limit: reserve a usage slot before streaming.
   // Admins bypass entirely for testing.
+  // The reserve_ai_usage RPC returns a boolean (true = ok, false = limit
+  // hit). It used to return an array of objects in an earlier iteration,
+  // and the route still has shape-tolerant fallback below for robustness.
   let usageReservationId: string | null = null;
   if (!isAdmin) {
-    const { data: reservation } = await supabase.rpc("reserve_ai_usage", {
+    const { data: reservation, error: rpcError } = await supabase.rpc("reserve_ai_usage", {
       p_student_id: user.id,
       p_feature: "guide",
     });
 
-    const result = reservation?.[0] ?? { status: "ok", reservation_id: null };
+    if (rpcError) {
+      // Log the RPC error so we don't silently swallow rate-limit failures.
+      // We still proceed (fail-open) — better to let the student through
+      // than to block them on a Supabase function bug — but this gives us
+      // visibility in Vercel logs.
+      console.error("[lesson-chat] reserve_ai_usage RPC error:", rpcError.message, rpcError.code);
+    }
 
-    if (result.status === "hourly_limit") {
+    // Boolean shape (current): true = ok, false = limit hit
+    if (reservation === false) {
       return Response.json(
-        { error: "Take a breather! You can continue in a few minutes." },
+        { error: "You've hit today's AI limit. Great work! Come back tomorrow to keep going." },
         { status: 429 }
       );
     }
-    if (result.status === "daily_limit") {
-      return Response.json(
-        { error: "You've hit today's limit. Great work! Come back tomorrow to keep going." },
-        { status: 429 }
-      );
+
+    // Object-array shape (legacy): { status, reservation_id }
+    if (Array.isArray(reservation)) {
+      const result = reservation[0] ?? { status: "ok", reservation_id: null };
+      if (result.status === "hourly_limit") {
+        return Response.json(
+          { error: "Take a breather! You can continue in a few minutes." },
+          { status: 429 }
+        );
+      }
+      if (result.status === "daily_limit") {
+        return Response.json(
+          { error: "You've hit today's limit. Great work! Come back tomorrow to keep going." },
+          { status: 429 }
+        );
+      }
+      usageReservationId = result.reservation_id;
     }
-    usageReservationId = result.reservation_id;
   }
 
   // Get profile + learning profile
@@ -173,12 +209,16 @@ export async function POST(request: Request) {
 
   const profile = profileData as unknown as Profile | null;
   if (!profile?.business_idea) {
+    console.error("[lesson-chat] 400 — no business_idea on profile", { userId: user.id, hasProfile: !!profile });
     return new Response("Complete onboarding first", { status: 400 });
   }
 
   // Get lesson plan
   const plan = getLessonPlan(moduleSequence, lessonSequence);
-  if (!plan) return new Response("Lesson plan not found", { status: 404 });
+  if (!plan) {
+    console.error("[lesson-chat] 404 — no lesson plan", { moduleSequence, lessonSequence, types: { m: typeof moduleSequence, l: typeof lessonSequence } });
+    return new Response("Lesson plan not found", { status: 404 });
+  }
 
   // Get existing conversation from progress
   const { data: progressData } = await supabase
