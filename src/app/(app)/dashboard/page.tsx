@@ -29,7 +29,15 @@ export default async function DashboardPage() {
   const streaksEnabled = classData?.classes?.streaks_enabled ?? true;
 
   const profile = profileRes.data as unknown as Profile | null;
-  if (!profile?.business_idea) redirect("/onboarding");
+  // If the profile fetch errored entirely, log it and bounce to /login instead
+  // of silently sending the student to /onboarding (which would re-fetch and
+  // re-bounce them in a loop). Only redirect to /onboarding when the profile
+  // exists but business_idea is genuinely missing.
+  if (!profile) {
+    console.error("[dashboard] profile fetch returned null", { user_id: user.id, error: profileRes.error });
+    redirect("/login");
+  }
+  if (!profile.business_idea) redirect("/onboarding");
 
   const lessons = (lessonsRes.data ?? []) as unknown as Lesson[];
   const progress = (progressRes.data ?? []) as unknown as StudentProgress[];

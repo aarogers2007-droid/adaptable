@@ -125,6 +125,13 @@ export async function completeClassEnrollment(
     .insert({ class_id: classId, student_id: user.id });
 
   if (enrollError) {
+    console.error("[join] enrollment failed:", {
+      user_id: user.id,
+      class_id: classId,
+      message: enrollError.message,
+      code: enrollError.code,
+      details: enrollError.details,
+    });
     return { error: "Failed to enroll in class" };
   }
 

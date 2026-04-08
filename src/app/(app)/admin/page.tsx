@@ -52,6 +52,9 @@ export default async function AdminPage() {
           <Link href="/instructor/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             Instructor View
           </Link>
+          <Link href="/admin/feedback" className="text-sm font-medium text-[var(--accent)] hover:text-[var(--text-primary)]">
+            💭 Tester Feedback
+          </Link>
           <div className="ml-auto">
             <form action="/auth/signout" method="POST">
               <button className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">Sign out</button>
