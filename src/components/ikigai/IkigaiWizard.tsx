@@ -145,6 +145,64 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoM
     return () => clearTimeout(t);
   }, [revealPhase]);
 
+  // Auto-resume synthesis on mount if the student has a complete draft but
+  // no business_idea yet. This is the "Aaron case" — student finished the
+  // wizard, draft was saved, but the reveal/confirm step didn't complete (page
+  // closed, network died, etc.). When they come back to /onboarding, the
+  // wizard would otherwise show "4/4 complete" with no card and no continue
+  // option. Auto-firing the synth picks up exactly where they left off.
+  useEffect(() => {
+    // Only run once on mount, only in non-demo mode, only when:
+    // - all 4 steps have data
+    // - we're not already synthesizing
+    // - we don't already have a businessIdea
+    // - reveal phase hasn't started yet (we're not mid-animation)
+    if (demoMode) return;
+    if (synthesizing) return;
+    if (businessIdea) return;
+    if (revealPhase !== "none") return;
+    const draftComplete =
+      !!draft.passions?.length &&
+      !!draft.skills?.length &&
+      !!draft.needs?.length &&
+      !!draft.monetization;
+    if (!draftComplete) return;
+
+    // Don't fight an active step view
+    if (activeStep) return;
+
+    let cancelled = false;
+    (async () => {
+      setSynthesizing(true);
+      let idea: BusinessIdea | null = null;
+      try {
+        const { synthesizeBusinessIdea } = await import("@/app/(app)/onboarding/actions");
+        const result = await synthesizeBusinessIdea(draft);
+        if (cancelled) return;
+        idea = result.idea;
+        if (!idea && result.error) setError(result.error);
+      } catch { /* preview mode */ }
+      if (cancelled) return;
+
+      if (!idea) {
+        idea = generateMockBusinessIdea(draft, studentName);
+      }
+
+      setSynthesizing(false);
+      setBusinessIdea(idea);
+      setTimeout(() => setRevealPhase("dimming"), 200);
+      setTimeout(() => setRevealPhase("card"), 1200);
+      setTimeout(() => setRevealPhase("ready"), 2000);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Intentionally only runs once on mount — we don't want this to re-fire
+    // when the user's local state changes. The dependency array is empty.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Load suggestions for a step
   async function loadSuggestions(step: IkigaiStep, regen = 0) {
     if (!regen && suggestions[step]?.length) return;
@@ -554,7 +612,15 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoM
       {/* DIAGRAM VIEW */}
       {nameConfirmed && ikigaiIntroSeen && !activeStep && (
         <div
-          className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8 overflow-hidden"
+          className={`relative min-h-screen flex flex-col items-center px-4 py-8 ${
+            // Pre-reveal: center the diagram vertically and hide overflow
+            // (the diagram is fixed-size and looks best centered).
+            // Reveal phases: top-align so the card flows naturally below the
+            // heading and the page scrolls if the card is taller than the
+            // viewport. This is the fix for mobile users getting stuck with
+            // the "I'm in" button below the fold.
+            revealPhase === "none" ? "justify-center overflow-hidden" : "justify-start"
+          }`}
           style={{
             opacity: diagramEntering ? 1 : 0,
             transition: "opacity 1s ease-in-out",
@@ -589,34 +655,30 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoM
             )}
           </div>
 
-          <div
-            className="relative w-full max-w-[500px]"
-            style={{
-              opacity: revealPhase === "none" ? 1 : revealPhase === "dimming" ? 0.15 : 0.08,
-              transform: revealPhase !== "none" ? "scale(0.6) translateY(-20%)" : "scale(1)",
-              transition: "all 800ms cubic-bezier(0.4, 0, 0.2, 1)",
-              pointerEvents: revealPhase !== "none" ? "none" : "auto",
-            }}
-          >
-            <IkigaiDiagram
-              completedSteps={completedSteps}
-              onStepClick={handleStepClick}
-              showReveal={false}
-              businessName={undefined}
-            />
-          </div>
+          {/* Diagram — only rendered before the reveal. Once revealPhase fires
+              we hide it completely so the card can claim the full vertical
+              space and the page scrolls naturally on small screens. */}
+          {revealPhase === "none" && (
+            <div className="relative w-full max-w-[500px]">
+              <IkigaiDiagram
+                completedSteps={completedSteps}
+                onStepClick={handleStepClick}
+                showReveal={false}
+                businessName={undefined}
+              />
+            </div>
+          )}
 
-          {/* Personal Card reveal */}
+          {/* Personal Card reveal — in-flow (not absolute) so it pushes the
+              parent's scroll height. The buttons at the bottom of the card
+              are reachable on any device. */}
           {revealPhase !== "none" && businessIdea && (
             <div
-              className="absolute left-1/2 w-full px-4"
+              className="relative w-full px-4 pb-12"
               style={{
                 maxWidth: "420px",
-                top: revealPhase === "card" || revealPhase === "ready" ? "50%" : "110%",
-                transform: revealPhase === "card" || revealPhase === "ready"
-                  ? "translate(-50%, -50%)"
-                  : "translate(-50%, 0%)",
                 opacity: revealPhase === "card" || revealPhase === "ready" ? 1 : 0,
+                transform: revealPhase === "card" || revealPhase === "ready" ? "translateY(0)" : "translateY(20px)",
                 transition: "all 600ms cubic-bezier(0.2, 0.8, 0.2, 1)",
               }}
             >
