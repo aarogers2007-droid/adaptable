@@ -211,12 +211,39 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
 
   async function handleConfirm() {
     if (!businessIdea) return;
+    setError(null);
     try {
       const { confirmBusinessIdea } = await import("@/app/(app)/onboarding/actions");
       const result = await confirmBusinessIdea(businessIdea, draft);
-      if (result.success) { router.push("/onboarding/ready"); return; }
-    } catch { /* preview mode */ }
-    router.push("/onboarding/ready");
+      if (result.success) {
+        router.push("/onboarding/ready");
+        return;
+      }
+      // Server action returned an error — surface it instead of silently
+      // navigating to /onboarding/ready, which would bounce back to the
+      // wizard and look like a confusing restart.
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setError("Couldn't save your business idea. Please try again — if this keeps happening, refresh the page.");
+    } catch (e) {
+      // Network failure / preview mode — distinguish the two. In a real
+      // browser context (not preview), surface the error. In preview mode
+      // (no Supabase), the import itself succeeds and the action call would
+      // throw a server-only error — fall through to /onboarding/ready so
+      // the demo path still works.
+      const isPreview =
+        typeof window !== "undefined" &&
+        (window.location.hostname === "localhost" ||
+          window.location.pathname.startsWith("/demo"));
+      if (isPreview) {
+        router.push("/onboarding/ready");
+        return;
+      }
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      setError(`Couldn't save your business idea: ${msg}. Please try again.`);
+    }
   }
 
   async function handleResynthesize() {
