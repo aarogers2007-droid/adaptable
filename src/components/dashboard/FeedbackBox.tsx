@@ -91,7 +91,7 @@ export default function FeedbackBox() {
                 placeholder="Write what you're thinking..."
                 rows={4}
                 maxLength={5000}
-                className="w-full rounded-lg border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/15 resize-none"
+                className="w-full rounded-lg border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-base text-[var(--text-primary)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/15 resize-none"
                 disabled={isPending}
               />
               <div className="mt-1 flex items-center justify-between">

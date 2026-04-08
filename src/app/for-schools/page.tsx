@@ -426,41 +426,46 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* How It Works — vertical timeline */}
+      {/* How It Works — vertical timeline. Two-column on lg+: sticky heading on
+            the left, timeline on the right. Single column under lg. */}
       <section id="how-it-works" className="border-b border-[var(--border)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
-          <h2 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
-            The Student Journey
-          </h2>
-          <p className="mt-2 max-w-[600px] text-base text-[var(--text-secondary)]">
-            Six modules. 22 lessons. One real business at the end.
-          </p>
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <h2 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
+                The Student Journey
+              </h2>
+              <p className="mt-2 text-base text-[var(--text-secondary)]">
+                Six modules. 22 lessons. One real business at the end.
+              </p>
+            </div>
 
-          <div className="relative mt-12 max-w-[640px] space-y-10">
-            {/* Vertical connecting line */}
-            <div
-              className="absolute left-[15px] top-0 bottom-0 w-[2px]"
-              style={{ background: "linear-gradient(to bottom, var(--primary), var(--primary-light), transparent)" }}
-              aria-hidden="true"
-            />
+            <div className="relative space-y-10">
+              {/* Vertical connecting line */}
+              <div
+                className="absolute left-[15px] top-0 bottom-0 w-[2px]"
+                style={{ background: "linear-gradient(to bottom, var(--primary), var(--primary-light), transparent)" }}
+                aria-hidden="true"
+              />
 
-            {JOURNEY_STEPS.map((step, idx) => (
-              <div key={step.number} className="relative flex gap-6">
-                {/* Number badge */}
-                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] font-[family-name:var(--font-display)] text-sm font-bold text-white">
-                  {step.number}
+              {JOURNEY_STEPS.map((step, idx) => (
+                <div key={step.number} className="relative flex gap-6">
+                  {/* Number badge */}
+                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] font-[family-name:var(--font-display)] text-sm font-bold text-white">
+                    {step.number}
+                  </div>
+                  {/* Content */}
+                  <div className={idx < JOURNEY_STEPS.length - 1 ? "pb-2" : ""}>
+                    <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--text-primary)]">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 text-base leading-relaxed text-[var(--text-secondary)]">
+                      {step.description}
+                    </p>
+                  </div>
                 </div>
-                {/* Content */}
-                <div className={idx < JOURNEY_STEPS.length - 1 ? "pb-2" : ""}>
-                  <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--text-primary)]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-base leading-relaxed text-[var(--text-secondary)]">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -605,25 +610,32 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ — sticky heading left, list right on lg+ */}
       <section id="faq" className="border-b border-[var(--border)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
-          <h2 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
-            Frequently Asked Questions
-          </h2>
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <h2 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
+                Frequently Asked Questions
+              </h2>
+              <p className="mt-2 text-base text-[var(--text-secondary)]">
+                Everything teachers, admins, and parents tend to ask before adopting Adaptable.
+              </p>
+            </div>
 
-          <div className="mt-12 max-w-[800px] divide-y divide-[var(--border)] border-t border-[var(--border)]">
-            {FAQ.map((item, idx) => (
-              <div key={idx} className="py-6 -mx-4 px-4 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors duration-100">
-                <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)]">
-                  <span className="text-[var(--primary)] mr-1.5">Q:</span>
-                  {item.q}
-                </h3>
-                <p className="mt-2 text-base leading-relaxed text-[var(--text-secondary)]">
-                  {item.a}
-                </p>
-              </div>
-            ))}
+            <div className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
+              {FAQ.map((item, idx) => (
+                <div key={idx} className="py-6 -mx-4 px-4 rounded-lg hover:bg-[var(--bg-subtle)] transition-colors duration-100">
+                  <h3 className="font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)]">
+                    <span className="text-[var(--primary)] mr-1.5">Q:</span>
+                    {item.q}
+                  </h3>
+                  <p className="mt-2 text-base leading-relaxed text-[var(--text-secondary)]">
+                    {item.a}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

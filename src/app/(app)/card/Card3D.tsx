@@ -431,7 +431,8 @@ export default function Card3D(props: Card3DProps) {
         <div
           className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-[var(--bg)]/80 border border-[var(--border)] text-sm text-[var(--text-muted)] backdrop-blur-sm pointer-events-none"
         >
-          Hover to tilt
+          <span className="hidden md:inline">Hover to tilt</span>
+          <span className="md:hidden">Drag to tilt</span>
         </div>
       )}
     </div>

@@ -23,6 +23,7 @@ import IkigaiDiagram from "@/components/ikigai/IkigaiDiagram";
 import Card3D from "@/app/(app)/card/Card3D";
 import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
 import AppNav from "@/components/ui/AppNav";
+import IkigaiRevealDemo from "./IkigaiRevealDemo";
 
 // ── Demo data ──
 const ELSA = {
@@ -55,6 +56,8 @@ const DECISIONS = [
 export default function DemoShowcase() {
   const [showCeremony, setShowCeremony] = useState(false);
   const [ceremonyDone, setCeremonyDone] = useState(false);
+  const [showIkigaiReveal, setShowIkigaiReveal] = useState(false);
+  const [ikigaiRevealDone, setIkigaiRevealDone] = useState(false);
 
   if (showCeremony && !ceremonyDone) {
     return (
@@ -74,8 +77,10 @@ export default function DemoShowcase() {
 
   return (
     <main className="min-h-screen bg-[var(--bg)]">
-      {/* ═══ REAL APP NAV ═══ */}
-      <AppNav isAdmin={false} studentName={ELSA.name} />
+      {/* ═══ REAL APP NAV — preview mode renders the full nav visually but
+              every link/button is inert so the visitor can't accidentally
+              click into a real app route that would bounce them to /login ═══ */}
+      <AppNav isAdmin={false} previewMode />
 
       {/* ═══ HERO ═══ */}
       <section className="flex flex-col items-center justify-center px-6 py-32 text-center border-b border-[var(--border)]">
@@ -268,7 +273,7 @@ export default function DemoShowcase() {
       </Section>
 
       {/* ═══ 4. BUSINESS CARD — REAL COMPONENT ═══ */}
-      <Section label="The Reward" title="Business Card Designer" description={`Students design a 3D business card that tilts on hover and unlocks new fonts and finishes as they progress. Try hovering over ${ELSA.first}'s card below — this is the actual component.`}>
+      <Section label="The Reward" title="Business Card Designer" description={`Students design a 3D business card that tilts as they move across it and unlocks new fonts and finishes as they progress. Try moving over ${ELSA.first}'s card below — this is the actual component.`}>
         <div className="mx-auto" style={{ width: "100%", maxWidth: "560px", height: "400px" }}>
           <Card3D
             businessName={STUDIO_BLOOM.name}
@@ -294,7 +299,9 @@ export default function DemoShowcase() {
           />
         </div>
         <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-          Hover to tilt &middot; 7 base colors &middot; 8 unlockable fonts &middot; 5 card finishes (matte, holographic, silver, chrome, gold)
+          <span className="hidden md:inline">Hover</span>
+          <span className="md:hidden">Drag</span>
+          {" "}to tilt &middot; 7 base colors &middot; 8 unlockable fonts &middot; 5 card finishes (matte, holographic, silver, chrome, gold)
         </p>
       </Section>
 
@@ -328,7 +335,7 @@ export default function DemoShowcase() {
           <div className="mt-8 pt-6 border-t border-[var(--border)]">
             <p className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider mb-3">The Pitch</p>
             <p className="text-xl font-medium font-[family-name:var(--font-display)] text-[var(--text-primary)] leading-relaxed italic">
-              &ldquo;{STUDIO_BLOOM.name} gives teens a place to create, learn, and earn through art — because everyone deserves to express themselves, regardless of what they can afford.&rdquo;
+              &ldquo;{STUDIO_BLOOM.name}{" "}gives teens a place to create, learn, and earn through art — because everyone deserves to express themselves, regardless of what they can afford.&rdquo;
             </p>
             <p className="mt-3 text-sm text-[var(--text-muted)]">&mdash; {ELSA.first}, Founder of {STUDIO_BLOOM.name}</p>
           </div>
@@ -343,7 +350,7 @@ export default function DemoShowcase() {
               <h3 className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">Entrepreneurship — Period 3</h3>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">28 students &middot; <span className="text-[var(--warning)]">2 alerts</span></p>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               {[
                 { key: "students", label: "Students", count: 28, active: true },
                 { key: "feed", label: "Live Feed", active: false },
@@ -351,7 +358,7 @@ export default function DemoShowcase() {
                 { key: "followups", label: "Follow-ups", active: false },
                 { key: "analytics", label: "Analytics", active: false },
               ].map((tab) => (
-                <span key={tab.key} className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${tab.active ? "bg-[var(--primary)] text-white" : "text-[var(--text-muted)]"}`}>
+                <span key={tab.key} className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors ${tab.active ? "bg-[var(--primary)] text-white" : "text-[var(--text-muted)]"}`}>
                   {tab.label}
                   {tab.count !== undefined && tab.count > 0 && (
                     <span className={`ml-1.5 text-xs ${tab.active ? "text-white/80" : "text-[var(--text-muted)]"}`}>({tab.count})</span>
@@ -396,18 +403,22 @@ export default function DemoShowcase() {
             </table>
           </div>
           {/* Alert using real alert panel styling */}
-          <div className="flex items-start gap-3 border-t border-amber-300 bg-amber-50 px-4 py-3">
-            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-[var(--text-secondary)]">...</span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm text-[var(--text-primary)]">Marcus Johnson</span>
-                <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-medium">warning</span>
-                <span className="rounded-full bg-[var(--bg-muted)] px-2 py-0.5 text-xs text-[var(--text-muted)]">stuck</span>
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3 border-t border-amber-300 bg-amber-50 px-4 py-3">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-[var(--text-secondary)]">...</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium text-sm text-[var(--text-primary)]">Marcus Johnson</span>
+                  <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-xs font-medium">warning</span>
+                  <span className="rounded-full bg-[var(--bg-muted)] px-2 py-0.5 text-xs text-[var(--text-muted)]">stuck</span>
+                </div>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">Student hasn&apos;t progressed past Lesson 3 in 4 days</p>
               </div>
-              <p className="mt-1 text-sm text-[var(--text-secondary)]">Student hasn&apos;t progressed past Lesson 3 in 4 days</p>
             </div>
-            <span className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--primary)] hover:bg-white cursor-pointer transition-colors">Send Nudge</span>
-            <span className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] hover:bg-white cursor-pointer transition-colors">Dismiss</span>
+            <div className="flex items-center gap-2 sm:shrink-0 pl-10 sm:pl-0">
+              <span className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--primary)] hover:bg-white cursor-pointer transition-colors">Send Nudge</span>
+              <span className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] hover:bg-white cursor-pointer transition-colors">Dismiss</span>
+            </div>
           </div>
         </div>
       </Section>
@@ -458,21 +469,78 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
-      {/* ═══ 8. THE REVEAL — Ikigai → gravitational collapse → business name ═══ */}
-      <Section label="The Moment" title="The Business Name Reveal" description="When a student completes the program, the four Ikigai circles collapse into one gravitational point — and the business they built with the AI emerges from it. This is the same animation real students see, stripped to its essential moment. Press play to watch.">
-        <div className="mx-auto max-w-[500px] text-center">
-          <button
-            onClick={() => { setShowCeremony(true); setCeremonyDone(false); }}
-            className="rounded-lg bg-[var(--accent)] px-8 py-3 text-base font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-colors"
-            style={{ boxShadow: "0 0 20px rgba(245, 158, 11, 0.35), 0 0 60px rgba(245, 158, 11, 0.1)" }}
-          >
-            {ceremonyDone ? "Watch again" : "Watch the reveal"}
-          </button>
-          {ceremonyDone && (
-            <p className="mt-4 text-sm text-[var(--text-muted)] font-medium">That&apos;s the moment. Real students see it after lesson 22.</p>
+      {/* ═══ 8. THE TWO REVEALS ═══
+              Two distinct moments in a real student's journey:
+                1. Ikigai Reveal — at the end of the wizard, before the lessons
+                2. Graduation Ceremony — after lesson 22, at the end of the program */}
+      <Section label="The Two Moments" title="The Reveals" description="Two moments real students get. The first lands at the end of the Ikigai wizard — their venture appears, ignited, before they've taken a single lesson. The second lands after lesson 22 — the four Ikigai circles collapse into a single point, the business they built with the AI emerges, the founder's letter, then the diploma.">
+        <div className="mx-auto max-w-[640px]">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {/* Ikigai Reveal — wizard's "ignited" card */}
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 text-center">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Moment 1</p>
+              <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[var(--text-primary)]">
+                The Ikigai Reveal
+              </h3>
+              <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+                The wizard ignites. Their venture appears with a multi-layer breathing glow and spark embers. Ten minutes after they walked in with no idea, they walk out with one.
+              </p>
+              <button
+                onClick={() => {
+                  setShowIkigaiReveal(true);
+                  setIkigaiRevealDone(false);
+                }}
+                className="mt-5 rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+                style={{ boxShadow: "0 0 20px rgba(13, 148, 136, 0.35), 0 0 60px rgba(13, 148, 136, 0.1)" }}
+              >
+                {ikigaiRevealDone ? "Watch Ikigai Reveal again" : "Watch Ikigai Reveal"}
+              </button>
+            </div>
+
+            {/* Graduation Ceremony — gravitational collapse → letter → diploma */}
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 text-center">
+              <p className="text-xs font-semibold text-[var(--accent)] uppercase tracking-wider">Moment 2</p>
+              <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[var(--text-primary)]">
+                The Graduation Ceremony
+              </h3>
+              <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+                Gravitational collapse of the four circles. Business name emerges from the singularity. Founder&apos;s letter from AJ. Diploma. The full arc.
+              </p>
+              <button
+                onClick={() => {
+                  setShowCeremony(true);
+                  setCeremonyDone(false);
+                }}
+                className="mt-5 rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] transition-colors"
+                style={{ boxShadow: "0 0 20px rgba(245, 158, 11, 0.35), 0 0 60px rgba(245, 158, 11, 0.1)" }}
+              >
+                {ceremonyDone ? "Watch Graduation Ceremony again" : "Watch Graduation Ceremony"}
+              </button>
+            </div>
+          </div>
+
+          {(ikigaiRevealDone || ceremonyDone) && (
+            <p className="mt-6 text-center text-sm text-[var(--text-muted)] font-medium">
+              That&apos;s what real students see. Confidence built on a moment they earned.
+            </p>
           )}
         </div>
       </Section>
+
+      {/* Ikigai reveal overlay */}
+      {showIkigaiReveal && (
+        <IkigaiRevealDemo
+          studentFirstName={ELSA.first}
+          businessName={STUDIO_BLOOM.name}
+          businessNiche={STUDIO_BLOOM.niche}
+          whyThisFits={`You love painting and helping others create. You're good at color theory and teaching. Your community needs affordable art education for teens. ${STUDIO_BLOOM.name} is where all four meet.`}
+          revenueModel={STUDIO_BLOOM.revenue}
+          onClose={() => {
+            setShowIkigaiReveal(false);
+            setIkigaiRevealDone(true);
+          }}
+        />
+      )}
 
       {/* ═══ THE NUMBERS — measured outcomes ═══ */}
       <Section label="The Numbers" title="Measured Like an ML Team, Not an Ed-Tech Course" description="We don't ship AI mentoring on vibes. Every prompt change is graded against a stress test of simulated student personas, judged by an independent model. Here's what the latest full run shows.">

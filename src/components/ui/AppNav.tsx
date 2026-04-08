@@ -7,9 +7,16 @@ import { useState } from "react";
 interface AppNavProps {
   isAdmin: boolean;
   studentName?: string;
+  /**
+   * Preview mode: render the full nav visually but disable every link, the
+   * sign-out button, and the admin controls. Used by /demo so an unauthed
+   * visitor can see what the real student nav looks like without being
+   * ejected to /login the moment they click anything.
+   */
+  previewMode?: boolean;
 }
 
-export default function AppNav({ isAdmin, studentName }: AppNavProps) {
+export default function AppNav({ isAdmin, studentName, previewMode = false }: AppNavProps) {
   const pathname = usePathname();
   const [adminMode, setAdminMode] = useState(isAdmin);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -29,20 +36,41 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
     return pathname === tab.href;
   }
 
+  // In preview mode, every nav link becomes a styled span so the demo
+  // visitor sees the full nav UI but clicking nothing ejects them.
+  const NavLink = ({
+    href,
+    className,
+    children,
+  }: {
+    href: string;
+    className?: string;
+    children: React.ReactNode;
+  }) =>
+    previewMode ? (
+      <span className={className} aria-disabled="true">
+        {children}
+      </span>
+    ) : (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+
   return (
     <>
       {/* Desktop nav */}
       <nav className="hidden md:block border-b border-[var(--border)] bg-[var(--bg)]">
         <div className="mx-auto flex max-w-[1200px] items-center gap-1 px-6 py-3">
-          <Link
+          <NavLink
             href={adminMode ? "/admin" : "/dashboard"}
             className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)] mr-4"
           >
             Adaptable
-          </Link>
+          </NavLink>
 
           {tabs.map((tab) => (
-            <Link
+            <NavLink
               key={tab.href}
               href={tab.href}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors min-h-[44px] flex items-center ${
@@ -52,10 +80,10 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
               }`}
             >
               {tab.label}
-            </Link>
+            </NavLink>
           ))}
 
-          {isAdmin && (
+          {isAdmin && !previewMode && (
             <Link
               href="/admin"
               className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors min-h-[44px] flex items-center ${
@@ -69,7 +97,7 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
           )}
 
           <div className="ml-auto flex items-center gap-3">
-            {isAdmin && (
+            {isAdmin && !previewMode && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setAdminMode(!adminMode)}
@@ -98,11 +126,13 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
               <span className="text-sm text-[var(--text-muted)]">{studentName}</span>
             )}
 
-            <form action="/auth/signout" method="POST">
-              <button className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] min-h-[44px] px-2">
-                Sign out
-              </button>
-            </form>
+            {!previewMode && (
+              <form action="/auth/signout" method="POST">
+                <button className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] min-h-[44px] px-2">
+                  Sign out
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </nav>
@@ -110,12 +140,12 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
       {/* Mobile top bar */}
       <nav className="md:hidden border-b border-[var(--border)] bg-[var(--bg)]">
         <div className="flex items-center justify-between px-4 py-3">
-          <Link
+          <NavLink
             href="/dashboard"
             className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]"
           >
             Adaptable
-          </Link>
+          </NavLink>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[var(--bg-muted)] transition-colors"
@@ -136,23 +166,38 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
         {/* Mobile dropdown */}
         {mobileOpen && (
           <div className="border-t border-[var(--border)] px-4 py-3 space-y-1 animate-slide-down">
-            {tabs.map((tab) => (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
-                  isActive(tab)
-                    ? "bg-[var(--primary)]/10 text-[var(--primary)]"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
-                }`}
-              >
-                <span>{tab.icon}</span>
-                {tab.label}
-              </Link>
-            ))}
+            {tabs.map((tab) =>
+              previewMode ? (
+                <span
+                  key={tab.href}
+                  aria-disabled="true"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                    isActive(tab)
+                      ? "bg-[var(--primary)]/10 text-[var(--primary)]"
+                      : "text-[var(--text-secondary)]"
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  {tab.label}
+                </span>
+              ) : (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                    isActive(tab)
+                      ? "bg-[var(--primary)]/10 text-[var(--primary)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  {tab.label}
+                </Link>
+              )
+            )}
 
-            {isAdmin && (
+            {isAdmin && !previewMode && (
               <>
                 <Link
                   href="/admin"
@@ -180,12 +225,14 @@ export default function AppNav({ isAdmin, studentName }: AppNavProps) {
               {studentName && (
                 <p className="px-3 py-2 text-sm text-[var(--text-muted)]">{studentName}</p>
               )}
-              <form action="/auth/signout" method="POST">
-                <button className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--bg-muted)] w-full text-left">
-                  <span>👋</span>
-                  Sign out
-                </button>
-              </form>
+              {!previewMode && (
+                <form action="/auth/signout" method="POST">
+                  <button className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--bg-muted)] w-full text-left">
+                    <span>👋</span>
+                    Sign out
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         )}

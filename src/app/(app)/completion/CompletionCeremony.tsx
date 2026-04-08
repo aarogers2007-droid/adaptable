@@ -29,17 +29,19 @@ interface CeremonyProps {
    */
   showAnswerLabels?: boolean;
   /**
-   * Demo mode: skip the founder's letter, "Program Complete", diploma, and
-   * mentor farewell scenes entirely. Start directly on the Ikigai reveal,
-   * play through the gravitational collapse + business name reveal, then
-   * auto-call onComplete. Used by the /demo page.
+   * Demo mode: starts directly on the Ikigai reveal (skipping the
+   * "Program Complete" beat), plays the gravitational collapse + business
+   * name reveal, then auto-advances through the founder's letter and
+   * diploma on a timer (no "I'M IN" / "Continue" buttons), then calls
+   * onComplete. Used by the /demo page so testers can watch the whole
+   * graduation arc without clicking.
    *
-   * Default: false (real students get the full ceremony).
+   * Default: false (real students get the full ceremony with click-through).
    */
   demoMode?: boolean;
 }
 
-type Scene = "letter" | "complete" | "reveal" | "diploma" | "farewell";
+type Scene = "letter" | "complete" | "reveal" | "diploma";
 
 export default function CompletionCeremony({
   studentName,
@@ -55,7 +57,6 @@ export default function CompletionCeremony({
   const [letterPhase, setLetterPhase] = useState<"hidden" | "p1" | "p2" | "sig" | "reading" | "fading">("hidden");
   const [revealedCircles, setRevealedCircles] = useState<number[]>([]);
   const [revealedAnswers, setRevealedAnswers] = useState<number[]>([]);
-  const [centerVisible, setCenterVisible] = useState(false);
   const [contracting, setContracting] = useState(false);
   const [centerAbsorb, setCenterAbsorb] = useState(false);
   const [centerCollapse, setCenterCollapse] = useState(false);
@@ -64,9 +65,6 @@ export default function CompletionCeremony({
   const [circlesReturning, setCirclesReturning] = useState(false);
   const [originVisible, setOriginVisible] = useState(false);
   const [imInVisible, setImInVisible] = useState(false);
-  const [farewellText, setFarewellText] = useState("");
-  const [farewellDone, setFarewellDone] = useState(false);
-  const [farewellCtaVisible, setFarewellCtaVisible] = useState(false);
   const mountedRef = useRef(true);
 
   const firstName = studentName.split(" ")[0] || "there";
@@ -198,10 +196,48 @@ export default function CompletionCeremony({
       await sleep(PHI * PHI * BASE);
       if (cancelled) return;
 
-      // Demo mode auto-completes after the reveal — no "I'M IN" button,
-      // no diploma, no farewell. Just the moment, then back to the demo scroll.
+      // Demo mode plays the full graduation arc on its own timer — no
+      // "I'M IN" button. Sequence: reveal → founder's letter → diploma → done.
+      // Real students click through the buttons themselves.
       if (demoMode) {
         await sleep(PHI * BASE); // Let the name breathe
+
+        // ── Founder's letter ──
+        if (cancelled) return;
+        setExitingScene("reveal");
+        await sleep(PHI * BASE);
+        if (cancelled) return;
+        setActiveScene("letter");
+        setExitingScene(null);
+
+        // Cycle through the letter phases (same beats as real mode)
+        await sleep(PHI * BASE);
+        if (cancelled) return;
+        setLetterPhase("p1");
+
+        await sleep(2.618 * BASE);
+        if (cancelled) return;
+        setLetterPhase("p2");
+
+        await sleep(4.236 * BASE);
+        if (cancelled) return;
+        setLetterPhase("sig");
+
+        await sleep(4.236 * BASE);
+        if (cancelled) return;
+        setLetterPhase("fading");
+
+        await sleep(2 * BASE);
+
+        // ── Diploma ──
+        if (cancelled) return;
+        setExitingScene("letter");
+        await sleep(PHI * BASE);
+        if (cancelled) return;
+        setActiveScene("diploma");
+        setExitingScene(null);
+
+        await sleep(PHI * PHI * PHI * BASE); // Hold the diploma
         if (cancelled) return;
         onComplete();
       } else {
@@ -214,43 +250,6 @@ export default function CompletionCeremony({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ─── MENTOR FAREWELL TYPEWRITER ───
-  useEffect(() => {
-    if (activeScene !== "farewell") return;
-    let cancelled = false;
-
-    const text = `${firstName}. I remember when you first told me about ${businessName}. You said it like you weren\u2019t sure you were allowed to want something that big. You were.\n\nYou didn\u2019t take the easy path. When the hard decisions came, you made them. When the research challenged what you assumed, you actually listened. That takes more courage than most adults ever show.\n\n${businessName} is real. You built it from who you are \u2014 not from a template, not from what someone told you to care about. From you.\n\nI\u2019ll be here. For this venture, the next one, or just to talk.`;
-
-    (async () => {
-      let built = "";
-      for (let i = 0; i < text.length; i++) {
-        if (cancelled) return;
-        const char = text[i];
-        if (char === "\n") {
-          built += "<br>";
-        } else {
-          built += char;
-        }
-        setFarewellText(built);
-
-        if (char === "." || char === "?") await sleep(450);
-        else if (char === ",") await sleep(180);
-        else if (char === "\n") await sleep(700);
-        else if (char === "\u2014") await sleep(280);
-        else await sleep(50);
-      }
-      if (cancelled) return;
-      setFarewellDone(true);
-      await sleep(PHI * PHI * BASE);
-      if (cancelled) return;
-      setFarewellCtaVisible(true);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activeScene, firstName, businessName]);
 
   useEffect(() => {
     return () => {
@@ -375,30 +374,10 @@ export default function CompletionCeremony({
         </div>
         <button
           className="ceremony-diploma-continue"
-          onClick={() => {
-            setExitingScene("diploma");
-            setTimeout(() => {
-              setActiveScene("farewell");
-              setExitingScene(null);
-            }, PHI * BASE);
-          }}
+          onClick={onComplete}
         >
-          Continue
+          Begin
         </button>
-      </div>
-
-      {/* Scene 5: Mentor Farewell */}
-      <div className={sceneClass("farewell")}>
-        <div className="ceremony-farewell-content">
-          <div className="ceremony-farewell-mentor">Nova</div>
-          <div className="ceremony-farewell-text">
-            <span dangerouslySetInnerHTML={{ __html: farewellText }} />
-            {!farewellDone && <span className="ceremony-farewell-cursor" />}
-          </div>
-          <div className={`ceremony-farewell-cta ${farewellCtaVisible ? "visible" : ""}`}>
-            <button onClick={onComplete}>Begin</button>
-          </div>
-        </div>
       </div>
     </div>
   );

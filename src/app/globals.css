@@ -801,3 +801,24 @@ button:active:not(:disabled) {
   }
   .ceremony-particles { display: none; }
 }
+
+/* iOS auto-zoom prevention — fonts under 16px on inputs trigger Safari to
+   zoom the page on focus. We have lots of `text-sm` (14px) inputs across the
+   app; rather than touch every file, force ≥16px on small viewports only.
+   Desktop renders unchanged. */
+@media (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input:not([type]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
