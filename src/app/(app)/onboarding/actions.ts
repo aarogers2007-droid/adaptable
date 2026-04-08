@@ -160,7 +160,7 @@ CRITICAL RULES:
 
 Return a JSON object with exactly these fields:
 - niche: specific description of the business area, OR "needs_clarification" per rule 8
-- name: a SHORT (1-3 words), memorable brand name a teen would actually put on Instagram. NEVER use the format "[Name]'s [Service]". NEVER include "Studio," "Lab," "Academy," "Solutions," "Services," "Suite," "Consulting," "Co.," "Enterprises," "Media," "Shop," or "Agency" in the name. Think real teen brands: Press Pause, Drip District, Fade, Bonsai ER, Hot Sauce Club, Vault, Spoke, Burn Unit. The name should evoke the vibe, not describe the service. If you cannot think of a real brand name, use null and the student will name it themselves.
+- category: a SHORT (1-2 words) noun phrase for the TYPE of venture this is, in title case. Examples: "Art Studio", "Tutoring", "Discord Studio", "Cake Co", "Fade Shop", "Photo Studio", "Coaching", "Print Shop". This is NOT the brand name — it's the category word that will be combined with the student's first name to make a placeholder ("Walk's Discord Studio") that the student can rename to whatever they want. Pick the most specific, evocative 1-2 word noun for what they actually do. NEVER use generic words like "Services", "Solutions", "Enterprises", "Consulting", "Agency". If nothing better fits, return "Venture".
 - target_customer: specific description of who would pay, named per rule 2 (peers / parents of peers / neighbors / family).
 - revenue_model: brief sentence describing how they make money. If the student named a model that doesn't fit (e.g., "monthly retainers," "subscription," "creator deals") and you swapped to a teen-executable one, name the swap explicitly: "You said X, but for now Y will get you paid faster because…"
 - legal_note: a SHORT string (one sentence, can be empty "") flagging any real legal/regulatory constraint a teen needs to know about this specific idea. Examples: "Selling baked goods from home is fine in most US states under cottage food laws if you stay under the income cap and label allergens." OR "Cosmetology services on others' bodies legally require a license in most states — keep this to friends and don't advertise publicly." OR "Accepting money for fantasy sports picks crosses into unlicensed gambling in some states even between friends — keep it free and just for bragging rights." If no legal concern applies, return "".
@@ -220,9 +220,24 @@ First, identify the distinct themes in their answers. If their interests span mu
       if (legalNote) parts.push(`Heads up: ${legalNote}`);
       if (parentNote) parts.push(`Talk to a parent: ${parentNote}`);
       const whyComposed = parts.filter(Boolean).join("\n\n").trim() || undefined;
+
+      // Build the placeholder name from the AI's category word.
+      // The wizard renders this in an editable input — the student can rename
+      // it to whatever they want before clicking "I'm in".
+      // Fallback to "Venture" if the AI omitted the category or returned junk.
+      const rawCategory = typeof parsed.category === "string" ? parsed.category.trim() : "";
+      // Sanitize: strip control chars, cap length, drop anything weird
+      const safeCategory = rawCategory
+        .replace(/[\x00-\x1F\x7F]/g, "")
+        .replace(/[^A-Za-z0-9 &'\-]/g, "")
+        .trim()
+        .slice(0, 24);
+      const category = safeCategory.length > 0 ? safeCategory : "Venture";
+      const placeholderName = `${studentName}'s ${category}`;
+
       const idea: BusinessIdea = {
         niche: parsed.niche,
-        name: parsed.name ?? `${studentName}'s New Thing`,
+        name: placeholderName,
         target_customer: parsed.target_customer,
         revenue_model: parsed.revenue_model,
         why_this_fits: whyComposed,

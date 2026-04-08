@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import IkigaiDiagram, { STEPS, type IkigaiStep } from "./IkigaiDiagram";
 import StepContent from "./StepContent";
@@ -100,9 +100,42 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
   const [regenCounts, setRegenCounts] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(false);
   const [businessIdea, setBusinessIdea] = useState<BusinessIdea | null>(null);
+  // The student's editable business name. Initialized to the AI's placeholder
+  // (`{first}'s {category}`) on synthesis, but the student can rename it to
+  // anything they want before clicking "I'm in". Reset on every re-synthesize.
+  const [editableName, setEditableName] = useState<string>("");
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const [synthesizing, setSynthesizing] = useState(false);
   const [revealPhase, setRevealPhase] = useState<"none" | "dimming" | "card" | "ready">("none");
   const [error, setError] = useState<string | null>(null);
+
+  // Sync editableName to the AI's placeholder name whenever a new businessIdea
+  // arrives (initial synth + every re-synthesize). This is the (2b) behavior:
+  // re-synthesize resets the name back to the placeholder for the new niche.
+  useEffect(() => {
+    if (businessIdea?.name) {
+      setEditableName(businessIdea.name);
+    }
+  }, [businessIdea]);
+
+  // When the reveal hits "ready" on desktop, focus the name input and place
+  // the cursor at the end so the I-beam blinks at the end of the placeholder
+  // — visual hint that the student can rename it. We skip mobile auto-focus
+  // because popping the keyboard during a celebratory reveal is jarring.
+  useEffect(() => {
+    if (revealPhase !== "ready") return;
+    const isDesktop = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+    if (!isDesktop) return;
+    const input = nameInputRef.current;
+    if (!input) return;
+    // Tiny delay so the focus lands AFTER the reveal animation settles
+    const t = setTimeout(() => {
+      input.focus();
+      const len = input.value.length;
+      input.setSelectionRange(len, len);
+    }, 200);
+    return () => clearTimeout(t);
+  }, [revealPhase]);
 
   // Load suggestions for a step
   async function loadSuggestions(step: IkigaiStep, regen = 0) {
@@ -212,9 +245,27 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
   async function handleConfirm() {
     if (!businessIdea) return;
     setError(null);
+
+    // Use the student's edited name if they typed one, otherwise fall back
+    // to the AI placeholder. Trim and validate before sending — empty or
+    // whitespace-only is rejected with an inline error so the student knows
+    // they need to type something.
+    const finalName = (editableName || businessIdea.name || "").trim();
+    if (!finalName) {
+      setError("Give your venture a name first — even just a placeholder works.");
+      nameInputRef.current?.focus();
+      return;
+    }
+    if (finalName.length > 60) {
+      setError("That name is too long — keep it under 60 characters.");
+      nameInputRef.current?.focus();
+      return;
+    }
+    const ideaToSave: BusinessIdea = { ...businessIdea, name: finalName };
+
     try {
       const { confirmBusinessIdea } = await import("@/app/(app)/onboarding/actions");
-      const result = await confirmBusinessIdea(businessIdea, draft);
+      const result = await confirmBusinessIdea(ideaToSave, draft);
       if (result.success) {
         router.push("/onboarding/ready");
         return;
@@ -595,11 +646,28 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
 
                 <div className="p-6 text-left">
                   <p className="text-sm font-medium text-[var(--text-muted)] tracking-wide">
-                    {studentName.split(" ")[0]}&apos;s venture
+                    Your venture (tap to rename)
                   </p>
-                  <h2 className="mt-2 font-[family-name:var(--font-display)] text-[32px] font-bold leading-tight text-[var(--text-primary)]">
-                    {businessIdea.name}
-                  </h2>
+                  {/* Editable business name. The AI provides a placeholder
+                      ({first}'s {category}) and the student can rename it to
+                      anything they want before clicking "I'm in". The input is
+                      styled to look like the original h2 — same font, same
+                      size, same weight — but with a subtle dashed underline
+                      that thickens on focus, signaling editability without
+                      shouting "form field". On desktop the input auto-focuses
+                      with the cursor at the end so the I-beam blinks at the
+                      end of the placeholder name as a visual hint. */}
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={editableName}
+                    onChange={(e) => setEditableName(e.target.value)}
+                    maxLength={60}
+                    autoComplete="off"
+                    spellCheck={false}
+                    aria-label="Business name (editable)"
+                    className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] text-[32px] font-bold leading-tight text-[var(--text-primary)] outline-none border-b-2 border-dashed border-[var(--border)] focus:border-[var(--primary)] focus:border-solid transition-colors px-0 py-0.5"
+                  />
                   <p className="mt-2 text-base text-[var(--text-secondary)]">
                     {businessIdea.niche}
                   </p>
