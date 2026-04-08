@@ -429,15 +429,19 @@ export default function LessonConversation({
                 }));
               }
 
+              // Use [^\]]+ instead of \w+ so we strip the literal placeholder
+              // case where the model echoes "[STYLE:direct|exploratory|cautious]"
+              // — pipes aren't word chars, so the old \w+ patterns missed it
+              // and the meta-tag leaked into the visible chat output.
               const clean = assistantMsg
-                .replace(/\[CHECKPOINT:\S+\]/g, "")
+                .replace(/\[CHECKPOINT:[^\]]+\]/g, "")
                 .replace(/\[LESSON_COMPLETE\]/g, "")
-                .replace(/\[STYLE:\w+\]/g, "")
-                .replace(/\[PACE:\w+\]/g, "")
-                .replace(/\[DETAIL:\w+\]/g, "")
-                .replace(/\[MOTIVATION:\w+\]/g, "")
-                .replace(/\[REGISTER:\w+\]/g, "")
-                .replace(/\[EMOTION:\w+\]/g, "")
+                .replace(/\[STYLE:[^\]]+\]/g, "")
+                .replace(/\[PACE:[^\]]+\]/g, "")
+                .replace(/\[DETAIL:[^\]]+\]/g, "")
+                .replace(/\[MOTIVATION:[^\]]+\]/g, "")
+                .replace(/\[REGISTER:[^\]]+\]/g, "")
+                .replace(/\[EMOTION:[^\]]+\]/g, "")
                 .replace(/\[(?:CHECKPOINT|LESSON_COMPLETE|STYLE|PACE|DETAIL|MOTIVATION|REGISTER|EMOTION)[^\]]*$/g, "")
                 .trim();
               setMessages((prev) => {
