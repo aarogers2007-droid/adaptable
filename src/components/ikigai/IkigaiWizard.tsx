@@ -60,9 +60,17 @@ interface IkigaiWizardProps {
   initialDraft: IkigaiDraft | null;
   initialName?: string;
   isAdmin?: boolean;
+  /**
+   * Demo mode: visitor on /demo who doesn't have an account. Skips the
+   * saveDraft DB writes (no auth) and replaces the "I'm in" → /onboarding/ready
+   * navigation with a sign-up CTA modal. Synthesis still uses the real AI
+   * (rate-limited per-IP server-side).
+   */
+  demoMode?: boolean;
+  onDemoComplete?: (idea: BusinessIdea) => void;
 }
 
-export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: IkigaiWizardProps) {
+export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoMode, onDemoComplete }: IkigaiWizardProps) {
   const router = useRouter();
 
   const [studentName, setStudentName] = useState(initialName ?? "");
@@ -185,11 +193,13 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     newCompleted.add(activeStep);
     setCompletedSteps(newCompleted);
 
-    // Save draft (non-blocking)
-    try {
-      const { saveDraft } = await import("@/app/(app)/onboarding/actions");
-      saveDraft(newDraft);
-    } catch { /* preview mode */ }
+    // Save draft (non-blocking) — skip in demo mode (no auth, no DB)
+    if (!demoMode) {
+      try {
+        const { saveDraft } = await import("@/app/(app)/onboarding/actions");
+        saveDraft(newDraft);
+      } catch { /* preview mode */ }
+    }
 
     // Back to diagram
     setActiveStep(null);
@@ -201,8 +211,15 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
       let idea: BusinessIdea | null = null;
       try {
         const { synthesizeBusinessIdea } = await import("@/app/(app)/onboarding/actions");
-        const result = await synthesizeBusinessIdea(newDraft);
+        const result = await synthesizeBusinessIdea(
+          newDraft,
+          demoMode ? { demoMode: true, firstName: studentName } : undefined
+        );
         idea = result.idea;
+        // Surface rate-limit / cap errors to the visitor
+        if (!idea && result.error && demoMode) {
+          setError(result.error);
+        }
       } catch { /* preview mode */ }
 
       if (!idea) {
@@ -263,6 +280,14 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     }
     const ideaToSave: BusinessIdea = { ...businessIdea, name: finalName };
 
+    // Demo mode: don't write to DB. Hand the idea up to the parent component
+    // (DemoShowcase) so it can render the sign-up CTA with the visitor's
+    // venture rendered above it.
+    if (demoMode) {
+      onDemoComplete?.(ideaToSave);
+      return;
+    }
+
     try {
       const { confirmBusinessIdea } = await import("@/app/(app)/onboarding/actions");
       const result = await confirmBusinessIdea(ideaToSave, draft);
@@ -305,8 +330,12 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin }: Iki
     let idea: BusinessIdea | null = null;
     try {
       const { synthesizeBusinessIdea } = await import("@/app/(app)/onboarding/actions");
-      const result = await synthesizeBusinessIdea(draft);
+      const result = await synthesizeBusinessIdea(
+        draft,
+        demoMode ? { demoMode: true, firstName: studentName } : undefined
+      );
       idea = result.idea;
+      if (!idea && result.error && demoMode) setError(result.error);
     } catch { /* preview mode */ }
 
     if (!idea) {

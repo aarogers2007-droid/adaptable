@@ -23,7 +23,12 @@ import IkigaiDiagram from "@/components/ikigai/IkigaiDiagram";
 import Card3D from "@/app/(app)/card/Card3D";
 import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
 import AppNav from "@/components/ui/AppNav";
+import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
+import type { BusinessIdea } from "@/lib/types";
 import IkigaiRevealDemo from "./IkigaiRevealDemo";
+import DemoPricingCalc from "./DemoPricingCalc";
+import DemoAchievements from "./DemoAchievements";
+import DemoCardDesigner from "./DemoCardDesigner";
 
 // ── Demo data ──
 const ELSA = {
@@ -58,12 +63,22 @@ export default function DemoShowcase() {
   const [ceremonyDone, setCeremonyDone] = useState(false);
   const [showIkigaiReveal, setShowIkigaiReveal] = useState(false);
   const [ikigaiRevealDone, setIkigaiRevealDone] = useState(false);
+  // Editable business name — visitor can rename "Studio Bloom" and watch
+  // it propagate across the dashboard, business plan, business card, parent
+  // view, instructor dashboard preview, and pitch quote. Single source of
+  // truth, no persistence (resets on page refresh).
+  const [bizName, setBizName] = useState<string>(STUDIO_BLOOM.name);
+  // DIY wizard launcher: when true, the inline IkigaiDiagram in the Ikigai
+  // Discovery section is replaced with a live IkigaiWizard component running
+  // in demoMode (no auth, real synthesis, sign-up CTA at the end).
+  const [showDiyWizard, setShowDiyWizard] = useState(false);
+  const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
 
   if (showCeremony && !ceremonyDone) {
     return (
       <CompletionCeremony
         studentName={ELSA.name}
-        businessName={STUDIO_BLOOM.name}
+        businessName={bizName}
         businessNiche={STUDIO_BLOOM.niche}
         ikigai={IKIGAI}
         demoMode={true}
@@ -104,7 +119,7 @@ export default function DemoShowcase() {
               completedSteps={new Set([1, 2, 3, 4])}
               onStepClick={() => {}}
               showReveal={false}
-              businessName={STUDIO_BLOOM.name}
+              businessName={bizName}
             />
           </div>
           <div className="space-y-4">
@@ -126,15 +141,121 @@ export default function DemoShowcase() {
             ))}
           </div>
         </div>
+
+        {/* Try-it-yourself CTA — launches the real Ikigai wizard in demo mode */}
+        <div className="mt-12 rounded-xl border-2 border-[var(--primary)]/30 bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 p-8 text-center">
+          <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">DIY moment</p>
+          <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+            Try it yourself
+          </h3>
+          <p className="mt-2 text-base text-[var(--text-secondary)] max-w-[520px] mx-auto">
+            Walk the actual Ikigai wizard — same steps, same questions, same AI synthesis a real student gets. In about 3 minutes you&apos;ll have your own venture.
+          </p>
+          <button
+            onClick={() => {
+              setShowDiyWizard(true);
+              setDiyResult(null);
+            }}
+            className="mt-5 rounded-lg bg-[var(--primary)] px-7 py-3.5 text-base font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+            style={{ boxShadow: "0 0 20px rgba(13, 148, 136, 0.35), 0 0 60px rgba(13, 148, 136, 0.1)" }}
+          >
+            Walk the wizard →
+          </button>
+          <p className="mt-3 text-xs text-[var(--text-muted)]">
+            Real AI synthesis. Rate-limited to 5 tries per visitor.
+          </p>
+        </div>
       </Section>
 
+      {/* Full-screen DIY wizard overlay */}
+      {showDiyWizard && !diyResult && (
+        <div className="fixed inset-0 z-[100] bg-[var(--bg)] overflow-y-auto">
+          <button
+            onClick={() => setShowDiyWizard(false)}
+            className="fixed top-4 right-4 z-[110] rounded-full border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] transition-colors shadow-md"
+          >
+            Close ✕
+          </button>
+          <IkigaiWizard
+            initialDraft={null}
+            demoMode
+            onDemoComplete={(idea) => setDiyResult(idea)}
+          />
+        </div>
+      )}
+
+      {/* DIY result — shows the visitor's venture + sign-up CTA */}
+      {showDiyWizard && diyResult && (
+        <div className="fixed inset-0 z-[100] bg-[var(--bg-subtle)] overflow-y-auto px-6 py-12">
+          <div className="mx-auto max-w-[560px]">
+            <button
+              onClick={() => {
+                setShowDiyWizard(false);
+                setDiyResult(null);
+              }}
+              className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            >
+              ← back to demo
+            </button>
+            <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-8">
+              <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider">Your venture</p>
+              <h2 className="mt-2 font-[family-name:var(--font-display)] text-[40px] font-bold leading-tight text-[var(--text-primary)]">
+                {diyResult.name}
+              </h2>
+              <p className="mt-3 text-lg text-[var(--text-secondary)]">{diyResult.niche}</p>
+              {diyResult.why_this_fits && (
+                <div className="mt-6 pt-6 border-t border-[var(--border)]">
+                  <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-2">Why this fits you</p>
+                  <p className="text-base text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">{diyResult.why_this_fits}</p>
+                </div>
+              )}
+              <div className="mt-6 pt-6 border-t border-[var(--border)]">
+                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-2">How you&apos;d earn</p>
+                <p className="text-base text-[var(--text-secondary)]">{diyResult.revenue_model}</p>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-base text-[var(--text-secondary)]">
+                Real students go through 22 lessons with a personal AI mentor next.
+              </p>
+              <Link
+                href="/signup"
+                className="mt-4 inline-block rounded-lg bg-[var(--primary)] px-8 py-3.5 text-base font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+                style={{ boxShadow: "0 0 20px rgba(13, 148, 136, 0.35), 0 0 60px rgba(13, 148, 136, 0.1)" }}
+              >
+                Save this venture & start lesson 1 →
+              </Link>
+              <p className="mt-3 text-xs text-[var(--text-muted)]">
+                Free. Takes 30 seconds. No credit card.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══ 2. DASHBOARD — Using real CSS classes ═══ */}
-      <Section label="The Home Base" title="Student Dashboard" description={`After discovering her Ikigai, ${ELSA.first} lands on her personalized venture studio. Everything revolves around ${STUDIO_BLOOM.name}.`}>
+      <Section label="The Home Base" title="Student Dashboard" description={`After discovering her Ikigai, ${ELSA.first} lands on her personalized venture studio. Everything revolves around ${bizName}.`}>
         <div className="mx-auto max-w-[620px]">
           {/* Business hero */}
           <div className="stagger-enter rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-8">
-            <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider">Your Venture</p>
-            <h2 className="mt-2 font-[family-name:var(--font-display)] text-[32px] font-bold text-[var(--text-primary)]">{STUDIO_BLOOM.name}</h2>
+            <p className="text-xs font-medium text-[var(--primary)] uppercase tracking-wider">
+              Your Venture <span className="ml-1 text-[var(--text-muted)] normal-case tracking-normal">(tap to rename — watch it change everywhere)</span>
+            </p>
+            {/* Editable name — same pattern as the production wizard. Visitor
+                renames Studio Bloom and the new name propagates instantly to
+                the business card, business plan, parent view, instructor table,
+                and pitch quote below. Pure local state, no persistence. */}
+            <input
+              type="text"
+              value={bizName}
+              onChange={(e) => setBizName(e.target.value.slice(0, 60))}
+              maxLength={60}
+              autoComplete="off"
+              spellCheck={false}
+              aria-label="Business name (editable)"
+              className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] font-bold leading-tight text-[var(--text-primary)] outline-none border-b-2 border-dashed border-[var(--border)] focus:border-[var(--primary)] focus:border-solid transition-colors px-0 py-0.5"
+            />
             <p className="mt-1 text-[var(--text-secondary)]">{STUDIO_BLOOM.niche}</p>
             <div className="mt-6 grid grid-cols-2 gap-4">
               <div>
@@ -220,7 +341,7 @@ export default function DemoShowcase() {
                   <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Guide</span>
                 </div>
                 <div className="ai-message rounded-2xl bg-[var(--bg-muted)] text-[var(--text-primary)] px-6 py-5 space-y-3">
-                  <p className="text-base leading-relaxed">Let&apos;s think about who your ideal customer really is. Not just &ldquo;everyone&rdquo; — but the specific person who would be MOST excited about {STUDIO_BLOOM.name}.</p>
+                  <p className="text-base leading-relaxed">Let&apos;s think about who your ideal customer really is. Not just &ldquo;everyone&rdquo; — but the specific person who would be MOST excited about {bizName}.</p>
                   <p className="text-base leading-relaxed">Think about age, interests, and what problem they&apos;re trying to solve. Who comes to mind?</p>
                 </div>
               </div>
@@ -272,37 +393,30 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
-      {/* ═══ 4. BUSINESS CARD — REAL COMPONENT ═══ */}
-      <Section label="The Reward" title="Business Card Designer" description={`Students design a 3D business card that tilts as they move across it and unlocks new fonts and finishes as they progress. Try moving over ${ELSA.first}'s card below — this is the actual component.`}>
-        <div className="mx-auto" style={{ width: "100%", maxWidth: "560px", height: "400px" }}>
-          <Card3D
-            businessName={STUDIO_BLOOM.name}
-            niche={STUDIO_BLOOM.niche}
+      {/* ═══ 4. BUSINESS CARD — DIY DESIGNER ═══ */}
+      <Section label="The Reward" title="Business Card Designer" description="Students design a 3D business card that tilts as they move across it and unlocks new fonts and finishes as they progress. Pick the color, accent, finish, and border below — the card responds in real time.">
+        <div className="mx-auto max-w-[820px]">
+          <DemoCardDesigner
             studentName={ELSA.name}
+            defaultBusinessName={bizName}
+            niche={STUDIO_BLOOM.niche}
             targetCustomer={STUDIO_BLOOM.target}
-            finish="holographic"
-            accentColor="#0D9488"
-            cardBase="black"
-            showBack={false}
-            backContent={{
-              achievements: [
-                { name: "First Idea", icon: "💡", tier: "gold" },
-                { name: "Market Ready", icon: "🎯", tier: "silver" },
-                { name: "Customer Pro", icon: "🤝", tier: "gold" },
-                { name: "Price Setter", icon: "💰", tier: "bronze" },
-                { name: "Pitch Perfect", icon: "🎤", tier: "silver" },
-              ],
-            }}
-            borderStyle="rounded"
-            isFounder={true}
-            showRotateHint={true}
           />
         </div>
-        <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-          <span className="hidden md:inline">Hover</span>
-          <span className="md:hidden">Drag</span>
-          {" "}to tilt &middot; 7 base colors &middot; 8 unlockable fonts &middot; 5 card finishes (matte, holographic, silver, chrome, gold)
-        </p>
+      </Section>
+
+      {/* ═══ 4b. PRICING CALCULATOR — DIY ═══ */}
+      <Section label="The Pressure-Test" title="Set a Price You Believe In" description="Lesson 5 has students calculate what they're actually paying themselves per hour. Most teens undercharge wildly because they don't account for their time. Try it on a job you'd quote — see what your price means in real terms.">
+        <div className="mx-auto max-w-[640px]">
+          <DemoPricingCalc />
+        </div>
+      </Section>
+
+      {/* ═══ 4c. ACHIEVEMENT GALLERY — DIY ═══ */}
+      <Section label="The Milestones" title="Achievement Gallery" description="Real students earn these badges as they progress through the program. Click any to unlock it and see the celebration. Each tier (bronze, silver, gold) signals a different depth of mastery.">
+        <div className="mx-auto max-w-[820px]">
+          <DemoAchievements />
+        </div>
       </Section>
 
       {/* ═══ 5. BUSINESS PLAN — Using real CSS patterns ═══ */}
@@ -335,9 +449,9 @@ export default function DemoShowcase() {
           <div className="mt-8 pt-6 border-t border-[var(--border)]">
             <p className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider mb-3">The Pitch</p>
             <p className="text-xl font-medium font-[family-name:var(--font-display)] text-[var(--text-primary)] leading-relaxed italic">
-              &ldquo;{STUDIO_BLOOM.name}{" "}gives teens a place to create, learn, and earn through art — because everyone deserves to express themselves, regardless of what they can afford.&rdquo;
+              &ldquo;{bizName}{" "}gives teens a place to create, learn, and earn through art — because everyone deserves to express themselves, regardless of what they can afford.&rdquo;
             </p>
-            <p className="mt-3 text-sm text-[var(--text-muted)]">&mdash; {ELSA.first}, Founder of {STUDIO_BLOOM.name}</p>
+            <p className="mt-3 text-sm text-[var(--text-muted)]">&mdash; {ELSA.first}, Founder of {bizName}</p>
           </div>
         </div>
       </Section>
@@ -378,7 +492,7 @@ export default function DemoShowcase() {
               </thead>
               <tbody>
                 {[
-                  { name: ELSA.name, biz: STUDIO_BLOOM.name, pct: 62.5, active: "2 min ago", status: "On track", sColor: "var(--success)" },
+                  { name: ELSA.name, biz: bizName, pct: 62.5, active: "2 min ago", status: "On track", sColor: "var(--success)" },
                   { name: "Marcus Johnson", biz: "Fresh Kicks Co.", pct: 37.5, active: "3 days ago", status: "Needs help", sColor: "var(--warning)" },
                   { name: "Priya Sharma", biz: "Spice Route", pct: 87.5, active: "1 hr ago", status: "On track", sColor: "var(--success)" },
                   { name: "Jaylen Carter", biz: "Cart Culture", pct: 25, active: "5 days ago", status: "Inactive", sColor: "var(--error)" },
@@ -444,7 +558,7 @@ export default function DemoShowcase() {
           </div>
           <div className="p-5 border-b border-[var(--border)]">
             <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Business Idea</p>
-            <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">{STUDIO_BLOOM.name}</p>
+            <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">{bizName}</p>
             <p className="text-sm text-[var(--text-secondary)]">{STUDIO_BLOOM.niche}</p>
           </div>
           <div className="p-5 grid grid-cols-2 gap-3 border-b border-[var(--border)]">
@@ -463,7 +577,7 @@ export default function DemoShowcase() {
           <div className="p-5">
             <p className="text-xs font-semibold text-[var(--text-primary)] mb-1">How You Can Help</p>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-              {ELSA.first} is halfway through and doing great. Ask her about the customer interviews she&apos;s been practicing — she&apos;s learning to ask the right questions before building. Encouraging her to talk to real people about {STUDIO_BLOOM.name} would be the most valuable thing right now.
+              {ELSA.first} is halfway through and doing great. Ask her about the customer interviews she&apos;s been practicing — she&apos;s learning to ask the right questions before building. Encouraging her to talk to real people about {bizName} would be the most valuable thing right now.
             </p>
           </div>
         </div>
@@ -531,9 +645,9 @@ export default function DemoShowcase() {
       {showIkigaiReveal && (
         <IkigaiRevealDemo
           studentFirstName={ELSA.first}
-          businessName={STUDIO_BLOOM.name}
+          businessName={bizName}
           businessNiche={STUDIO_BLOOM.niche}
-          whyThisFits={`You love painting and helping others create. You're good at color theory and teaching. Your community needs affordable art education for teens. ${STUDIO_BLOOM.name} is where all four meet.`}
+          whyThisFits={`You love painting and helping others create. You're good at color theory and teaching. Your community needs affordable art education for teens. ${bizName} is where all four meet.`}
           revenueModel={STUDIO_BLOOM.revenue}
           onClose={() => {
             setShowIkigaiReveal(false);

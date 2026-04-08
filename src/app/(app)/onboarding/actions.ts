@@ -101,23 +101,86 @@ export async function saveDraft(draft: IkigaiDraft) {
   return { success: true };
 }
 
-export async function synthesizeBusinessIdea(draft: IkigaiDraft): Promise<{
+export async function synthesizeBusinessIdea(
+  draft: IkigaiDraft,
+  options?: { demoMode?: boolean; firstName?: string }
+): Promise<{
   idea: BusinessIdea | null;
   error?: string;
 }> {
+  const demoMode = options?.demoMode === true;
   try {
-    // Get student name for the personal business name
-    const supabaseForName = await createClient();
-    const { data: { user: currentUser } } = await supabaseForName.auth.getUser();
+    // Determine the student's first name. In demo mode (visitor with no
+    // account), use the name they typed in the demo wizard, falling back to
+    // "You" if they skipped it. Otherwise look it up from the auth'd profile.
     let studentName = "Student";
-    if (currentUser) {
-      const { data: nameData } = await supabaseForName
-        .from("profiles")
-        .select("full_name")
-        .eq("id", currentUser.id)
-        .single();
-      if (nameData?.full_name) {
-        studentName = (nameData.full_name as string).split(" ")[0]; // First name only
+    if (demoMode) {
+      const safeName = (options?.firstName ?? "")
+        .replace(/[^a-zA-Z\s'\-]/g, "")
+        .trim()
+        .slice(0, 30);
+      studentName = safeName || "You";
+
+      // Demo rate limit: cap demo synth calls per IP and globally to bound
+      // API spend from anonymous visitors. Reuses parent_pin_attempts table
+      // (also used by /join and /parent/view for IP rate limiting).
+      const { headers } = await import("next/headers");
+      const h = await headers();
+      const ip =
+        h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        h.get("x-real-ip") ||
+        "unknown";
+      const ipHash = `demo_synth_${ip}`;
+
+      const { createAdminClient } = await import("@/lib/supabase/admin");
+      const admin = createAdminClient();
+
+      // Per-IP: max 5 demo syntheses per hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count: ipCount } = await admin
+        .from("parent_pin_attempts")
+        .select("id", { count: "exact", head: true })
+        .eq("token_hash", ipHash)
+        .gte("attempted_at", oneHourAgo);
+      if ((ipCount ?? 0) >= 5) {
+        return {
+          idea: null,
+          error: "You've tried the demo a few times — sign up to keep going for real.",
+        };
+      }
+
+      // Global: max 200 demo syntheses per day (cost cap)
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count: globalCount } = await admin
+        .from("parent_pin_attempts")
+        .select("id", { count: "exact", head: true })
+        .like("token_hash", "demo_synth_%")
+        .gte("attempted_at", oneDayAgo);
+      if ((globalCount ?? 0) >= 200) {
+        return {
+          idea: null,
+          error: "The demo wizard is rate-limited for today. Sign up to use the real one — same prompt, no limits.",
+        };
+      }
+
+      // Record the attempt
+      await admin.from("parent_pin_attempts").insert({
+        token_hash: ipHash,
+        attempted_at: new Date().toISOString(),
+      });
+    } else {
+      // Auth'd path: look up the student's name from their profile
+      const supabaseForName = await createClient();
+      const { data: { user: currentUser } } = await supabaseForName.auth.getUser();
+      if (currentUser) {
+        const { data: nameData } = await supabaseForName
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (nameData?.full_name) {
+          studentName = (nameData.full_name as string).split(" ")[0];
+        }
       }
     }
 
@@ -180,23 +243,26 @@ First, identify the distinct themes in their answers. If their interests span mu
       ],
     });
 
-    // Log usage
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // Log usage (auth'd path only — demo mode visitors don't get logged
+    // because they have no student_id)
+    if (!demoMode) {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (user) {
-      await supabase.from("ai_usage_log").insert({
-        student_id: user.id,
-        feature: "ikigai",
-        model: "claude-sonnet-4-20250514",
-        input_tokens: result.usage.input_tokens,
-        output_tokens: result.usage.output_tokens,
-        estimated_cost_usd:
-          (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) /
-          1_000_000,
-      });
+      if (user) {
+        await supabase.from("ai_usage_log").insert({
+          student_id: user.id,
+          feature: "ikigai",
+          model: "claude-sonnet-4-20250514",
+          input_tokens: result.usage.input_tokens,
+          output_tokens: result.usage.output_tokens,
+          estimated_cost_usd:
+            (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) /
+            1_000_000,
+        });
+      }
     }
 
     const cleanText = result.text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
