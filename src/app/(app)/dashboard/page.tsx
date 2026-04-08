@@ -8,6 +8,7 @@ import Link from "next/link";
 import AppNav from "@/components/ui/AppNav";
 import DailyCheckIn from "@/components/dashboard/DailyCheckIn";
 import DashboardAchievements from "./DashboardAchievements";
+import FeedbackBox from "@/components/dashboard/FeedbackBox";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -157,6 +158,11 @@ export default async function DashboardPage() {
             </div>
           </div>
         </section>
+
+        {/* Tester feedback box — friends/family user testing 2026-04-09 */}
+        <div className="stagger-enter mt-4" style={{ animationDelay: "30ms" }}>
+          <FeedbackBox />
+        </div>
 
         {/* All lessons complete */}
         {!nextLesson && completedCount === lessons.length && lessons.length > 0 && (
