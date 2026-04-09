@@ -253,7 +253,7 @@ export default function DemoShowcase() {
               autoComplete="off"
               spellCheck={false}
               aria-label="Business name (editable)"
-              className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] font-bold leading-tight text-[var(--text-primary)] outline-none border-b-2 border-dashed border-[var(--border)] focus:border-[var(--primary)] focus:border-solid transition-colors px-0 py-0.5"
+              className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] font-bold leading-tight text-[var(--text-primary)] outline-none border-2 border-dashed border-[var(--border)] rounded-xl focus:border-[var(--primary)] focus:border-solid transition-colors px-4 py-3"
             />
             <p className="mt-1 text-[var(--text-secondary)]">{STUDIO_BLOOM.niche}</p>
             <div className="mt-6 grid grid-cols-2 gap-4">
@@ -579,7 +579,7 @@ export default function DemoShowcase() {
               Two distinct moments in a real student's journey:
                 1. Ikigai Reveal — at the end of the wizard, before the lessons
                 2. Graduation Ceremony — after lesson 22, at the end of the program */}
-      <Section label="The Two Moments" title="The Reveals" description="Two moments real students get. The first lands at the end of the Ikigai wizard — their venture appears, ignited, before they've taken a single lesson. The second lands after lesson 22 — the four Ikigai circles collapse into a single point, the business they built with the AI emerges, the founder's letter, then the diploma.">
+      <Section label="The Two Moments" title="The Reveals" description="Two moments real students get. The first lands at the end of the Ikigai wizard — their venture appears, ignited, before they've taken a single lesson. The second lands after lesson 22 — the four parts of who they are remain in vigil while the venture they built with the AI is born in the negative space between them, then the founder's letter, then the diploma.">
         <div className="mx-auto max-w-[640px]">
           <div className="grid gap-6 sm:grid-cols-2">
             {/* Ikigai Reveal — wizard's "ignited" card */}
@@ -603,14 +603,14 @@ export default function DemoShowcase() {
               </button>
             </div>
 
-            {/* Graduation Ceremony — gravitational collapse → letter → diploma */}
+            {/* Graduation Ceremony — vigil: parents witness, ember ignites, name is born */}
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 text-center">
               <p className="text-xs font-semibold text-[var(--accent)] uppercase tracking-wider">Moment 2</p>
               <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[var(--text-primary)]">
                 The Graduation Ceremony
               </h3>
               <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
-                Gravitational collapse of the four circles. Business name emerges from the singularity. Founder&apos;s letter from AJ. Diploma. The full arc.
+                The four parts of who they are arrive, breathing on their own. Light gathers in the space they hold between them. Their venture is born from that light. The four remain, witnessing. Founder&apos;s letter. Diploma. The full arc.
               </p>
               <button
                 onClick={() => {
