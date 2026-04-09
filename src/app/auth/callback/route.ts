@@ -32,15 +32,26 @@ export async function GET(request: Request) {
           .eq("id", user.id)
           .single();
 
-        // New user without an org: needs to join a class first
+        // ── PROGRESS-FIRST RULE ──
+        // If they have a business_idea, they have already completed
+        // onboarding. NEVER bounce them backward to /join or /onboarding,
+        // even if their org_id is null. The dashboard handles a missing
+        // org gracefully and can prompt them to join a class as a soft
+        // banner if needed. This prevents the regression that hit Alberto:
+        // signing in with a complete business but null org_id and being
+        // sent to /join as if he were a brand-new user.
+        if (profile?.business_idea) {
+          return NextResponse.redirect(`${origin}${next}`);
+        }
+
+        // No business idea yet — they're mid-onboarding.
+        // No org_id either: they need a class first.
         if (!profile?.org_id) {
           return NextResponse.redirect(`${origin}/join`);
         }
 
-        // User without business idea: needs to complete Ikigai
-        if (!profile?.business_idea) {
-          return NextResponse.redirect(`${origin}/onboarding`);
-        }
+        // Has org but no business idea — start/resume the Ikigai wizard.
+        return NextResponse.redirect(`${origin}/onboarding`);
       }
 
       return NextResponse.redirect(`${origin}${next}`);
