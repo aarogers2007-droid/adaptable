@@ -12,7 +12,7 @@
  *   Gap between header and content: 48px (≈ φ⁴ × 8)
  *
  * Student: Elsa Martinez
- * Business: Studio Bloom
+ * Business: Elsa's Art Studio
  */
 
 import { useState } from "react";
@@ -35,8 +35,8 @@ const ELSA = {
   first: "Elsa",
 };
 
-const STUDIO_BLOOM = {
-  name: "Studio Bloom",
+const ELSA_STUDIO = {
+  name: "Elsa's Art Studio",
   niche: "An art education studio for creative self-expression",
   target: "14-18 year olds who love creating but don't have access to art programs",
   revenue: "Weekly group workshops ($25/session) + private lessons ($40/hr)",
@@ -62,11 +62,11 @@ export default function DemoShowcase() {
   const [ceremonyDone, setCeremonyDone] = useState(false);
   const [showIkigaiReveal, setShowIkigaiReveal] = useState(false);
   const [ikigaiRevealDone, setIkigaiRevealDone] = useState(false);
-  // Editable business name — visitor can rename "Studio Bloom" and watch
-  // it propagate across the dashboard, business plan, business card, parent
-  // view, instructor dashboard preview, and pitch quote. Single source of
-  // truth, no persistence (resets on page refresh).
-  const [bizName, setBizName] = useState<string>(STUDIO_BLOOM.name);
+  // Editable business name — visitor can rename "Elsa's Art Studio" and
+  // watch it propagate across the dashboard, business plan, business card,
+  // parent view, instructor dashboard preview, and pitch quote. Single
+  // source of truth, no persistence (resets on page refresh).
+  const [bizName, setBizName] = useState<string>(ELSA_STUDIO.name);
   // DIY wizard launcher: when true, the inline IkigaiDiagram in the Ikigai
   // Discovery section is replaced with a live IkigaiWizard component running
   // in demoMode (no auth, real synthesis, sign-up CTA at the end).
@@ -78,7 +78,7 @@ export default function DemoShowcase() {
       <CompletionCeremony
         studentName={ELSA.name}
         businessName={bizName}
-        businessNiche={STUDIO_BLOOM.niche}
+        businessNiche={ELSA_STUDIO.niche}
         ikigai={IKIGAI}
         demoMode={true}
         onComplete={() => {
@@ -242,9 +242,9 @@ export default function DemoShowcase() {
               Your Venture <span className="ml-1 text-[var(--text-muted)] normal-case tracking-normal">(tap to rename — watch it change everywhere)</span>
             </p>
             {/* Editable name — same pattern as the production wizard. Visitor
-                renames Studio Bloom and the new name propagates instantly to
-                the business card, business plan, parent view, instructor table,
-                and pitch quote below. Pure local state, no persistence. */}
+                renames Elsa's Art Studio and the new name propagates instantly
+                to the business card, business plan, parent view, instructor
+                table, and pitch quote below. Pure local state, no persistence. */}
             <input
               type="text"
               value={bizName}
@@ -255,15 +255,15 @@ export default function DemoShowcase() {
               aria-label="Business name (editable)"
               className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] font-bold leading-tight text-[var(--text-primary)] outline-none border-2 border-dashed border-[var(--border)] rounded-xl focus:border-[var(--primary)] focus:border-solid transition-colors px-4 py-3"
             />
-            <p className="mt-1 text-[var(--text-secondary)]">{STUDIO_BLOOM.niche}</p>
+            <p className="mt-1 text-[var(--text-secondary)]">{ELSA_STUDIO.niche}</p>
             <div className="mt-6 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs font-medium text-[var(--text-muted)]">Target Customer</p>
-                <p className="mt-1 text-sm text-[var(--text-primary)]">{STUDIO_BLOOM.target}</p>
+                <p className="mt-1 text-sm text-[var(--text-primary)]">{ELSA_STUDIO.target}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-[var(--text-muted)]">Revenue Model</p>
-                <p className="mt-1 text-sm text-[var(--text-primary)]">{STUDIO_BLOOM.revenue}</p>
+                <p className="mt-1 text-sm text-[var(--text-primary)]">{ELSA_STUDIO.revenue}</p>
               </div>
             </div>
           </div>
@@ -398,8 +398,8 @@ export default function DemoShowcase() {
           <DemoCardDesigner
             studentName={ELSA.name}
             defaultBusinessName={bizName}
-            niche={STUDIO_BLOOM.niche}
-            targetCustomer={STUDIO_BLOOM.target}
+            niche={ELSA_STUDIO.niche}
+            targetCustomer={ELSA_STUDIO.target}
           />
         </div>
       </Section>
@@ -416,8 +416,8 @@ export default function DemoShowcase() {
         <div className="mx-auto max-w-[620px]">
           <div className="space-y-6">
             {[
-              { n: 1, t: "Vision", b: `${STUDIO_BLOOM.niche}. Born from ${ELSA.first}'s Ikigai — her love of painting, her teaching ability, and her community's need for affordable art education.` },
-              { n: 2, t: "Target Customer", b: `${STUDIO_BLOOM.target}. Revenue: ${STUDIO_BLOOM.revenue}.` },
+              { n: 1, t: "Vision", b: `${ELSA_STUDIO.niche}. Born from ${ELSA.first}'s Ikigai — her love of painting, her teaching ability, and her community's need for affordable art education.` },
+              { n: 2, t: "Target Customer", b: `${ELSA_STUDIO.target}. Revenue: ${ELSA_STUDIO.revenue}.` },
               { n: 3, t: "Key Decisions", decisions: true },
             ].map((s) => (
               <div key={s.n} className="stagger-enter flex gap-4" style={{ animationDelay: `${s.n * 100}ms` }}>
@@ -551,7 +551,7 @@ export default function DemoShowcase() {
           <div className="p-5 border-b border-[var(--border)]">
             <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Business Idea</p>
             <p className="mt-1 font-[family-name:var(--font-display)] text-lg font-bold text-[var(--text-primary)]">{bizName}</p>
-            <p className="text-sm text-[var(--text-secondary)]">{STUDIO_BLOOM.niche}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{ELSA_STUDIO.niche}</p>
           </div>
           <div className="p-5 grid grid-cols-2 gap-3 border-b border-[var(--border)]">
             {[
@@ -638,9 +638,9 @@ export default function DemoShowcase() {
         <IkigaiRevealDemo
           studentFirstName={ELSA.first}
           businessName={bizName}
-          businessNiche={STUDIO_BLOOM.niche}
+          businessNiche={ELSA_STUDIO.niche}
           whyThisFits={`You love painting and helping others create. You're good at color theory and teaching. Your community needs affordable art education for teens. ${bizName} is where all four meet.`}
-          revenueModel={STUDIO_BLOOM.revenue}
+          revenueModel={ELSA_STUDIO.revenue}
           onClose={() => {
             setShowIkigaiReveal(false);
             setIkigaiRevealDone(true);

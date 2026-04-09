@@ -90,10 +90,10 @@ const GOLD_CONVERSATIONS: GoldConversation[] = [
     lesson: "Welcome to Adaptable",
     description: "A motivated student gives strong answers throughout. Should fire all 3 checkpoints and complete.",
     systemPrompt: SYSTEM_PROMPT_TEMPLATE,
-    studentContext: { name: "Elsa", businessName: "Studio Bloom", niche: "art education for teens" },
+    studentContext: { name: "Elsa", businessName: "Elsa's Art Studio", niche: "art education for teens" },
     turns: [
       {
-        studentMessage: "Studio Bloom is going to be a small art studio where I teach weekly painting workshops for teens. The first customer would walk away with their finished canvas from a 90-minute beginner watercolor session.",
+        studentMessage: "Elsa's Art Studio is going to be a small art studio where I teach weekly painting workshops for teens. The first customer would walk away with their finished canvas from a 90-minute beginner watercolor session.",
         expectations: {
           shouldFireCheckpoint: "welcome-1",
           maxSentences: 4,
