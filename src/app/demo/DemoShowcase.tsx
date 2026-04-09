@@ -36,7 +36,6 @@ const MOBILE_TABS: { key: MobileTab; label: string }[] = [
 import IkigaiDiagram from "@/components/ikigai/IkigaiDiagram";
 import Card3D from "@/app/(app)/card/Card3D";
 import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
-import AppNav from "@/components/ui/AppNav";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { BusinessIdea } from "@/lib/types";
 import IkigaiRevealDemo from "./IkigaiRevealDemo";
@@ -129,11 +128,6 @@ export default function DemoShowcase() {
 
   return (
     <main className="min-h-screen bg-[var(--bg)]">
-      {/* ═══ REAL APP NAV — preview mode renders the full nav visually but
-              every link/button is inert so the visitor can't accidentally
-              click into a real app route that would bounce them to /login ═══ */}
-      <AppNav isAdmin={false} previewMode />
-
       {/* ═══ HERO ═══ */}
       <section className="flex flex-col items-center justify-center px-6 py-32 text-center border-b border-[var(--border)]">
         <h1 className="font-[family-name:var(--font-display)] text-[48px] font-bold leading-[1.1] text-[var(--text-primary)]">
