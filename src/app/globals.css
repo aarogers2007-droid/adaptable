@@ -825,14 +825,15 @@ button:active:not(:disabled) {
 
 /* Ikigai wizard editable business name. The reveal renders the name as an
    input styled to look like a heading. The global iOS auto-zoom rule above
-   would shrink it to 16px on mobile, breaking the heading effect. We override
-   here with a still-≥16px size (24px) so iOS Safari won't auto-zoom AND the
-   heading still feels like a heading on small screens. */
-.ikigai-name-input {
-  font-size: 32px;
+   uses `input[type="text"]` which has higher CSS specificity than a plain
+   class selector — so we use `input.ikigai-name-input` to match specificity
+   AND come later in the file so it wins via cascade order. We pick a size
+   ≥16px so iOS Safari still won't auto-zoom on focus. */
+input.ikigai-name-input {
+  font-size: 32px !important;
 }
 @media (max-width: 767px) {
-  .ikigai-name-input {
+  input.ikigai-name-input {
     font-size: 24px !important;
   }
 }
