@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 const PHI = 1.618034;
 const BASE = 1000;
@@ -57,17 +57,32 @@ export default function CompletionCeremony({
   const [letterPhase, setLetterPhase] = useState<"hidden" | "p1" | "p2" | "sig" | "reading" | "fading">("hidden");
   const [revealedCircles, setRevealedCircles] = useState<number[]>([]);
   const [revealedAnswers, setRevealedAnswers] = useState<number[]>([]);
-  const [contracting, setContracting] = useState(false);
-  const [centerAbsorb, setCenterAbsorb] = useState(false);
-  const [centerCollapse, setCenterCollapse] = useState(false);
-  const [shockwave, setShockwave] = useState(false);
+  // ── VIGIL state ──
+  // The four parents do not contract. There is no center collapse.
+  // The ember ignites between them, the name is born, the parents
+  // remain and applaud their child.
+  const [emberLit, setEmberLit] = useState(false);
+  const [emberSettled, setEmberSettled] = useState(false);
   const [bizVisible, setBizVisible] = useState(false);
-  const [circlesReturning, setCirclesReturning] = useState(false);
-  const [originVisible, setOriginVisible] = useState(false);
+  const [applauseRipple, setApplauseRipple] = useState(false);
+  const [applauding, setApplauding] = useState(false);
   const [imInVisible, setImInVisible] = useState(false);
   const mountedRef = useRef(true);
 
   const firstName = studentName.split(" ")[0] || "there";
+
+  // Dust motes — generated once per mount. Below conscious notice
+  // but the eye knows the scene is INHABITED.
+  const dustMotes = useMemo(
+    () =>
+      Array.from({ length: 12 }, () => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        delay: Math.random() * -26,
+        duration: 24 + Math.random() * 14,
+      })),
+    []
+  );
 
   // Ikigai answers for the reveal
   const answers = ikigai
@@ -138,61 +153,54 @@ export default function CompletionCeremony({
         setExitingScene(null);
       }
 
-      // ── REVEAL SCENE — runs in both modes ──
-      await sleep(demoMode ? 0.5 * BASE : BASE);
+      // ── REVEAL SCENE (VIGIL) — runs in both modes ──
+      // Beat 0: silence in the void.
+      await sleep(demoMode ? 0.5 * BASE : 1.2 * BASE);
 
+      // Beat 1: the four parents arrive, gentle and slow.
+      // 1.4s stagger between births. Each takes 3.236s to fully bloom
+      // (CSS handles the transform/opacity curve).
       for (let i = 0; i < 4; i++) {
         if (cancelled) return;
         setRevealedCircles((prev) => [...prev, i]);
-        await sleep(PHI * BASE);
-        // Answer labels only show when showAnswerLabels is true; the state still
-        // updates here so the gating in JSX behaves predictably.
-        if (cancelled) return;
+        // Answer label state still updates so showAnswerLabels keeps working.
         setRevealedAnswers((prev) => [...prev, i]);
-        await sleep(BASE);
+        await sleep(1.4 * BASE);
       }
 
-      await sleep(PHI * PHI * BASE); // Let all four breathe together
-
-      // Gravitational collapse — circles contract inward
-      if (cancelled) return;
-      setContracting(true);
-
-      // Wait for contraction to near completion, then center absorbs
+      // Beat 2: let the four breathe together. φ seconds — Kuleshov
+      // compositional-read ceiling for a 4-element symmetric shot.
       await sleep(1.618 * BASE);
-      if (cancelled) return;
-      setCenterAbsorb(true);
-      await sleep(PHI * BASE);
 
-      // Center collapses and disappears
+      // Beat 3: the ember ignites between the parents. No collapse.
+      // No sacrifice. The light gathers from nothing, in the negative
+      // space the parents hold open. They remain.
       if (cancelled) return;
-      setCenterCollapse(true);
-      setCenterAbsorb(false);
+      setEmberLit(true);
 
-      // Shockwaves
-      await sleep(0.382 * BASE);
-      if (cancelled) return;
-      setShockwave(true);
+      // Wait through ignition. φ² seconds — ember passes its 35%
+      // warmth keyframe at ~2.26s in, curiosity peaks before it decays.
+      await sleep(2.618 * BASE);
 
-      // Business name fades in with glow
-      await sleep(0.382 * BASE);
+      // Beat 4: held breath. φ⁻¹ seconds — Walter Murch's "inhale
+      // before the cut". 618ms is the golden pause inside that window.
+      await sleep(0.618 * BASE);
+
+      // Beat 5: the name is born. Ember settles into a soft halo.
       if (cancelled) return;
       setBizVisible(true);
+      setEmberSettled(true);
 
-      // Wait for name + glow to settle
-      await sleep(PHI * PHI * BASE);
+      // Wait for the name to fully form
+      await sleep(1.8 * BASE);
 
-      // "This came from who you are." — skip in demo mode (cleaner / no text dump)
-      if (!demoMode) {
-        if (cancelled) return;
-        setOriginVisible(true);
-      }
-
-      // Circles return as ghosts
-      await sleep(PHI * BASE);
+      // Beat 6: applause. ONE shockwave ripples outward through the
+      // parents. As it passes them, they brighten in response. Witness.
       if (cancelled) return;
-      setCirclesReturning(true);
+      setApplauseRipple(true);
+      setApplauding(true);
 
+      // Beat 7: hold the final tableau.
       await sleep(PHI * PHI * BASE);
       if (cancelled) return;
 
@@ -291,14 +299,31 @@ export default function CompletionCeremony({
         <span className="ceremony-complete-text">Program Complete.</span>
       </div>
 
-      {/* Scene 3: Ikigai Reveal */}
+      {/* Scene 3: Ikigai Reveal — VIGIL
+          The four parents do not disappear. The name is born between
+          them. They remain, lit, and applaud their child. */}
       <div className={sceneClass("reveal")}>
-        <div className="ceremony-particles" />
+        {/* Background dust field — 12 motes drift slowly */}
+        <div className="ceremony-particles">
+          {dustMotes.map((m, i) => (
+            <div
+              key={i}
+              className="ceremony-dust-mote"
+              style={{
+                left: `${m.left}%`,
+                top: `${m.top}%`,
+                animationDelay: `${m.delay}s`,
+                animationDuration: `${m.duration}s`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="ceremony-vignette" />
         <div className="ceremony-ambient-glow" />
 
         <div className="ceremony-ik-wrap">
-          {/* Answer labels — hidden by default for a cleaner reveal.
-              Pass showAnswerLabels={true} to bring them back. */}
+          {/* Answer labels — hidden by default. showAnswerLabels prop kept
+              for backward compat with any callers that pass it. */}
           {showAnswerLabels &&
             ["a1", "a2", "a3", "a4"].map((cls, i) => (
               <div
@@ -309,32 +334,24 @@ export default function CompletionCeremony({
               </div>
             ))}
 
-          {/* Four circles — collapse inward, then return as ghosts */}
+          {/* Four parents — born one by one, breathe on their own
+              periods, applaud when the child is named. */}
           {["c1", "c2", "c3", "c4"].map((cls, i) => (
             <div
               key={cls}
-              className={`ceremony-ik-circle ${cls} ${revealedCircles.includes(i) ? "reveal" : ""} ${contracting ? "contracting" : ""} ${circlesReturning ? "returning" : ""}`}
-              style={contracting ? { animationDelay: `${i * 0.382}s` } : circlesReturning ? { animationDelay: `${i * 0.236}s` } : undefined}
+              className={`ceremony-ik-circle ${cls} ${revealedCircles.includes(i) ? "reveal" : ""} ${applauding ? "applauding" : ""}`}
             />
           ))}
 
-          {/* Center glow — absorbs then collapses to nothing */}
-          <div className={`ceremony-ik-center ${centerAbsorb ? "absorb" : ""} ${centerCollapse ? "collapse" : ""}`} />
+          {/* Ember — ignites between the parents, then settles into a halo */}
+          <div className={`ceremony-ik-ember ${emberLit ? "lit" : ""} ${emberSettled ? "settled" : ""}`} />
 
-          {/* Shockwaves */}
-          {shockwave && (
-            <>
-              <div className="ceremony-shockwave expanding" />
-              <div className="ceremony-shockwave s2 expanding" style={{ animationDelay: "0.236s" }} />
-            </>
-          )}
+          {/* Applause — single shockwave ripples through the parents */}
+          <div className={`ceremony-ik-applause ${applauseRipple ? "ripple" : ""}`} />
 
-          {/* Business name — fades in with glow burst */}
+          {/* Business name — the christening */}
           <div className={`ceremony-biz-wrap ${bizVisible ? "birthing" : ""}`}>
             <span className="ceremony-biz-name">{businessName}</span>
-            <span className={`ceremony-biz-origin ${originVisible ? "visible" : ""}`}>
-              This came from who you are.
-            </span>
           </div>
         </div>
 
