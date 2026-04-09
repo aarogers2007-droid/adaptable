@@ -538,27 +538,40 @@ button:active:not(:disabled) {
 .ceremony-scene.active { opacity: 1; pointer-events: auto; }
 .ceremony-scene.exiting { opacity: 0; pointer-events: none; }
 
-/* Scene 1: Founder's Letter */
+/* Scene 1: Founder's Letter
+   Sized with clamp() so it scales fluidly between mobile and large
+   desktops. Body text floor 22px (mobile) → ceiling 56px (large
+   desktop), preferred ~3.6vw. Width caps at 1100px. */
 .ceremony-letter-content {
-  width: min(780px, 80.9%);
+  width: min(1100px, 88vw);
   font-family: var(--font-serif), 'EB Garamond', 'Times New Roman', serif;
-  font-size: 32px; line-height: 1.5;
-  color: rgba(255,255,255,0.78); text-align: left;
+  font-size: clamp(22px, 3.6vw, 56px);
+  line-height: 1.4;
+  color: rgba(255,255,255,0.82); text-align: left;
 }
 .ceremony-letter-content p {
-  margin-bottom: 1.618em; opacity: 0; transform: translateY(8px);
+  margin-bottom: 1.382em; opacity: 0; transform: translateY(8px);
   transition: opacity 1.618s ease-out, transform 1.618s ease-out;
 }
 .ceremony-letter-content p.ceremony-letter-fade-in { opacity: 1; transform: translateY(0); }
 .ceremony-letter-content p.ceremony-letter-fade-out { opacity: 0; transform: translateY(0); transition: opacity 2.618s ease-in; }
-.ceremony-letter-signature { margin-top: 2.618em; font-style: italic; color: rgba(255,255,255,0.65); font-size: 26px; }
-.ceremony-letter-name { font-style: normal; font-weight: 600; color: rgba(255,255,255,0.78); display: block; margin-top: 0.382em; font-size: 22px; }
-.ceremony-letter-title { font-style: normal; font-size: 16px; color: rgba(255,255,255,0.45); display: block; margin-top: 0.236em; }
-@media (max-width: 767px) {
-  .ceremony-letter-content { font-size: 22px; line-height: 1.55; width: min(560px, 88%); }
-  .ceremony-letter-signature { font-size: 19px; }
-  .ceremony-letter-name { font-size: 17px; }
-  .ceremony-letter-title { font-size: 13px; }
+.ceremony-letter-signature {
+  margin-top: 2em; font-style: italic;
+  color: rgba(255,255,255,0.7);
+  font-size: clamp(18px, 2.4vw, 36px);
+}
+.ceremony-letter-name {
+  font-style: normal; font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  display: block; margin-top: 0.382em;
+  font-size: clamp(16px, 2vw, 30px);
+}
+.ceremony-letter-title {
+  font-style: normal;
+  color: rgba(255,255,255,0.5);
+  display: block; margin-top: 0.382em;
+  font-size: clamp(12px, 1.3vw, 20px);
+  letter-spacing: 0.05em;
 }
 
 /* Scene 2: Program Complete */
