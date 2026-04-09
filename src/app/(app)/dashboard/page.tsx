@@ -197,12 +197,13 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Current Lesson CTA — first-time users (0 completed) get a hero
-            treatment with a personalized welcome and a strong CTA button.
-            Returning users get the compact version. Per Opus UX review:
-            "make 'Continue' significantly more prominent for users with 0
-            progress; the hierarchy doesn't scream 'do this first'." */}
-        {nextLesson && completed === 0 && (
+        {/* Current Lesson CTA — first-time users (0 completed LESSONS,
+            the wizard doesn't count) get a hero treatment with a
+            personalized welcome and a strong CTA button. Returning users
+            get the compact version. Per Opus UX review: "make 'Continue'
+            significantly more prominent for users with 0 progress;
+            the hierarchy doesn't scream 'do this first'." */}
+        {nextLesson && completedCount === 0 && (
           <Link
             href={`/lessons/${nextLesson.id}`}
             className="stagger-enter mt-4 block rounded-xl border-2 border-[var(--primary)] bg-gradient-to-br from-[var(--primary)]/5 to-[var(--primary)]/10 p-6 sm:p-8 hover:from-[var(--primary)]/10 hover:to-[var(--primary)]/15 transition-colors group"
@@ -225,7 +226,7 @@ export default async function DashboardPage() {
             </span>
           </Link>
         )}
-        {nextLesson && completed > 0 && (
+        {nextLesson && completedCount > 0 && (
           <Link
             href={`/lessons/${nextLesson.id}`}
             className="stagger-enter mt-4 block rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 hover:border-[var(--primary)] transition-colors group"
