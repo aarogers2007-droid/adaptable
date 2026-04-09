@@ -26,7 +26,6 @@ import AppNav from "@/components/ui/AppNav";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { BusinessIdea } from "@/lib/types";
 import IkigaiRevealDemo from "./IkigaiRevealDemo";
-import DemoPricingCalc from "./DemoPricingCalc";
 import DemoAchievements from "./DemoAchievements";
 import DemoCardDesigner from "./DemoCardDesigner";
 
@@ -405,14 +404,7 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
-      {/* ═══ 4b. PRICING CALCULATOR — DIY ═══ */}
-      <Section label="The Pressure-Test" title="Set a Price You Believe In" description="Lesson 5 has students calculate what they're actually paying themselves per hour. Most teens undercharge wildly because they don't account for their time. Try it on a job you'd quote — see what your price means in real terms.">
-        <div className="mx-auto max-w-[640px]">
-          <DemoPricingCalc />
-        </div>
-      </Section>
-
-      {/* ═══ 4c. ACHIEVEMENT GALLERY — DIY ═══ */}
+      {/* ═══ 4b. ACHIEVEMENT GALLERY — DIY ═══ */}
       <Section label="The Milestones" title="Achievement Gallery" description="Real students earn these badges as they progress through the program. Click any to unlock it and see the celebration. Each tier (bronze, silver, gold) signals a different depth of mastery.">
         <div className="mx-auto max-w-[820px]">
           <DemoAchievements />
