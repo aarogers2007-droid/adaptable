@@ -86,29 +86,23 @@ export default function DemoShowcase() {
   const [showDiyWizard, setShowDiyWizard] = useState(false);
   const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
 
-  // Mobile-only tab state. Ignored on md+ because every tab pane is
-  // force-shown via md:!block on desktop — the linear scroll layout is
-  // unchanged from before. Default to "journey" (the product walkthrough).
+  // Tab state — applies on both mobile and desktop. Default to "journey"
+  // (the product walkthrough).
   const [mobileTab, setMobileTab] = useState<MobileTab>("journey");
   const tabsAnchorRef = useRef<HTMLDivElement | null>(null);
 
   const selectMobileTab = (key: MobileTab) => {
     setMobileTab(key);
-    // On mobile only — scroll the tab bar back into view so the visitor
-    // lands at the top of the new pane instead of mid-scroll of the old one.
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      requestAnimationFrame(() => {
-        tabsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
+    // Scroll the tab bar back into view so the visitor lands at the top
+    // of the new pane instead of mid-scroll of the old one.
+    requestAnimationFrame(() => {
+      tabsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   };
 
-  // Utility: className that hides the group on mobile unless its tab is
-  // active, but force-shows it on desktop (md:!block). "contents" would
-  // also work but the !block form is more explicit and survives any
-  // future Tailwind purging quirks.
+  // Utility: className that hides the group unless its tab is active.
   const tabPane = (key: MobileTab) =>
-    `${mobileTab === key ? "" : "hidden "}md:!block`;
+    mobileTab === key ? "" : "hidden";
 
   if (showCeremony && !ceremonyDone) {
     return (
@@ -141,18 +135,17 @@ export default function DemoShowcase() {
         </p>
       </section>
 
-      {/* ═══ MOBILE-ONLY TAB NAV ═══
-              Hidden on md+ (md:hidden). Sticky so a visitor scrolling
-              within a tab can jump sideways without scrolling all the
-              way back up. Horizontally scrollable if the labels overflow
-              a narrow screen. Desktop is untouched. */}
+      {/* ═══ TAB NAV — applies on both mobile and desktop ═══
+              Sticky so a visitor scrolling within a tab can jump sideways
+              without scrolling all the way back up. Centered on desktop,
+              horizontally scrollable on narrow screens if labels overflow. */}
       <div
         ref={tabsAnchorRef}
-        className="md:hidden sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm"
+        className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm"
         role="tablist"
         aria-label="Demo sections"
       >
-        <div className="flex gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mx-auto flex max-w-[1200px] gap-1 overflow-x-auto px-3 py-3 md:justify-center md:gap-2 md:px-6 md:py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {MOBILE_TABS.map((t) => {
             const active = mobileTab === t.key;
             return (
@@ -163,7 +156,7 @@ export default function DemoShowcase() {
                 aria-selected={active}
                 data-tab={t.key}
                 onClick={() => selectMobileTab(t.key)}
-                className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors ${
+                className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors md:px-6 md:py-2.5 md:text-sm ${
                   active
                     ? "bg-[var(--primary)] text-white"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
