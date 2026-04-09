@@ -15,8 +15,22 @@
  * Business: Elsa's Art Studio
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
+
+// ── Mobile tab system (md:hidden). Desktop (>=md) is unaffected — every
+// tab pane force-shows via md:!block so the linear scroll layout is
+// identical to before. Tabs group the demo's 12 sections into 5 coherent
+// narrative beats so mobile visitors aren't staring down a 19,500px scroll. ──
+type MobileTab = "journey" | "rewards" | "teachers" | "moments" | "proof";
+
+const MOBILE_TABS: { key: MobileTab; label: string }[] = [
+  { key: "journey", label: "Journey" },
+  { key: "rewards", label: "Rewards" },
+  { key: "teachers", label: "Teachers" },
+  { key: "moments", label: "Moments" },
+  { key: "proof", label: "Proof" },
+];
 
 // ── ACTUAL PLATFORM COMPONENTS ──
 import IkigaiDiagram from "@/components/ikigai/IkigaiDiagram";
@@ -73,6 +87,30 @@ export default function DemoShowcase() {
   const [showDiyWizard, setShowDiyWizard] = useState(false);
   const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
 
+  // Mobile-only tab state. Ignored on md+ because every tab pane is
+  // force-shown via md:!block on desktop — the linear scroll layout is
+  // unchanged from before. Default to "journey" (the product walkthrough).
+  const [mobileTab, setMobileTab] = useState<MobileTab>("journey");
+  const tabsAnchorRef = useRef<HTMLDivElement | null>(null);
+
+  const selectMobileTab = (key: MobileTab) => {
+    setMobileTab(key);
+    // On mobile only — scroll the tab bar back into view so the visitor
+    // lands at the top of the new pane instead of mid-scroll of the old one.
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      requestAnimationFrame(() => {
+        tabsAnchorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
+
+  // Utility: className that hides the group on mobile unless its tab is
+  // active, but force-shows it on desktop (md:!block). "contents" would
+  // also work but the !block form is more explicit and survives any
+  // future Tailwind purging quirks.
+  const tabPane = (key: MobileTab) =>
+    `${mobileTab === key ? "" : "hidden "}md:!block`;
+
   if (showCeremony && !ceremonyDone) {
     return (
       <CompletionCeremony
@@ -108,6 +146,44 @@ export default function DemoShowcase() {
           This is {ELSA.first}&apos;s journey through the platform. Scroll to see every feature.
         </p>
       </section>
+
+      {/* ═══ MOBILE-ONLY TAB NAV ═══
+              Hidden on md+ (md:hidden). Sticky so a visitor scrolling
+              within a tab can jump sideways without scrolling all the
+              way back up. Horizontally scrollable if the labels overflow
+              a narrow screen. Desktop is untouched. */}
+      <div
+        ref={tabsAnchorRef}
+        className="md:hidden sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm"
+        role="tablist"
+        aria-label="Demo sections"
+      >
+        <div className="flex gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {MOBILE_TABS.map((t) => {
+            const active = mobileTab === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                data-tab={t.key}
+                onClick={() => selectMobileTab(t.key)}
+                className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors ${
+                  active
+                    ? "bg-[var(--primary)] text-white"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+                }`}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ═══ TAB PANE: JOURNEY — Ikigai → Dashboard → Lessons ═══ */}
+      <div className={tabPane("journey")}>
 
       {/* ═══ 1. IKIGAI DIAGRAM — REAL COMPONENT ═══ */}
       <Section label="The Starting Point" title="Ikigai Discovery" description={`Every student begins by answering four questions about themselves. The Ikigai diagram guides them through the process. Here is the actual interactive diagram — click any circle.`}>
@@ -391,6 +467,12 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
+      </div>
+      {/* ═══ END TAB PANE: JOURNEY ═══ */}
+
+      {/* ═══ TAB PANE: REWARDS — Card, Achievements, Business Plan ═══ */}
+      <div className={tabPane("rewards")}>
+
       {/* ═══ 4. BUSINESS CARD — DIY DESIGNER ═══ */}
       <Section label="The Reward" title="Business Card Designer" description="Students design a 3D business card that tilts as they move across it and unlocks new fonts and finishes as they progress. Pick the color, accent, finish, and border below — the card responds in real time.">
         <div className="mx-auto max-w-[820px]">
@@ -446,6 +528,12 @@ export default function DemoShowcase() {
           </div>
         </div>
       </Section>
+
+      </div>
+      {/* ═══ END TAB PANE: REWARDS ═══ */}
+
+      {/* ═══ TAB PANE: TEACHERS — Instructor dashboard + Parent view ═══ */}
+      <div className={tabPane("teachers")}>
 
       {/* ═══ 6. INSTRUCTOR DASHBOARD — Full fidelity mockup ═══ */}
       <Section label="For Teachers" title="Instructor Dashboard" description="Real-time visibility into every student's progress, business idea, and emotional state. Smart alerts detect when students are stuck. One-click nudges keep them moving.">
@@ -574,6 +662,12 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
+      </div>
+      {/* ═══ END TAB PANE: TEACHERS ═══ */}
+
+      {/* ═══ TAB PANE: MOMENTS — The Two Reveals ═══ */}
+      <div className={tabPane("moments")}>
+
       {/* ═══ 8. THE TWO REVEALS ═══
               Two distinct moments in a real student's journey:
                 1. Ikigai Reveal — at the end of the wizard, before the lessons
@@ -646,6 +740,12 @@ export default function DemoShowcase() {
           }}
         />
       )}
+
+      </div>
+      {/* ═══ END TAB PANE: MOMENTS ═══ */}
+
+      {/* ═══ TAB PANE: PROOF — Numbers, Partnership, Story ═══ */}
+      <div className={tabPane("proof")}>
 
       {/* ═══ THE NUMBERS — measured outcomes ═══ */}
       <Section label="The Numbers" title="Measured Like an ML Team, Not an Ed-Tech Course" description="We don't ship AI mentoring on vibes. Every prompt change is graded against a stress test of simulated student personas, judged by an independent model. Here's what the latest full run shows.">
@@ -795,6 +895,9 @@ export default function DemoShowcase() {
           </article>
         </div>
       </Section>
+
+      </div>
+      {/* ═══ END TAB PANE: PROOF ═══ */}
 
       {/* ═══ CLOSING ═══ */}
       <section className="flex flex-col items-center justify-center min-h-[50vh] px-6 py-20 text-center border-t border-[var(--border)]">
