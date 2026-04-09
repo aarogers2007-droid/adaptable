@@ -155,9 +155,11 @@ export default function BusinessCardClient({
         My Business Card
       </h2>
 
-      {/* Card preview — hero, centered, no wrapper box */}
+      {/* Card preview — hero, centered. Real US business card is 3.5"×2"
+          which is 1.75:1 (7/4) — locked here so the wrapper matches the
+          card itself. */}
       <div className="mx-auto max-w-[560px]">
-        <div ref={cardRef} style={{ aspectRatio: "16 / 10" }}>
+        <div ref={cardRef} style={{ aspectRatio: "7 / 4" }}>
           <Card3D {...cardProps} showRotateHint={true} />
         </div>
       </div>
@@ -442,7 +444,9 @@ export default function BusinessCardClient({
           </button>
 
           {/* Card */}
-          <div className="w-full h-full max-w-[800px] max-h-[500px] m-8">
+          {/* Fullscreen card — locked to 1.75:1 (real business card ratio).
+              max width 800 → max height 800/1.75 ≈ 457. */}
+          <div className="w-full max-w-[800px] m-8" style={{ aspectRatio: "7 / 4", maxHeight: "457px" }}>
             <Card3D {...cardProps} showRotateHint={false} large />
           </div>
 

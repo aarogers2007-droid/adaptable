@@ -69,8 +69,10 @@ export default function DemoCardDesigner({
       </p>
 
       <div className="mt-5 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">
-        {/* Card preview */}
-        <div className="relative" style={{ height: "320px" }}>
+        {/* Card preview — wrapper locked to 1.75:1 (real US business card
+            dimensions, 3.5" × 2"). The Card3D inside also locks to 1.75:1
+            so it fills the wrapper exactly. */}
+        <div className="relative w-full" style={{ aspectRatio: "7 / 4", maxWidth: "500px" }}>
           <Card3D
             businessName={businessName}
             niche={niche}

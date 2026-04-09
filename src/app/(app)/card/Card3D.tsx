@@ -184,12 +184,18 @@ export default function Card3D(props: Card3DProps) {
       className="relative w-full h-full flex items-center justify-center"
       style={{ perspective: "1000px" }}
     >
-      {/* Shadow layer (separate div so filter doesn't break preserve-3d) */}
+      {/* Shadow layer (separate div so filter doesn't break preserve-3d).
+          Real US business cards are 3.5" × 2" = 1.75:1 aspect ratio. We
+          lock the card to that exact ratio so it always looks like a real
+          business card regardless of container shape. Width is sized to
+          fit ~90% of the parent (capped at 500/800px) and height follows
+          aspect-ratio automatically. */}
       <div
         style={{
           position: "absolute",
           width: large ? "min(90%, 800px)" : "min(90%, 500px)",
-          height: large ? "min(80%, 500px)" : "min(70%, 315px)",
+          aspectRatio: "1.75 / 1",
+          maxHeight: large ? "min(90%, 457px)" : "min(90%, 286px)",
           borderRadius,
           background: style.shadow,
           transform: `rotateX(${rotateX}deg) rotateY(${isFlipped ? rotateY + 180 : rotateY}deg) translateZ(-2px)`,
@@ -205,7 +211,8 @@ export default function Card3D(props: Card3DProps) {
       <div
         style={{
           width: large ? "min(90%, 800px)" : "min(90%, 500px)",
-          height: large ? "min(80%, 500px)" : "min(70%, 315px)",
+          aspectRatio: "1.75 / 1",
+          maxHeight: large ? "min(90%, 457px)" : "min(90%, 286px)",
           position: "relative",
           transformStyle: "preserve-3d",
           transform: `rotateX(${rotateX}deg) rotateY(${isFlipped ? rotateY + 180 : rotateY}deg)`,
