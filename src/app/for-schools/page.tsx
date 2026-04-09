@@ -669,7 +669,7 @@ export default function ForSchoolsPage() {
       <footer className="border-t border-[var(--border)] bg-[var(--bg)]">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-4 px-6 py-6 sm:flex-row sm:justify-between">
           <span className="font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--text-muted)]">
-            Adaptable &mdash; A VentureLab Product
+            Adaptable
           </span>
           <div className="flex items-center gap-6">
             <Link

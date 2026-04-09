@@ -98,8 +98,7 @@ export default function DemoShowcase() {
 
       {/* ═══ HERO ═══ */}
       <section className="flex flex-col items-center justify-center px-6 py-32 text-center border-b border-[var(--border)]">
-        <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">A VentureLab Product</p>
-        <h1 className="mt-3 font-[family-name:var(--font-display)] text-[48px] font-bold leading-[1.1] text-[var(--text-primary)]">
+        <h1 className="font-[family-name:var(--font-display)] text-[48px] font-bold leading-[1.1] text-[var(--text-primary)]">
           Adaptable
         </h1>
         <p className="mt-5 max-w-[500px] text-lg leading-relaxed text-[var(--text-secondary)]">

@@ -691,8 +691,7 @@ export default async function ParentViewPage({
             Powered by{" "}
             <span className="font-[family-name:var(--font-display)] font-semibold text-[var(--primary)]">
               Adaptable
-            </span>{" "}
-            &middot; A VentureLab program
+            </span>
           </p>
           <p className="mt-2 text-xs text-[var(--text-muted)]">
             This view is read-only. Your student&apos;s AI conversations are private.

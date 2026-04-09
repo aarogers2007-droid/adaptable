@@ -49,7 +49,6 @@ const STEPS: Step[] = [
     name: "demo",
     url: `${PROD}/demo`,
     expect: [
-      "A VentureLab Product",
       "Ikigai Discovery",
       "Student Dashboard",
       "AI Lesson Conversations",
