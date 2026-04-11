@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono, EB_Garamond, Playfair_Display } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import SplashScreen from "@/components/ui/SplashScreen";
 
@@ -53,6 +54,7 @@ export default function RootLayout({
         <SplashScreen>
           {children}
         </SplashScreen>
+        <Analytics />
       </body>
     </html>
   );
