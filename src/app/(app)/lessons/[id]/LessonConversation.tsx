@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import MirrorModal from "@/components/mirror/MirrorModal";
 
 /**
  * Typewriter hook: reveals text character by character at a fixed speed.
@@ -146,6 +147,9 @@ export default function LessonConversation({
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const composingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showPacingNudge, setShowPacingNudge] = useState(false);
+  const [mirrorPrompt, setMirrorPrompt] = useState<string | null>(null);
+  const [mirrorEmotion, setMirrorEmotion] = useState<string>("engaged");
+  const [showMirror, setShowMirror] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
@@ -460,6 +464,13 @@ export default function LessonConversation({
               if (parsed.meta.lesson_complete) {
                 setCompleted(true);
                 router.refresh();
+                // Show Founder's Mirror if prompt was generated
+                if (parsed.meta.mirror_prompt) {
+                  setMirrorPrompt(parsed.meta.mirror_prompt);
+                  setMirrorEmotion(parsed.meta.mirror_emotion ?? "engaged");
+                  // Delay mirror to let completion celebration land first
+                  setTimeout(() => setShowMirror(true), 2000);
+                }
               }
             }
           } catch {
@@ -740,6 +751,16 @@ export default function LessonConversation({
         </>
       )}
 
+      {/* Founder's Mirror */}
+      {showMirror && mirrorPrompt && (
+        <MirrorModal
+          mirrorPrompt={mirrorPrompt}
+          triggerType="lesson_completion"
+          lessonId={Number(lessonId)}
+          emotionalSnapshot={mirrorEmotion}
+          onClose={() => setShowMirror(false)}
+        />
+      )}
 
       {/* Input */}
       {!completed && !showSandbox && (

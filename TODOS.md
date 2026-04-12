@@ -152,6 +152,16 @@ per-school pricing.
 
 ## P2 — Medium priority (v2)
 
+### Founder's Mirror: Template-based prompts as cost/latency optimization
+After pilot data shows which Mirror prompts students actually respond to, evaluate
+replacing AI generation with a curated template library for the most common patterns
+(e.g., "You completed [lesson] in [N] days. What was different this time?"). Templates
+would be deterministic, zero-latency, zero-cost for ~80% of triggers, with Haiku
+reserved for edge cases. Decision should be data-driven: analyze prompt-to-response
+correlation from the first 100+ founder_log_entries.
+Depends on: Phase 1 Founder's Mirror shipping + pilot data.
+Effort: S (human: ~1 day / CC: ~30 min)
+
 ### Shareable Student Portfolio Page
 Public-facing page showing what each student built. Business concept, key decisions, pitch.
 Proof of impact for VentureLab fundraising. Tangible artifact for students to show colleges.

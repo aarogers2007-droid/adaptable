@@ -22,12 +22,13 @@ import Link from "next/link";
 // tab pane force-shows via md:!block so the linear scroll layout is
 // identical to before. Tabs group the demo's 12 sections into 5 coherent
 // narrative beats so mobile visitors aren't staring down a 19,500px scroll. ──
-type MobileTab = "journey" | "rewards" | "teachers" | "moments" | "proof";
+type MobileTab = "journey" | "rewards" | "teachers" | "mirror" | "moments" | "proof";
 
 const MOBILE_TABS: { key: MobileTab; label: string }[] = [
   { key: "journey", label: "Journey" },
   { key: "rewards", label: "Rewards" },
   { key: "teachers", label: "Teachers" },
+  { key: "mirror", label: "Mirror" },
   { key: "moments", label: "Moments" },
   { key: "proof", label: "Proof" },
 ];
@@ -652,6 +653,129 @@ export default function DemoShowcase() {
       </div>
       {/* ═══ END TAB PANE: TEACHERS ═══ */}
 
+      {/* ═══ TAB PANE: MIRROR — Founder's Mirror + Founder's Log ═══ */}
+      <div className={tabPane("mirror")}>
+
+      <Section label="The Inner Game" title="Founder's Mirror" description="No entrepreneur understood discipline, consistency, and failure-as-growth on day one. Neither will your students. The Mirror doesn't teach resilience — it creates the conditions where resilience develops on its own.">
+        <div className="mx-auto max-w-[640px] space-y-10">
+
+          {/* The Mirror Modal */}
+          <div>
+            <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider mb-4">The Moment</p>
+            <div className="rounded-xl overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.08)" }}>
+              {/* Teal header band */}
+              <div className="bg-[#F0FDFA] border-b border-[#CCFBF1] px-7 pt-6 pb-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)] mb-4 flex items-center gap-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                  Founder&apos;s Mirror
+                </p>
+                <p className="font-[family-name:var(--font-display)] text-[20px] font-normal leading-[1.6] text-[var(--text-primary)] tracking-[-0.01em]">
+                  You started this lesson three times before finishing it. What was different today?
+                </p>
+              </div>
+              <div className="bg-white px-7 pt-6 pb-7">
+                <div className="flex items-center gap-1.5 mb-5 text-[13px] text-[var(--text-muted)]">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" className="opacity-60"><path d="M4 7V5a4 4 0 118 0v2h1a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V8a1 1 0 011-1h1zm2 0h4V5a2 2 0 10-4 0v2z" /></svg>
+                  <span>Private to you. No one else sees this.</span>
+                </div>
+                <div className="w-full min-h-[100px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[16px] leading-[1.65] text-[var(--text-muted)] italic">
+                  I think I was rushing the first two times. Today I actually read each question before answering...
+                </div>
+                <div className="flex items-center justify-between mt-5">
+                  <span className="text-[14px] text-[var(--text-muted)]">Not right now</span>
+                  <span className="min-h-[44px] px-7 rounded-lg bg-[var(--primary)] text-white text-[14px] font-medium inline-flex items-center">Save this</span>
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
+              After every lesson completion, the AI generates one observation and one question. Maximum 40 words. No advice. No praise. No &ldquo;failure is growth&rdquo; platitudes. It states what it sees and asks what the student sees. Then it shuts up. The student decides whether to write honestly or skip. Both are okay.
+            </p>
+          </div>
+
+          {/* Three trigger types */}
+          <div>
+            <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider mb-4">Three Triggers</p>
+            <div className="grid gap-3">
+              {[
+                { trigger: "Lesson Completion", example: "You moved through this one fast. What clicked?", color: "var(--primary)" },
+                { trigger: "Return from Absence", example: "You've been away 6 days. Last time you were working on brand identity. What brought you back?", color: "#6366F1" },
+                { trigger: "Weekly Review", example: "You were active 5 days this week and completed 2 lessons. What pattern are you noticing about yourself?", color: "var(--accent)" },
+              ].map((t) => (
+                <div key={t.trigger} className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4 flex gap-3 items-start">
+                  <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style={{ background: t.color }} />
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">{t.trigger}</p>
+                    <p className="mt-1 text-sm italic text-[var(--text-secondary)]">&ldquo;{t.example}&rdquo;</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Founder's Log */}
+          <div>
+            <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider mb-4">The Founder&apos;s Log</p>
+            <div className="rounded-xl border border-[var(--border)] bg-white overflow-hidden">
+              <div className="px-6 pt-6 pb-4">
+                <h3 className="font-[family-name:var(--font-display)] text-[22px] font-semibold text-[var(--text-primary)]">Your Founder&apos;s Log</h3>
+                <p className="text-[13px] text-[var(--text-muted)] mt-1">5 reflections across 3 weeks</p>
+                {/* Mood bar */}
+                <div className="flex gap-[3px] h-[6px] rounded-[3px] overflow-hidden mt-4">
+                  <div className="flex-1 rounded-[3px]" style={{ background: "#0D9488" }} />
+                  <div className="flex-1 rounded-[3px]" style={{ background: "#0D9488" }} />
+                  <div className="flex-1 rounded-[3px]" style={{ background: "#F59E0B" }} />
+                  <div className="flex-1 rounded-[3px]" style={{ background: "#6366F1" }} />
+                  <div className="flex-1 rounded-[3px]" style={{ background: "#0D9488" }} />
+                </div>
+              </div>
+
+              {/* Timeline entries */}
+              <div className="relative pl-10 pr-6 pb-6">
+                <div className="absolute left-[25px] top-0 bottom-0 w-[2px] bg-[var(--bg-muted)]" />
+
+                {[
+                  { date: "April 12", context: "After \u201CWhat to Do After Your First Sale\u201D", dot: "#0D9488", wash: "bg-[#F0FDFA] border-l-[#0D9488]", prompt: "You moved through this one fast. What clicked?", response: "I think it clicked because I already experienced my first real customer interaction last week. The lesson felt like it was describing what I'd just lived through." },
+                  { date: "April 9", context: "After \u201CSet Your Price\u201D", dot: "#F59E0B", wash: "bg-[#FFFBEB] border-l-[#F59E0B]", prompt: "Your pricing numbers changed 4 times. What were you wrestling with?", response: "I kept going back and forth between charging what I think it's worth and what my friends would actually pay. I still don't know the answer tbh." },
+                  { date: "April 5", context: "Welcome back", dot: "#6366F1", wash: "bg-[#EEF2FF] border-l-[#6366F1]", prompt: "You've been away 9 days. What brought you back?", response: "Honestly, I almost didn't come back. But I kept thinking about the logo I designed and I wanted to see if I could actually make it real." },
+                ].map((entry, i) => (
+                  <div key={i} className="relative pb-8 last:pb-0">
+                    <div className="absolute -left-[22px] top-[3px] w-3 h-3 rounded-full border-2 border-white" style={{ background: entry.dot, boxShadow: "0 0 0 1px rgba(0,0,0,0.06)" }} />
+                    <p className="text-[12px] font-medium text-[var(--text-muted)] mb-2">{entry.date} &middot; {entry.context}</p>
+                    <p className="text-[14px] italic text-[var(--text-muted)] mb-2">{entry.prompt}</p>
+                    <div className={`text-[15px] text-[var(--text-primary)] leading-[1.7] p-4 rounded-lg border-l-[3px] ${entry.wash}`}>
+                      {entry.response}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
+              Over 22 lessons, these reflections accumulate into a private journal of who the student is becoming as a founder. The emotional color washes tell the story without words: teal for engaged, amber for frustrated, indigo for return-from-absence. No teacher sees this. No AI analyzes the content. It&apos;s the student&apos;s own record of their own journey.
+            </p>
+          </div>
+
+          {/* Privacy + Design Philosophy */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">Privacy by Design</p>
+              <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed">
+                RLS locks every row to the student who wrote it. No teacher access. No admin bypass. No AI reads the content. Safety monitoring uses the existing emotional detection system, not the journal. Trust is earned at the pixel level.
+              </p>
+            </div>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">AI Restraint</p>
+              <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed">
+                The Mirror prompt is validated before display: max 40 words, no advice words (&ldquo;should&rdquo;, &ldquo;try&rdquo;), no praise (&ldquo;great&rdquo;, &ldquo;amazing&rdquo;), no reframing (&ldquo;failure is growth&rdquo;). If the AI breaks a rule, it falls back to a generic prompt. The quality is inversely proportional to how much the AI talks.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </Section>
+
+      </div>
+      {/* ═══ END TAB PANE: MIRROR ═══ */}
+
       {/* ═══ TAB PANE: MOMENTS — The Two Reveals ═══ */}
       <div className={tabPane("moments")}>
 
@@ -850,19 +974,19 @@ export default function DemoShowcase() {
             }}
           >
             <p>
-              Most teen entrepreneurship products assume the student already has an idea. Adaptable starts at zero. The Ikigai wizard takes a 14-year-old who has never thought about business and gives them one specific, executable idea in ten minutes — grounded in what they already love and what they&apos;re already good at.
+              Most teen entrepreneurship programs assume the student already has an idea. Adaptable starts at zero. The Ikigai wizard takes a 14-year-old who has never thought about business and gives them one specific, executable idea in ten minutes, grounded in what they already love and what they&apos;re already good at.
             </p>
             <p>
-              From there, 22 conversation-style lessons across six modules walk the student from discovery through their first sale. Find Your Niche, Know Your Customer, Build Your Brand, Get Your First Customer, Run the Numbers, Launch and Learn. Every lesson is delivered by a one-to-one AI mentor that asks questions instead of giving lectures, references the student&apos;s specific business by name, and gates progression on checkpoint mastery so students can&apos;t skip ahead.
+              From there, 22 conversation-style lessons across six modules walk the student from discovery through their first sale: Find Your Niche, Know Your Customer, Build Your Brand, Get Your First Customer, Run the Numbers, Launch and Learn. Every lesson is delivered by a one-to-one AI mentor that asks questions instead of giving lectures, references the student&apos;s specific business by name, and gates progression on checkpoint mastery so no one skips ahead.
             </p>
             <p>
-              The mentor pulls from a fact-checked knowledge base of 20 entries covering real frameworks: Lean Canvas, Jobs-to-be-Done, Mom Test, Golden Circle, value-based pricing. Every claim is traceable to a source a 16-year-old could verify in 60 seconds. Two layers of moderation run on every input and output. Crisis signals fire real-time email alerts to the instructor. Parental consent is COPPA-compliant. All 22 lessons are mapped to NBEA, Common Core, ISTE, and Jump$tart standards.
+              But the hardest part of entrepreneurship isn&apos;t the business plan. It&apos;s the inner game: discipline, consistency, and the realization that bad days aren&apos;t failure, they&apos;re the mechanism. The Founder&apos;s Mirror surfaces this by showing students their own behavior back to them after every lesson, every return from absence, every week. One observation, one question, maximum 40 words. No advice. No praise. The AI shuts up and the student decides whether to write honestly about what they&apos;re feeling. Over 22 lessons, those reflections accumulate into a private Founder&apos;s Log that no teacher sees and no algorithm analyzes.
             </p>
             <p>
-              The latest measured outcomes from a 60-path simulated eval, judged by an independent Claude Opus model: <strong>100% of students gained self-confidence (+1.15 / 5)</strong>, <strong>100% gained understanding of what entrepreneurship actually means (+1.53 / 5)</strong>, and <strong>97% flipped from &ldquo;business is something other people do&rdquo; to &ldquo;this could be me.&rdquo;</strong>
+              The mentor pulls from a fact-checked knowledge base where every claim is traceable to a source a 16-year-old could verify in 60 seconds. Two layers of moderation run on every input and output. Crisis signals fire real-time email alerts to the instructor. All 22 lessons are mapped to NBEA, Common Core, ISTE, and Jump$tart standards. 18 achievements across five categories reward consistency, depth, and comebacks, not just completion.
             </p>
             <p>
-              The mission, in the founder&apos;s own words: <em>transformation, not education. Confidence in their knowledge should be facts-based.</em> Adaptable is the missing first step in teen entrepreneurship education — the place where a kid who has never thought about starting something walks out the other side understanding it as accessible instead of foreign. Inside VentureLab, it becomes a multiplier: same teachers, same schools, same global reach, with a tool that gets every student to &ldquo;I have an idea I actually want to build&rdquo; before lesson one.
+              The mission, in the founder&apos;s own words: <em>transformation, not education.</em> Adaptable is the place where a kid who has never thought about starting something walks out the other side understanding entrepreneurship as accessible instead of foreign, with a private record of their own growth in their own words to prove it.
             </p>
 
             <div className="pt-4 mt-2 border-t border-[var(--border)]">

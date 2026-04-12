@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { detectAbsenceGap } from "@/lib/activity";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -633,21 +634,13 @@ export async function checkAndAwardAchievements(
 
   // Comeback: 5+ day gap in activity, then completed a lesson
   if (usageLogs.length >= 2 && completedProgress.length > 0) {
-    for (let i = 1; i < usageLogs.length; i++) {
-      const prev = new Date(usageLogs[i - 1].created_at);
-      const curr = new Date(usageLogs[i].created_at);
-      const gapDays = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
-      if (gapDays >= 5) {
-        // Check if any lesson was completed after the gap
-        const gapEnd = curr;
-        if (
-          completedProgress.some(
-            (p) => p.completed_at && new Date(p.completed_at) >= gapEnd
-          )
-        ) {
-          award("comeback", "gold");
-          break;
-        }
+    const gap = detectAbsenceGap(usageLogs);
+    if (gap) {
+      const hasPostGapCompletion = completedProgress.some(
+        (p) => p.completed_at && new Date(p.completed_at) >= gap.gapEnd
+      );
+      if (hasPostGapCompletion) {
+        award("comeback", "gold");
       }
     }
   }

@@ -639,7 +639,7 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
             ).catch(() => {});
           }
 
-          // Save conversation + checkpoint progress
+          // Save conversation + checkpoint progress + last_emotion
           const updatedConversation = [
             ...conversationHistory,
             { role: "user", content: message },
@@ -647,20 +647,27 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
           ];
 
           // Update artifacts via user client (RLS-scoped)
+          // Also persist last_emotion for the Founder's Mirror
+          const progressUpdate: Record<string, unknown> = {
+            artifacts: {
+              ...artifacts,
+              conversation: updatedConversation,
+              checkpoints_reached: newCheckpoints,
+              learning_profile: updatedProfile,
+            },
+          };
+          if (emotionMatch?.[1]) {
+            progressUpdate.last_emotion = emotionMatch[1];
+          }
+
           await supabase
             .from("student_progress")
-            .update({
-              artifacts: {
-                ...artifacts,
-                conversation: updatedConversation,
-                checkpoints_reached: newCheckpoints,
-                learning_profile: updatedProfile,
-              },
-            })
+            .update(progressUpdate)
             .eq("id", progressId)
             .eq("student_id", user.id);
 
           // Mark lesson complete via admin client (bypasses trigger that blocks student status changes)
+          let mirrorPrompt: string | undefined;
           if (lessonComplete) {
             const { createAdminClient } = await import("@/lib/supabase/admin");
             const adminDb = createAdminClient();
@@ -669,9 +676,22 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
               .update({ status: "completed", completed_at: new Date().toISOString() })
               .eq("id", progressId)
               .eq("student_id", user.id);
+
+            // Generate Founder's Mirror prompt (non-blocking on failure)
+            try {
+              const { generateMirrorPrompt } = await import("@/lib/mirror");
+              mirrorPrompt = await generateMirrorPrompt({
+                triggerType: "lesson_completion",
+                lessonTitle: plan.title,
+                lastEmotion: emotionMatch?.[1] ?? undefined,
+                businessName: (profile as Profile)?.business_idea?.name ?? undefined,
+              });
+            } catch {
+              // Mirror generation failure should never block lesson completion
+            }
           }
 
-          // Send completion and checkpoint info to client
+          // Send completion, checkpoint, and mirror info to client
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({
@@ -679,6 +699,10 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
                   checkpoints_reached: newCheckpoints,
                   total_checkpoints: plan.checkpoints.length,
                   lesson_complete: lessonComplete,
+                  ...(mirrorPrompt ? {
+                    mirror_prompt: mirrorPrompt,
+                    mirror_emotion: emotionMatch?.[1] ?? "engaged",
+                  } : {}),
                 },
               })}\n\n`
             )

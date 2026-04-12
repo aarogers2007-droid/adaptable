@@ -9,6 +9,9 @@ import AppNav from "@/components/ui/AppNav";
 import DailyCheckIn from "@/components/dashboard/DailyCheckIn";
 import DashboardAchievements from "./DashboardAchievements";
 import FeedbackBox from "@/components/dashboard/FeedbackBox";
+import DashboardMirror from "@/components/dashboard/DashboardMirror";
+import { detectAbsenceGap } from "@/lib/activity";
+import { generateAbsenceMirror, generateWeeklyMirror, hasMirrorFiredToday } from "./mirror-actions";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -117,9 +120,76 @@ export default async function DashboardPage() {
     };
   });
 
+  // --- Founder's Mirror trigger detection ---
+  // Priority: absence > weekly. Only one fires per dashboard load.
+  let mirrorPrompt: string | null = null;
+  let mirrorTrigger: "return_from_absence" | "weekly_review" | null = null;
+  let mirrorDaysAbsent: number | undefined;
+
+  // Fetch recent usage logs for absence detection
+  const { data: usageLogs } = await supabase
+    .from("ai_usage_log")
+    .select("created_at")
+    .eq("student_id", user.id)
+    .order("created_at", { ascending: true })
+    .limit(200);
+
+  if (usageLogs && usageLogs.length >= 2) {
+    // 1. Check for return-from-absence (5+ days)
+    const gap = detectAbsenceGap(usageLogs);
+    if (gap) {
+      // Only fire if the gap ends today (student just returned)
+      const gapEndDate = gap.gapEnd.toISOString().slice(0, 10);
+      const todayDate = new Date().toISOString().slice(0, 10);
+      if (gapEndDate === todayDate) {
+        const alreadyFired = await hasMirrorFiredToday("return_from_absence");
+        if (!alreadyFired) {
+          mirrorDaysAbsent = Math.round(gap.gapDays);
+          mirrorPrompt = await generateAbsenceMirror(mirrorDaysAbsent, name);
+          mirrorTrigger = "return_from_absence";
+        }
+      }
+    }
+  }
+
+  // 2. Check for weekly review (if no absence trigger fired)
+  if (!mirrorPrompt && profile.created_at) {
+    const daysSinceJoin = Math.floor(
+      (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (daysSinceJoin > 0 && daysSinceJoin % 7 === 0) {
+      const alreadyFired = await hasMirrorFiredToday("weekly_review");
+      if (!alreadyFired) {
+        // Count active days this week from usage logs
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const thisWeekLogs = (usageLogs ?? []).filter(
+          (l) => new Date(l.created_at) >= weekAgo
+        );
+        const activeDays = new Set(
+          thisWeekLogs.map((l) => new Date(l.created_at).toISOString().slice(0, 10))
+        ).size;
+        const lessonsThisWeek = progress.filter(
+          (p) => p.status === "completed" && p.completed_at && new Date(p.completed_at) >= weekAgo
+        ).length;
+
+        mirrorPrompt = await generateWeeklyMirror(activeDays, lessonsThisWeek, name);
+        mirrorTrigger = "weekly_review";
+      }
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
       <AppNav isAdmin={profile.role === "org_admin"} studentName={profile.full_name || profile.email || undefined} />
+
+      {/* Founder's Mirror — fires on return-from-absence or weekly review */}
+      {mirrorPrompt && mirrorTrigger && (
+        <DashboardMirror
+          mirrorPrompt={mirrorPrompt}
+          triggerType={mirrorTrigger}
+          daysAbsent={mirrorDaysAbsent}
+        />
+      )}
 
       <div className="mx-auto max-w-[1200px] px-6 py-8">
         {/* Business Hero — tightened. Heading scales down on mobile so the
@@ -339,6 +409,34 @@ export default async function DashboardPage() {
             earned={earnedDisplay}
           />
         </div>
+
+        {/* Founder's Log link — appears after first lesson completed */}
+        {completedCount > 0 && (
+          <div className="stagger-enter mt-4" style={{ animationDelay: "300ms" }}>
+            <Link
+              href="/dashboard/founders-log"
+              className="flex items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-[18px_20px] hover:border-[var(--primary)] hover:shadow-[0_2px_12px_rgba(13,148,136,0.08)] transition-all group"
+              aria-label="Open your Founder's Log"
+            >
+              <div className="w-11 h-11 rounded-[10px] bg-[#F0FDFA] flex items-center justify-center shrink-0">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-[family-name:var(--font-display)] text-[15px] font-semibold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors">
+                  Founder&apos;s Log
+                </p>
+                <p className="text-[13px] text-[var(--text-muted)] leading-snug">
+                  Your reflections, in your own words
+                </p>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="text-[#D1D5DB] shrink-0 group-hover:text-[var(--primary)] group-hover:translate-x-0.5 transition-all" aria-hidden="true">
+                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+              </svg>
+            </Link>
+          </div>
+        )}
 
         {/* Tester feedback box — friends/family user testing window. Moved
             from above-the-fold to below the achievements per Opus UX review:
