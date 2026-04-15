@@ -903,13 +903,15 @@ export default function DemoShowcase() {
           <div className="mt-4 rounded-lg border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5">
             <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider">The Adaptable Factual Floor</p>
             <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
-              The AI mentor pulls from a curated knowledge base of <strong>20 entries</strong> covering real frameworks and
+              The AI mentor pulls from a curated knowledge base of <strong>38 entries</strong> covering real frameworks and
               principles — Lean Canvas, Jobs-to-be-Done, Mom Test, Golden Circle, Build-Measure-Learn, value-based pricing,
               and more. Every entry is fact-checked by an independent Claude Opus judge against a single standard:
               <em> any claim a student could see must be traceable to a source a 16-year-old could verify in 60 seconds</em>.
-              The latest audit: <strong>0 likely-hallucinated citations across 15 specific claims</strong>. Zero invented
-              statistics, zero fabricated case studies, zero misattributed quotes. <strong>22 of 22 lessons</strong> get
-              this verified context the moment a student starts a conversation. Confidence built on facts, not hype.
+              Zero invented statistics, zero fabricated case studies, zero misattributed quotes.
+              Retrieval is hybrid: tag-based candidate fetch plus per-message semantic re-ranking
+              so each student gets the most relevant context for their specific question and business.
+              <strong>22 of 22 lessons</strong> have verified context with at least 3 topically matched entries each.
+              Confidence built on facts, not hype.
             </p>
           </div>
         </div>
@@ -983,7 +985,7 @@ export default function DemoShowcase() {
               But the hardest part of entrepreneurship isn&apos;t the business plan. It&apos;s the inner game: discipline, consistency, and the realization that bad days aren&apos;t failure, they&apos;re the mechanism. The Founder&apos;s Mirror surfaces this by showing students their own behavior back to them after every lesson, every return from absence, every week. One observation, one question, maximum 40 words. No advice. No praise. The AI shuts up and the student decides whether to write honestly about what they&apos;re feeling. Over 22 lessons, those reflections accumulate into a private Founder&apos;s Log that no teacher sees and no algorithm analyzes.
             </p>
             <p>
-              The mentor pulls from a fact-checked knowledge base where every claim is traceable to a source a 16-year-old could verify in 60 seconds. Two layers of moderation run on every input and output. Crisis signals fire real-time email alerts to the instructor. All 22 lessons are mapped to NBEA, Common Core, ISTE, and Jump$tart standards. 18 achievements across five categories reward consistency, depth, and comebacks, not just completion.
+              The mentor pulls from a fact-checked knowledge base of 38 entries where every claim is traceable to a source a 16-year-old could verify in 60 seconds. Two layers of moderation run on every input and output. Crisis signals fire real-time email alerts to the instructor. All 22 lessons are mapped to NBEA, Common Core, ISTE, and Jump$tart standards. 20 achievements across five categories reward consistency, depth, and comebacks, not just completion.
             </p>
             <p>
               The mission, in the founder&apos;s own words: <em>transformation, not education.</em> Adaptable is the place where a kid who has never thought about starting something walks out the other side understanding entrepreneurship as accessible instead of foreign, with a private record of their own growth in their own words to prove it.
