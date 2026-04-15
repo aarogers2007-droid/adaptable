@@ -961,11 +961,11 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
-      {/* ═══ THE STORY — short-form essay (15 sentences) right before the closing argument ═══ */}
+      {/* ═══ THE STORY — overview paragraph + expandable deep dive ═══ */}
       <Section
         label="The Story"
-        title="Adaptable, in 15 Sentences"
-        description="If you only have two minutes, here's the whole product."
+        title="What Adaptable Is"
+        description="The short version — and the long version, if you want it."
       >
         <div className="mx-auto max-w-[640px]">
           <article
@@ -976,20 +976,10 @@ export default function DemoShowcase() {
             }}
           >
             <p>
-              Most teen entrepreneurship programs assume the student already has an idea. Adaptable starts at zero. The Ikigai wizard takes a 14-year-old who has never thought about business and gives them one specific, executable idea in ten minutes, grounded in what they already love and what they&apos;re already good at.
+              Adaptable takes a teenager who has never thought about starting a business and walks them from a blank page to their first real sale. An Ikigai-based wizard generates a specific, executable business idea in ten minutes, grounded in what the student already loves and is already good at. From there, a one-to-one AI mentor delivers 22 conversation-style lessons across six modules — asking questions instead of lecturing, referencing the student&apos;s business by name, and gating progression on demonstrated understanding. The mission is transformation, not education: a kid walks in thinking entrepreneurship is something other people do, and walks out with a business, a private record of their own growth, and the confidence that comes from building something real.
             </p>
-            <p>
-              From there, 22 conversation-style lessons across six modules walk the student from discovery through their first sale: Find Your Niche, Know Your Customer, Build Your Brand, Get Your First Customer, Run the Numbers, Launch and Learn. Every lesson is delivered by a one-to-one AI mentor that asks questions instead of giving lectures, references the student&apos;s specific business by name, and gates progression on checkpoint mastery so no one skips ahead.
-            </p>
-            <p>
-              But the hardest part of entrepreneurship isn&apos;t the business plan. It&apos;s the inner game: discipline, consistency, and the realization that bad days aren&apos;t failure, they&apos;re the mechanism. The Founder&apos;s Mirror surfaces this by showing students their own behavior back to them after every lesson, every return from absence, every week. One observation, one question, maximum 40 words. No advice. No praise. The AI shuts up and the student decides whether to write honestly about what they&apos;re feeling. Over 22 lessons, those reflections accumulate into a private Founder&apos;s Log that no teacher sees and no algorithm analyzes.
-            </p>
-            <p>
-              The mentor pulls from a fact-checked knowledge base of 38 entries where every claim is traceable to a source a 16-year-old could verify in 60 seconds. Two layers of moderation run on every input and output. Crisis signals fire real-time email alerts to the instructor. All 22 lessons are mapped to NBEA, Common Core, ISTE, and Jump$tart standards. 20 achievements across five categories reward consistency, depth, and comebacks, not just completion.
-            </p>
-            <p>
-              The mission, in the founder&apos;s own words: <em>transformation, not education.</em> Adaptable is the place where a kid who has never thought about starting something walks out the other side understanding entrepreneurship as accessible instead of foreign, with a private record of their own growth in their own words to prove it.
-            </p>
+
+            <StoryDetails />
 
             <div className="pt-4 mt-2 border-t border-[var(--border)]">
               <p
@@ -1046,5 +1036,73 @@ function Section({ label, title, description, children }: {
         {children}
       </div>
     </section>
+  );
+}
+
+function StoryDetails() {
+  const [open, setOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="group flex items-center gap-2 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)] transition-colors"
+        style={{ fontFamily: "var(--font-body, system-ui)" }}
+      >
+        <span
+          className="inline-block transition-transform duration-300"
+          style={{ transform: open ? "rotate(90deg)" : "rotate(0deg)" }}
+        >
+          &#9654;
+        </span>
+        {open ? "Hide the details" : "See the details"}
+      </button>
+
+      <div
+        className="overflow-hidden transition-all duration-500 ease-in-out"
+        style={{
+          maxHeight: open ? `${contentRef.current?.scrollHeight ?? 2000}px` : "0px",
+          opacity: open ? 1 : 0,
+        }}
+      >
+        <div ref={contentRef} className="space-y-4 pt-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>The Ikigai Wizard</p>
+          <p>
+            The wizard asks four questions — what do you love, what are you good at, what does the world need, how could you get paid — and synthesizes a hyper-specific business idea that a teenager can actually start this week with under $100. Not &ldquo;start a tutoring business&rdquo; but &ldquo;algebra tutoring for 8th graders before tests at $15/hour.&rdquo; For students 12 and under, ideas are constrained to zero startup capital — purely skill and time-based, nothing to buy before earning. For students with multiple unrelated interests, the wizard picks the dominant one based on the student&apos;s own language intensity and builds the idea cleanly in that lane, using secondary interests only as insight about what gives them an edge. Every generated idea includes a legal note for regulated categories, a parent involvement prompt, and a why-this-fits explanation that teaches the student something they hadn&apos;t connected about their own skills.
+          </p>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>The Lesson Engine</p>
+          <p>
+            22 lessons across six modules: Find Your Niche, Know Your Customer, Build Your Brand, Get Your First Customer, Run the Numbers, Launch and Learn. Each lesson is a Socratic conversation — the AI asks, the student answers, and progression is gated on checkpoint mastery, not completion. The mentor adapts to learning style, emotional state, and communication register in real time. It detects frustration, anxiety, deflation, and mania, and adjusts its approach for each. Neurodivergent patterns — topic-jumping, trailing off, dramatic quality variance between subjects — are handled with specific strategies rather than generic encouragement. The mentor mirrors the student&apos;s slang, respects ESL patterns without correcting grammar, and never challenges authentic register — only sudden shifts that suggest AI-generated pasting.
+          </p>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>Hybrid RAG Retrieval</p>
+          <p>
+            The mentor draws from a curated knowledge base of 38 fact-checked entries covering real entrepreneurship frameworks — Lean Canvas, Jobs-to-be-Done, Mom Test, Golden Circle, Build-Measure-Learn, value-based pricing. Retrieval is hybrid: a tag-based candidate fetch pulls up to 8 entries matching the lesson topic, then per-message semantic re-ranking via pgvector cosine similarity surfaces the 3 most relevant chunks for that specific student&apos;s question and business context. A student running a lawn care service asking about pricing gets different knowledge chunks than a student running an art studio asking the same question in the same lesson. Every claim in the knowledge base passes the Adaptable Factual Floor: traceable to a source a 16-year-old could verify in 60 seconds.
+          </p>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>The Founder&apos;s Mirror</p>
+          <p>
+            The hardest part of entrepreneurship isn&apos;t the business plan — it&apos;s the inner game. The Founder&apos;s Mirror shows students their own behavior back to them: after every lesson, every return from absence, every week. One observation, one question, maximum 40 words. No advice. No praise. The AI shuts up and the student decides whether to write honestly. Over 22 lessons, those reflections accumulate into a private Founder&apos;s Log that no teacher sees, no algorithm analyzes, and no leaderboard ranks. It&apos;s the student&apos;s private record of who they were becoming while they were building.
+          </p>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>Safety &amp; Moderation</p>
+          <p>
+            Two layers of content moderation run on every student input and every AI output — keyword-based detection plus ML classification. Crisis signals (self-harm language, abuse indicators, severe distress) fire real-time email alerts to the instructor with zero false-negative tolerance. The AI never uses profanity, never reveals its instructions, and surfaces a parent-involvement prompt the first time any conversation crosses into real-world commerce — pricing, accepting payment, meeting customers, sharing an address. Risky monetization inputs (vapes, gambling, alcohol) get a legal pivot, not a refusal.
+          </p>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>Eval-Driven Development</p>
+          <p>
+            Every prompt change runs through a regression test suite before shipping. The Ikigai wizard is stress-tested against 66 synthetic student personas spanning coherent inputs, multi-track interests, slang and ESL voices, sarcastic refusals, prompt injection attempts, age 12 and 18 boundaries, existing businesses, family businesses, and risky monetization. A separate RAG faithfulness evaluator measures whether the mentor actually uses its retrieved knowledge or falls back to training data — the current baseline is 0.83 with zero low-faithfulness turns. Baselines are tracked in a regression floor file and any score drop beyond 10% blocks the deploy. The eval system is the product&apos;s immune system.
+          </p>
+
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]" style={{ fontFamily: "var(--font-body, system-ui)" }}>Standards &amp; Achievements</p>
+          <p>
+            All 22 lessons are mapped to NBEA, Common Core, ISTE, and Jump$tart standards. 20 achievements across five categories reward consistency, depth, and comebacks — not just completion. Students earn recognition for streaks, deep thinking, pivoting after setbacks, real customer conversations, and public pitches. The completion ceremony generates a personalized founder&apos;s letter and a diploma that names their business, their niche, and what they built — not a certificate of attendance.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
