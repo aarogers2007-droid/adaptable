@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "eval:run": "npx tsx scripts/run-eval.ts",
+    "eval:faithfulness": "npx tsx scripts/eval-faithfulness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.81.0",
@@ -17,6 +19,7 @@
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "next": "16.2.2",
+    "openai": "^6.34.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.10.0",

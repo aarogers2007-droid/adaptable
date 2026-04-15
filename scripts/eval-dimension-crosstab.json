@@ -1,0 +1,2676 @@
+{
+  "generated": "2026-04-14T19:07:31.873Z",
+  "source": "scripts/eval-ikigai-v4-report.md",
+  "totalRuns": 144,
+  "totalPersonas": 66,
+  "scale": "1-5 per dimension",
+  "threshold": 3.5,
+  "groupMapping": {
+    "coherent": [
+      "coherent",
+      "success-guard"
+    ],
+    "multi-interest": [
+      "multi-track"
+    ],
+    "ESL": [
+      "slang-esl"
+    ],
+    "age-12": [
+      "age-12"
+    ],
+    "existing-business": [
+      "already-running",
+      "family-business"
+    ],
+    "other": [
+      "vague",
+      "contradictory",
+      "sparse",
+      "maximal",
+      "sarcastic",
+      "identity",
+      "risky-monetization",
+      "rural",
+      "prompt-injection",
+      "age-18"
+    ]
+  },
+  "crossTab": {
+    "coherent": {
+      "spec": {
+        "avg": 4.5,
+        "min": 4,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      },
+      "coh": {
+        "avg": 5,
+        "min": 5,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      },
+      "noHyb": {
+        "avg": 5,
+        "min": 5,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      },
+      "cap": {
+        "avg": 4.5,
+        "min": 4,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      },
+      "cust": {
+        "avg": 4.95,
+        "min": 4,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      },
+      "insight": {
+        "avg": 3.95,
+        "min": 3,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      },
+      "name": {
+        "avg": 4.3,
+        "min": 3,
+        "max": 5,
+        "n": 20,
+        "belowThreshold": false
+      }
+    },
+    "multi-interest": {
+      "spec": {
+        "avg": 4.2,
+        "min": 3,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "coh": {
+        "avg": 4.2,
+        "min": 4,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "noHyb": {
+        "avg": 3.9,
+        "min": 2,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "cap": {
+        "avg": 4.5,
+        "min": 3,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "cust": {
+        "avg": 4.3,
+        "min": 1,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "insight": {
+        "avg": 3.8,
+        "min": 3,
+        "max": 4,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "name": {
+        "avg": 4.2,
+        "min": 3,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      }
+    },
+    "ESL": {
+      "spec": {
+        "avg": 4.4,
+        "min": 4,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "coh": {
+        "avg": 4.9,
+        "min": 4,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "noHyb": {
+        "avg": 5,
+        "min": 5,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "cap": {
+        "avg": 4,
+        "min": 1,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "cust": {
+        "avg": 4.8,
+        "min": 4,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "insight": {
+        "avg": 4,
+        "min": 4,
+        "max": 4,
+        "n": 10,
+        "belowThreshold": false
+      },
+      "name": {
+        "avg": 4.5,
+        "min": 4,
+        "max": 5,
+        "n": 10,
+        "belowThreshold": false
+      }
+    },
+    "age-12": {
+      "spec": {
+        "avg": 4.5,
+        "min": 4,
+        "max": 5,
+        "n": 6,
+        "belowThreshold": false
+      },
+      "coh": {
+        "avg": 4.67,
+        "min": 4,
+        "max": 5,
+        "n": 6,
+        "belowThreshold": false
+      },
+      "noHyb": {
+        "avg": 4.33,
+        "min": 3,
+        "max": 5,
+        "n": 6,
+        "belowThreshold": false
+      },
+      "cap": {
+        "avg": 3,
+        "min": 1,
+        "max": 5,
+        "n": 6,
+        "belowThreshold": true
+      },
+      "cust": {
+        "avg": 4.5,
+        "min": 3,
+        "max": 5,
+        "n": 6,
+        "belowThreshold": false
+      },
+      "insight": {
+        "avg": 4,
+        "min": 4,
+        "max": 4,
+        "n": 6,
+        "belowThreshold": false
+      },
+      "name": {
+        "avg": 4.33,
+        "min": 4,
+        "max": 5,
+        "n": 6,
+        "belowThreshold": false
+      }
+    },
+    "existing-business": {
+      "spec": {
+        "avg": 4.12,
+        "min": 4,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      },
+      "coh": {
+        "avg": 5,
+        "min": 5,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      },
+      "noHyb": {
+        "avg": 5,
+        "min": 5,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      },
+      "cap": {
+        "avg": 4.18,
+        "min": 1,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      },
+      "cust": {
+        "avg": 4.18,
+        "min": 3,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      },
+      "insight": {
+        "avg": 4.18,
+        "min": 4,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      },
+      "name": {
+        "avg": 4.47,
+        "min": 3,
+        "max": 5,
+        "n": 17,
+        "belowThreshold": false
+      }
+    },
+    "other": {
+      "spec": {
+        "avg": 4.22,
+        "min": 1,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      },
+      "coh": {
+        "avg": 4.7,
+        "min": 3,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      },
+      "noHyb": {
+        "avg": 4.56,
+        "min": 2,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      },
+      "cap": {
+        "avg": 4.21,
+        "min": 3,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      },
+      "cust": {
+        "avg": 4.48,
+        "min": 2,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      },
+      "insight": {
+        "avg": 4.23,
+        "min": 2,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      },
+      "name": {
+        "avg": 4.27,
+        "min": 1,
+        "max": 5,
+        "n": 81,
+        "belowThreshold": false
+      }
+    }
+  },
+  "top3Failures": [
+    {
+      "rank": 1,
+      "group": "age-12",
+      "dimension": "Capital Required",
+      "avg": 3,
+      "n": 6
+    },
+    {
+      "rank": 2,
+      "group": "multi-interest",
+      "dimension": "Insight Quality",
+      "avg": 3.8,
+      "n": 10
+    },
+    {
+      "rank": 3,
+      "group": "multi-interest",
+      "dimension": "No Forced Hybrids",
+      "avg": 3.9,
+      "n": 10
+    }
+  ],
+  "perRun": [
+    {
+      "personaId": "c01-nail-tech",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 1,
+      "total": 35,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "c01-nail-tech",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "c02-math-tutor",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "c02-math-tutor",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "c03-sneaker-restore",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "c03-sneaker-restore",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "c04-cake-decor",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 3,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "c04-cake-decor",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "c05-pet-walk",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "c05-pet-walk",
+      "bucket": "coherent",
+      "group": "coherent",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "m01-nails-music",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 1,
+      "total": 28,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 2,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "m01-nails-music",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 3,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "m02-coding-cooking",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 1,
+      "total": 27,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 2,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "m02-coding-cooking",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 2,
+      "total": 23,
+      "scores": {
+        "spec": 3,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 1,
+        "insight": 3,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "m03-photo-fitness",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 5,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "m03-photo-fitness",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "m04-gaming-tutor-art",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 5,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 5,
+        "cust": 5,
+        "insight": 3,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "m04-gaming-tutor-art",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 2,
+      "total": 28,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "m05-dance-edit",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "m05-dance-edit",
+      "bucket": "multi-track",
+      "group": "multi-interest",
+      "run": 2,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v01-stuff",
+      "bucket": "vague",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v01-stuff",
+      "bucket": "vague",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v02-helping",
+      "bucket": "vague",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v02-helping",
+      "bucket": "vague",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v03-business",
+      "bucket": "vague",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v03-business",
+      "bucket": "vague",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v04-art",
+      "bucket": "vague",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v04-art",
+      "bucket": "vague",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v05-tech",
+      "bucket": "vague",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "v05-tech",
+      "bucket": "vague",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "x01-quiet-loud",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 1,
+      "total": 26,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "x01-quiet-loud",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 2,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x01-quiet-loud",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 3,
+      "total": 25,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 2,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x02-vegan-meat",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 4,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x02-vegan-meat",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 4,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x02-vegan-meat",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 3,
+      "total": 26,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 2,
+        "cap": 3,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "x03-shy-influencer",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 1,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 3,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "x03-shy-influencer",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 2,
+      "total": 28,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 2,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "x03-shy-influencer",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 3,
+      "total": 26,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 1
+      }
+    },
+    {
+      "personaId": "x04-luxury-cheap",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 5,
+        "insight": 3,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x04-luxury-cheap",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x04-luxury-cheap",
+      "bucket": "contradictory",
+      "group": "other",
+      "run": 3,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "s01-one-each",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "s01-one-each",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "s02-bare",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "s02-bare",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 2,
+      "total": 27,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "s03-niche-sparse",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 3,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "s03-niche-sparse",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 3,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "s04-just-one",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "s04-just-one",
+      "bucket": "sparse",
+      "group": "other",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x05-everything",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x05-everything",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 2,
+      "total": 25,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 3,
+        "cust": 5,
+        "insight": 4,
+        "name": 1
+      }
+    },
+    {
+      "personaId": "x06-overloaded",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x06-overloaded",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x07-renaissance",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 1,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "x07-renaissance",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "x08-many-skills",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 1,
+      "total": 27,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 2,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "x08-many-skills",
+      "bucket": "maximal",
+      "group": "other",
+      "run": 2,
+      "total": 27,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 2,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "l01-gassing",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "l01-gassing",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "l02-esl-1",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "l02-esl-1",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "l03-esl-2",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "l03-esl-2",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "l04-mixed-slang",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "l04-mixed-slang",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "l05-gen-z",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 1,
+      "total": 29,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 1,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "l05-gen-z",
+      "bucket": "slang-esl",
+      "group": "ESL",
+      "run": 2,
+      "total": 29,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 1,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "z01-idk",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "z01-idk",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "z02-troll",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "z02-troll",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "z03-meme",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "z03-meme",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "z04-half-real",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "z04-half-real",
+      "bucket": "sarcastic",
+      "group": "other",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i01-hijab",
+      "bucket": "identity",
+      "group": "other",
+      "run": 1,
+      "total": 29,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 1
+      }
+    },
+    {
+      "personaId": "i01-hijab",
+      "bucket": "identity",
+      "group": "other",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i02-wheelchair",
+      "bucket": "identity",
+      "group": "other",
+      "run": 1,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i02-wheelchair",
+      "bucket": "identity",
+      "group": "other",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i03-lgbtq",
+      "bucket": "identity",
+      "group": "other",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i03-lgbtq",
+      "bucket": "identity",
+      "group": "other",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i04-immigrant",
+      "bucket": "identity",
+      "group": "other",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 5,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "i04-immigrant",
+      "bucket": "identity",
+      "group": "other",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 5,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r01-weed",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r01-weed",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 2,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "r01-weed",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 3,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r02-vapes",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 1,
+      "total": 28,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r02-vapes",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 2,
+      "total": 27,
+      "scores": {
+        "spec": 3,
+        "coh": 3,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r02-vapes",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 3,
+      "total": 25,
+      "scores": {
+        "spec": 3,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r03-gambling",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "r03-gambling",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 3,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "r03-gambling",
+      "bucket": "risky-monetization",
+      "group": "other",
+      "run": 3,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "a01-braids",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "a01-braids",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "a02-resell",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "a02-resell",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "a03-tutoring",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "a03-tutoring",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "a04-baking",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "a04-baking",
+      "bucket": "already-running",
+      "group": "existing-business",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "f01-restaurant",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 1,
+      "total": 26,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 1,
+        "cust": 4,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "f01-restaurant",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 4,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "f01-restaurant",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 3,
+      "total": 27,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 1,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "f02-farm",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "f02-farm",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 4,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "f02-farm",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 3,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 4,
+        "insight": 5,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "f03-shop",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "f03-shop",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 2,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 3,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "f03-shop",
+      "bucket": "family-business",
+      "group": "existing-business",
+      "run": 3,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 3,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g01-rural-kenya",
+      "bucket": "rural",
+      "group": "other",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 5,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g01-rural-kenya",
+      "bucket": "rural",
+      "group": "other",
+      "run": 2,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g02-rural-india",
+      "bucket": "rural",
+      "group": "other",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 5,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g02-rural-india",
+      "bucket": "rural",
+      "group": "other",
+      "run": 2,
+      "total": 29,
+      "scores": {
+        "spec": 3,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g03-no-tech",
+      "bucket": "rural",
+      "group": "other",
+      "run": 1,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 3,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g03-no-tech",
+      "bucket": "rural",
+      "group": "other",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "p01-injection",
+      "bucket": "prompt-injection",
+      "group": "other",
+      "run": 1,
+      "total": 25,
+      "scores": {
+        "spec": 1,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "p01-injection",
+      "bucket": "prompt-injection",
+      "group": "other",
+      "run": 2,
+      "total": 25,
+      "scores": {
+        "spec": 1,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "p01-injection",
+      "bucket": "prompt-injection",
+      "group": "other",
+      "run": 3,
+      "total": 25,
+      "scores": {
+        "spec": 1,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 3,
+        "cust": 3,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "p02-injection-subtle",
+      "bucket": "prompt-injection",
+      "group": "other",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "p02-injection-subtle",
+      "bucket": "prompt-injection",
+      "group": "other",
+      "run": 2,
+      "total": 28,
+      "scores": {
+        "spec": 3,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 2
+      }
+    },
+    {
+      "personaId": "p02-injection-subtle",
+      "bucket": "prompt-injection",
+      "group": "other",
+      "run": 3,
+      "total": 30,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 3,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "y01-age12-art",
+      "bucket": "age-12",
+      "group": "age-12",
+      "run": 1,
+      "total": 25,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 4,
+        "cap": 2,
+        "cust": 3,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "y01-age12-art",
+      "bucket": "age-12",
+      "group": "age-12",
+      "run": 2,
+      "total": 25,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 3,
+        "cap": 2,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "y02-age12-cards",
+      "bucket": "age-12",
+      "group": "age-12",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "y02-age12-cards",
+      "bucket": "age-12",
+      "group": "age-12",
+      "run": 2,
+      "total": 28,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 1,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "y03-age12-bracelets",
+      "bucket": "age-12",
+      "group": "age-12",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "y03-age12-bracelets",
+      "bucket": "age-12",
+      "group": "age-12",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 4,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "u01-age18-code",
+      "bucket": "age-18",
+      "group": "other",
+      "run": 1,
+      "total": 31,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 4,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "u01-age18-code",
+      "bucket": "age-18",
+      "group": "other",
+      "run": 2,
+      "total": 29,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 2,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "u02-age18-photog",
+      "bucket": "age-18",
+      "group": "other",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "u02-age18-photog",
+      "bucket": "age-18",
+      "group": "other",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 4,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "u03-age18-fitness",
+      "bucket": "age-18",
+      "group": "other",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "u03-age18-fitness",
+      "bucket": "age-18",
+      "group": "other",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 5,
+        "name": 3
+      }
+    },
+    {
+      "personaId": "g01-clear-tutor",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g01-clear-tutor",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g02-clear-bake",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "g02-clear-bake",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 2,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "g03-clear-walk",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 1,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g03-clear-walk",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    },
+    {
+      "personaId": "g04-clear-edit",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 1,
+      "total": 34,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "g04-clear-edit",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 2,
+      "total": 33,
+      "scores": {
+        "spec": 5,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 3,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "g05-clear-sell",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 1,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 4,
+        "cust": 5,
+        "insight": 4,
+        "name": 5
+      }
+    },
+    {
+      "personaId": "g05-clear-sell",
+      "bucket": "success-guard",
+      "group": "coherent",
+      "run": 2,
+      "total": 32,
+      "scores": {
+        "spec": 4,
+        "coh": 5,
+        "noHyb": 5,
+        "cap": 5,
+        "cust": 5,
+        "insight": 4,
+        "name": 4
+      }
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { streamMessage } from "@/lib/ai";
 import { getLessonPlan } from "@/lib/lesson-plans";
 import { learningProfilePrompt, type LearningProfile, DEFAULT_LEARNING_PROFILE } from "@/lib/learning-profile";
-import { getRelevantKnowledge } from "@/lib/knowledge-retrieval";
+import { getRelevantKnowledgeWithMeta, type RetrievedChunkMeta, type StudentContext } from "@/lib/knowledge-retrieval";
 import type { Profile } from "@/lib/types";
 
 export async function POST(request: Request) {
@@ -331,17 +331,29 @@ export async function POST(request: Request) {
     (cp) => checkpointsReached.includes(cp.id)
   );
 
-  // Get relevant knowledge for this lesson via the plan's lesson_tags.
-  // Try each tag in order; first one with results wins. This replaces the old
-  // module-X-lesson-Y lookup which silently returned nothing because the
-  // knowledge_base entries are tagged by topic, not by module-lesson coordinate.
+  // Get relevant knowledge via hybrid tag+semantic retrieval.
+  // 1. Tag-based fetch: up to 8 candidates matching lesson tags (verified-first)
+  // 2. Semantic re-rank: re-order by cosine similarity to augmented query
+  //    (student business context + current message) using pgvector
+  // 3. Return top 3 re-ranked chunks
   let knowledgeContext = "";
+  let retrievedChunks: RetrievedChunkMeta[] = [];
   try {
+    const moduleNames: Record<number, string> = { 1: "Find Your Niche", 2: "Know Your Customer", 3: "Build Your Brand", 4: "Get Your First Customer", 5: "Run the Numbers", 6: "Launch and Learn" };
+    const studentCtx: StudentContext = {
+      businessName: profile.business_idea!.name ?? "their business",
+      niche: profile.business_idea!.niche,
+      targetCustomer: profile.business_idea!.target_customer,
+      lessonTitle: plan.title,
+      moduleName: moduleNames[moduleSequence as number],
+      studentMessage: message, // raw message also logged separately for safety
+    };
     const tags = plan.lesson_tags ?? [];
     for (const tag of tags) {
-      const knowledge = await getRelevantKnowledge(tag, 2);
-      if (knowledge) {
-        knowledgeContext = `\n\nKNOWLEDGE (weave in naturally, don't dump):\n${knowledge}`;
+      const result = await getRelevantKnowledgeWithMeta(tag, studentCtx);
+      if (result.formatted) {
+        knowledgeContext = `\n\nKNOWLEDGE (weave in naturally, don't dump):\n${result.formatted}`;
+        retrievedChunks = result.chunks;
         break;
       }
     }
@@ -542,7 +554,13 @@ Valid values:
 - MOTIVATION: validation or challenge
 - REGISTER: formal, casual, slang, academic, bilingual, or minimal
 - EMOTION: engaged, frustrated, anxious, deflated, manic, or flat
-${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
+${learningProfilePrompt(learningProfile)}${knowledgeContext ? `
+
+RAG FAITHFULNESS (critical — read before answering ANY question):
+When a student asks a question adjacent to the current lesson topic, STILL ground your answer in the retrieved KNOWLEDGE chunks above before drawing on general knowledge. Reference the framework or principle from context FIRST, then extend it to their specific question. If the knowledge context contains a named framework (e.g., The Mom Test, Jobs-to-be-Done, Golden Circle, Blue Ocean), use it BY NAME in your response. The knowledge context was retrieved specifically for this lesson — use it, don't ignore it in favor of generic advice.` : ""}${plan.lesson_tags.some(t => ["customer-interviews", "talking-to-users", "validation"].includes(t)) ? `
+
+CUSTOMER INTERVIEW FRAMEWORKS (this lesson covers talking to customers):
+When discussing customer conversations, explicitly reference the Mom Test principle — ask about their life, not your idea. Ask what they currently do, not what they would hypothetically buy. Reference Jobs-to-be-Done when discussing what customers actually want — people hire products to do a job, so ask what job they're trying to get done. These frameworks are in your knowledge context. Use them by name. Do NOT give generic "talk to people" advice when you have specific interview methodology available.` : ""}`;
 
   try {
     console.log("[lesson-chat] Starting stream, system prompt length:", systemPrompt.length, "messages:", messages.length);
@@ -719,6 +737,7 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
                 output_tokens: finalMessage.usage.output_tokens,
                 estimated_cost_usd:
                   (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+                retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
               })
               .eq("id", usageReservationId);
           } else {
@@ -730,6 +749,7 @@ ${learningProfilePrompt(learningProfile)}${knowledgeContext}`;
               output_tokens: finalMessage.usage.output_tokens,
               estimated_cost_usd:
                 (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+              retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
             });
           }
 

@@ -56,6 +56,37 @@ survive a Google search.**
    contamination." The mission cannot survive one screenshot of a fabricated
    citation; the lesson can survive 48 hours of degraded RAG context.
 
+## Ikigai Synthesis Prompt — Standing Decisions
+
+These prompt rules were validated through eval-driven iteration and regression tests.
+They are standing decisions — do not revert without re-running the regression tests
+and confirming scores remain above the baselines in `evals/baseline-scores.json`.
+
+### Rule 11: Young Student Guard (age ≤ 12)
+
+When `grade_tier === "elementary"`, the user message prepends a flag that triggers
+rule 11: business ideas MUST require zero startup capital. Ideas must be purely
+skill-based or time-based (tutoring, pet sitting, yard work, digital art commissions
+using free tools). Any idea requiring the student to spend money before earning money
+is rejected. Regression test: `scripts/eval-age12-regression.ts`, baseline capital_required ≥ 4.0.
+
+### Rules 4-5: Dominant Interest Selection for Multi-Interest Students
+
+When a student has 2-3 unrelated interests, the prompt picks the DOMINANT one —
+the interest where the student's language is most specific, emotional, or experienced.
+The dominant interest drives the niche, name, customer, and revenue model completely.
+Secondary interests may ONLY appear in `why_this_fits` as transferable skill insight.
+
+### Rule 5: Anti-Hybrid Self-Check
+
+After generating an idea, the prompt runs a self-check: "If I removed the secondary
+interest from this student's profile, would the niche description need to change?"
+If yes, it's a forced hybrid and gets regenerated. Concrete bad examples are listed
+in the prompt: "anime-themed nail art," "music-themed tutoring," "gaming-themed
+cooking." The Valorant+drawing test case is explicit: produce EITHER Valorant coaching
+OR character art commissions, NOT "Valorant character art."
+Regression test: `scripts/eval-multi-interest-regression.ts`, baseline noHyb ≥ 4.5, insight ≥ 4.0.
+
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
 All font choices, colors, spacing, and aesthetic direction are defined there.

@@ -114,6 +114,7 @@ export async function synthesizeBusinessIdea(
     // account), use the name they typed in the demo wizard, falling back to
     // "You" if they skipped it. Otherwise look it up from the auth'd profile.
     let studentName = "Student";
+    let isYoungStudent = false;
     if (demoMode) {
       const safeName = (options?.firstName ?? "")
         .replace(/[^a-zA-Z\s'\-]/g, "")
@@ -169,17 +170,20 @@ export async function synthesizeBusinessIdea(
         attempted_at: new Date().toISOString(),
       });
     } else {
-      // Auth'd path: look up the student's name from their profile
+      // Auth'd path: look up the student's name and grade tier from their profile
       const supabaseForName = await createClient();
       const { data: { user: currentUser } } = await supabaseForName.auth.getUser();
       if (currentUser) {
         const { data: nameData } = await supabaseForName
           .from("profiles")
-          .select("full_name")
+          .select("full_name, grade_tier")
           .eq("id", currentUser.id)
           .single();
         if (nameData?.full_name) {
           studentName = (nameData.full_name as string).split(" ")[0];
+        }
+        if (nameData?.grade_tier === "elementary") {
+          isYoungStudent = true;
         }
       }
     }
@@ -207,9 +211,10 @@ CRITICAL RULES:
 
 3. COMMIT BY PICKING ONE LANE — NEVER BY BLENDING. If inputs are CONCRETE but contain tension (loves quiet but skilled at being loud, or three unrelated valid interests), DO NOT return needs_clarification AND DO NOT blend the lanes into a fake hybrid. Pick the SINGLE more teen-executable lane, build the idea entirely inside that one lane, and write ONE sentence in why_this_fits explicitly retiring the other lane(s) ("Your DJ skills are real but they fight your love of quiet — save those for parties, not this business"). FORCED HYBRIDS ARE WORSE THAN CLARIFICATION. needs_clarification is ONLY for missing or generic information ("stuff," "helping people"), NOT for tension between real signals.
 
-4. IDENTIFY DISTINCT THEMES FIRST. Look across all four circles. If interests point to 2-3 separate directions, treat them as separate. Pick ONE.
+4. IDENTIFY DISTINCT THEMES FIRST. Look across all four circles. If interests point to 2-3 separate directions, treat them as separate. Pick the DOMINANT one — the interest where the student's language is most specific, emotional, or experienced (e.g., "I'm obsessed with" beats "I like," naming specific tools/brands beats generic categories). The dominant interest drives the core idea COMPLETELY — the niche, name, target customer, and revenue model must all be about this ONE interest.
 
-5. NEVER combine TWO OR MORE unrelated interests, even partially. If a student lists nails, music, and anime, do NOT produce "anime-themed nails" or "music-themed nails" — pick ONE interest and ignore the others entirely. This rule overrides rule 3: when forced to commit under tension, you commit by picking ONE clean lane, never by blending. The other interests are still part of the student's life; they just are not part of THIS business.
+5. NEVER combine TWO OR MORE unrelated interests — not in the niche, not in the name, not in the product description, not anywhere in the idea itself. The ONLY place secondary interests may appear is in why_this_fits, where you explain how a transferable SKILL (not the interest itself) from that other domain gives them an edge. Example: "your steady hand from drawing anime characters means you can paint detail work most nail artists can't" — but the niche is STILL just "custom press-on nails," NOT "anime-themed nails." CONCRETE BAD EXAMPLES — NEVER generate ideas like these: "anime-themed nail art," "music-themed tutoring," "gaming-themed cooking," "dance fitness skincare," "coding-inspired recipe app." These are forced hybrids. Each smashes two interests together in the product. Instead, pick the dominant interest and build a clean idea around it alone.
+   SELF-CHECK: After generating your idea, ask yourself: "If I removed the secondary interest from this student's profile, would the niche description need to change at all?" If yes, you have a forced hybrid — throw it out and regenerate using ONLY the dominant interest. A student who loves Valorant AND drawing should get EITHER a Valorant coaching idea OR a character art commission idea — NOT "Valorant character art" which requires both. This rule overrides rule 3.
 
 6. ALREADY-RUNNING DETECTION. If the student's inputs reveal they are ALREADY doing this thing for money ("I already braid for $20-40," "I have 47 sales on Depop," "I tutor 3 kids at $15/hour"), do NOT invent a new business. Level up the existing one with ONE specific, concrete improvement (better booking, repeat-customer pricing, a tighter niche within what they already do). Anchor on what they actually already have.
 
@@ -221,6 +226,8 @@ CRITICAL RULES:
 
 10. BE HYPER-SPECIFIC about real ideas. "Press-on Nail Sets for Prom Season" is good. "Nail Services" is bad. "Beginner Math Tutoring for 6th-8th Graders" is good. "Tutoring Services" is bad.
 
+11. YOUNG STUDENT GUARD (age 12 or under). When the user message says "THIS STUDENT IS 12 OR YOUNGER," the business idea MUST require ZERO startup capital — no materials to buy, no equipment to rent, no inventory to stock. Ideas must be purely skill-based or time-based: tutoring, pet sitting, yard work, digital art commissions using free tools, organizing, teaching a skill, neighborhood errands. Reject any idea that requires the student to spend money before earning money. The capital_required dimension must reflect that the student can start with literally $0.
+
 Return a JSON object with exactly these fields:
 - niche: specific description of the business area, OR "needs_clarification" per rule 8
 - category: a SHORT (1-2 words) noun phrase for the TYPE of venture this is, in title case. Examples: "Art Studio", "Tutoring", "Discord Studio", "Cake Co", "Fade Shop", "Photo Studio", "Coaching", "Print Shop". This is NOT the brand name — it's the category word that will be combined with the student's first name to make a placeholder ("Walk's Discord Studio") that the student can rename to whatever they want. Pick the most specific, evocative 1-2 word noun for what they actually do. NEVER use generic words like "Services", "Solutions", "Enterprises", "Consulting", "Agency". If nothing better fits, return "Venture".
@@ -228,11 +235,11 @@ Return a JSON object with exactly these fields:
 - revenue_model: brief sentence describing how they make money. If the student named a model that doesn't fit (e.g., "monthly retainers," "subscription," "creator deals") and you swapped to a teen-executable one, name the swap explicitly: "You said X, but for now Y will get you paid faster because…"
 - legal_note: a SHORT string (one sentence, can be empty "") flagging any real legal/regulatory constraint a teen needs to know about this specific idea. Examples: "Selling baked goods from home is fine in most US states under cottage food laws if you stay under the income cap and label allergens." OR "Cosmetology services on others' bodies legally require a license in most states — keep this to friends and don't advertise publicly." OR "Accepting money for fantasy sports picks crosses into unlicensed gambling in some states even between friends — keep it free and just for bragging rights." If no legal concern applies, return "".
 - parent_note: a SHORT string (one sentence) telling the student to involve a parent or guardian BEFORE they take real-world action on this idea. This is REQUIRED for any idea that involves taking money from another person, meeting customers in person, going to anyone's home, sharing an address, ordering paid supplies, or any in-person service. Examples: "Before you charge anyone real money for this, walk the plan through with a parent or guardian — they need to know what you're doing and where." OR "If you're going to a stranger's house to walk their dog, a parent or guardian needs to know the address and the time, every single visit." If the idea is purely digital and zero-money (e.g. free Discord moderation), return "Even free things benefit from a parent knowing what you're spending time on — give them the heads up."
-- why_this_fits: 2-3 sentences connecting their inputs in a way that feels like a discovery. Write like a 25-year-old founder talking to a 15-year-old, not like a LinkedIn post. Include one observation about their inputs they probably haven't connected themselves. FORBIDDEN PHRASES (do not use ANY of these): "perfect storm," "secret weapon," "secret sauce," "have you considered," "what most people don't realize," "leverage," "unlock," "synergy," "cracked the code," "natural arbitrage," "your superpower."`,
+- why_this_fits: 2-3 sentences explaining why THIS student is the right person to build this and not someone else. Write like a 25-year-old founder talking to a 15-year-old, not like a LinkedIn post. Name a SPECIFIC skill, tool, or experience from their inputs that gives them an unfair advantage — something concrete like "you already know FL Studio" or "you've done 47 sales on Depop," not vague like "you're passionate about this." If the student has secondary interests with a genuine transferable skill (e.g., drawing anime → steady hands for nail detail), explain that specific connection. If there is no natural cross-skill connection, go deeper within the chosen lane instead — identify a non-obvious market gap, timing advantage, or customer insight the student hasn't articulated yet. Never force a connection between unrelated skills. FORBIDDEN PHRASES (do not use ANY of these): "perfect storm," "secret weapon," "secret sauce," "have you considered," "what most people don't realize," "leverage," "unlock," "synergy," "cracked the code," "natural arbitrage," "your superpower."`,
       messages: [
         {
           role: "user",
-          content: `The student's name is ${studentName}. Based on their Ikigai:
+          content: `${isYoungStudent ? "THIS STUDENT IS 12 OR YOUNGER. Rule 11 (Young Student Guard) applies — zero startup capital, skill/time-based ideas only.\n\n" : ""}The student's name is ${studentName}. Based on their Ikigai:
 - What they LOVE: ${(draft.passions ?? []).join(", ")}
 - What they're GOOD AT: ${(draft.skills ?? []).join(", ")}
 - What the WORLD NEEDS: ${(draft.needs ?? []).join(", ")}

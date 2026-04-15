@@ -1,0 +1,1227 @@
+{
+  "generated": "2026-04-15T00:43:25.952Z",
+  "note": "Retrieved chunks approximated from current KB state, not exact logged chunks",
+  "summary": {
+    "overall_faithfulness": 0.83,
+    "rag_enabled_faithfulness": 0.83,
+    "total_conversations": 20,
+    "total_teaching_turns": 80,
+    "low_faithfulness_count": 0,
+    "kb_gap_lessons": []
+  },
+  "by_module": {
+    "module_1": {
+      "avg": 0.84,
+      "turns": 32,
+      "has_kb_gaps": false
+    },
+    "module_2": {
+      "avg": 0.8,
+      "turns": 32,
+      "has_kb_gaps": false
+    },
+    "module_4": {
+      "avg": 0.88,
+      "turns": 16,
+      "has_kb_gaps": false
+    }
+  },
+  "by_tag": {
+    "why": {
+      "avg": 0.79,
+      "turns": 32
+    },
+    "competition": {
+      "avg": 0.89,
+      "turns": 16
+    },
+    "customer-interviews": {
+      "avg": 0.73,
+      "turns": 32
+    },
+    "pricing": {
+      "avg": 0.87,
+      "turns": 32
+    },
+    "marketing": {
+      "avg": 0.88,
+      "turns": 32
+    }
+  },
+  "low_faithfulness": [],
+  "conversations": [
+    {
+      "persona": "Mia",
+      "lesson": "M1L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.79,
+      "turns": [
+        {
+          "question": "I'm excited about my press-on nail business, but I'm wondering - should I really be starting with 'why'? I already know what I want to sell and who wants it. Isn't that enough?",
+          "response_preview": "I love that you're eager to jump in! But here's the thing about the Golden Circle framework - successful ventures work from purpose (why) to process (how) to product (what). You've got the 'what' figu",
+          "word_count": 106,
+          "faithfulness": {
+            "score": 0.8,
+            "reasoning": "The response clearly draws on the 'Starting With Why' chunk, directly referencing the Golden Circle framework (why → how → what), the concept of WHY as a 'North Star,' and the idea that purpose sustains motivation when challenges arise. These phrases closely mirror the student summary language in the retrieved chunk. However, the key principles, real examples, and quotes in the chunks were all undefined, so the AI supplemented with general coaching knowledge (e.g., specific probing questions about confidence and creativity).",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product"
+            ]
+          }
+        },
+        {
+          "question": "Honestly, I'm feeling a bit overwhelmed thinking about all the business stuff I don't know yet. What if I'm not ready to be an entrepreneur?",
+          "response_preview": "That feeling of being overwhelmed? That's actually exactly where you need to be! The entrepreneurial mindset is about being comfortable with being uncomfortable. While most students wait until they kn",
+          "word_count": 104,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The AI response directly mirrors language from the 'Entrepreneurial Mindset' chunk's Student Summary, including near-verbatim phrases like 'comfortable with being uncomfortable,' 'entrepreneurs jump in and figure things out as they go,' and 'your lack of experience isn't a weakness - it's actually an advantage.' While the key principles, examples, and quotes in the chunks were all undefined, the AI clearly drew from the Student Summary sections. The final sentence about not needing to know everything is a reasonable extension but not directly from the chunks.",
+            "used_chunks": [
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "How should I price my nail sets? I was thinking $25-40, but I'm not sure if that's right for high school students.",
+          "response_preview": "Pricing is definitely important, but let's connect this back to your WHY first. Using the Ikigai framework, you want to find where your interests, skills, and market needs overlap - including what the",
+          "word_count": 107,
+          "faithfulness": {
+            "score": 0.7,
+            "reasoning": "The response clearly references the Ikigai framework and the concept of starting with WHY, both of which are mentioned in the retrieved chunks' student summaries. However, the chunks themselves are largely undefined/empty in their key principles and examples, so the AI is working primarily from the student summaries. The 'jobs to be hired for' framing and pricing strategy advice go beyond what the chunks provide, drawing on general business knowledge, but the response does meaningfully anchor itself in the retrieved context.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product"
+            ]
+          }
+        },
+        {
+          "question": "Should I start posting on Instagram and TikTok right away to build my following before prom season?",
+          "response_preview": "Social media can be powerful, but let's ground this in your purpose first. Remember, the Golden Circle shows that successful ventures start with WHY, then move to HOW, then WHAT. Before jumping into t",
+          "word_count": 116,
+          "faithfulness": {
+            "score": 0.8,
+            "reasoning": "The response clearly draws on both retrieved chunks. It explicitly references the Golden Circle framework (WHY → HOW → WHAT) from the 'Starting With Why' chunk and paraphrases the entrepreneurial mindset principle about being comfortable making decisions and learning quickly from the second chunk. However, the key principles and examples in the chunks were all undefined, so the AI was working primarily from the student summaries. The application to the student's specific prom nail business adds general knowledge beyond what the chunks provided.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Devon",
+      "lesson": "M1L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.75,
+      "turns": [
+        {
+          "question": "I'm excited to start tutoring but honestly, I'm not sure if I'm doing this for the right reasons. I mean, I like math and I could use the money, but is that enough? How do I know if this is actually something I should pursue?",
+          "response_preview": "That's actually a perfect question to start with! What you're wrestling with is exactly what the Golden Circle framework addresses - you're trying to figure out your WHY before jumping into the WHAT. ",
+          "word_count": 133,
+          "faithfulness": {
+            "score": 0.78,
+            "reasoning": "The response clearly draws on the 'Starting With Why' chunk, referencing the Golden Circle framework (why → how → what) and using the exact phrase 'North Star' from the student summary. It also aligns with the chunk's guidance about teens who start with genuine problems they care about versus chasing quick money. However, the specific details like the $15-20/hour rate and some of the emotional framing are general knowledge additions not from the chunks. The chunks themselves were largely undefined in their key principles and examples, so the AI primarily relied on the student summaries.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product"
+            ]
+          }
+        },
+        {
+          "question": "I get the WHY thing, but I'm worried because I don't have any real teaching experience. What if parents don't trust me because I'm just a teenager? How do I compete with actual tutoring companies?",
+          "response_preview": "Here's where the entrepreneurial mindset becomes your secret weapon! While you're seeing your lack of experience as a weakness, entrepreneurs learn to flip that script. Your 'inexperience' actually fo",
+          "word_count": 127,
+          "faithfulness": {
+            "score": 0.75,
+            "reasoning": "The response clearly draws on 'The Entrepreneurial Mindset' chunk, paraphrasing its key ideas about lack of experience being an advantage that forces creativity, and getting comfortable making decisions and learning from them quickly rather than eliminating uncertainty. It also touches on the 'Starting With Why' chunk implicitly. However, the response adds substantial general advice (relating to students as a recent student, remembering what confusion felt like) that isn't traceable to the chunks, which were mostly undefined/empty beyond the student summaries.",
+            "used_chunks": [
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "That makes sense, but how should I set up my social media to attract students? Should I be on TikTok, Instagram, what platform works best for reaching middle and high schoolers?",
+          "response_preview": "Great question! Before we dive into which platforms, let's connect this back to your WHY and the Golden Circle. Your purpose (helping students gain confidence in algebra) should drive HOW you show up ",
+          "word_count": 144,
+          "faithfulness": {
+            "score": 0.75,
+            "reasoning": "The response clearly references the Golden Circle framework and the concept of starting with WHY from the first chunk, and draws on the entrepreneurial mindset of jumping in and learning as you go from the second chunk. However, the retrieved chunks had mostly undefined/empty fields, so the AI was primarily working from the 'Student Summary' sections. The response also includes substantial general advice about social media authenticity and content ideas that goes beyond the retrieved context, though it doesn't contradict it.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "I think I'm starting to understand my why better - I really do want to help kids not hate math like I used to. But what if I start this tutoring thing and then realize I want to do something completely different later? Am I locking myself into one path?",
+          "response_preview": "This is such an insightful question, and it perfectly captures what makes the entrepreneurial mindset different! While students often think they need to pick one path and stick with it forever, entrep",
+          "word_count": 164,
+          "faithfulness": {
+            "score": 0.7,
+            "reasoning": "The response draws on several ideas from the retrieved chunks, including the 'North Star' metaphor from the WHY lesson, the 'comfortable with being uncomfortable' principle from the Entrepreneurial Mindset lesson, and the concept of starting with WHY before product. However, the key principles, examples, and quotes in the chunks were all undefined, so the AI was primarily working from the Student Summary sections and supplementing with general knowledge about entrepreneurship and career flexibility.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Jada",
+      "lesson": "M1L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.81,
+      "turns": [
+        {
+          "question": "I've been doing braids for my friends for a while now and thinking about making it a real business. But honestly, I'm not sure if I'm doing this for the right reasons. Like, is it okay that I partly want to do this just to make some money?",
+          "response_preview": "That's such an honest question, and it shows you're thinking like a real entrepreneur! Let's dig into your WHY using something called the Golden Circle framework. Successful ventures work from purpose",
+          "word_count": 137,
+          "faithfulness": {
+            "score": 0.8,
+            "reasoning": "The response clearly draws on the 'Starting With Why' chunk, referencing the Golden Circle framework by name and echoing the Student Summary's language about discovering a 'deeper reason you want to create something' and how a genuine WHY sustains motivation through challenges. It also reflects the chunk's note about teens who chase quick money versus those with genuine purpose. However, the specific applications to braiding (confidence, saving time, feeling cared for) are generated from general knowledge rather than chunk content, and the key principles/examples/quotes in the chunks were all undefined, so the AI necessarily supplemented with training data.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product"
+            ]
+          }
+        },
+        {
+          "question": "I keep second-guessing myself about whether I actually know enough about hair and business to charge people. What if I mess up someone's hair or don't know how to handle the business side?",
+          "response_preview": "Welcome to the entrepreneurial mindset! What you're experiencing - being comfortable with being uncomfortable - is exactly what separates founders from people who never start. Here's the thing: while ",
+          "word_count": 140,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response draws heavily and almost verbatim from 'The Entrepreneurial Mindset' chunk's Student Summary, using phrases like 'comfortable with being uncomfortable,' 'wait until they know everything before acting,' 'jump in and figure things out as they go,' 'lack of experience isn't a weakness - it's actually an advantage because it forces you to be creative,' and 'get comfortable making decisions and learning from them quickly.' It also adds some personalized advice about starting with close friends and building confidence, which is general but reasonable. The slight deduction is because the response doesn't reference the 'Starting With Why' chunk at all and adds some assumptions (e.g., 'you've been doing it for friends successfully') not grounded in the retrieved context.",
+            "used_chunks": [
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "How should I promote my braiding business on social media? I see other people doing it but I'm not sure what to post or how often.",
+          "response_preview": "Great question! Before we dive into posting schedules, let's connect this back to your WHY and the Golden Circle. Your social media should start with your purpose (why you braid), then show your proce",
+          "word_count": 140,
+          "faithfulness": {
+            "score": 0.78,
+            "reasoning": "The response clearly draws on both retrieved chunks. It explicitly references the Golden Circle framework (why → how → what) from the 'Starting With Why' chunk and applies it to the student's social media strategy. It also references the entrepreneurial mindset of figuring things out as you go and being comfortable with uncertainty from the second chunk. However, the social media-specific advice (before-and-after photos, posting videos, content strategy tips) comes entirely from general training data, not the retrieved context.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "Sometimes I wonder if I should just focus on getting good grades instead of spending time on this business. How do I know if entrepreneurship is really worth pursuing?",
+          "response_preview": "This is where understanding your personal Ikigai becomes crucial - that's where your interests, skills, and market needs overlap to create your deeper purpose. The entrepreneurial mindset isn't about ",
+          "word_count": 156,
+          "faithfulness": {
+            "score": 0.82,
+            "reasoning": "The response clearly draws on both retrieved chunks. It explicitly references Ikigai (from 'Starting With Why'), mentions that teens who start with genuine problems they care about tend to stick with ventures longer (a near-direct quote from the student summary), and references the entrepreneurial mindset concept of navigating uncertainty and making decisions (from 'The Entrepreneurial Mindset'). However, some claims like 'teaching you real-world skills like customer service, money management, and problem-solving' are general knowledge not traced to the chunks.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Ravi",
+      "lesson": "M1L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.8,
+      "turns": [
+        {
+          "question": "I've been coding Python scripts for my parents' shop and think I could sell similar ones to other local businesses. But I'm not sure if I'm doing this for the right reasons - like, am I just trying to make quick money or is there something deeper here?",
+          "response_preview": "That's exactly the right question to start with! You're naturally discovering what we call the Golden Circle - instead of jumping straight to WHAT you're selling (Python scripts), you're asking WHY yo",
+          "word_count": 113,
+          "faithfulness": {
+            "score": 0.8,
+            "reasoning": "The response clearly draws on the 'Starting With Why' chunk, referencing the Golden Circle framework, the concept of WHY as a 'North Star,' and the idea that purpose sustains motivation when challenges arise — all phrases that appear directly in the student summary. It also implicitly touches on the entrepreneurial mindset chunk by encouraging the student to explore deeper motivations. However, the specific application to the student's Python scenario (saving parents time, reducing stress, competing better) is general mentoring embellishment not directly from the chunks.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product"
+            ]
+          }
+        },
+        {
+          "question": "But I feel like I don't know enough about business yet. Should I wait until I learn more about marketing, accounting, and all that stuff before I start approaching other shops?",
+          "response_preview": "This is where the entrepreneurial mindset really shines through! While students often wait until they know everything before acting, entrepreneurs jump in and figure things out as they go. Your lack o",
+          "word_count": 109,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on 'The Entrepreneurial Mindset' chunk, nearly directly quoting its Student Summary language about students waiting until they know everything, jumping in and figuring things out, lack of experience as an advantage, and getting comfortable making decisions and learning quickly. The practical advice about starting with one shop is a reasonable extension but not directly from the chunks. The response doesn't reference the 'Starting With Why' chunk at all, though it wasn't as relevant to the question.",
+            "used_chunks": [
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "Speaking of marketing, should I create social media accounts for my automation business? Like Instagram or TikTok to show off the scripts I'm building?",
+          "response_preview": "Great question! Let's connect this back to your WHY and the Golden Circle framework. Before deciding on social media tactics (the HOW), let's make sure it aligns with your deeper purpose (your WHY). I",
+          "word_count": 136,
+          "faithfulness": {
+            "score": 0.8,
+            "reasoning": "The response explicitly references the Golden Circle framework (WHY/HOW/WHAT) from the 'Starting With Why' chunk and the entrepreneurial mindset concept of getting comfortable with uncertainty from the second chunk. These are clearly drawn from the retrieved context's student summaries. However, the practical advice about walking into local shops and the social media critique is general business knowledge not found in the chunks.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        },
+        {
+          "question": "What if I find out that what I think these shop owners need isn't actually what they want? Like, what if they don't see the value in automation?",
+          "response_preview": "That uncertainty you're feeling? That's exactly what the entrepreneurial mindset is about - being comfortable with being uncomfortable! This is where your WHY becomes crucial as your North Star to gui",
+          "word_count": 134,
+          "faithfulness": {
+            "score": 0.75,
+            "reasoning": "The response clearly draws on the Student Summary content from both chunks. It references 'comfortable with being uncomfortable' from the Entrepreneurial Mindset chunk, 'WHY becomes your North Star' from the Starting With Why chunk, 'making decisions and learning from them quickly,' and 'lack of experience' as an advantage. However, the key principles, examples, and quotes in both chunks are all undefined, so the AI had very limited actual content to work with beyond the summaries. The specific advice about inventory management and explaining automation differently appears to come from general knowledge rather than the retrieved context.",
+            "used_chunks": [
+              "Starting With Why: Finding Your Purpose Before Your Product",
+              "The Entrepreneurial Mindset: What Makes a Founder Different"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Mia",
+      "lesson": "M1L3",
+      "chunks_available": 1,
+      "no_rag": false,
+      "avg_score": 0.89,
+      "turns": [
+        {
+          "question": "I'm confused about who my competition actually is. Like, are other nail artists my main competition, or is it something else?",
+          "response_preview": "Great question! Here's the thing - your biggest competition might not be other businesses at all. Sometimes your real competition is the status quo - people doing nothing, making do with existing solu",
+          "word_count": 106,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly draws on the key principle that 'your biggest competition might not be other businesses' and nearly quotes the chunk verbatim with phrases like 'the status quo - people doing nothing, making do with existing solutions, or solving the problem themselves' and 'Understanding what customers currently do helps you position your offering.' These are clearly traceable to the retrieved context. The application to the prom nail business (salons, DIY nails, skipping fancy nails) is a natural extension but represents general reasoning applied to the specific student context rather than chunk content.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "There are already some girls at school doing nails for people. How do I compete with them without starting drama?",
+          "response_preview": "This is exactly where differentiation becomes your best friend! Direct competition rarely benefits new businesses - when you compete head-to-head on the same features as others, it usually creates pro",
+          "word_count": 115,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly draws on multiple specific phrases and principles from the retrieved chunk, including 'direct competition rarely benefits new businesses,' 'differentiate through multiple dimensions,' and 'choosing dimensions they either cannot or will not match.' These are near-verbatim references to the chunk content. The response also applies the differentiation framework to the student's specific nail business context, which adds practical value beyond the chunks but remains consistent with them.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "Should I price my sets lower than what I see other people charging to get more customers?",
+          "response_preview": "Hold up - this thinking falls into the direct competition trap! When you compete head-to-head on the same features as established players, you typically lose because they might have more experience or",
+          "word_count": 113,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly draws on multiple specific principles from the retrieved chunk, including near-verbatim phrases like 'compete head-to-head on the same features as established players, you typically lose,' 'differentiation across other dimensions,' 'niche markets often provide the clearest path to differentiation,' 'serving a specific, underserved segment extremely well,' and 'easier to dominate a small market than to capture a tiny slice of a massive one.' The application to the student's prom nail business (matching nails to dress styles, rush delivery) is the AI's own contextual addition, which is appropriate and consistent with the chunk's guidance.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "What's the best social media platform to promote my nail business and beat the competition?",
+          "response_preview": "Before we dive into platforms, let's connect this back to differentiation strategy. Your social media approach should reflect how you're choosing to be different from competitors. If you're differenti",
+          "word_count": 127,
+          "faithfulness": {
+            "score": 0.82,
+            "reasoning": "The response clearly draws on several key principles from the retrieved chunk, including differentiation strategy, niche focus, and the idea that competition can be people 'doing things themselves' (the status quo). It ties the social media question back to the lesson's core framework about being different rather than just better. However, it also includes general knowledge about Instagram/TikTok being good for visual businesses, which isn't from the chunks.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Devon",
+      "lesson": "M1L3",
+      "chunks_available": 1,
+      "no_rag": false,
+      "avg_score": 0.91,
+      "turns": [
+        {
+          "question": "I'm worried there are already tons of math tutors out there. How do I compete with all of them, especially the ones who have been doing this for years?",
+          "response_preview": "Here's the key insight: direct competition rarely benefits new businesses. When you try to beat established tutors at their own game - same methods, same approach - you're fighting an uphill battle be",
+          "word_count": 138,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly quotes or closely paraphrases multiple specific phrases from the retrieved chunks, including 'direct competition rarely benefits new businesses,' 'ways to be different, not just better,' and 'cannot or will not match.' It explicitly references the visual learner tutoring example from the Real Examples section. The only minor additions are general suggestions (gaming methods, test anxiety, age proximity) that serve as natural applications to the student's context but aren't from the chunks.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "What if I just charge less than everyone else? Like $10 instead of $20? Wouldn't that get me more customers?",
+          "response_preview": "That's actually one of the riskiest differentiation strategies! Remember, differentiation can happen across multiple dimensions - price point is just one of them, and often not the best one for new bu",
+          "word_count": 142,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response clearly draws on multiple specific principles from the retrieved chunks, including 'differentiation can happen across multiple dimensions,' 'niche markets often provide the clearest path to differentiation,' and the concept of making it hard for people to compare you directly to competitors. It also references the visual learners example from the chunks. The 'race to the bottom' concept and coffee shop meeting idea are general business knowledge not explicitly in the chunks, but they're consistent with the retrieved content.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "How do I figure out what other tutors are doing wrong so I can do it better?",
+          "response_preview": "Smart thinking, but let me reframe this slightly. Rather than just doing what others do 'better,' you want to find gaps where you can be genuinely different. Here's how to research strategically: Firs",
+          "word_count": 152,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response closely mirrors multiple specific principles from the retrieved chunk, including the idea that 'your biggest competition might not be other businesses' (applied as competition being students doing nothing), differentiating through 'multiple dimensions' like target customer, service method, and approach, and the principle of 'choosing dimensions your competitors either cannot or will not match.' The reframing from 'better' to 'different' directly reflects the chunk's key principle that 'success comes from finding ways to be different, not just better.' The only minor additions are contextual applications to the student's specific tutoring business, which are natural extensions rather than departures.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "Should I create an Instagram account to promote my tutoring business? I see other students doing that for their businesses.",
+          "response_preview": "Absolutely, but let's connect this to your differentiation strategy first. Remember, you can differentiate through distribution method and brand personality - and social media is actually a perfect ex",
+          "word_count": 165,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on multiple specific principles from the retrieved chunk, including differentiation through 'distribution method' and 'brand personality,' the principle that 'niche markets often provide the clearest path to differentiation,' and the idea of choosing 'dimensions your competitors either cannot or will not match.' It even echoes exact phrasing from the chunks. However, it also adds practical Instagram-specific advice (memes, study methods, social pressures) that goes beyond the retrieved context, blending chunk-grounded reasoning with general knowledge about social media marketing.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Jada",
+      "lesson": "M1L3",
+      "chunks_available": 1,
+      "no_rag": false,
+      "avg_score": 0.91,
+      "turns": [
+        {
+          "question": "I'm trying to figure out who my competition is for my knotless braids business. Should I be worried about the salon down the street that does braids?",
+          "response_preview": "Great question! Let's think about this strategically. The key principle here is that direct competition rarely benefits new businesses - when you compete head-to-head on the same features as establish",
+          "word_count": 123,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly references the key principle that 'direct competition rarely benefits new businesses' using nearly verbatim language from the retrieved chunk. It also applies the differentiation framework (target customer, price point, distribution method, convenience) and ends with a question inspired by the chunk's guidance about dimensions 'competitors either cannot or will not match.' The specific examples about the salon targeting adult women, higher prices, and appointments are reasonable inferences applied to the student's context rather than chunk content, blending retrieved principles with practical application.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "How do I know if I'm charging the right amount compared to other people doing braids?",
+          "response_preview": "This touches on a crucial differentiation principle - you can differentiate through price point, but it should be strategic, not just random. Instead of just matching what others charge, think about t",
+          "word_count": 146,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response clearly draws on multiple specific principles from the retrieved chunk: differentiating through multiple dimensions (price point, convenience, specialization), the idea that 'your real competition might not even be other businesses - sometimes it's the status quo,' and the principle that niche/specialized offerings can command their own pricing. These concepts are directly traceable to the chunk content. The response also adds some practical, student-specific application (e.g., salon wait times, school convenience) that goes slightly beyond the chunks but is consistent with their spirit.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "Should I try to do every type of braid style so I can compete with everyone?",
+          "response_preview": "Actually, that's exactly the opposite of what successful entrepreneurs do! Remember, niche markets often provide the clearest path to differentiation. By serving a specific, underserved segment extrem",
+          "word_count": 141,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly quotes key principles from the retrieved chunks, including the exact phrase 'niche markets often provide the clearest path to differentiation' and the principle about dominating a small market versus capturing a tiny slice of a massive one. It also explicitly references the pet-sitting service example for senior dogs with mobility issues. The advice is tightly aligned with the differentiation and niche focus principles from the knowledge base.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "What about promoting my business on social media? Won't other braiders just copy what I post?",
+          "response_preview": "Here's where differentiation strategy really helps with marketing fears! When you differentiate across multiple dimensions - like your target customer, service level, and distribution method - it beco",
+          "word_count": 156,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly draws on multiple specific principles from the retrieved chunk, including 'differentiate across multiple dimensions,' 'choosing dimensions your competitors either cannot or will not match,' and 'sometimes your biggest competition isn't even other businesses.' These phrases closely mirror or directly quote the chunk content. The response applies these principles effectively to the student's braiding business context, though some of the application (e.g., social media storytelling advice) goes beyond the chunk content into general knowledge.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Ravi",
+      "lesson": "M1L3",
+      "chunks_available": 1,
+      "no_rag": false,
+      "avg_score": 0.87,
+      "turns": [
+        {
+          "question": "I'm worried there might be too many people already doing Python automation for small businesses. How do I even start researching who my competitors are?",
+          "response_preview": "Great question! Let's start with a key principle from competition research: your biggest competition might not be other businesses doing Python automation. Sometimes your real competition is the statu",
+          "word_count": 104,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on the retrieved chunk's key principle that 'your biggest competition might not be other businesses' and that 'sometimes your real competition is the status quo - people doing nothing, making do with existing solutions, or solving the problem themselves.' The phrase 'Understanding what customers currently do helps you position your offering' is nearly a direct paraphrase from the chunk. The three-layer framework (direct, indirect, do-nothing) adds practical structure that goes slightly beyond the chunks but is consistent with and built upon them.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "What if I find out there are already established companies doing automation services? Should I just give up on this idea?",
+          "response_preview": "Absolutely not! Remember, direct competition rarely benefits new businesses when you compete head-to-head on the same features as established players. But here's the opportunity: you can differentiate",
+          "word_count": 106,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on multiple specific principles from the retrieved chunk, including near-verbatim quotes like 'direct competition rarely benefits new businesses,' 'differentiate across multiple dimensions,' and 'choosing dimensions your competitors either cannot or will not match.' However, it also introduces specific details not found in the chunks—like the student's parents' business, $50-100 price points, and same-day responses—which appear to be fabricated context about the student or general business advice not grounded in the retrieved material.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "How much should I charge compared to what competitors are charging? I was thinking $50-100 but what if others charge way less or way more?",
+          "response_preview": "Pricing connects directly to your differentiation strategy. If you position yourself the same as competitors, you'll be forced into price competition - and that's usually a losing game for new busines",
+          "word_count": 125,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response clearly draws on multiple specific elements from the retrieved chunks. It references the principle that competing head-to-head with established players is a losing strategy, uses the pet-sitting and tutoring examples directly from the chunks, and echoes the key idea about making it hard for customers to compare you directly. The advice about differentiation dimensions and niche positioning is well-grounded in the chunk content. The minor addition of specific practical advice ('local teen who understands small family businesses,' '24-hour delivery') goes slightly beyond the chunks but is a reasonable application of the principles.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        },
+        {
+          "question": "Should I look at what big automation companies are posting on social media to understand their marketing strategies?",
+          "response_preview": "That's smart thinking, but let's ground this in competition strategy first. Since niche markets often provide the clearest path to differentiation, studying big companies' broad social media approach ",
+          "word_count": 131,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on multiple principles from the retrieved chunk, including direct references to niche markets providing the clearest path to differentiation and the idea that it's easier to dominate a small market than capture a tiny slice of a massive one (both near-direct quotes). It also applies the chunk's principle about differentiation across multiple dimensions and the concept that the real competition may be the status quo. However, it also includes practical advice about social media research tactics and enterprise vs. local messaging that goes beyond the retrieved content into general business knowledge.",
+            "used_chunks": [
+              "Competition and Differentiation: Finding Your Unique Market Position"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Mia",
+      "lesson": "M2L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.74,
+      "turns": [
+        {
+          "question": "I want to interview girls at school about my press-on nail business, but I'm worried they'll just be polite and not give me real feedback. How do I get them to be honest?",
+          "response_preview": "Great question! This is exactly what The Mom Test principle addresses - you need to ask about their life, not your idea. Instead of asking 'Do you like my press-on nail concept?' which invites politen",
+          "word_count": 116,
+          "faithfulness": {
+            "score": 0.55,
+            "reasoning": "The response references the Jobs-to-be-Done framework from the 'Target Customer Profiling' chunk, which is a clear connection. However, the central advice about 'The Mom Test' principle is not present in any retrieved chunk — this comes from external training data (Rob Fitzpatrick's book). The retrieved chunks on customer feedback specifically recommend the Two-Question Framework ('What's working well?' / 'What would make this better?') and other specific techniques for getting honest feedback, none of which were used. The most directly relevant chunk on feedback methodology was largely ignored in favor of external knowledge.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "What specific questions should I ask during these interviews to understand if girls would actually buy my custom press-on nails?",
+          "response_preview": "Use the two-question framework from customer feedback principles, but adapt it for discovery interviews. Start with their past experiences: 'Walk me through how you handled nails for your last formal ",
+          "word_count": 113,
+          "faithfulness": {
+            "score": 0.75,
+            "reasoning": "The response clearly draws on the two-question framework from the 'Getting and Using Customer Feedback' chunk and the Jobs-to-be-Done framework from the 'Target Customer Profiling' chunk, applying both to the student's custom press-on nail context. However, the reference to 'The Mom Test' principle is not found anywhere in the retrieved chunks — this is external training data knowledge injected into the response, which lowers the faithfulness score somewhat.",
+            "used_chunks": [
+              "Getting and Using Customer Feedback as a Young Entrepreneur",
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "How should I price my custom press-on nail sets? I was thinking $25-40 but I'm not sure if that's right for high school girls.",
+          "response_preview": "Pricing connects directly to customer validation through interviews! The Jobs-to-be-Done framework is key here - what job are they hiring nail services to do, and what are they currently paying for th",
+          "word_count": 131,
+          "faithfulness": {
+            "score": 0.82,
+            "reasoning": "The response clearly draws on the Jobs-to-be-Done framework and customer personas principles from the 'Target Customer Profiling' chunk, applying them specifically to the pricing question. It also incorporates the customer validation through interviews concept. However, the specific interview questions ('What did you pay for nails last time?') and the comparison framing ($60 salon vs $5 drugstore) are practical additions from general knowledge rather than directly from the chunks. The feedback chunk's two-question framework could have been referenced but wasn't.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas",
+              "Getting and Using Customer Feedback as a Young Entrepreneur"
+            ]
+          }
+        },
+        {
+          "question": "Should I create an Instagram account to promote my nail business while I'm doing these interviews, or wait until after?",
+          "response_preview": "Smart thinking about timing! The customer validation principle says test assumptions through direct interaction first. Your interviews will reveal crucial insights about your target customer personas ",
+          "word_count": 130,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on multiple concepts from the retrieved chunks, including the Jobs-to-be-Done framework, customer validation through direct interaction, and customer persona concepts like preferred communication channels. It applies these specifically to the student's nail business context. However, it also includes some general advice about platform selection and timing that goes beyond the chunks, and the specific application to social media discovery habits is an extension rather than a direct citation.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Devon",
+      "lesson": "M2L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.83,
+      "turns": [
+        {
+          "question": "I want to start interviewing potential customers for my algebra tutoring business, but I'm nervous about approaching people. What should I actually ask them?",
+          "response_preview": "Great question! The key is to follow what's called The Mom Test principle - ask about their life, not your idea. Instead of saying 'Would you pay $15-20/hour for algebra tutoring?' ask about their cur",
+          "word_count": 133,
+          "faithfulness": {
+            "score": 0.7,
+            "reasoning": "The response clearly draws on the Jobs-to-be-Done framework from the 'Target Customer Profiling' chunk and the two-question framework from the 'Getting and Using Customer Feedback' chunk, applying both to the student's specific tutoring context. However, 'The Mom Test' principle is not mentioned anywhere in the retrieved chunks — it comes from general training data (Rob Fitzpatrick's book). The specific price point of '$15-20/hour' also appears to be fabricated rather than drawn from context. The blend of chunk-sourced and external content places this solidly in the 0.7 range.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas",
+              "Getting and Using Customer Feedback as a Young Entrepreneur"
+            ]
+          }
+        },
+        {
+          "question": "Should I focus on interviewing struggling students or good students? I'm not sure who my real target is.",
+          "response_preview": "This is exactly why customer interviews are so valuable! You mentioned both 8th-10th graders, but within that group you likely have different customer personas with different jobs-to-be-done. The tuto",
+          "word_count": 118,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly references the tutoring example from the Target Customer Profiling chunk about a teen discovering motivated students were better customers than struggling ones. It also explicitly uses the Jobs-to-be-Done framework, the narrow targeting principle, and the concept of customer personas — all clearly drawn from the retrieved context. The 'avoid failing' vs. 'get into honors classes' framing is a natural application of the Jobs-to-be-Done framework to the student's specific situation, which is a minor creative extension but fully consistent with the chunks.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "What if I get negative feedback during these interviews? Like what if someone says my pricing is too high or they don't think I'm qualified since I'm just a student?",
+          "response_preview": "Perfect mindset check! Remember that negative feedback is just data, not a judgment about your worth as a person. If someone says your pricing is too high, that's actually valuable information - ask f",
+          "word_count": 141,
+          "faithfulness": {
+            "score": 0.82,
+            "reasoning": "The response clearly draws on multiple principles from the 'Getting and Using Customer Feedback' chunk, including 'Negative Feedback as Data' (treating criticism as information, not personal worth), 'Pattern Recognition Over Single Opinions' (the three-people threshold and not pivoting on one opinion), and the action-oriented response principle. The mention of 'Mom Test questions' is external knowledge not found in the chunks, and some of the specific follow-up questions are general coaching advice rather than chunk-derived.",
+            "used_chunks": [
+              "Getting and Using Customer Feedback as a Young Entrepreneur"
+            ]
+          }
+        },
+        {
+          "question": "How should I market my tutoring business on social media after I finish these interviews?",
+          "response_preview": "Smart to think ahead about marketing, but here's how customer interviews directly inform your social media strategy! The Jobs-to-be-Done framework you discover through interviews will shape your entir",
+          "word_count": 155,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on specific concepts from both retrieved chunks. It explicitly references the Jobs-to-be-Done framework, customer personas combining demographics with behaviors and pain points, and the two-question feedback framework. The example about a motivated student wanting to get ahead versus a struggling student mirrors the tutoring example from the Target Customer Profiling chunk. However, the specific claim about 'reduce parent arguments about grades' as a job-to-be-done is fabricated and not from the chunks, and the overall framing of applying these concepts to social media strategy goes beyond the retrieved content.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas",
+              "Getting and Using Customer Feedback as a Young Entrepreneur"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Jada",
+      "lesson": "M2L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.66,
+      "turns": [
+        {
+          "question": "I want to interview my potential customers about my knotless braids business, but I'm nervous they'll just be nice to me since we go to school together. How do I get honest feedback?",
+          "response_preview": "Great question! This is exactly why The Mom Test principle is so important - you need to ask about their life, not your idea. Instead of asking 'Would you get braids from me?' which invites politeness",
+          "word_count": 121,
+          "faithfulness": {
+            "score": 0.55,
+            "reasoning": "The response references the Jobs-to-be-Done framework, which is clearly drawn from the 'Target Customer Profiling and Customer Personas' chunk. However, the central advice about 'The Mom Test' principle is not found anywhere in the retrieved chunks — this comes from general training data (Rob Fitzpatrick's book). The two-question framework and other specific feedback methodologies from the 'Getting and Using Customer Feedback' chunk were not utilized, despite being highly relevant to the student's question about getting honest feedback.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "What specific questions should I ask girls at school to find out if they'd actually pay for my braids?",
+          "response_preview": "Perfect! Let's use The Mom Test approach - ask about their life, not your idea. Start with questions like: 'How often do you get your hair braided?' and 'Where do you usually go?' Then dig into their ",
+          "word_count": 124,
+          "faithfulness": {
+            "score": 0.55,
+            "reasoning": "The response explicitly references the Jobs-to-be-Done framework from the 'Target Customer Profiling' chunk, which is a clear draw from the retrieved context. However, 'The Mom Test' approach is not mentioned anywhere in the retrieved chunks — it comes from external training data (Rob Fitzpatrick's book). The two-question feedback framework from the chunks was not utilized, and much of the interview question advice is generic customer discovery guidance rather than specifically drawn from the retrieved context.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "Should I be charging more than $20-40? Some girls spend way more at salons, but I don't want to price myself out since I'm just starting.",
+          "response_preview": "This connects directly to customer validation through interviews! The Jobs-to-be-Done framework shows that customers hire products to accomplish specific jobs - and they'll pay different amounts based",
+          "word_count": 137,
+          "faithfulness": {
+            "score": 0.78,
+            "reasoning": "The response clearly draws on the Jobs-to-be-Done framework and customer personas from the Target Customer Profiling chunk, correctly applying them to the pricing question. It references the tutoring example from the chunks, though it slightly misrepresents it — the chunk says the tutor discovered motivated students wanting to get ahead (not that they'd pay more than expected). The response also correctly references customer validation through interviews. However, some advice like specific interview questions and the pricing guidance is general business knowledge rather than drawn directly from the chunks.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "How many people do I need to interview before I really understand my customers?",
+          "response_preview": "The key is pattern recognition over single opinions - you're looking for themes across multiple customers rather than changing everything based on one person's feedback. I'd recommend starting with 5-",
+          "word_count": 138,
+          "faithfulness": {
+            "score": 0.75,
+            "reasoning": "The response clearly draws on several concepts from the retrieved chunks: 'pattern recognition over single opinions' and 'three similar comments suggest a real issue' come directly from the feedback chunk, while 'Jobs-to-be-Done framework' and 'customer personas' with 'behaviors, motivations' come from the target customer profiling chunk. However, 'The Mom Test' is not mentioned anywhere in the retrieved context and comes from general training data, and the specific recommendation of 5-7 interviews is not grounded in the chunks either.",
+            "used_chunks": [
+              "Getting and Using Customer Feedback as a Young Entrepreneur",
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Ravi",
+      "lesson": "M2L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.71,
+      "turns": [
+        {
+          "question": "I want to interview some local shop owners about my Python automation scripts, but I'm nervous they'll think I'm just a kid who doesn't know what I'm talking about. How do I approach them professionally?",
+          "response_preview": "Great question! The key is to use what's called The Mom Test principle - instead of pitching your Python scripts, ask about their daily operations and challenges. Start with questions like 'What takes",
+          "word_count": 124,
+          "faithfulness": {
+            "score": 0.5,
+            "reasoning": "The response references the Jobs-to-be-Done framework from the retrieved chunks, which is a clear connection. However, the primary advice centers on 'The Mom Test' principle, which is not mentioned anywhere in the retrieved context — this is drawn from general training data (Rob Fitzpatrick's book). The chunks on customer feedback and customer profiling offered specific frameworks (like the Two-Question Framework, customer validation through direct interaction) that could have been applied more directly to the student's question about approaching shop owners professionally.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "When I'm talking to these business owners, what specific questions should I ask to figure out if they actually need automation, without just asking 'Do you want a Python script?'",
+          "response_preview": "Perfect! You're thinking like a real entrepreneur by avoiding the classic mistake of pitching your idea directly. Using The Mom Test approach, ask questions about their actual experiences: 'Walk me th",
+          "word_count": 132,
+          "faithfulness": {
+            "score": 0.55,
+            "reasoning": "The response explicitly references the Jobs-to-be-Done framework from the Target Customer Profiling chunk, which is a clear usage of retrieved context. However, the core advice about 'The Mom Test' approach is drawn from general training data (not present in any retrieved chunk), and the specific interview questions and pricing suggestions ($50-100) are independently generated. The two-question framework from the Feedback chunk could have been adapted for discovery interviews but was not used.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "What if they give me feedback that my price range of $50-100 is too expensive? Should I immediately lower my prices or is there something else I should do first?",
+          "response_preview": "Hold on before changing your pricing! This connects directly to the feedback principles we use in customer interviews. When someone says your price is 'too expensive,' that's often vague feedback with",
+          "word_count": 141,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response clearly draws on multiple specific concepts from the retrieved chunks. It explicitly references the 'feedback vs. noise' distinction, the 'two-question framework' (adapted for pricing), the 'pattern recognition over single opinions' principle (the 'three similar businesses' example), and the 'Jobs-to-be-Done framework' — all directly traceable to the chunk content. The adaptation of these frameworks to the pricing context is original but grounded in the retrieved material. The only minor addition not directly from chunks is the idea that a price objection might mean they 'don't see enough value yet,' which is reasonable general business knowledge.",
+            "used_chunks": [
+              "Getting and Using Customer Feedback as a Young Entrepreneur",
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        },
+        {
+          "question": "Should I create different customer personas for different types of shops, like restaurants vs retail stores? And how detailed should I get with these personas?",
+          "response_preview": "Absolutely! This is exactly how smart entrepreneurs think about target customer profiling. Different shop types definitely need different personas because they're hiring your automation scripts to do ",
+          "word_count": 141,
+          "faithfulness": {
+            "score": 0.88,
+            "reasoning": "The response clearly draws on multiple specific concepts from the retrieved chunks, including the Jobs-to-be-Done framework, narrow targeting for better initial traction, customer personas combining demographics with behaviors/pain points/decision-making processes, and customer validation through interviews. The language closely mirrors chunk content (e.g., 'narrow targeting leads to better initial traction,' 'whether your assumptions match reality'). The reference to the parents' business appears to be contextual inference rather than chunk-derived, and the specific automation examples (inventory tracking, pricing updates) come from general knowledge, but the core advice structure is faithful to the retrieved context.",
+            "used_chunks": [
+              "Target Customer Profiling and Customer Personas"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Mia",
+      "lesson": "M2L3",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.85,
+      "turns": [
+        {
+          "question": "I've been making press-on nails for friends and they love them, but I have no idea how to price them. I was thinking maybe $15 per set since that seems affordable for high schoolers?",
+          "response_preview": "I love that you're thinking about your customers' budgets! But let's use the Cost-Plus-Margin Formula to make sure $15 actually works for your business. First, calculate your True Unit Cost - that's m",
+          "word_count": 83,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response directly references the 'Cost-Plus-Margin Formula' by name from the Pricing Psychology chunk and 'True Unit Cost' from the Unit Economics chunk. It applies the specific framework of breaking costs into materials, time valued at a fair hourly rate, and overhead — all key principles explicitly stated in the retrieved chunks. The response also echoes the chunk's emphasis on valuing time at minimum wage or higher. The nail-specific material examples (tips, polish, gems, glue) are reasonable domain applications rather than chunk content, but the core structure is clearly drawn from the retrieved knowledge.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "It takes me about 2 hours per set and materials cost around $8. If I value my time at $10/hour, that's $28 total cost. But $28 seems like so much to charge other students!",
+          "response_preview": "Actually, that $28 is just covering your costs - you haven't made any profit yet! Remember the principle 'Revenue is vanity, profit is sanity' - you need profit margin on top of costs to sustain your ",
+          "word_count": 96,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response directly references the quote 'Revenue is vanity, profit is sanity' from the Unit Economics chunk and explicitly names the 'Price as Quality Signal' principle from the Pricing Psychology chunk. The explanation of $28 being cost (not profit) aligns with the Cost-Plus-Margin Formula and the distinction between Revenue vs Profit. However, the mention of a '$25-40 price range' appears fabricated — the student never mentioned this range and it's not in the chunks — which slightly reduces faithfulness.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "That makes sense about quality perception, but what if people think I'm being greedy or charging too much compared to regular nail salons?",
+          "response_preview": "This is where Value-Based Justification comes in! When customers question your price, focus on the specific value they receive rather than defending your costs. You're not just doing nails - you're cr",
+          "word_count": 95,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response directly references 'Value-Based Justification' by name from the Pricing Psychology chunk and accurately paraphrases its definition ('focus on the specific value they receive rather than defending your costs'). It also correctly quotes 'If you're not losing some customers to price, you're probably not charging enough' from the same chunk. The application to custom press-on nails (specific dress matching, keepsakes, scheduling flexibility) and the $35-40 price point are reasonable extrapolations but not directly from the chunks, adding some general knowledge.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "This is kind of off-topic, but should I be posting my work on social media to get more customers, or focus on pricing first?",
+          "response_preview": "Great question! Actually, this connects directly to pricing psychology. When you post on social media, you're essentially using the Anchor Pricing Effect - you want to show your most impressive, elabo",
+          "word_count": 109,
+          "faithfulness": {
+            "score": 0.78,
+            "reasoning": "The response explicitly references several concepts from the retrieved chunks: 'Anchor Pricing Effect,' 'Price as Quality Signal,' and 'True Unit Cost,' using the exact terminology from the knowledge base. However, the application of 'Anchor Pricing Effect' to social media posting is a creative extrapolation rather than a direct use of the chunk content — the chunk describes it in terms of tiered pricing options shown to customers, not social media posting order. The advice to get pricing foundations right before marketing aligns with the chunks' emphasis on unit economics and cost tracking. Some general marketing advice (posting on social media strategies) goes beyond the retrieved context.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers",
+              "Unit Economics and Cost Tracking for Teen Businesses"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Devon",
+      "lesson": "M2L3",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.86,
+      "turns": [
+        {
+          "question": "I've been charging $15/hour for algebra tutoring, but I'm wondering if that's too low? Some of my friends think I should charge more, but I'm worried I'll lose customers.",
+          "response_preview": "That's a great question! Let's think about this using unit economics. First, calculate your true cost per hour - not just the tutoring time, but preparation time, travel time, and any materials you pr",
+          "word_count": 113,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response clearly draws on both retrieved chunks. It directly uses the tutoring example from the Unit Economics chunk (15 min prep + travel time reducing effective hourly rate), applies the concept of true unit cost, and quotes the pricing psychology chunk verbatim ('if you're not losing some customers to price, you're probably not charging enough'). The response also references the price-as-quality-signal principle from the Pricing Psychology chunk. The slight deduction is because the travel time example was adapted (20 min instead of the chunk's 10 min each way = 20 min, which actually matches), and the $15-20 range recommendation blends chunk content with general knowledge.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "How do I know what my actual costs are for tutoring? I don't really buy much except maybe some worksheets and gas money.",
+          "response_preview": "Let's break down your true unit cost systematically. You mentioned worksheets and gas - those are your variable costs that change with each session. But don't forget to value your time fairly, typical",
+          "word_count": 115,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on multiple specific concepts from the retrieved chunks, including valuing time at minimum wage or higher (Unit Economics chunk), the 1 hour 35 minutes total time investment for tutoring sessions (directly from the tutoring example in Unit Economics), tracking costs in a spreadsheet (from the student summary), and the distinction between variable costs and hidden time costs. The 1 hour 35 minutes figure and the concept of true hourly rate are pulled directly from the tutoring example. However, the response introduces a $15/hour price point that wasn't mentioned by the student, and the specific minimum wage figure of $12 is general knowledge rather than from the chunks.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "What if parents compare me to those cheap online tutoring sites that charge like $10/hour? How do I handle that?",
+          "response_preview": "Perfect question about pricing psychology! When customers question your price, focus on value-based justification rather than defending your costs. Online tutoring lacks the personalized attention, in",
+          "word_count": 115,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on several specific concepts from the retrieved chunks, including 'value-based justification,' 'anchor pricing effect,' and 'price as quality signal' — all named explicitly and applied correctly to the student's algebra tutoring scenario. The three-tier pricing example closely mirrors the phone case example from the Pricing Psychology chunk. However, some advice (e.g., the specific framing about online tutoring lacking personalized attention and relationship building) goes beyond what the chunks explicitly state, drawing on general knowledge about tutoring services.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "Should I offer discounts or payment plans? Some parents have asked about it, and I don't want to seem inflexible.",
+          "response_preview": "Be careful with discounts - they can trigger underpricing burnout where you're working more hours for less money and attracting customers who don't value your service. However, you can structure this ",
+          "word_count": 120,
+          "faithfulness": {
+            "score": 0.82,
+            "reasoning": "The response clearly draws on several concepts from the retrieved chunks: 'underpricing burnout' from the Pricing Psychology chunk, 'unit economics' from the Unit Economics chunk, and directly quotes 'the most expensive mistake is undervaluing your work' from the Pricing Psychology chunk. The observation about low-price customers being more demanding aligns with the dog-walking example about low prices attracting disrespectful clients. However, the specific tactical advice about package deals (4 sessions for $90), splitting payments into two, and the framing around test prep packages appears to come from general business knowledge rather than the retrieved context.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers",
+              "Unit Economics and Cost Tracking for Teen Businesses"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Jada",
+      "lesson": "M2L3",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.92,
+      "turns": [
+        {
+          "question": "I've been charging $25 for knotless braids but some girls say it's too expensive. Should I lower my price to get more customers?",
+          "response_preview": "Before you lower your price, let's think about what your price signals to customers. Remember that customers often assume higher prices mean better quality, while very low prices can make them questio",
+          "word_count": 154,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly draws on multiple specific principles, examples, and quotes from both retrieved chunks. It references 'price as quality signal' (higher prices = perceived quality, low prices raise suspicion), 'true unit cost' calculation methodology (materials + time valued at fair hourly rate), the exact quote 'If you're not losing some customers to price, you're probably not charging enough,' and the concept of 'underpricing burnout.' The unit cost calculation example mirrors the structure from the unit economics chunk. The only minor addition is the specific $20 hypothetical and the 'save them salon money' framing, which are reasonable contextual applications rather than unfaithful claims.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "How do I figure out what to charge when I don't really know my costs yet?",
+          "response_preview": "Great question! Let's use the True Unit Cost principle to break this down. For your braiding business, you need to track three types of costs: materials (hair extensions, oils, any tools), your time v",
+          "word_count": 152,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly draws on multiple specific principles and frameworks from the retrieved chunks. It references 'True Unit Cost' by name, breaks costs into the three categories outlined in the Unit Economics chunk (materials, time/labor, overhead), uses the exact quote 'You can't manage what you don't measure,' references the break-even concept, recommends a spreadsheet for tracking (from the student summary), and incorporates the cost-plus-margin formula and profit margin concepts from the Pricing Psychology chunk. The $10-12/hour labor valuation aligns with the chunks' guidance on valuing time at minimum wage or higher.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "What if I want to start doing nails too - should I charge the same price structure?",
+          "response_preview": "Smart thinking about expanding! But here's the key principle: each service has different unit economics, so you can't just copy your braiding prices. Your True Unit Cost will be completely different f",
+          "word_count": 145,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on specific concepts from both retrieved chunks, including 'True Unit Cost,' 'unit economics,' 'Cost-Plus-Margin Formula,' 'pricing psychology,' 'anchoring effects,' and the direct quote 'Time is money, especially when it's yours.' The framework of calculating separate costs per service and tracking time/materials aligns directly with the chunk content. Some elements like the specific price ranges ($15-30, $20-40) appear to be general knowledge rather than chunk-derived.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "Should I offer package deals like 'braids + nails' to make more money?",
+          "response_preview": "Package deals can work, but you need to understand your unit economics for each service first! Here's how the anchor pricing effect applies: if you offer braids ($30) + nails ($20) separately versus a",
+          "word_count": 154,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response directly references and applies multiple specific concepts from the retrieved chunks: the anchor pricing effect from 'Pricing Psychology,' the 'Revenue is vanity, profit is sanity' quote from 'Unit Economics,' the true cost/unit economics framework, and the three-tier pricing strategy from the phone case example. The numerical examples (costs, profit calculations, hourly rate analysis) are original but constructed using the frameworks from the chunks. The only slight departure is that the specific dollar figures are fabricated for illustration rather than drawn from the chunks, but this is appropriate contextualization rather than unfaithfulness.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Ravi",
+      "lesson": "M2L3",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.85,
+      "turns": [
+        {
+          "question": "I'm thinking of charging $75 per automation script for local shops. Is that fair? I'm worried parents of my friends will think I'm overcharging since I'm just a teenager.",
+          "response_preview": "Great question! Let's use unit economics to validate that price. The principle here is 'True Unit Cost' - you need to count ALL your costs, including valuing your time fairly. How many hours does it t",
+          "word_count": 129,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly references 'True Unit Cost' from the Unit Economics chunk and 'Price as Quality Signal' from the Pricing Psychology chunk, applying both principles specifically to the student's situation. It uses the framework of counting all costs including time valued at a fair hourly rate, and references the concept that low prices signal low quality. The $10/hour minimum wage figure aligns with the chunks' guidance on valuing time at minimum wage or higher. The advice about focusing on results rather than apologizing maps to 'Value-Based Justification.' Minor general knowledge additions (like computer depreciation) go slightly beyond the chunks but are consistent with them.",
+            "used_chunks": [
+              "Unit Economics and Cost Tracking for Teen Businesses",
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "Should I offer different pricing tiers, like basic scripts for $50 and premium ones for $100? Or is that too confusing?",
+          "response_preview": "That's actually smart psychology! This taps into the 'Anchor Pricing Effect' - when customers see your $100 premium option first, it makes the $75 standard option seem reasonable. Most businesses bene",
+          "word_count": 111,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response directly references the 'Anchor Pricing Effect' and 'True Unit Cost' by name from the retrieved chunks. It also draws on the phone case example from the Pricing Psychology chunk, where three price points lead customers to choose the middle option. The three-tier structure advice and the emphasis on covering costs plus profit margin are well-grounded in the chunks. However, the specific tier descriptions ($50/$75/$100 with features) and some framing come from general business knowledge rather than the chunks directly.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers",
+              "Unit Economics and Cost Tracking for Teen Businesses"
+            ]
+          }
+        },
+        {
+          "question": "What if a shop owner says they can get someone on Fiverr to do it for $20? How do I handle that objection?",
+          "response_preview": "This is where 'Value-Based Justification' becomes crucial - focus on the specific value and results they receive rather than defending your costs. You could say: 'That's definitely an option! The diff",
+          "word_count": 144,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response directly quotes and references multiple specific elements from the retrieved chunks: the 'Value-Based Justification' principle by name, the exact quote 'People don't buy products, they buy better versions of themselves,' and the quote 'If you're not losing some customers to price, you're probably not charging enough.' The practical advice about emphasizing local presence, ongoing support, and specific business value is original application advice not directly from the chunks, but is well-aligned with the value-based justification framework. The POS system integration example is generated contextual advice rather than drawn from chunks, but it doesn't contradict anything retrieved.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers"
+            ]
+          }
+        },
+        {
+          "question": "I'm also thinking about creating a website to showcase my scripts. Should I put my prices on there or keep them private until someone contacts me?",
+          "response_preview": "Smart thinking about marketing! While website design isn't our main focus in pricing, this connects directly to the 'Price as Quality Signal' principle. Hiding your prices can make potential customers",
+          "word_count": 138,
+          "faithfulness": {
+            "score": 0.78,
+            "reasoning": "The response explicitly references 'Price as Quality Signal' and 'Anchor Pricing Effect' principles from the Pricing Psychology chunk, and mentions unit economics concepts from the first chunk. However, it also introduces ideas not in the chunks—such as the specific $50-100 price range, the three-tier Basic/Standard/Premium structure, the $20 Fiverr rate comparison, and the concept of 'pre-qualifying customers'—which come from general training data or assumed prior conversation context rather than the retrieved chunks.",
+            "used_chunks": [
+              "Pricing Psychology: What Your Price Signals to Customers",
+              "Unit Economics and Cost Tracking for Teen Businesses"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Mia",
+      "lesson": "M4L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.93,
+      "turns": [
+        {
+          "question": "I have literally zero followers on social media and no money for ads. How am I supposed to get customers for my press-on nail business when nobody knows I exist?",
+          "response_preview": "Great question! This is actually where the Zero-Follower Strategy from social media marketing becomes your best friend. Instead of worrying about having no followers, focus on creating searchable cont",
+          "word_count": 124,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly references and names specific concepts from the retrieved chunks: the 'Zero-Follower Strategy,' the '1-1-1 Content Formula,' and the principle that 'direct outreach beats mass advertising for early-stage businesses.' These are all traceable to the chunk content. The response also applies these concepts specifically to the student's press-on nail business context. The only minor addition not explicitly from the chunks is the specific prom-related content idea, which is a reasonable application rather than an unfaithful claim.",
+            "used_chunks": [
+              "TikTok and Instagram Content Strategy for Teen Service Businesses",
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        },
+        {
+          "question": "Should I just ask my friends to buy from me first, or is that weird? I don't want to be that person who's always trying to sell stuff.",
+          "response_preview": "Your network is definitely your starting point, but not your endpoint - and there's a smart way to approach this! Instead of jumping straight to sales, think about how you can provide value first. May",
+          "word_count": 122,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response directly draws on multiple specific principles from the 'Marketing with Zero Budget' chunk, including near-verbatim use of 'Your network is your starting point, but not your endpoint,' 'word-of-mouth marketing starts with exceptional customer experience,' and the concept of using early supporters for testimonials and referrals. The suggestion to offer free/at-cost work mirrors the tutoring example from the same chunk. The 'value first' framing also aligns with the content marketing principle from the TikTok chunk. Minor general advice is woven in but the core response is clearly grounded in the retrieved context.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money",
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        },
+        {
+          "question": "What kind of content should I actually post on TikTok and Instagram? I see other nail artists but I don't know if I should copy them or do something different.",
+          "response_preview": "Perfect question! Focus on the principle of 'Show Process Over Product' - document the actual work you do rather than just promoting your services. This builds credibility without seeming pushy. For y",
+          "word_count": 127,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly references multiple specific principles from the retrieved chunks by name: 'Show Process Over Product,' '1-1-1 Content Formula,' 'Platform-Specific Formatting,' and 'Authentic Documentation.' It quotes near-verbatim language from the chunks (e.g., 'teens can easily spot fake promotional material,' 'vertical videos with trending sounds and quick cuts'). The content-specific suggestions for press-on nails are original applications but grounded in the chunk frameworks.",
+            "used_chunks": [
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        },
+        {
+          "question": "I keep seeing other businesses collaborating with each other. Could that work for my nail business, and how would I even approach someone about that?",
+          "response_preview": "Absolutely! This taps into the principle that partnerships and collaboration multiply reach without multiplying costs. For your press-on nail business, think about who else serves girls preparing for ",
+          "word_count": 145,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly draws on the 'Marketing with Zero Budget' chunk, closely paraphrasing the principle that 'partnerships and collaboration multiply reach without multiplying costs' and the idea that collaboration allows you to 'access their audience while they access yours.' It also echoes the chunk's example of partnering with complementary businesses and the general framework of cross-promotion. The specific application to prom-related businesses and the advice about leading with value add practical detail that goes slightly beyond the chunks but remains consistent with their spirit.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Devon",
+      "lesson": "M4L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.88,
+      "turns": [
+        {
+          "question": "I get that I shouldn't spend money on ads, but how do I actually find students who need algebra help without just asking my friends?",
+          "response_preview": "Great question! Remember that direct outreach beats mass advertising for early-stage businesses, especially when you have no budget. Start with your immediate network - yes, friends and family - but u",
+          "word_count": 132,
+          "faithfulness": {
+            "score": 0.88,
+            "reasoning": "The response directly draws on multiple key principles from the 'Marketing with Zero Budget' chunk, including near-verbatim phrases like 'direct outreach beats mass advertising for early-stage businesses,' 'your network is your starting point, but not your endpoint,' and the idea that personal connections are free and more effective than paid ads. It also references the social media content strategy from the first chunk. The suggestions about asking teachers and reaching out to struggling students in class are reasonable additions not directly from the chunks but consistent with them.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money",
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        },
+        {
+          "question": "Should I post on TikTok or Instagram to get tutoring clients? And what would I even post about math?",
+          "response_preview": "Absolutely! Content creation costs time, not money, and builds long-term value. I'd recommend using the 1-1-1 Content Formula: for every three posts, share one educational tip, one behind-the-scenes m",
+          "word_count": 119,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly references multiple specific concepts from the retrieved chunks: the 1-1-1 Content Formula, the zero-follower strategy, 'show process over product,' 'content creation costs time, not money,' platform-specific vertical video formatting, and the advice about teens spotting fake content. It also adapts the tutoring-specific example from the TikTok/Instagram chunk (15-second Instagram Reel explaining a math concept with study setup). Nearly every sentence can be traced back to specific chunk content.",
+            "used_chunks": [
+              "TikTok and Instagram Content Strategy for Teen Service Businesses",
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        },
+        {
+          "question": "What if I mess up with my first few students? Won't bad word-of-mouth hurt my business before it even starts?",
+          "response_preview": "That's exactly why word-of-mouth marketing starts with exceptional customer experience - you're thinking about this the right way! Here's the thing: your early customers from your network are usually ",
+          "word_count": 131,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on specific language and principles from the 'Marketing with Zero Budget' chunk, including the exact phrase 'word-of-mouth marketing starts with exceptional customer experience,' the advice to 'start by helping classmates for free or at low cost,' the concept of creating 'such a positive experience that they naturally want to tell others,' and the idea of focusing 'intensely on customer satisfaction and following up.' The advice about handling problems turning into stronger relationships is general knowledge not from the chunks, but the overall response is well-grounded in the retrieved context.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        },
+        {
+          "question": "Are there other people or businesses I could team up with to get more tutoring clients?",
+          "response_preview": "Yes! Partnerships and collaboration multiply reach without multiplying costs - this is perfect for zero-budget marketing. Think about who else serves your target students: other subject tutors (Englis",
+          "word_count": 137,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response directly quotes the principle 'Partnerships and collaboration multiply reach without multiplying costs' from the 'Marketing with Zero Budget' chunk and builds upon the partnership/collaboration concept extensively. It also references the flyer/local business partnership example from the same chunk (leaving study tip flyers at coffee shops/bookstores in exchange for mentioning their location). However, the response adds substantial specific suggestions (teachers, test prep services, libraries, subject-swapping with classmates) that go beyond the retrieved context, drawing on general knowledge applied to the tutoring scenario.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Jada",
+      "lesson": "M4L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.91,
+      "turns": [
+        {
+          "question": "I want to start marketing my braiding business but I literally have zero money to spend on ads. How can I get customers without paying for anything?",
+          "response_preview": "Perfect question! The key principle here is that direct outreach beats mass advertising for early-stage businesses. When you have no budget, personal connection trumps broad reach. Start with one-on-o",
+          "word_count": 114,
+          "faithfulness": {
+            "score": 0.92,
+            "reasoning": "The response directly draws on multiple key principles from the 'Marketing with Zero Budget' chunk, including near-verbatim phrases like 'direct outreach beats mass advertising for early-stage businesses,' 'personal connection trumps broad reach,' 'Your network is your starting point,' and 'word-of-mouth marketing starts with exceptional customer experience.' These are clearly traceable to the retrieved context. The response could have also incorporated the TikTok/Instagram content strategy chunk (e.g., the 1-1-1 formula) which was highly relevant but went unused, slightly reducing the score.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        },
+        {
+          "question": "What kind of content should I post on TikTok and Instagram to get more braiding clients?",
+          "response_preview": "Use the 1-1-1 Content Formula: for every three posts, share one educational tip (like hair care advice or braid maintenance), one behind-the-scenes moment (you actually braiding someone's hair), and o",
+          "word_count": 113,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly references multiple specific concepts from the retrieved chunks: the 1-1-1 Content Formula, 'Show Process Over Product,' the Zero-Follower Strategy (searchable content over relying on followers), authentic documentation over staged content, and vertical filming format. Nearly every sentence can be traced back to specific principles in the 'TikTok and Instagram Content Strategy' chunk. The slight deduction is because the response didn't draw from the second chunk on zero-budget marketing or mention partnerships/word-of-mouth, but everything stated is faithful to the retrieved context.",
+            "used_chunks": [
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        },
+        {
+          "question": "Should I lower my prices from $20-40 to get more customers since I'm just starting out?",
+          "response_preview": "Here's the thing about zero-budget marketing - it's better to focus on demonstrating value rather than competing on price. Instead of lowering your rates, use content creation that costs time, not mon",
+          "word_count": 128,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on multiple specific principles from the retrieved chunks, including 'content creation costs time, not money, and builds long-term value,' 'word-of-mouth marketing starts with exceptional customer experience,' and the example of offering one small task for free to demonstrate quality. The advice about starting with people you know and using referrals also maps directly to chunk content. The framing around 'demonstrating value rather than competing on price' is a reasonable synthesis of the chunks' emphasis on showing expertise through content, though that specific framing isn't explicitly stated in the chunks.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money",
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        },
+        {
+          "question": "How do I reach girls outside my immediate friend group who might want braids?",
+          "response_preview": "This is where partnerships and collaboration multiply reach without multiplying costs! Look for ways to team up with other students or groups that serve the same girls you want to reach. Maybe partner",
+          "word_count": 127,
+          "faithfulness": {
+            "score": 0.9,
+            "reasoning": "The response directly draws on multiple specific principles from both retrieved chunks, including 'partnerships and collaboration multiply reach without multiplying costs' (quoted nearly verbatim), 'content creation costs time, not money, and builds long-term value' (also nearly verbatim), and the concept of using searchable content/hashtags from the TikTok/Instagram chunk. The cross-promotion idea aligns with the partnerships principle, and the suggestion to post tutorials and tips maps to the 1-1-1 content formula and educational content strategies. The application to braiding (nails/makeup partners, school clubs, dance groups) represents contextually appropriate elaboration rather than unfaithful deviation.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money",
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "persona": "Ravi",
+      "lesson": "M4L1",
+      "chunks_available": 2,
+      "no_rag": false,
+      "avg_score": 0.81,
+      "turns": [
+        {
+          "question": "I want to market my Python automation scripts to local shops, but I literally have zero dollars to spend on ads. How am I supposed to compete with established tech companies that have huge marketing budgets?",
+          "response_preview": "Here's the thing - direct outreach beats mass advertising for early-stage businesses, especially when you have no budget. Those big tech companies are trying to reach everyone, but you have a huge adv",
+          "word_count": 115,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response clearly draws on the 'Marketing with Zero Budget' chunk, directly echoing its key principle that 'direct outreach beats mass advertising for early-stage businesses' and the emphasis on one-on-one conversations, personal connections, and building genuine relationships. The language closely mirrors the chunk's phrasing. However, the response also adds contextual details specific to the student's Python automation business (inventory tracking, data entry) that go beyond the chunks, blending retrieved knowledge with general business advice.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        },
+        {
+          "question": "Should I be posting on TikTok about my coding work? It feels weird to film myself programming - that doesn't seem very exciting for social media.",
+          "response_preview": "Actually, this is perfect for the 1-1-1 Content Formula! For every three posts, share one educational tip, one behind-the-scenes moment, and one result or testimonial. Your programming work is ideal c",
+          "word_count": 123,
+          "faithfulness": {
+            "score": 0.95,
+            "reasoning": "The response directly and explicitly references multiple specific elements from the retrieved chunks: the '1-1-1 Content Formula,' 'show process over product,' 'authentic documentation,' vertical format, text overlays, and the quote 'people buy from those they know, like, and trust.' The adaptation to the student's Python automation context (before/after of a messy spreadsheet) mirrors the pattern of the dog walker before/after example and the tutoring 15-second explanation example from the chunks. Nearly every claim can be traced back to chunk content.",
+            "used_chunks": [
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        },
+        {
+          "question": "What should I charge for my scripts? I was thinking $50-100, but I'm not sure if that's too much for small businesses.",
+          "response_preview": "Your pricing range of $50-100 actually aligns well with zero-budget marketing principles. Here's why: when you focus on direct outreach and personal conversations with shop owners, you can demonstrate",
+          "word_count": 130,
+          "faithfulness": {
+            "score": 0.6,
+            "reasoning": "The response references several concepts from the 'Marketing with Zero Budget' chunk, including direct outreach, content creation to show expertise, word-of-mouth marketing through exceptional customer experience, and using testimonials/social proof. However, the core question was about pricing, which is not addressed anywhere in the retrieved chunks. The AI fabricated pricing advice (ROI framing, the $75 midpoint suggestion, 5 hours/week savings) entirely from general training knowledge. The chunks were about marketing strategies, not pricing, so the AI stretched the retrieved content to fit a question it wasn't designed to answer.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money"
+            ]
+          }
+        },
+        {
+          "question": "I'm worried that business owners won't take me seriously because I'm just a teenager. How do I overcome that without lying about my age?",
+          "response_preview": "This is where your zero-budget marketing strategy becomes your secret weapon. Content creation costs time, not money, and builds long-term value by positioning you as knowledgeable in your field. When",
+          "word_count": 147,
+          "faithfulness": {
+            "score": 0.85,
+            "reasoning": "The response directly references several specific principles and quotes from both retrieved chunks: 'Content creation costs time, not money, and builds long-term value' and 'Value first, sales second creates sustainable business relationships' are pulled verbatim. It also uses the 'authentic documentation' concept from the TikTok/Instagram chunk and the 'your network is your starting point' principle from the zero-budget marketing chunk. The advice about leading with specific problems and using testimonials aligns well with the chunks' emphasis on word-of-mouth and demonstrating expertise. However, the suggestion about using 'your parents' shop' as a first client is added general advice not found in the chunks, and the specific framing around age-based credibility concerns goes beyond what the chunks explicitly address.",
+            "used_chunks": [
+              "Marketing with Zero Budget: Building Your First Customer Base Without Spending Money",
+              "TikTok and Instagram Content Strategy for Teen Service Businesses"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

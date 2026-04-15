@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-04-14T22:21:06.297Z",
+  "runtime_seconds": 3432,
+  "all_pass": false,
+  "regression_threshold": "10% of baseline score",
+  "faithfulness_included": false,
+  "results": [
+    {
+      "name": "age-12 × Capital Required",
+      "key": "age12_capital_required",
+      "baseline": 4.5,
+      "floor": 4.05,
+      "actual": null,
+      "delta": null,
+      "pass": false,
+      "error": "Could not parse score from stdout"
+    },
+    {
+      "name": "multi-interest × Insight Quality",
+      "key": "multi_interest_insight_quality",
+      "baseline": 4.1,
+      "floor": 3.69,
+      "actual": null,
+      "delta": null,
+      "pass": false,
+      "error": "Could not parse score from stdout"
+    },
+    {
+      "name": "multi-interest × No Forced Hybrids",
+      "key": "multi_interest_no_forced_hybrids",
+      "baseline": 4.6,
+      "floor": 4.14,
+      "actual": null,
+      "delta": null,
+      "pass": false,
+      "error": "Could not parse score from stdout"
+    }
+  ],
+  "scripts": {
+    "scripts/eval-age12-regression.ts": {
+      "exit_code": 1,
+      "duration_ms": 805287
+    },
+    "scripts/eval-multi-interest-regression.ts": {
+      "exit_code": 1,
+      "duration_ms": 2626676
+    }
+  }
+}

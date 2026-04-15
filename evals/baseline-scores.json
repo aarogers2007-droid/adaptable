@@ -1,0 +1,65 @@
+{
+  "_comment": "Regression floor scores for Ikigai wizard eval dimensions. Do not ship prompt changes that drop any dimension below these baselines.",
+  "updated": "2026-04-14",
+  "source": "scripts/eval-dimension-crosstab.json + regression test results",
+  "scale": "1-5 per dimension",
+  "baselines": {
+    "age-12": {
+      "capital_required": {
+        "score": 4.50,
+        "previous": 3.00,
+        "fix": "Rule 11 — Young Student Guard (zero startup capital for age <= 12)",
+        "regression_test": "scripts/eval-age12-regression.ts",
+        "updated": "2026-04-14"
+      }
+    },
+    "multi-interest": {
+      "insight_quality": {
+        "score": 4.10,
+        "previous": 3.80,
+        "fix": "Rules 4-5 — dominant interest selection + specific insight guidance",
+        "regression_test": "scripts/eval-multi-interest-regression.ts",
+        "updated": "2026-04-14"
+      },
+      "no_forced_hybrids": {
+        "score": 4.60,
+        "previous": 3.90,
+        "fix": "Rule 5 — anti-hybrid self-check + concrete bad examples",
+        "regression_test": "scripts/eval-multi-interest-regression.ts",
+        "updated": "2026-04-14"
+      }
+    },
+    "overall": {
+      "_comment": "From v4 eval report (144 runs, 66 personas)",
+      "avg_35": 30.86,
+      "v1_comparable_30": 26.50
+    },
+    "faithfulness": {
+      "_comment": "RAG faithfulness — measures whether AI lesson responses use retrieved knowledge chunks vs. training data alone",
+      "overall": {
+        "score": 0.83,
+        "previous": 0.85,
+        "scale": "0-1",
+        "fix": "KB expansion to 38 entries across all 22 lessons; hybrid tag+semantic re-ranking with augmented query (business context + module name)",
+        "regression_test": "scripts/eval-faithfulness.ts",
+        "updated": "2026-04-15"
+      },
+      "by_tag": {
+        "customer-interviews": {
+          "score": 0.87,
+          "previous": 0.71,
+          "fix": "Explicit Mom Test + Jobs-to-be-Done naming instruction for customer interview lessons"
+        },
+        "getting-started": { "score": 0.87, "previous": 0.73 },
+        "marketing": { "score": 0.85, "previous": 0.76 },
+        "competition": { "score": 0.90, "previous": 0.78 },
+        "pricing": { "score": 0.85, "previous": 0.80 }
+      },
+      "low_faithfulness_pct": {
+        "score": 0.0,
+        "previous": 15.0,
+        "unit": "percent of teaching turns below 0.5 faithfulness"
+      }
+    }
+  }
+}
