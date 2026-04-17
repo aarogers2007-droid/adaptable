@@ -21,11 +21,10 @@
  * Business: Elsa's Art Studio
  */
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
 // ── ACTUAL PLATFORM COMPONENTS ──
-import IkigaiDiagram from "@/components/ikigai/IkigaiDiagram";
 import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { BusinessIdea } from "@/lib/types";
@@ -47,7 +46,7 @@ const IKIGAI = {
   passions: ["Painting", "Drawing", "Helping others create"],
   skills: ["Visual composition", "Color theory", "Teaching"],
   needs: ["Creative outlets for teens", "Affordable art education", "Self-expression spaces"],
-  monetization: "Art workshops, Private lessons, Commission pieces",
+  monetization: ["Art workshops", "Private lessons", "Commission pieces"],
 };
 
 // ── Scroll-triggered visibility hook ──
@@ -115,12 +114,24 @@ export default function DemoShowcase() {
   const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
   const [showIkigaiReveal, setShowIkigaiReveal] = useState(false);
 
+  // Mobile tab state (md:hidden tabs, desktop shows everything)
+  type MobileTab = "journey" | "build" | "proof" | "adults" | "ceremony";
+  const [mobileTab, setMobileTab] = useState<MobileTab>("journey");
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const selectTab = (key: MobileTab) => {
+    setMobileTab(key);
+    requestAnimationFrame(() => {
+      tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+  const tabPane = (key: MobileTab) =>
+    mobileTab === key ? "md:!block" : "hidden md:!block";
+
   // Scroll-triggered sections
   const distance = useInView(0.3);
   const conversation = useInView(0.2);
   const mirror = useInView(0.3);
   const numbers = useInView(0.2);
-  const ceremony = useInView(0.4);
 
   // Typewriter texts
   const chatLine1 = useTypewriter(
@@ -145,15 +156,7 @@ export default function DemoShowcase() {
   const confidenceBefore = useCounter(2, numbers.visible, 800);
   const confidenceAfter = useCounter(4, numbers.visible, 1400);
 
-  // Auto-trigger ceremony on scroll
-  const ceremonyTriggered = useRef(false);
-  useEffect(() => {
-    if (ceremony.visible && !ceremonyTriggered.current && !ceremonyDone) {
-      ceremonyTriggered.current = true;
-      const timer = setTimeout(() => setShowCeremony(true), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [ceremony.visible, ceremonyDone]);
+  // Ceremony is triggered by button press
 
   // ── Ceremony overlay ──
   if (showCeremony && !ceremonyDone) {
@@ -162,7 +165,7 @@ export default function DemoShowcase() {
         studentName={ELSA.name}
         businessName={ELSA_STUDIO.name}
         businessNiche={ELSA_STUDIO.niche}
-        ikigai={IKIGAI}
+        ikigai={{ ...IKIGAI, monetization: IKIGAI.monetization.join(", ") }}
         demoMode={true}
         onComplete={() => {
           setCeremonyDone(true);
@@ -204,6 +207,42 @@ export default function DemoShowcase() {
         </div>
       </section>
 
+      {/* ═══ MOBILE TAB NAV — md:hidden, desktop sees all sections ═══ */}
+      <div
+        ref={tabsRef}
+        className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm md:hidden"
+        role="tablist"
+        aria-label="Demo sections"
+      >
+        <div className="flex gap-1 overflow-x-auto px-3 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {([
+            { key: "journey" as MobileTab, label: "Journey" },
+            { key: "build" as MobileTab, label: "Build" },
+            { key: "proof" as MobileTab, label: "Proof" },
+            { key: "adults" as MobileTab, label: "Adults" },
+            { key: "ceremony" as MobileTab, label: "Ceremony" },
+          ]).map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === t.key}
+              onClick={() => selectTab(t.key)}
+              className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors ${
+                mobileTab === t.key
+                  ? "bg-[var(--primary)] text-white"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ TAB PANE: JOURNEY — Distance, Wizard, Conversation, Mirror ═══ */}
+      <div className={tabPane("journey")}>
+
       {/* ═══════════════════════════════════════════════════════════
           SECTION 2: THE DISTANCE
           Blank Ikigai (38.2%) vs completed plan (61.8%).
@@ -227,11 +266,15 @@ export default function DemoShowcase() {
                 Day 1
               </p>
               <div className="mx-auto w-full max-w-[320px] opacity-40">
-                <IkigaiDiagram
-                  completedSteps={new Set()}
-                  onStepClick={() => {}}
-                  showReveal={false}
-                />
+                {/* Bare circles — no labels, no checks, just the empty shape */}
+                <div style={{ aspectRatio: "1 / 1", position: "relative" }}>
+                  <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <circle cx="50" cy="30.9" r="20" fill="#F5E642" opacity="0.35" />
+                    <circle cx="30.9" cy="50" r="20" fill="#A8DB5A" opacity="0.35" />
+                    <circle cx="69.1" cy="50" r="20" fill="#F4A79D" opacity="0.35" />
+                    <circle cx="50" cy="69.1" r="20" fill="#6DD5D0" opacity="0.35" />
+                  </svg>
+                </div>
               </div>
               <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
                 No idea. No plan. Just a blank page.
@@ -253,13 +296,8 @@ export default function DemoShowcase() {
               >
                 Day 30
               </p>
-              <div className="mx-auto w-full max-w-[320px]">
-                <IkigaiDiagram
-                  completedSteps={new Set([1, 2, 3, 4])}
-                  onStepClick={() => {}}
-                  showReveal={false}
-                  businessName={ELSA_STUDIO.name}
-                />
+              <div className="mx-auto w-full max-w-[380px]">
+                <GoldenIkigai businessName={ELSA_STUDIO.name} />
               </div>
               <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
                 A real business. A 4-week plan. Confidence built on facts.
@@ -322,7 +360,7 @@ export default function DemoShowcase() {
               { label: "What she loves", items: IKIGAI.passions, color: "#F5E642" },
               { label: "What she's good at", items: IKIGAI.skills, color: "#A8DB5A" },
               { label: "What people need", items: IKIGAI.needs, color: "#F4A79D" },
-              { label: "How she earns", items: [IKIGAI.monetization], color: "#6DD5D0" },
+              { label: "How she earns", items: IKIGAI.monetization, color: "#6DD5D0" },
             ].map((g) => (
               <div key={g.label} className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4" style={{ borderLeftWidth: "3px", borderLeftColor: g.color }}>
                 <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#9CA3AF" }}>
@@ -604,6 +642,12 @@ export default function DemoShowcase() {
         </div>
       </section>
 
+      </div>
+      {/* ═══ END TAB PANE: JOURNEY ═══ */}
+
+      {/* ═══ TAB PANE: PROOF — Numbers ═══ */}
+      <div className={tabPane("proof")}>
+
       {/* ═══════════════════════════════════════════════════════════
           SECTION 6: THE NUMBERS
           Von Restorff Effect: darker background breaks the pattern.
@@ -709,6 +753,12 @@ export default function DemoShowcase() {
         </div>
       </section>
 
+      </div>
+      {/* ═══ END TAB PANE: PROOF ═══ */}
+
+      {/* ═══ TAB PANE: BUILD — Plan + Card ═══ */}
+      <div className={tabPane("build")}>
+
       {/* ═══════════════════════════════════════════════════════════
           SECTION 7: THE PLAN
           BusinessPlanFolder with grade tier badges.
@@ -794,6 +844,12 @@ export default function DemoShowcase() {
           </div>
         </div>
       </section>
+
+      </div>
+      {/* ═══ END TAB PANE: BUILD ═══ */}
+
+      {/* ═══ TAB PANE: ADULTS — Teacher + Parent ═══ */}
+      <div className={tabPane("adults")}>
 
       {/* ═══════════════════════════════════════════════════════════
           SECTION 9: THE TEACHER AND PARENT
@@ -912,13 +968,17 @@ export default function DemoShowcase() {
         </div>
       </section>
 
+      </div>
+      {/* ═══ END TAB PANE: ADULTS ═══ */}
+
+      {/* ═══ TAB PANE: CEREMONY ═══ */}
+      <div className={tabPane("ceremony")}>
+
       {/* ═══════════════════════════════════════════════════════════
           SECTION 10: THE CEREMONY
-          Auto-plays on scroll after 600ms delay.
-          Peak-End Rule: this is the peak.
+          Button-triggered. Peak-End Rule: this is the peak.
           ═══════════════════════════════════════════════════════════ */}
       <section
-        ref={ceremony.ref}
         className="border-t border-[var(--border)]"
         style={{ padding: "144px 34px", background: "var(--bg-subtle)" }}
       >
@@ -935,41 +995,33 @@ export default function DemoShowcase() {
           >
             {ceremonyDone ? "That's what real students see." : "After lesson 22, this happens."}
           </h2>
-          {!ceremonyDone && (
-            <p className="mt-3" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-              The four parts of who they are arrive. Light gathers in the space they hold. Their venture is born from that light. Founder&apos;s letter. Diploma.
-            </p>
-          )}
-
-          {ceremonyDone && (
-            <div className="mt-8">
-              <p style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-                Confidence built on a moment they earned.
-              </p>
-              <button
-                onClick={() => {
-                  setCeremonyDone(false);
-                  ceremonyTriggered.current = false;
-                  setShowCeremony(true);
-                }}
-                className="mt-5 rounded-lg border border-[var(--border-strong)] px-6 py-3 font-semibold hover:bg-[var(--bg-muted)] transition-colors"
-                style={{ fontSize: "13px", color: "#111827" }}
-              >
-                Watch it again
-              </button>
-            </div>
-          )}
-
-          {!ceremonyDone && !ceremony.visible && (
-            <p className="mt-8 animate-pulse" style={{ fontSize: "13px", color: "#9CA3AF" }}>
-              Scroll to trigger the ceremony...
-            </p>
-          )}
+          <p className="mt-3" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
+            {ceremonyDone
+              ? "Confidence built on a moment they earned."
+              : "The four parts of who they are arrive. Light gathers in the space they hold. Their venture is born from that light. Founder\u2019s letter. Diploma."}
+          </p>
+          <button
+            onClick={() => {
+              setCeremonyDone(false);
+              setShowCeremony(true);
+            }}
+            className="mt-8 rounded-lg px-8 py-4 font-semibold text-white transition-colors"
+            style={{
+              fontSize: "16px",
+              background: "#F59E0B",
+              boxShadow: "0 0 21px rgba(245, 158, 11, 0.35), 0 0 55px rgba(245, 158, 11, 0.1)",
+            }}
+          >
+            {ceremonyDone ? "Watch it again" : "Watch the graduation ceremony"}
+          </button>
         </div>
       </section>
 
+      </div>
+      {/* ═══ END TAB PANE: CEREMONY ═══ */}
+
       {/* ═══════════════════════════════════════════════════════════
-          SECTION 11: THE CTA
+          SECTION 11: THE CTA — always visible, outside tabs
           Dark. Simple. One line + sign up.
           Peak-End Rule: this is the end.
           ═══════════════════════════════════════════════════════════ */}
@@ -1022,5 +1074,96 @@ export default function DemoShowcase() {
         />
       )}
     </main>
+  );
+}
+
+/**
+ * Golden Ratio Ikigai Diagram — from /for-schools page.
+ * φ = 1.618034. Circle center offset = cluster_radius/φ = 19.1 units.
+ * Circle radius = 20 units. Center circle radius = R/φ² = 7.64 units.
+ */
+function GoldenIkigai({ businessName }: { businessName: string }) {
+  return (
+    <div
+      className="relative mx-auto w-full"
+      style={{ aspectRatio: "1 / 1" }}
+      role="img"
+      aria-label="Completed Ikigai diagram showing Elsa's business at the center"
+    >
+      <svg
+        className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
+        viewBox="0 0 100 100"
+        style={{ zIndex: 1 }}
+      >
+        <circle cx="50" cy="30.901" r="20" fill="#F5E642" opacity="0.55" />
+        <circle cx="30.901" cy="50" r="20" fill="#A8DB5A" opacity="0.55" />
+        <circle cx="69.099" cy="50" r="20" fill="#F4A79D" opacity="0.55" />
+        <circle cx="50" cy="69.099" r="20" fill="#6DD5D0" opacity="0.55" />
+
+        {/* Callout lines + dots */}
+        <line x1="31.26" y1="23.92" x2="26" y2="22" stroke="#C4B320" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="31.26" cy="23.92" r="1.05" fill="#C4B320" opacity="0.7" />
+        <line x1="21.25" y1="67.52" x2="17.7" y2="73.9" stroke="#7AAD3A" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="21.25" cy="67.52" r="1.05" fill="#7AAD3A" opacity="0.7" />
+        <line x1="78.64" y1="32.42" x2="82.1" y2="26.1" stroke="#D4796E" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="78.64" cy="32.42" r="1.05" fill="#D4796E" opacity="0.7" />
+        <line x1="68.74" y1="76.08" x2="72" y2="77.3" stroke="#4DBAB4" strokeWidth="0.5" opacity="0.55" />
+        <circle cx="68.74" cy="76.08" r="1.05" fill="#4DBAB4" opacity="0.7" />
+      </svg>
+
+      {/* Center circle */}
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: "15.28%",
+          height: "15.28%",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "radial-gradient(circle, #4A6741 40%, #8B9E6A 100%)",
+          boxShadow: "0 0 20px rgba(74, 103, 65, 0.3)",
+          zIndex: 5,
+        }}
+      />
+
+      {/* Center label */}
+      <div
+        className="absolute pointer-events-none flex flex-col items-center justify-center"
+        style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 6 }}
+      >
+        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
+          YOUR
+        </span>
+        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
+          BUSINESS
+        </span>
+      </div>
+
+      {/* Corner labels */}
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        style={{ top: "16.5%", left: "5%" }}
+      >
+        What you love
+      </div>
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        style={{ bottom: "14.5%", left: "5%" }}
+      >
+        What you&apos;re<br />good at
+      </div>
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        style={{ top: "14.5%", right: "5%", textAlign: "right" }}
+      >
+        What the world<br />needs
+      </div>
+      <div
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}
+      >
+        What you can<br />be paid for
+      </div>
+    </div>
   );
 }
