@@ -305,7 +305,7 @@ export default function DemoShowcase() {
               >
                 Day 30
               </p>
-              <div className="mx-auto w-full max-w-[480px]">
+              <div className="mx-auto w-full max-w-[320px]">
                 <GoldenIkigai />
               </div>
               <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
