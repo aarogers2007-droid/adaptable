@@ -3,19 +3,21 @@
 /*
  * ADAPTABLE DEMO — Narrative Experience
  *
- * A scroll-driven story following Elsa Martinez's journey.
- * No tabs. No feature catalog. Just the story of transformation.
+ * A story following Elsa Martinez's journey, structured as tabs
+ * so visitors navigate sideways, not through a 10,000px scroll.
  *
  * Golden Ratio (φ = 1.618034) governs all scales:
  *   Typography: 11, 13, 16, 21, 34, 55, 89, 144px (Fibonacci)
  *   Spacing:    8, 13, 21, 34, 55, 89, 144, 233px
  *   Line height: 1.618
  *
- * Psychological framework:
- *   Processing Fluency — simple layouts, generous whitespace
- *   Narrative Bias — story arc, not feature list
- *   Von Restorff Effect — Section 6 breaks the pattern
- *   Peak-End Rule — Ceremony + CTA are the last two things you feel
+ * Tab structure (replaces linear scroll):
+ *   Start    — Quote + Distance (Day 1 vs Day 30)
+ *   Learn    — Wizard + Conversation + Mirror + Founder's Log
+ *   Build    — Plan + Card
+ *   Prove    — Numbers (Von Restorff dark section)
+ *   Guide    — Teacher dashboard + Parent view
+ *   Graduate — Ceremony + CTA
  *
  * Student: Elsa Martinez, age 16
  * Business: Elsa's Art Studio
@@ -49,8 +51,6 @@ const IKIGAI = {
 };
 
 // ── Scroll-triggered visibility hook ──
-// `forceVisible` bypasses the observer (used when mobile tab switches
-// reveal a section that was display:none and couldn't intersect).
 function useInView(threshold = 0.3) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -67,7 +67,6 @@ function useInView(threshold = 0.3) {
   }, [threshold]);
 
   const forceVisible = () => setVisible(true);
-
   return { ref, visible, forceVisible };
 }
 
@@ -99,7 +98,6 @@ function useCounter(target: number, active: boolean, duration = 1200) {
     const start = performance.now();
     const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.round(target * eased));
       if (progress < 1) requestAnimationFrame(tick);
@@ -110,44 +108,51 @@ function useCounter(target: number, active: boolean, duration = 1200) {
   return value;
 }
 
+// ── Tab type ──
+type DemoTab = "start" | "learn" | "build" | "prove" | "guide" | "graduate";
+
+const TABS: { key: DemoTab; label: string }[] = [
+  { key: "start", label: "Start" },
+  { key: "learn", label: "Learn" },
+  { key: "build", label: "Build" },
+  { key: "prove", label: "Prove" },
+  { key: "guide", label: "Guide" },
+  { key: "graduate", label: "Graduate" },
+];
+
 export default function DemoShowcase() {
   const [showCeremony, setShowCeremony] = useState(false);
   const [ceremonyDone, setCeremonyDone] = useState(false);
   const [showDiyWizard, setShowDiyWizard] = useState(false);
   const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
+
+  // Tab state — applies on both mobile and desktop
+  const [activeTab, setActiveTab] = useState<DemoTab>("start");
+  const tabsRef = useRef<HTMLDivElement>(null);
+
   // Scroll-triggered sections
   const distance = useInView(0.3);
   const conversation = useInView(0.2);
   const mirror = useInView(0.3);
   const numbers = useInView(0.2);
 
-  // Mobile tab state (md:hidden tabs, desktop shows everything)
-  type MobileTab = "journey" | "build" | "proof" | "adults" | "ceremony";
-  const [mobileTab, setMobileTab] = useState<MobileTab>("journey");
-  const tabsRef = useRef<HTMLDivElement>(null);
-
-  // Map tabs → the scroll-triggered sections they contain, so we can
-  // force-fire animations when the tab reveals a previously hidden pane.
-  const tabAnimations: Record<MobileTab, Array<() => void>> = {
-    journey: [distance.forceVisible, conversation.forceVisible, mirror.forceVisible],
-    proof: [numbers.forceVisible],
+  // Map tabs → scroll-triggered sections they contain
+  const tabAnimations: Record<DemoTab, Array<() => void>> = {
+    start: [distance.forceVisible],
+    learn: [conversation.forceVisible, mirror.forceVisible],
     build: [],
-    adults: [],
-    ceremony: [],
+    prove: [numbers.forceVisible],
+    guide: [],
+    graduate: [],
   };
 
-  const selectTab = (key: MobileTab) => {
-    setMobileTab(key);
-    // Force-trigger animations for sections in this pane (they were
-    // display:none so IntersectionObserver never fired).
+  const selectTab = (key: DemoTab) => {
+    setActiveTab(key);
     requestAnimationFrame(() => {
       tabAnimations[key].forEach((fn) => fn());
       tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   };
-
-  const tabPane = (key: MobileTab) =>
-    mobileTab === key ? "md:!block" : "hidden md:!block";
 
   // Typewriter texts
   const chatLine1 = useTypewriter(
@@ -166,7 +171,6 @@ export default function DemoShowcase() {
   const [mirrorResponseReady, setMirrorResponseReady] = useState(false);
   useEffect(() => {
     if (!mirror.visible) return;
-    // 80 chars × 40ms/char = 3200ms for prompt + 1200ms pause
     const timer = setTimeout(() => setMirrorResponseReady(true), 4400);
     return () => clearTimeout(timer);
   }, [mirror.visible]);
@@ -180,8 +184,6 @@ export default function DemoShowcase() {
   // Confidence meter
   const confidenceBefore = useCounter(2, numbers.visible, 800);
   const confidenceAfter = useCounter(4, numbers.visible, 1400);
-
-  // Ceremony is triggered by button press
 
   // ── Ceremony overlay ──
   if (showCeremony && !ceremonyDone) {
@@ -203,13 +205,9 @@ export default function DemoShowcase() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
 
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 1: THE QUOTE
-          Full-bleed dark. One quote. One name. One age.
-          Peak-End Rule: the first feeling sets the frame.
-          ═══════════════════════════════════════════════════════════ */}
+      {/* ═══ HERO QUOTE — always visible above tabs ═══ */}
       <section
-        className="flex min-h-[100vh] flex-col items-center justify-center px-8 text-center"
+        className="flex min-h-[80vh] flex-col items-center justify-center px-8 text-center"
         style={{ background: "#111827" }}
       >
         <blockquote
@@ -221,40 +219,25 @@ export default function DemoShowcase() {
         <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
           AJ Rogers, founder, age 19
         </p>
-        <p className="mt-2" style={{ fontSize: "13px", color: "#9CA3AF" }}>
-          Scroll to see what we built
-        </p>
-        {/* Subtle scroll indicator */}
-        <div className="mt-13 animate-bounce" style={{ marginTop: "55px" }}>
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
       </section>
 
-      {/* ═══ MOBILE TAB NAV — md:hidden, desktop sees all sections ═══ */}
+      {/* ═══ TAB NAV — sticky, both mobile and desktop ═══ */}
       <div
         ref={tabsRef}
-        className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm md:hidden"
+        className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm"
         role="tablist"
         aria-label="Demo sections"
       >
-        <div className="flex gap-1 overflow-x-auto px-3 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {([
-            { key: "journey" as MobileTab, label: "Journey" },
-            { key: "build" as MobileTab, label: "Build" },
-            { key: "proof" as MobileTab, label: "Proof" },
-            { key: "adults" as MobileTab, label: "Adults" },
-            { key: "ceremony" as MobileTab, label: "Ceremony" },
-          ]).map((t) => (
+        <div className="mx-auto flex max-w-[1200px] gap-1 overflow-x-auto px-3 py-3 md:justify-center md:gap-2 md:px-6 md:py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {TABS.map((t) => (
             <button
               key={t.key}
               type="button"
               role="tab"
-              aria-selected={mobileTab === t.key}
+              aria-selected={activeTab === t.key}
               onClick={() => selectTab(t.key)}
-              className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors ${
-                mobileTab === t.key
+              className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors md:px-6 md:py-2.5 md:text-sm ${
+                activeTab === t.key
                   ? "bg-[var(--primary)] text-white"
                   : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
               }`}
@@ -265,15 +248,11 @@ export default function DemoShowcase() {
         </div>
       </div>
 
-      {/* ═══ TAB PANE: JOURNEY — Distance, Wizard, Conversation, Mirror ═══ */}
-      <div className={tabPane("journey")}>
-
       {/* ═══════════════════════════════════════════════════════════
-          SECTION 2: THE DISTANCE
-          Blank Ikigai (38.2%) vs completed plan (61.8%).
-          Processing Fluency: the contrast tells the story instantly.
+          TAB: START — Distance (Day 1 vs Day 30)
           ═══════════════════════════════════════════════════════════ */}
-      <section ref={distance.ref} style={{ padding: "144px 34px" }}>
+      {activeTab === "start" && (
+      <section ref={distance.ref} style={{ padding: "89px 34px" }}>
         <div className="mx-auto max-w-[1000px]">
           <div className="grid grid-cols-1 gap-13 md:grid-cols-2 items-center" style={{ gap: "89px" }}>
             {/* Before: blank Ikigai */}
@@ -291,7 +270,6 @@ export default function DemoShowcase() {
                 Day 1
               </p>
               <div className="mx-auto w-full max-w-[320px] opacity-40">
-                {/* Bare circles — no labels, no checks, just the empty shape */}
                 <div style={{ aspectRatio: "1 / 1", position: "relative" }}>
                   <svg viewBox="0 0 100 100" className="w-full h-full">
                     <circle cx="50" cy="30.9" r="20" fill="#F5E642" opacity="0.35" />
@@ -306,7 +284,7 @@ export default function DemoShowcase() {
               </p>
             </div>
 
-            {/* After: completed plan */}
+            {/* After: completed Ikigai */}
             <div
               className="text-center transition-all duration-700"
               style={{
@@ -324,9 +302,11 @@ export default function DemoShowcase() {
               <div className="mx-auto w-full max-w-[320px]">
                 <GoldenIkigai />
               </div>
-              <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
-                A real business. A 4-week plan. Confidence built on facts.
+              <p className="mt-8 font-[family-name:var(--font-display)] font-semibold" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
+                {ELSA_STUDIO.name}
               </p>
+              <p style={{ fontSize: "13px", color: "#4B5563" }}>{ELSA_STUDIO.target}</p>
+              <p style={{ fontSize: "13px", color: "#4B5563" }}>{ELSA_STUDIO.revenue}</p>
             </div>
           </div>
 
@@ -334,18 +314,21 @@ export default function DemoShowcase() {
             className="mx-auto mt-16 max-w-[600px] text-center font-[family-name:var(--font-display)]"
             style={{ fontSize: "21px", lineHeight: 1.618, color: "#111827" }}
           >
-            This is what Adaptable does. Everything below is how.
+            This is what Adaptable does. Use the tabs above to see how.
           </p>
         </div>
       </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════
-          SECTION 3: THE WIZARD
-          Full width. "Try it yourself." The DIY wizard is the centerpiece.
+          TAB: LEARN — Wizard + Conversation + Mirror + Founder's Log
           ═══════════════════════════════════════════════════════════ */}
+      {activeTab === "learn" && (
+      <>
+      {/* Wizard section */}
       <section
-        className="border-t border-b border-[var(--border)]"
-        style={{ padding: "144px 34px", background: "var(--bg-subtle)" }}
+        className="border-b border-[var(--border)]"
+        style={{ padding: "89px 34px", background: "var(--bg-subtle)" }}
       >
         <div className="mx-auto max-w-[800px] text-center">
           <p
@@ -378,7 +361,7 @@ export default function DemoShowcase() {
           </p>
         </div>
 
-        {/* Elsa's answers — context for what the wizard produces */}
+        {/* Elsa's answers */}
         <div className="mx-auto mt-16 max-w-[680px]">
           <div className="grid gap-4 sm:grid-cols-2">
             {[
@@ -402,7 +385,583 @@ export default function DemoShowcase() {
         </div>
       </section>
 
-      {/* Full-screen DIY wizard overlay */}
+      {/* Conversation section */}
+      <section ref={conversation.ref} style={{ padding: "89px 34px" }}>
+        <div className="mx-auto max-w-[620px]">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
+          >
+            What it feels like
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+          >
+            Every lesson is a conversation
+          </h2>
+          <p className="mt-3 max-w-[500px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
+            The AI asks questions instead of giving answers. Checkpoints gate progress. Every conversation is about {ELSA.first}&apos;s business, not a generic textbook.
+          </p>
+
+          {/* Chat transcript */}
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm" style={{ marginTop: "55px" }}>
+            <div className="border-b border-[var(--border)] px-5 py-3">
+              <div className="flex items-center gap-3">
+                <div className="shrink-0">
+                  <p style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Module 2</p>
+                  <p className="font-semibold" style={{ fontSize: "13px", color: "#111827" }}>Define Your Target Customer</p>
+                </div>
+                <div className="flex-1 h-2 rounded-full bg-[var(--bg-muted)]">
+                  <div className="h-2 rounded-full" style={{ width: "50%", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
+                </div>
+                <p style={{ fontSize: "11px", color: "#9CA3AF" }}>2/4</p>
+              </div>
+            </div>
+
+            <div className="lesson-atmosphere px-5 py-5 space-y-5">
+              {/* AI message */}
+              <div className="flex justify-start">
+                <div className="max-w-[85%]">
+                  <div className="flex items-center gap-1.5 mb-1 ml-1">
+                    <div className="ikigai-icon"><div className="ikigai-icon-dot ik-d1" /><div className="ikigai-icon-dot ik-d2" /><div className="ikigai-icon-dot ik-d3" /><div className="ikigai-icon-dot ik-d4" /></div>
+                    <span style={{ fontSize: "11px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Guide</span>
+                  </div>
+                  <div className="ai-message rounded-2xl bg-[var(--bg-muted)] px-6 py-5 space-y-3" style={{ color: "#111827" }}>
+                    <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
+                      Let&apos;s think about who your ideal customer really is. Not just &ldquo;everyone&rdquo; — but the specific person who would be MOST excited about {ELSA_STUDIO.name}.
+                    </p>
+                    <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
+                      Think about age, interests, and what problem they&apos;re trying to solve. Who comes to mind?
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Student message — typewriter */}
+              <div
+                className="transition-all duration-500"
+                style={{ opacity: conversation.visible ? 1 : 0, transitionDelay: "800ms" }}
+              >
+                <div className="flex justify-end">
+                  <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
+                    <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
+                      {chatLine1}
+                      {conversation.visible && chatLine1.length < 110 && <span className="animate-pulse">|</span>}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI response */}
+              <div
+                className="transition-all duration-500"
+                style={{ opacity: conversation.visible ? 1 : 0, transitionDelay: "4500ms" }}
+              >
+                <div className="flex justify-start">
+                  <div className="max-w-[85%]">
+                    <div className="flex items-center gap-1.5 mb-1 ml-1">
+                      <div className="ikigai-icon"><div className="ikigai-icon-dot ik-d1" /><div className="ikigai-icon-dot ik-d2" /><div className="ikigai-icon-dot ik-d3" /><div className="ikigai-icon-dot ik-d4" /></div>
+                      <span style={{ fontSize: "11px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Guide</span>
+                    </div>
+                    <div className="ai-message rounded-2xl bg-[var(--bg-muted)] px-6 py-5 space-y-3" style={{ color: "#111827" }}>
+                      <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
+                        Now THAT is a target customer. You can picture her — she doodles in class, watches art tutorials on YouTube, wishes she could take real lessons.
+                      </p>
+                      <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
+                        That specificity is what makes a business real. Where does she hang out? How would you find her?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Checkpoint */}
+              <div className="transition-all duration-300" style={{ opacity: conversation.visible ? 1 : 0, transitionDelay: "5500ms" }}>
+                <div className="checkpoint-celebration rounded-lg px-4 py-2.5 text-center" style={{ animation: "none", opacity: 1 }}>
+                  <p className="font-semibold" style={{ fontSize: "13px", color: "#0D9488" }}>Checkpoint reached</p>
+                  <p style={{ fontSize: "11px", color: "#9CA3AF" }}>2/4 complete</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#9CA3AF", textAlign: "center" }}>
+            22 lessons. 6 modules. Every one personalized to {ELSA.first}&apos;s business.
+          </p>
+        </div>
+      </section>
+
+      {/* Mirror + Founder's Log section */}
+      <section
+        ref={mirror.ref}
+        className="border-t border-[var(--border)]"
+        style={{ padding: "89px 34px", background: "var(--bg-subtle)" }}
+      >
+        <div className="mx-auto max-w-[620px]">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
+          >
+            The inner game
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+          >
+            Founder&apos;s Mirror
+          </h2>
+          <p className="mt-3 max-w-[500px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
+            After every lesson, one observation and one question. Maximum 40 words. No advice. No praise. The AI shuts up and the student decides whether to write honestly.
+          </p>
+
+          {/* Mirror card */}
+          <div className="rounded-xl overflow-hidden" style={{ marginTop: "55px", boxShadow: "0 8px 34px rgba(0,0,0,0.08)" }}>
+            <div className="bg-[#F0FDFA] border-b border-[#CCFBF1] px-7 pt-6 pb-5">
+              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488", marginBottom: "16px" }}>
+                Founder&apos;s Mirror
+              </p>
+              <p
+                className="font-[family-name:var(--font-display)]"
+                style={{ fontSize: "21px", fontWeight: 400, lineHeight: 1.618, color: "#111827" }}
+              >
+                {mirrorPrompt}
+                {mirror.visible && mirrorPrompt.length < 80 && <span className="animate-pulse" style={{ color: "#0D9488" }}>|</span>}
+              </p>
+            </div>
+            <div className="bg-white px-7 pt-6 pb-7">
+              <div className="flex items-center gap-1.5 mb-5" style={{ fontSize: "13px", color: "#9CA3AF" }}>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" className="opacity-60"><path d="M4 7V5a4 4 0 118 0v2h1a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V8a1 1 0 011-1h1zm2 0h4V5a2 2 0 10-4 0v2z" /></svg>
+                <span>Private to you. No one else sees this.</span>
+              </div>
+              <div
+                className="w-full min-h-[89px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] italic"
+                style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}
+              >
+                {mirrorResponseReady ? mirrorResponse : ""}
+                {mirrorResponseReady && mirrorResponse.length < 95 && (
+                  <span className="animate-pulse">|</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Founder's Log preview — #9 */}
+          <div className="mt-13" style={{ marginTop: "55px" }}>
+            <p style={{ fontSize: "13px", fontWeight: 600, color: "#0D9488", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "16px" }}>
+              The Founder&apos;s Log
+            </p>
+            <p style={{ fontSize: "13px", color: "#4B5563", marginBottom: "16px" }}>
+              Over 22 lessons, these reflections accumulate into a private journal. No teacher sees this. No algorithm ranks it.
+            </p>
+            <div className="space-y-3">
+              {[
+                { date: "April 12", lesson: "What to Do After Your First Sale", prompt: "You moved through this one fast. What clicked?", color: "#0D9488" },
+                { date: "April 9", lesson: "Set Your Price", prompt: "Your pricing numbers changed 4 times. What were you wrestling with?", color: "#F59E0B" },
+                { date: "April 5", lesson: "Welcome back", prompt: "You've been away 9 days. What brought you back?", color: "#6366F1" },
+                { date: "March 28", lesson: "Find Your Niche", prompt: "You spent 20 minutes on this answer. What made it hard?", color: "#0D9488" },
+              ].map((entry) => (
+                <div key={entry.date} className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+                  <div className="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style={{ background: entry.color }} />
+                  <div className="min-w-0">
+                    <p style={{ fontSize: "11px", color: "#9CA3AF" }}>{entry.date} &middot; {entry.lesson}</p>
+                    <p className="mt-1 italic" style={{ fontSize: "13px", color: "#4B5563" }}>&ldquo;{entry.prompt}&rdquo;</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      </>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          TAB: BUILD — Plan + Card
+          ═══════════════════════════════════════════════════════════ */}
+      {activeTab === "build" && (
+      <>
+      <section style={{ padding: "89px 34px" }}>
+        <div className="mx-auto max-w-[800px]">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
+          >
+            What she built
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+          >
+            A business plan that builds itself
+          </h2>
+          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
+            Students never &ldquo;write a business plan.&rdquo; It assembles from their decisions across 22 lessons. Click through {ELSA.first}&apos;s.
+          </p>
+
+          <div className="flex justify-center" style={{ marginTop: "55px" }}>
+            <BusinessPlanFolder />
+          </div>
+
+          {/* Grade tier badges — #12: descriptions visible, not title-only */}
+          <div className="mt-8">
+            <p style={{ fontSize: "13px", color: "#9CA3AF", marginBottom: "13px", textAlign: "center" }}>Adapts to every grade level</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { tier: "K-2", label: "Lower Elementary", desc: "$0 startup capital. Neighborhood only." },
+                { tier: "3-5", label: "Upper Elementary", desc: "Under $10. School + local." },
+                { tier: "6-8", label: "Middle School", desc: "Under $50. Online OK." },
+                { tier: "9-12", label: "High School", desc: "Under $100. Full range." },
+              ].map((g) => (
+                <div
+                  key={g.tier}
+                  className="rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3"
+                >
+                  <span className="font-semibold" style={{ fontSize: "13px", color: "#111827" }}>{g.tier} {g.label}</span>
+                  <p style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px" }}>{g.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="border-t border-[var(--border)]"
+        style={{ padding: "89px 34px", background: "var(--bg-subtle)" }}
+      >
+        <div className="mx-auto max-w-[820px]">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
+          >
+            What she earned
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+          >
+            A business card she designed
+          </h2>
+          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
+            3D tilt, custom colors, finishes that unlock with progress. Pick any combination below.
+          </p>
+
+          <div style={{ marginTop: "55px" }}>
+            <DemoCardDesigner
+              studentName={ELSA.name}
+              defaultBusinessName={ELSA_STUDIO.name}
+              niche={ELSA_STUDIO.niche}
+              targetCustomer={ELSA_STUDIO.target}
+            />
+          </div>
+        </div>
+      </section>
+      </>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          TAB: PROVE — Numbers (Von Restorff dark section)
+          ═══════════════════════════════════════════════════════════ */}
+      {activeTab === "prove" && (
+      <section
+        ref={numbers.ref}
+        style={{ padding: "89px 34px", background: "#111827" }}
+      >
+        <div className="mx-auto max-w-[800px]">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
+          >
+            How we measure
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
+          >
+            Built to measure before we had 10,000 students
+          </h2>
+          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
+            We built an eval harness before we built marketing. Every prompt change is graded against synthetic student personas, judged by an independent model. Here&apos;s what the latest run shows.
+          </p>
+
+          {/* Confidence meter */}
+          <div
+            className="rounded-xl border border-white/10 p-8"
+            style={{ marginTop: "55px", background: "rgba(255,255,255,0.05)" }}
+          >
+            <p style={{ fontSize: "13px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+              Self-confidence: &ldquo;Could YOU start a business?&rdquo;
+            </p>
+            <div className="mt-8 flex items-end gap-8 justify-center">
+              <div className="text-center">
+                <div
+                  className="mx-auto rounded-lg transition-all duration-1000"
+                  style={{ width: "55px", height: `${confidenceBefore * 34}px`, background: "rgba(255,255,255,0.15)", minHeight: "8px" }}
+                />
+                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
+                  {confidenceBefore}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
+                </p>
+                <p style={{ fontSize: "11px", color: "#9CA3AF" }}>Before</p>
+              </div>
+              <svg width="34" height="21" viewBox="0 0 34 21" fill="none" className="mb-8">
+                <path d="M1 10.5h28M23 4l6 6.5-6 6.5" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="text-center">
+                <div
+                  className="mx-auto rounded-lg transition-all duration-[1400ms]"
+                  style={{ width: "55px", height: `${confidenceAfter * 34}px`, background: "linear-gradient(180deg, #14B8A6, #0D9488)", minHeight: "8px" }}
+                />
+                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
+                  {confidenceAfter}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
+                </p>
+                <p style={{ fontSize: "11px", color: "#0D9488" }}>After</p>
+              </div>
+            </div>
+            <p className="mt-5 text-center" style={{ fontSize: "13px", color: "#9CA3AF" }}>
+              +{numbers.visible ? "1.15" : "0"} average gain. 100% of simulated students gained.
+            </p>
+          </div>
+
+          {/* Stats — #14: 2-column instead of 3-column anti-pattern */}
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {[
+              { label: "Understanding gain", value: "+1.53", sub: "on a 5-point scale. 100% gained." },
+              { label: "Alien to accessible", value: "97%", sub: "flipped from 'business isn't for me' to 'this could be me.'" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-xl border border-white/10 p-5"
+                style={{ background: "rgba(255,255,255,0.05)" }}
+              >
+                <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+                  {stat.label}
+                </p>
+                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
+                  {stat.value}
+                </p>
+                <p className="mt-1" style={{ fontSize: "13px", color: "#9CA3AF" }}>{stat.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#9CA3AF" }}>
+            60 synthetic student personas across 3 motivation levels. Synthesizer: Claude Sonnet. Judge: Claude Opus (cross-model, eliminates self-preference bias). These are simulated upper bounds, not real-teen rates — but the shape of the result is what matters: when the wizard works, it changes how kids think about themselves before it changes what they do.
+          </p>
+
+          {/* #10: Standards alignment */}
+          <div className="mt-8 rounded-xl border border-white/10 p-5" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <p style={{ fontSize: "13px", color: "#F9FAFB" }}>
+              All 22 lessons aligned to <strong>NBEA</strong>, <strong>Common Core</strong>, <strong>ISTE</strong>, and <strong>Jump$tart</strong> standards. Detailed curriculum mapping available for administrators.
+            </p>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          TAB: GUIDE — Teacher dashboard + Parent view
+          ═══════════════════════════════════════════════════════════ */}
+      {activeTab === "guide" && (
+      <section style={{ padding: "89px 34px" }}>
+        <div className="mx-auto max-w-[1000px]">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
+          >
+            For educators and parents
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+          >
+            Teachers see everything. Parents see enough.
+          </h2>
+
+          <div className="grid gap-8 lg:grid-cols-5" style={{ marginTop: "55px" }}>
+            {/* Instructor dashboard — 3/5 */}
+            <div className="lg:col-span-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+              <div className="p-5 border-b border-[var(--border)]">
+                <h3 className="font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>
+                  Entrepreneurship — Period 3
+                </h3>
+                <p className="mt-1" style={{ fontSize: "13px", color: "#4B5563" }}>
+                  28 students &middot; <span style={{ color: "#D97706" }}>2 alerts</span>
+                </p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[var(--border)]">
+                      {["Student", "Business", "Progress", "Status"].map(h => (
+                        <th key={h} className="px-4 py-3 text-left" style={{ fontSize: "11px", fontWeight: 500, color: "#9CA3AF" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { name: ELSA.name, biz: ELSA_STUDIO.name, pct: 64, status: "On track", sColor: "#059669" },
+                      { name: "Marcus Johnson", biz: "Fresh Kicks Co.", pct: 38, status: "Needs help", sColor: "#D97706" },
+                      { name: "Priya Sharma", biz: "Spice Route", pct: 88, status: "On track", sColor: "#059669" },
+                      { name: "Jaylen Carter", biz: "Cart Culture", pct: 25, status: "Inactive", sColor: "#DC2626" },
+                    ].map((s, i) => (
+                      <tr key={i} className="border-b border-[var(--border)]">
+                        <td className="px-4 py-3 font-medium" style={{ fontSize: "13px", color: "#111827" }}>{s.name}</td>
+                        <td className="px-4 py-3" style={{ fontSize: "13px", color: "#4B5563" }}>{s.biz}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="h-1.5 w-16 rounded-full bg-[var(--bg-muted)]">
+                              <div className="h-1.5 rounded-full" style={{ width: `${s.pct}%`, background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
+                            </div>
+                            <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{s.pct}%</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="rounded-full px-2 py-0.5" style={{ fontSize: "11px", fontWeight: 500, color: s.sColor, background: `${s.sColor}15` }}>
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Alert — #13: button instead of span */}
+              <div className="flex items-start gap-3 border-t border-amber-300 bg-amber-50 px-4 py-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium" style={{ fontSize: "13px", color: "#111827" }}>Marcus Johnson</span>
+                    <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5" style={{ fontSize: "11px" }}>stuck</span>
+                  </div>
+                  <p className="mt-1" style={{ fontSize: "13px", color: "#4B5563" }}>
+                    Hasn&apos;t progressed past Lesson 3 in 4 days
+                  </p>
+                </div>
+                <button type="button" className="rounded-lg px-3 py-1.5 hover:bg-white transition-colors" style={{ fontSize: "11px", fontWeight: 500, color: "#0D9488" }}>
+                  Send Nudge
+                </button>
+              </div>
+            </div>
+
+            {/* Parent view — 2/5 — #7: fixed progress ring math */}
+            <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm self-start">
+              <div className="p-5 flex items-center gap-4 border-b border-[var(--border)]">
+                <div className="relative" style={{ width: "55px", height: "55px" }}>
+                  <svg viewBox="0 0 120 120" className="w-full h-full">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--bg-muted)" strokeWidth="8" />
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" strokeWidth="8"
+                      strokeDasharray={`${2 * Math.PI * 52 * (14/22)} ${2 * Math.PI * 52 * (1 - 14/22)}`}
+                      strokeLinecap="round" transform="rotate(-90 60 60)" />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center font-bold" style={{ fontSize: "13px", color: "#0D9488" }}>64%</span>
+                </div>
+                <div>
+                  <h3 className="font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>{ELSA.name}</h3>
+                  <p style={{ fontSize: "11px", color: "#9CA3AF" }}>14 of 22 lessons complete</p>
+                </div>
+              </div>
+              <div className="p-5 border-b border-[var(--border)]">
+                <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Business Idea</p>
+                <p className="mt-1 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>{ELSA_STUDIO.name}</p>
+                <p style={{ fontSize: "13px", color: "#4B5563" }}>{ELSA_STUDIO.niche}</p>
+              </div>
+              <div className="p-5">
+                <p className="font-semibold" style={{ fontSize: "13px", color: "#111827", marginBottom: "4px" }}>How You Can Help</p>
+                <p style={{ fontSize: "13px", lineHeight: 1.618, color: "#4B5563" }}>
+                  {ELSA.first} is halfway through and doing great. Ask her about the customer interviews she&apos;s been practicing. Encouraging her to talk to real people would be the most valuable thing right now.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          TAB: GRADUATE — Ceremony + CTA
+          ═══════════════════════════════════════════════════════════ */}
+      {activeTab === "graduate" && (
+      <>
+      {/* Ceremony */}
+      <section
+        style={{ padding: "89px 34px", background: "var(--bg-subtle)" }}
+      >
+        <div className="mx-auto max-w-[640px] text-center">
+          <p
+            className="font-[family-name:var(--font-display)]"
+            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#F59E0B" }}
+          >
+            The moment
+          </p>
+          <h2
+            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+          >
+            {ceremonyDone ? "That's what real students see." : "Every student who finishes all 22 lessons gets this."}
+          </h2>
+          <p className="mt-3" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
+            {ceremonyDone
+              ? "Confidence built on a moment they earned."
+              : "It takes 90 seconds. Press play."}
+          </p>
+          <button
+            onClick={() => {
+              setCeremonyDone(false);
+              setShowCeremony(true);
+            }}
+            className="mt-8 rounded-lg px-8 py-4 font-semibold text-white transition-colors hover:brightness-110"
+            style={{
+              fontSize: "16px",
+              background: "#F59E0B",
+              boxShadow: "0 0 21px rgba(245, 158, 11, 0.35), 0 0 55px rgba(245, 158, 11, 0.1)",
+            }}
+          >
+            {ceremonyDone ? "Watch it again" : "Watch the graduation ceremony"}
+          </button>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section
+        className="flex min-h-[55vh] flex-col items-center justify-center px-8 text-center"
+        style={{ background: "#111827" }}
+      >
+        <h2
+          className="font-[family-name:var(--font-display)] font-semibold"
+          style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
+        >
+          This is Adaptable.
+        </h2>
+        <p className="mt-5 max-w-[480px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
+          The blank page is the hardest part of starting anything. We solved it for teens.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4" style={{ marginTop: "55px" }}>
+          <Link
+            href="/signup"
+            className="rounded-lg bg-[var(--primary)] px-8 py-4 font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors text-center"
+            style={{
+              fontSize: "16px",
+              boxShadow: "0 0 21px rgba(13, 148, 136, 0.35), 0 0 55px rgba(13, 148, 136, 0.1)",
+            }}
+          >
+            Find your venture
+          </Link>
+          <Link
+            href="/for-schools"
+            className="rounded-lg border border-white/20 px-8 py-4 font-semibold transition-colors hover:bg-white/5 text-center"
+            style={{ fontSize: "16px", color: "#F9FAFB" }}
+          >
+            Bring Adaptable to your district
+          </Link>
+        </div>
+        <p style={{ marginTop: "89px", fontSize: "11px", color: "#9CA3AF" }}>
+          Built for VentureLab&apos;s 155-country network &middot; By AJ Rogers, age 19
+        </p>
+      </section>
+      </>
+      )}
+
+      {/* ── Full-screen DIY wizard overlay ── */}
       {showDiyWizard && !diyResult && (
         <div className="fixed inset-0 z-[100] bg-[var(--bg)] overflow-y-auto">
           <button
@@ -419,7 +978,7 @@ export default function DemoShowcase() {
         </div>
       )}
 
-      {/* DIY result — visitor's venture + sign-up CTA */}
+      {/* DIY result */}
       {showDiyWizard && diyResult && (
         <div className="fixed inset-0 z-[100] bg-[var(--bg-subtle)] overflow-y-auto px-8" style={{ paddingTop: "89px", paddingBottom: "89px" }}>
           <div className="mx-auto max-w-[560px]">
@@ -448,7 +1007,7 @@ export default function DemoShowcase() {
                 <p style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>{diyResult.revenue_model}</p>
               </div>
             </div>
-            <div className="mt-13 text-center" style={{ marginTop: "55px" }}>
+            <div className="text-center" style={{ marginTop: "55px" }}>
               <p style={{ fontSize: "16px", color: "#4B5563" }}>
                 Real students go through 22 lessons with a personal AI mentor next.
               </p>
@@ -467,634 +1026,12 @@ export default function DemoShowcase() {
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 4: THE CONVERSATION
-          Typewriter chat transcript. The core product experience.
-          Narrative Bias: you watch Elsa learn in real time.
-          ═══════════════════════════════════════════════════════════ */}
-      <section ref={conversation.ref} style={{ padding: "144px 34px" }}>
-        <div className="mx-auto max-w-[620px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            The core experience
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
-          >
-            Every lesson is a conversation
-          </h2>
-          <p className="mt-3 max-w-[500px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            The AI asks questions instead of giving answers. Checkpoints gate progress. Every conversation is about {ELSA.first}&apos;s business, not a generic textbook.
-          </p>
-
-          {/* Chat transcript */}
-          <div
-            className="mt-13 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm"
-            style={{ marginTop: "55px" }}
-          >
-            {/* Lesson header */}
-            <div className="border-b border-[var(--border)] px-5 py-3">
-              <div className="flex items-center gap-3">
-                <div className="shrink-0">
-                  <p style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Module 2</p>
-                  <p className="font-semibold" style={{ fontSize: "13px", color: "#111827" }}>Define Your Target Customer</p>
-                </div>
-                <div className="flex-1 h-2 rounded-full bg-[var(--bg-muted)]">
-                  <div className="h-2 rounded-full" style={{ width: "50%", background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
-                </div>
-                <p style={{ fontSize: "11px", color: "#9CA3AF" }}>2/4</p>
-              </div>
-            </div>
-
-            <div className="lesson-atmosphere px-5 py-5 space-y-5">
-              {/* AI message */}
-              <div
-                className="transition-all duration-500"
-                style={{ opacity: conversation.visible ? 1 : 0, transform: conversation.visible ? "translateY(0)" : "translateY(13px)" }}
-              >
-                <div className="flex justify-start">
-                  <div className="max-w-[85%]">
-                    <div className="flex items-center gap-1.5 mb-1 ml-1">
-                      <div className="ikigai-icon"><div className="ikigai-icon-dot ik-d1" /><div className="ikigai-icon-dot ik-d2" /><div className="ikigai-icon-dot ik-d3" /><div className="ikigai-icon-dot ik-d4" /></div>
-                      <span style={{ fontSize: "11px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Guide</span>
-                    </div>
-                    <div className="ai-message rounded-2xl bg-[var(--bg-muted)] px-6 py-5 space-y-3" style={{ color: "#111827" }}>
-                      <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
-                        Let&apos;s think about who your ideal customer really is. Not just &ldquo;everyone&rdquo; — but the specific person who would be MOST excited about {ELSA_STUDIO.name}.
-                      </p>
-                      <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
-                        Think about age, interests, and what problem they&apos;re trying to solve. Who comes to mind?
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Student message — typewriter */}
-              <div
-                className="transition-all duration-500"
-                style={{
-                  opacity: conversation.visible ? 1 : 0,
-                  transform: conversation.visible ? "translateY(0)" : "translateY(13px)",
-                  transitionDelay: "800ms",
-                }}
-              >
-                <div className="flex justify-end">
-                  <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
-                    <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
-                      {chatLine1}
-                      {conversation.visible && chatLine1.length < 110 && <span className="animate-pulse">|</span>}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI response */}
-              <div
-                className="transition-all duration-500"
-                style={{
-                  opacity: conversation.visible ? 1 : 0,
-                  transform: conversation.visible ? "translateY(0)" : "translateY(13px)",
-                  transitionDelay: "4500ms",
-                }}
-              >
-                <div className="flex justify-start">
-                  <div className="max-w-[85%]">
-                    <div className="flex items-center gap-1.5 mb-1 ml-1">
-                      <div className="ikigai-icon"><div className="ikigai-icon-dot ik-d1" /><div className="ikigai-icon-dot ik-d2" /><div className="ikigai-icon-dot ik-d3" /><div className="ikigai-icon-dot ik-d4" /></div>
-                      <span style={{ fontSize: "11px", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Guide</span>
-                    </div>
-                    <div className="ai-message rounded-2xl bg-[var(--bg-muted)] px-6 py-5 space-y-3" style={{ color: "#111827" }}>
-                      <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
-                        Now THAT is a target customer. You can picture her — she doodles in class, watches art tutorials on YouTube, wishes she could take real lessons.
-                      </p>
-                      <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
-                        That specificity is what makes a business real. Where does she hang out? How would you find her?
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Checkpoint */}
-              <div
-                className="transition-all duration-300"
-                style={{
-                  opacity: conversation.visible ? 1 : 0,
-                  transitionDelay: "5500ms",
-                }}
-              >
-                <div className="checkpoint-celebration rounded-lg px-4 py-2.5 text-center" style={{ animation: "none", opacity: 1 }}>
-                  <p className="font-semibold" style={{ fontSize: "13px", color: "#0D9488" }}>Checkpoint reached</p>
-                  <p style={{ fontSize: "11px", color: "#9CA3AF" }}>2/4 complete</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#9CA3AF", textAlign: "center" }}>
-            22 lessons. 6 modules. Every one personalized to {ELSA.first}&apos;s business.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 5: THE MIRROR
-          Typewriter reflection + AI response after 1.2s pause.
-          The quiet moment. The inner game.
-          ═══════════════════════════════════════════════════════════ */}
-      <section
-        ref={mirror.ref}
-        className="border-t border-[var(--border)]"
-        style={{ padding: "144px 34px", background: "var(--bg-subtle)" }}
-      >
-        <div className="mx-auto max-w-[620px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            The inner game
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
-          >
-            Founder&apos;s Mirror
-          </h2>
-          <p className="mt-3 max-w-[500px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            After every lesson, one observation and one question. Maximum 40 words. No advice. No praise. The AI shuts up and the student decides whether to write honestly.
-          </p>
-
-          {/* Mirror card */}
-          <div className="mt-13 rounded-xl overflow-hidden" style={{ marginTop: "55px", boxShadow: "0 8px 34px rgba(0,0,0,0.08)" }}>
-            {/* Teal header */}
-            <div className="bg-[#F0FDFA] border-b border-[#CCFBF1] px-7 pt-6 pb-5">
-              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488", marginBottom: "16px" }}>
-                Founder&apos;s Mirror
-              </p>
-              <p
-                className="font-[family-name:var(--font-display)]"
-                style={{ fontSize: "21px", fontWeight: 400, lineHeight: 1.618, color: "#111827" }}
-              >
-                {mirrorPrompt}
-                {mirror.visible && mirrorPrompt.length < 80 && <span className="animate-pulse" style={{ color: "#0D9488" }}>|</span>}
-              </p>
-            </div>
-            {/* Student response */}
-            <div className="bg-white px-7 pt-6 pb-7">
-              <div className="flex items-center gap-1.5 mb-5" style={{ fontSize: "13px", color: "#9CA3AF" }}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" className="opacity-60"><path d="M4 7V5a4 4 0 118 0v2h1a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V8a1 1 0 011-1h1zm2 0h4V5a2 2 0 10-4 0v2z" /></svg>
-                <span>Private to you. No one else sees this.</span>
-              </div>
-              <div
-                className="w-full min-h-[89px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] italic"
-                style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}
-              >
-                {mirrorResponseReady ? mirrorResponse : ""}
-                {mirrorResponseReady && mirrorResponse.length < 95 && (
-                  <span className="animate-pulse">|</span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-8 text-center" style={{ fontSize: "13px", lineHeight: 1.618, color: "#9CA3AF" }}>
-            Over 22 lessons, these accumulate into a private Founder&apos;s Log that no teacher sees and no algorithm ranks.
-          </p>
-        </div>
-      </section>
-
-      </div>
-      {/* ═══ END TAB PANE: JOURNEY ═══ */}
-
-      {/* ═══ TAB PANE: PROOF — Numbers ═══ */}
-      <div className={tabPane("proof")}>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 6: THE NUMBERS
-          Von Restorff Effect: darker background breaks the pattern.
-          Animated confidence meter is the centerpiece.
-          ═══════════════════════════════════════════════════════════ */}
-      <section
-        ref={numbers.ref}
-        style={{ padding: "144px 34px", background: "#111827" }}
-      >
-        <div className="mx-auto max-w-[800px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            The proof
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
-          >
-            Measured like an ML team, not an ed-tech course
-          </h2>
-
-          {/* Confidence meter — the centerpiece */}
-          <div
-            className="mt-13 rounded-xl border border-white/10 p-8"
-            style={{ marginTop: "55px", background: "rgba(255,255,255,0.05)" }}
-          >
-            <p style={{ fontSize: "13px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
-              Self-confidence: &ldquo;Could YOU start a business?&rdquo;
-            </p>
-            <div className="mt-8 flex items-end gap-8 justify-center">
-              {/* Before */}
-              <div className="text-center">
-                <div
-                  className="mx-auto rounded-lg transition-all duration-1000"
-                  style={{
-                    width: "55px",
-                    height: `${confidenceBefore * 34}px`,
-                    background: "rgba(255,255,255,0.15)",
-                    minHeight: "8px",
-                  }}
-                />
-                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
-                  {confidenceBefore}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
-                </p>
-                <p style={{ fontSize: "11px", color: "#9CA3AF" }}>Before</p>
-              </div>
-
-              {/* Arrow */}
-              <svg width="34" height="21" viewBox="0 0 34 21" fill="none" className="mb-8">
-                <path d="M1 10.5h28M23 4l6 6.5-6 6.5" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-
-              {/* After */}
-              <div className="text-center">
-                <div
-                  className="mx-auto rounded-lg transition-all duration-[1400ms]"
-                  style={{
-                    width: "55px",
-                    height: `${confidenceAfter * 34}px`,
-                    background: "linear-gradient(180deg, #14B8A6, #0D9488)",
-                    minHeight: "8px",
-                  }}
-                />
-                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
-                  {confidenceAfter}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
-                </p>
-                <p style={{ fontSize: "11px", color: "#0D9488" }}>After</p>
-              </div>
-            </div>
-            <p className="mt-5 text-center" style={{ fontSize: "13px", color: "#9CA3AF" }}>
-              +{numbers.visible ? "1.15" : "0"} average gain. 100% of simulated students gained.
-            </p>
-          </div>
-
-          {/* Stats grid */}
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {[
-              { label: "Understanding gain", value: "+1.53", sub: "on a 5-point scale" },
-              { label: "Alien to accessible", value: "97%", sub: "flipped their self-belief" },
-              { label: "Decisively moved", value: "70%", sub: "independent Opus judge" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-white/10 p-5"
-                style={{ background: "rgba(255,255,255,0.05)" }}
-              >
-                <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
-                  {stat.label}
-                </p>
-                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
-                  {stat.value}
-                </p>
-                <p className="mt-1" style={{ fontSize: "13px", color: "#9CA3AF" }}>{stat.sub}</p>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#9CA3AF" }}>
-            60 simulated students, 20 personas across 3 motivation levels. Synthesizer: Claude Sonnet. Judge: Claude Opus (cross-model, eliminates self-preference bias). Every commit measured.
-          </p>
-        </div>
-      </section>
-
-      </div>
-      {/* ═══ END TAB PANE: PROOF ═══ */}
-
-      {/* ═══ TAB PANE: BUILD — Plan + Card ═══ */}
-      <div className={tabPane("build")}>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 7: THE PLAN
-          BusinessPlanFolder with grade tier badges.
-          ═══════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "144px 34px" }}>
-        <div className="mx-auto max-w-[800px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            The output
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
-          >
-            A business plan that builds itself
-          </h2>
-          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            Students never &ldquo;write a business plan.&rdquo; It assembles from their decisions across 22 lessons. Click through {ELSA.first}&apos;s.
-          </p>
-
-          <div className="mt-13 flex justify-center" style={{ marginTop: "55px" }}>
-            <BusinessPlanFolder />
-          </div>
-
-          {/* Grade tier badges */}
-          <div className="mt-8 text-center">
-            <p style={{ fontSize: "13px", color: "#9CA3AF", marginBottom: "13px" }}>Adapts to every grade level</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {[
-                { tier: "K-2", label: "Lower Elementary", desc: "$0 capital, neighborhood" },
-                { tier: "3-5", label: "Upper Elementary", desc: "Under $10, school + local" },
-                { tier: "6-8", label: "Middle School", desc: "Under $50, online OK" },
-                { tier: "9-12", label: "High School", desc: "Under $100, full range" },
-              ].map((g) => (
-                <span
-                  key={g.tier}
-                  className="rounded-full border border-[var(--border)] px-3 py-1.5"
-                  style={{ fontSize: "11px", color: "#4B5563" }}
-                  title={g.desc}
-                >
-                  {g.tier} {g.label}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 8: THE CARD
-          DemoCardDesigner — 3D business card the student designs.
-          ═══════════════════════════════════════════════════════════ */}
-      <section
-        className="border-t border-[var(--border)]"
-        style={{ padding: "144px 34px", background: "var(--bg-subtle)" }}
-      >
-        <div className="mx-auto max-w-[820px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            The reward
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
-          >
-            A business card they designed
-          </h2>
-          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            3D tilt, custom colors, finishes that unlock with progress. Pick any combination below.
-          </p>
-
-          <div className="mt-13" style={{ marginTop: "55px" }}>
-            <DemoCardDesigner
-              studentName={ELSA.name}
-              defaultBusinessName={ELSA_STUDIO.name}
-              niche={ELSA_STUDIO.niche}
-              targetCustomer={ELSA_STUDIO.target}
-            />
-          </div>
-        </div>
-      </section>
-
-      </div>
-      {/* ═══ END TAB PANE: BUILD ═══ */}
-
-      {/* ═══ TAB PANE: ADULTS — Teacher + Parent ═══ */}
-      <div className={tabPane("adults")}>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 9: THE TEACHER AND PARENT
-          Dashboard + parent view side by side on desktop.
-          ═══════════════════════════════════════════════════════════ */}
-      <section style={{ padding: "144px 34px" }}>
-        <div className="mx-auto max-w-[1000px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            The adults
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
-          >
-            Teachers see everything. Parents see enough.
-          </h2>
-
-          <div className="mt-13 grid gap-8 lg:grid-cols-5" style={{ marginTop: "55px" }}>
-            {/* Instructor dashboard — 3/5 width */}
-            <div className="lg:col-span-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
-              <div className="p-5 border-b border-[var(--border)]">
-                <h3 className="font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>
-                  Entrepreneurship — Period 3
-                </h3>
-                <p className="mt-1" style={{ fontSize: "13px", color: "#4B5563" }}>
-                  28 students &middot; <span style={{ color: "#D97706" }}>2 alerts</span>
-                </p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-[var(--border)]">
-                      {["Student", "Business", "Progress", "Status"].map(h => (
-                        <th key={h} className="px-4 py-3 text-left" style={{ fontSize: "11px", fontWeight: 500, color: "#9CA3AF" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { name: ELSA.name, biz: ELSA_STUDIO.name, pct: 63, status: "On track", sColor: "#059669" },
-                      { name: "Marcus Johnson", biz: "Fresh Kicks Co.", pct: 38, status: "Needs help", sColor: "#D97706" },
-                      { name: "Priya Sharma", biz: "Spice Route", pct: 88, status: "On track", sColor: "#059669" },
-                      { name: "Jaylen Carter", biz: "Cart Culture", pct: 25, status: "Inactive", sColor: "#DC2626" },
-                    ].map((s, i) => (
-                      <tr key={i} className="border-b border-[var(--border)]">
-                        <td className="px-4 py-3 font-medium" style={{ fontSize: "13px", color: "#111827" }}>{s.name}</td>
-                        <td className="px-4 py-3" style={{ fontSize: "13px", color: "#4B5563" }}>{s.biz}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="h-1.5 w-16 rounded-full bg-[var(--bg-muted)]">
-                              <div className="h-1.5 rounded-full" style={{ width: `${s.pct}%`, background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
-                            </div>
-                            <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{s.pct}%</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="rounded-full px-2 py-0.5" style={{ fontSize: "11px", fontWeight: 500, color: s.sColor, background: `${s.sColor}15` }}>
-                            {s.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {/* Alert */}
-              <div className="flex items-start gap-3 border-t border-amber-300 bg-amber-50 px-4 py-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium" style={{ fontSize: "13px", color: "#111827" }}>Marcus Johnson</span>
-                    <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5" style={{ fontSize: "11px" }}>stuck</span>
-                  </div>
-                  <p className="mt-1" style={{ fontSize: "13px", color: "#4B5563" }}>
-                    Hasn&apos;t progressed past Lesson 3 in 4 days
-                  </p>
-                </div>
-                <span className="rounded-lg px-3 py-1.5 cursor-pointer hover:bg-white transition-colors" style={{ fontSize: "11px", fontWeight: 500, color: "#0D9488" }}>
-                  Send Nudge
-                </span>
-              </div>
-            </div>
-
-            {/* Parent view — 2/5 width */}
-            <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm self-start">
-              <div className="p-5 flex items-center gap-4 border-b border-[var(--border)]">
-                <div className="relative" style={{ width: "55px", height: "55px" }}>
-                  <svg viewBox="0 0 120 120" className="w-full h-full">
-                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--bg-muted)" strokeWidth="8" />
-                    <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" strokeWidth="8"
-                      strokeDasharray={`${2 * Math.PI * 52 * 0.625} ${2 * Math.PI * 52 * 0.375}`}
-                      strokeLinecap="round" transform="rotate(-90 60 60)" />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center font-bold" style={{ fontSize: "13px", color: "#0D9488" }}>63%</span>
-                </div>
-                <div>
-                  <h3 className="font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>{ELSA.name}</h3>
-                  <p style={{ fontSize: "11px", color: "#9CA3AF" }}>14 of 22 lessons complete</p>
-                </div>
-              </div>
-              <div className="p-5 border-b border-[var(--border)]">
-                <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "#9CA3AF" }}>Business Idea</p>
-                <p className="mt-1 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>{ELSA_STUDIO.name}</p>
-                <p style={{ fontSize: "13px", color: "#4B5563" }}>{ELSA_STUDIO.niche}</p>
-              </div>
-              <div className="p-5">
-                <p className="font-semibold" style={{ fontSize: "13px", color: "#111827", marginBottom: "4px" }}>How You Can Help</p>
-                <p style={{ fontSize: "13px", lineHeight: 1.618, color: "#4B5563" }}>
-                  {ELSA.first} is halfway through and doing great. Ask her about the customer interviews she&apos;s been practicing. Encouraging her to talk to real people would be the most valuable thing right now.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      </div>
-      {/* ═══ END TAB PANE: ADULTS ═══ */}
-
-      {/* ═══ TAB PANE: CEREMONY ═══ */}
-      <div className={tabPane("ceremony")}>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 10: THE CEREMONY
-          Button-triggered. Peak-End Rule: this is the peak.
-          ═══════════════════════════════════════════════════════════ */}
-      <section
-        className="border-t border-[var(--border)]"
-        style={{ padding: "144px 34px", background: "var(--bg-subtle)" }}
-      >
-        <div className="mx-auto max-w-[640px] text-center">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#F59E0B" }}
-          >
-            The moment
-          </p>
-          <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
-          >
-            {ceremonyDone ? "That's what real students see." : "After lesson 22, this happens."}
-          </h2>
-          <p className="mt-3" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            {ceremonyDone
-              ? "Confidence built on a moment they earned."
-              : "The four parts of who they are arrive. Light gathers in the space they hold. Their venture is born from that light. Founder\u2019s letter. Diploma."}
-          </p>
-          <button
-            onClick={() => {
-              setCeremonyDone(false);
-              setShowCeremony(true);
-            }}
-            className="mt-8 rounded-lg px-8 py-4 font-semibold text-white transition-colors"
-            style={{
-              fontSize: "16px",
-              background: "#F59E0B",
-              boxShadow: "0 0 21px rgba(245, 158, 11, 0.35), 0 0 55px rgba(245, 158, 11, 0.1)",
-            }}
-          >
-            {ceremonyDone ? "Watch it again" : "Watch the graduation ceremony"}
-          </button>
-        </div>
-      </section>
-
-      </div>
-      {/* ═══ END TAB PANE: CEREMONY ═══ */}
-
-      {/* ═══════════════════════════════════════════════════════════
-          SECTION 11: THE CTA — always visible, outside tabs
-          Dark. Simple. One line + sign up.
-          Peak-End Rule: this is the end.
-          ═══════════════════════════════════════════════════════════ */}
-      <section
-        className="flex min-h-[55vh] flex-col items-center justify-center px-8 text-center"
-        style={{ background: "#111827" }}
-      >
-        <h2
-          className="font-[family-name:var(--font-display)] font-semibold"
-          style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
-        >
-          This is Adaptable.
-        </h2>
-        <p className="mt-5 max-w-[480px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
-          The blank page is the hardest part of starting anything. We solved it for teens.
-        </p>
-        <div className="mt-13 flex gap-4" style={{ marginTop: "55px" }}>
-          <Link
-            href="/signup"
-            className="rounded-lg bg-[var(--primary)] px-8 py-4 font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
-            style={{
-              fontSize: "16px",
-              boxShadow: "0 0 21px rgba(13, 148, 136, 0.35), 0 0 55px rgba(13, 148, 136, 0.1)",
-            }}
-          >
-            Get started
-          </Link>
-          <Link
-            href="/for-schools"
-            className="rounded-lg border border-white/20 px-8 py-4 font-semibold transition-colors hover:bg-white/5"
-            style={{ fontSize: "16px", color: "#F9FAFB" }}
-          >
-            For schools
-          </Link>
-        </div>
-        <p className="mt-13" style={{ marginTop: "89px", fontSize: "11px", color: "#4B5563" }}>
-          Built for VentureLab &middot; By AJ Rogers, age 19
-        </p>
-      </section>
-
     </main>
   );
 }
 
 /**
  * Golden Ratio Ikigai Diagram — exact copy from /for-schools page.
- * φ = 1.618034. Circle center offset = cluster_radius/φ = 19.1 units.
- * Circle radius = 20 units. Center circle radius = R/φ² = 7.64 units.
  */
 function GoldenIkigai() {
   return (
@@ -1104,83 +1041,54 @@ function GoldenIkigai() {
       role="img"
       aria-label="Ikigai diagram: four overlapping circles representing what you love, what you're good at, what the world needs, and what you can be paid for, with your business at the center"
     >
-      {/* SVG layer: circles, callout lines, callout dots */}
       <svg
         className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
         viewBox="0 0 100 100"
         style={{ zIndex: 1 }}
       >
-        {/* Four main circles — golden ratio positions */}
         <circle cx="50" cy="30.901" r="20" fill="#F5E642" opacity="0.55" className="ikigai-hero-circle" />
         <circle cx="30.901" cy="50" r="20" fill="#A8DB5A" opacity="0.55" className="ikigai-hero-circle" />
         <circle cx="69.099" cy="50" r="20" fill="#F4A79D" opacity="0.55" className="ikigai-hero-circle" />
         <circle cx="50" cy="69.099" r="20" fill="#6DD5D0" opacity="0.55" className="ikigai-hero-circle" />
 
-        {/* Callout lines + dots (dots on circle edges, 3-unit gap to labels) */}
         <line x1="31.26" y1="23.92" x2="26" y2="22" stroke="#C4B320" strokeWidth="0.5" opacity="0.55" />
         <circle cx="31.26" cy="23.92" r="1.05" fill="#C4B320" opacity="0.7" />
-
         <line x1="21.25" y1="67.52" x2="17.7" y2="73.9" stroke="#7AAD3A" strokeWidth="0.5" opacity="0.55" />
         <circle cx="21.25" cy="67.52" r="1.05" fill="#7AAD3A" opacity="0.7" />
-
         <line x1="78.64" y1="32.42" x2="82.1" y2="26.1" stroke="#D4796E" strokeWidth="0.5" opacity="0.55" />
         <circle cx="78.64" cy="32.42" r="1.05" fill="#D4796E" opacity="0.7" />
-
         <line x1="68.74" y1="76.08" x2="72" y2="77.3" stroke="#4DBAB4" strokeWidth="0.5" opacity="0.55" />
         <circle cx="68.74" cy="76.08" r="1.05" fill="#4DBAB4" opacity="0.7" />
       </svg>
 
-      {/* Center circle — gradient + glow */}
       <div
         className="absolute rounded-full pointer-events-none ikigai-hero-center"
         style={{
-          width: "15.28%",
-          height: "15.28%",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
+          width: "15.28%", height: "15.28%",
+          left: "50%", top: "50%", transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, #4A6741 40%, #8B9E6A 100%)",
-          boxShadow: "0 0 20px rgba(74, 103, 65, 0.3)",
-          zIndex: 5,
+          boxShadow: "0 0 20px rgba(74, 103, 65, 0.3)", zIndex: 5,
         }}
       />
 
-      {/* Center label */}
       <div
         className="absolute pointer-events-none flex flex-col items-center justify-center ikigai-hero-center"
         style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 6 }}
       >
-        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
-          YOUR
-        </span>
-        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
-          BUSINESS
-        </span>
+        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">YOUR</span>
+        <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">BUSINESS</span>
       </div>
 
-      {/* Corner labels — square arrangement, equidistant from center */}
-      <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
-        style={{ top: "16.5%", left: "5%" }}
-      >
+      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ top: "16.5%", left: "5%" }}>
         What you love
       </div>
-      <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
-        style={{ bottom: "14.5%", left: "5%" }}
-      >
+      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ bottom: "14.5%", left: "5%" }}>
         What you&apos;re<br />good at
       </div>
-      <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
-        style={{ top: "14.5%", right: "5%", textAlign: "right" }}
-      >
+      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ top: "14.5%", right: "5%", textAlign: "right" }}>
         What the world<br />needs
       </div>
-      <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
-        style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}
-      >
+      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}>
         What you can<br />be paid for
       </div>
     </div>
