@@ -28,7 +28,6 @@ import Link from "next/link";
 import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { BusinessIdea } from "@/lib/types";
-import IkigaiRevealDemo from "./IkigaiRevealDemo";
 import DemoCardDesigner from "./DemoCardDesigner";
 import BusinessPlanFolder from "@/components/business-plan/BusinessPlanFolder";
 
@@ -50,6 +49,8 @@ const IKIGAI = {
 };
 
 // ── Scroll-triggered visibility hook ──
+// `forceVisible` bypasses the observer (used when mobile tab switches
+// reveal a section that was display:none and couldn't intersect).
 function useInView(threshold = 0.3) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -65,7 +66,9 @@ function useInView(threshold = 0.3) {
     return () => observer.disconnect();
   }, [threshold]);
 
-  return { ref, visible };
+  const forceVisible = () => setVisible(true);
+
+  return { ref, visible, forceVisible };
 }
 
 // ── Typewriter effect hook ──
@@ -112,26 +115,39 @@ export default function DemoShowcase() {
   const [ceremonyDone, setCeremonyDone] = useState(false);
   const [showDiyWizard, setShowDiyWizard] = useState(false);
   const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
-  const [showIkigaiReveal, setShowIkigaiReveal] = useState(false);
-
-  // Mobile tab state (md:hidden tabs, desktop shows everything)
-  type MobileTab = "journey" | "build" | "proof" | "adults" | "ceremony";
-  const [mobileTab, setMobileTab] = useState<MobileTab>("journey");
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const selectTab = (key: MobileTab) => {
-    setMobileTab(key);
-    requestAnimationFrame(() => {
-      tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
-  const tabPane = (key: MobileTab) =>
-    mobileTab === key ? "md:!block" : "hidden md:!block";
-
   // Scroll-triggered sections
   const distance = useInView(0.3);
   const conversation = useInView(0.2);
   const mirror = useInView(0.3);
   const numbers = useInView(0.2);
+
+  // Mobile tab state (md:hidden tabs, desktop shows everything)
+  type MobileTab = "journey" | "build" | "proof" | "adults" | "ceremony";
+  const [mobileTab, setMobileTab] = useState<MobileTab>("journey");
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  // Map tabs → the scroll-triggered sections they contain, so we can
+  // force-fire animations when the tab reveals a previously hidden pane.
+  const tabAnimations: Record<MobileTab, Array<() => void>> = {
+    journey: [distance.forceVisible, conversation.forceVisible, mirror.forceVisible],
+    proof: [numbers.forceVisible],
+    build: [],
+    adults: [],
+    ceremony: [],
+  };
+
+  const selectTab = (key: MobileTab) => {
+    setMobileTab(key);
+    // Force-trigger animations for sections in this pane (they were
+    // display:none so IntersectionObserver never fired).
+    requestAnimationFrame(() => {
+      tabAnimations[key].forEach((fn) => fn());
+      tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const tabPane = (key: MobileTab) =>
+    mobileTab === key ? "md:!block" : "hidden md:!block";
 
   // Typewriter texts
   const chatLine1 = useTypewriter(
@@ -200,13 +216,13 @@ export default function DemoShowcase() {
           className="max-w-[680px] font-[family-name:var(--font-display)]"
           style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
         >
-          &ldquo;I walked in thinking entrepreneurship was something other people do. I walked out with a business.&rdquo;
+          &ldquo;The hardest moment in a 14-year-old&apos;s entrepreneurial journey isn&apos;t building the business. It&apos;s the blank page before the business exists.&rdquo;
         </blockquote>
         <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
-          {ELSA.name}, age {ELSA.age}
+          AJ Rogers, founder, age 19
         </p>
-        <p className="mt-2" style={{ fontSize: "13px", color: "#4B5563" }}>
-          Scroll to see her journey
+        <p className="mt-2" style={{ fontSize: "13px", color: "#9CA3AF" }}>
+          Scroll to see what we built
         </p>
         {/* Subtle scroll indicator */}
         <div className="mt-13 animate-bounce" style={{ marginTop: "55px" }}>
@@ -340,7 +356,7 @@ export default function DemoShowcase() {
           </p>
           <h2
             className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "55px", lineHeight: 1.618, color: "#111827" }}
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
           >
             Try it yourself
           </h2>
@@ -714,7 +730,7 @@ export default function DemoShowcase() {
               {/* After */}
               <div className="text-center">
                 <div
-                  className="mx-auto rounded-lg transition-all duration-1400"
+                  className="mx-auto rounded-lg transition-all duration-[1400ms]"
                   style={{
                     width: "55px",
                     height: `${confidenceAfter * 34}px`,
@@ -1071,17 +1087,6 @@ export default function DemoShowcase() {
         </p>
       </section>
 
-      {/* ── Ikigai reveal overlay ── */}
-      {showIkigaiReveal && (
-        <IkigaiRevealDemo
-          studentFirstName={ELSA.first}
-          businessName={ELSA_STUDIO.name}
-          businessNiche={ELSA_STUDIO.niche}
-          whyThisFits={`You love painting and helping others create. You're good at color theory and teaching. Your community needs affordable art education for teens. ${ELSA_STUDIO.name} is where all four meet.`}
-          revenueModel={ELSA_STUDIO.revenue}
-          onClose={() => setShowIkigaiReveal(false)}
-        />
-      )}
     </main>
   );
 }
