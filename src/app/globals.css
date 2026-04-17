@@ -121,6 +121,12 @@ button:active:not(:disabled) {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Demo tab cascade — tabs slide in from below with stagger */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .stagger-enter {
   animation: fade-up 400ms ease-out both;
 }

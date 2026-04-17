@@ -126,6 +126,18 @@ export default function DemoShowcase() {
   const [showDiyWizard, setShowDiyWizard] = useState(false);
   const [diyResult, setDiyResult] = useState<BusinessIdea | null>(null);
 
+  // Entry state — false = quote landing, true = tabs visible
+  const [entered, setEntered] = useState(false);
+  const [quoteFading, setQuoteFading] = useState(false);
+
+  const handleEnter = () => {
+    setQuoteFading(true);
+    setTimeout(() => {
+      setEntered(true);
+      window.scrollTo({ top: 0 });
+    }, 600); // match the quote fade-out duration
+  };
+
   // Tab state — applies on both mobile and desktop
   const [activeTab, setActiveTab] = useState<DemoTab>("start");
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -205,67 +217,77 @@ export default function DemoShowcase() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
 
-      {/* ═══ HERO QUOTE — always visible above tabs ═══ */}
-      <section
-        className="flex min-h-[80vh] flex-col items-center justify-center px-8 text-center"
-        style={{ background: "#111827" }}
-      >
-        <blockquote
-          className="max-w-[680px] font-[family-name:var(--font-display)]"
-          style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
-        >
-          &ldquo;The hardest moment in a 14-year-old&apos;s entrepreneurial journey isn&apos;t building the business. It&apos;s the blank page before the business exists.&rdquo;
-        </blockquote>
-        <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
-          AJ Rogers, founder, age 19
-        </p>
-        <button
-          onClick={() => {
-            tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-          className="mt-13 rounded-lg bg-[var(--primary)] px-8 py-4 font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+      {/* ═══ QUOTE LANDING — full viewport, fades out on enter ═══ */}
+      {!entered && (
+        <section
+          className="flex min-h-[100vh] flex-col items-center justify-center px-8 text-center transition-opacity duration-600"
           style={{
-            marginTop: "55px",
-            fontSize: "16px",
-            boxShadow: "0 0 21px rgba(13, 148, 136, 0.35), 0 0 55px rgba(13, 148, 136, 0.1)",
+            background: "#111827",
+            opacity: quoteFading ? 0 : 1,
+            transition: "opacity 600ms ease-out",
           }}
         >
-          Experience the journey
-        </button>
-      </section>
+          <blockquote
+            className="max-w-[680px] font-[family-name:var(--font-display)]"
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
+          >
+            &ldquo;The hardest moment in a 14-year-old&apos;s entrepreneurial journey isn&apos;t building the business. It&apos;s the blank page before the business exists.&rdquo;
+          </blockquote>
+          <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
+            AJ Rogers, founder, age 19
+          </p>
+          <button
+            onClick={handleEnter}
+            className="rounded-lg bg-[var(--primary)] px-8 py-4 font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+            style={{
+              marginTop: "55px",
+              fontSize: "16px",
+              boxShadow: "0 0 21px rgba(13, 148, 136, 0.35), 0 0 55px rgba(13, 148, 136, 0.1)",
+            }}
+          >
+            Experience the journey
+          </button>
+        </section>
+      )}
 
-      {/* ═══ TAB NAV — sticky, both mobile and desktop ═══ */}
-      <div
-        ref={tabsRef}
-        className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm"
-        role="tablist"
-        aria-label="Demo sections"
-      >
-        <div className="mx-auto flex max-w-[1200px] gap-1 overflow-x-auto px-3 py-3 md:justify-center md:gap-2 md:px-6 md:py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === t.key}
-              onClick={() => selectTab(t.key)}
-              className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-colors md:px-6 md:py-2.5 md:text-sm ${
-                activeTab === t.key
-                  ? "bg-[var(--primary)] text-white"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+      {/* ═══ TAB NAV — appears after entry, tabs cascade in ═══ */}
+      {entered && (
+        <div
+          ref={tabsRef}
+          className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm"
+          role="tablist"
+          aria-label="Demo sections"
+        >
+          <div className="mx-auto flex max-w-[1200px] gap-1 overflow-x-auto px-3 py-3 md:justify-center md:gap-2 md:px-6 md:py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {TABS.map((t, i) => (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === t.key}
+                onClick={() => selectTab(t.key)}
+                className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-all md:px-6 md:py-2.5 md:text-sm ${
+                  activeTab === t.key
+                    ? "bg-[var(--primary)] text-white"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+                }`}
+                style={{
+                  opacity: 0,
+                  animation: `fadeSlideIn 400ms ease-out ${i * 120}ms forwards`,
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════
           TAB: START — Distance (Day 1 vs Day 30)
           ═══════════════════════════════════════════════════════════ */}
-      {activeTab === "start" && (
-      <section ref={distance.ref} style={{ padding: "89px 34px" }}>
+      {entered && activeTab === "start" && (
+      <section ref={distance.ref} style={{ padding: "89px 34px", animation: "fadeSlideIn 600ms ease-out 300ms both" }}>
         <div className="mx-auto max-w-[1000px]">
           <div className="grid grid-cols-1 gap-13 md:grid-cols-2 items-center" style={{ gap: "89px" }}>
             {/* Before: blank Ikigai */}
@@ -336,7 +358,7 @@ export default function DemoShowcase() {
       {/* ═══════════════════════════════════════════════════════════
           TAB: LEARN — Wizard + Conversation + Mirror + Founder's Log
           ═══════════════════════════════════════════════════════════ */}
-      {activeTab === "learn" && (
+      {entered && activeTab === "learn" && (
       <>
       {/* Wizard section */}
       <section
@@ -592,7 +614,7 @@ export default function DemoShowcase() {
       {/* ═══════════════════════════════════════════════════════════
           TAB: BUILD — Plan + Card
           ═══════════════════════════════════════════════════════════ */}
-      {activeTab === "build" && (
+      {entered && activeTab === "build" && (
       <>
       <section style={{ padding: "89px 34px" }}>
         <div className="mx-auto max-w-[800px]">
@@ -676,7 +698,7 @@ export default function DemoShowcase() {
       {/* ═══════════════════════════════════════════════════════════
           TAB: PROVE — Numbers (Von Restorff dark section)
           ═══════════════════════════════════════════════════════════ */}
-      {activeTab === "prove" && (
+      {entered && activeTab === "prove" && (
       <section
         ref={numbers.ref}
         style={{ padding: "89px 34px", background: "#111827" }}
@@ -775,7 +797,7 @@ export default function DemoShowcase() {
       {/* ═══════════════════════════════════════════════════════════
           TAB: GUIDE — Teacher dashboard + Parent view
           ═══════════════════════════════════════════════════════════ */}
-      {activeTab === "guide" && (
+      {entered && activeTab === "guide" && (
       <section style={{ padding: "89px 34px" }}>
         <div className="mx-auto max-w-[1000px]">
           <p
@@ -893,7 +915,7 @@ export default function DemoShowcase() {
       {/* ═══════════════════════════════════════════════════════════
           TAB: GRADUATE — Ceremony + CTA
           ═══════════════════════════════════════════════════════════ */}
-      {activeTab === "graduate" && (
+      {entered && activeTab === "graduate" && (
       <>
       {/* Ceremony */}
       <section
