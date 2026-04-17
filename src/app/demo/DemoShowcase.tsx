@@ -146,9 +146,18 @@ export default function DemoShowcase() {
     40
   );
 
+  // Mirror response starts after the prompt finishes typing (80 chars × 40ms = ~3.2s + 1.2s pause)
+  const [mirrorResponseReady, setMirrorResponseReady] = useState(false);
+  useEffect(() => {
+    if (!mirror.visible) return;
+    // 80 chars × 40ms/char = 3200ms for prompt + 1200ms pause
+    const timer = setTimeout(() => setMirrorResponseReady(true), 4400);
+    return () => clearTimeout(timer);
+  }, [mirror.visible]);
+
   const mirrorResponse = useTypewriter(
     "I think I was rushing the first two times. Today I actually read each question before answering...",
-    mirror.visible,
+    mirrorResponseReady,
     35
   );
 
@@ -296,8 +305,8 @@ export default function DemoShowcase() {
               >
                 Day 30
               </p>
-              <div className="mx-auto w-full max-w-[380px]">
-                <GoldenIkigai businessName={ELSA_STUDIO.name} />
+              <div className="mx-auto w-full max-w-[480px]">
+                <GoldenIkigai />
               </div>
               <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
                 A real business. A 4-week plan. Confidence built on facts.
@@ -628,8 +637,8 @@ export default function DemoShowcase() {
                 className="w-full min-h-[89px] p-4 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] italic"
                 style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}
               >
-                {mirror.visible && mirrorPrompt.length >= 80 ? mirrorResponse : ""}
-                {mirror.visible && mirrorPrompt.length >= 80 && mirrorResponse.length < 95 && (
+                {mirrorResponseReady ? mirrorResponse : ""}
+                {mirrorResponseReady && mirrorResponse.length < 95 && (
                   <span className="animate-pulse">|</span>
                 )}
               </div>
@@ -1078,42 +1087,47 @@ export default function DemoShowcase() {
 }
 
 /**
- * Golden Ratio Ikigai Diagram — from /for-schools page.
+ * Golden Ratio Ikigai Diagram — exact copy from /for-schools page.
  * φ = 1.618034. Circle center offset = cluster_radius/φ = 19.1 units.
  * Circle radius = 20 units. Center circle radius = R/φ² = 7.64 units.
  */
-function GoldenIkigai({ businessName }: { businessName: string }) {
+function GoldenIkigai() {
   return (
     <div
-      className="relative mx-auto w-full"
+      className="relative mx-auto w-full max-w-[480px]"
       style={{ aspectRatio: "1 / 1" }}
       role="img"
-      aria-label="Completed Ikigai diagram showing Elsa's business at the center"
+      aria-label="Ikigai diagram: four overlapping circles representing what you love, what you're good at, what the world needs, and what you can be paid for, with your business at the center"
     >
+      {/* SVG layer: circles, callout lines, callout dots */}
       <svg
         className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
         viewBox="0 0 100 100"
         style={{ zIndex: 1 }}
       >
-        <circle cx="50" cy="30.901" r="20" fill="#F5E642" opacity="0.55" />
-        <circle cx="30.901" cy="50" r="20" fill="#A8DB5A" opacity="0.55" />
-        <circle cx="69.099" cy="50" r="20" fill="#F4A79D" opacity="0.55" />
-        <circle cx="50" cy="69.099" r="20" fill="#6DD5D0" opacity="0.55" />
+        {/* Four main circles — golden ratio positions */}
+        <circle cx="50" cy="30.901" r="20" fill="#F5E642" opacity="0.55" className="ikigai-hero-circle" />
+        <circle cx="30.901" cy="50" r="20" fill="#A8DB5A" opacity="0.55" className="ikigai-hero-circle" />
+        <circle cx="69.099" cy="50" r="20" fill="#F4A79D" opacity="0.55" className="ikigai-hero-circle" />
+        <circle cx="50" cy="69.099" r="20" fill="#6DD5D0" opacity="0.55" className="ikigai-hero-circle" />
 
-        {/* Callout lines + dots */}
+        {/* Callout lines + dots (dots on circle edges, 3-unit gap to labels) */}
         <line x1="31.26" y1="23.92" x2="26" y2="22" stroke="#C4B320" strokeWidth="0.5" opacity="0.55" />
         <circle cx="31.26" cy="23.92" r="1.05" fill="#C4B320" opacity="0.7" />
+
         <line x1="21.25" y1="67.52" x2="17.7" y2="73.9" stroke="#7AAD3A" strokeWidth="0.5" opacity="0.55" />
         <circle cx="21.25" cy="67.52" r="1.05" fill="#7AAD3A" opacity="0.7" />
+
         <line x1="78.64" y1="32.42" x2="82.1" y2="26.1" stroke="#D4796E" strokeWidth="0.5" opacity="0.55" />
         <circle cx="78.64" cy="32.42" r="1.05" fill="#D4796E" opacity="0.7" />
+
         <line x1="68.74" y1="76.08" x2="72" y2="77.3" stroke="#4DBAB4" strokeWidth="0.5" opacity="0.55" />
         <circle cx="68.74" cy="76.08" r="1.05" fill="#4DBAB4" opacity="0.7" />
       </svg>
 
-      {/* Center circle */}
+      {/* Center circle — gradient + glow */}
       <div
-        className="absolute rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none ikigai-hero-center"
         style={{
           width: "15.28%",
           height: "15.28%",
@@ -1128,7 +1142,7 @@ function GoldenIkigai({ businessName }: { businessName: string }) {
 
       {/* Center label */}
       <div
-        className="absolute pointer-events-none flex flex-col items-center justify-center"
+        className="absolute pointer-events-none flex flex-col items-center justify-center ikigai-hero-center"
         style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 6 }}
       >
         <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">
@@ -1139,27 +1153,27 @@ function GoldenIkigai({ businessName }: { businessName: string }) {
         </span>
       </div>
 
-      {/* Corner labels */}
+      {/* Corner labels — square arrangement, equidistant from center */}
       <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
         style={{ top: "16.5%", left: "5%" }}
       >
         What you love
       </div>
       <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
         style={{ bottom: "14.5%", left: "5%" }}
       >
         What you&apos;re<br />good at
       </div>
       <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
         style={{ top: "14.5%", right: "5%", textAlign: "right" }}
       >
         What the world<br />needs
       </div>
       <div
-        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none"
+        className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label"
         style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}
       >
         What you can<br />be paid for
