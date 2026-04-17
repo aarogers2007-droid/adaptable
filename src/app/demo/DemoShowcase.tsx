@@ -219,6 +219,19 @@ export default function DemoShowcase() {
         <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
           AJ Rogers, founder, age 19
         </p>
+        <button
+          onClick={() => {
+            tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          className="mt-13 rounded-lg bg-[var(--primary)] px-8 py-4 font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors"
+          style={{
+            marginTop: "55px",
+            fontSize: "16px",
+            boxShadow: "0 0 21px rgba(13, 148, 136, 0.35), 0 0 55px rgba(13, 148, 136, 0.1)",
+          }}
+        >
+          Experience the journey
+        </button>
       </section>
 
       {/* ═══ TAB NAV — sticky, both mobile and desktop ═══ */}
