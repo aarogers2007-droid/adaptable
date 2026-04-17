@@ -3,7 +3,8 @@ import { streamMessage } from "@/lib/ai";
 import { getLessonPlan } from "@/lib/lesson-plans";
 import { learningProfilePrompt, type LearningProfile, DEFAULT_LEARNING_PROFILE } from "@/lib/learning-profile";
 import { getRelevantKnowledgeWithMeta, type RetrievedChunkMeta, type StudentContext } from "@/lib/knowledge-retrieval";
-import type { Profile } from "@/lib/types";
+import type { Profile, GradeTier } from "@/lib/types";
+import { getMentorAdaptation } from "@/lib/grade-adaptation";
 
 export async function POST(request: Request) {
   // CSRF protection
@@ -203,7 +204,7 @@ export async function POST(request: Request) {
   // Get profile + learning profile
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name, ikigai_result")
+    .select("business_idea, full_name, ikigai_result, grade_tier")
     .eq("id", user.id)
     .single();
 
@@ -363,7 +364,12 @@ export async function POST(request: Request) {
   const bizDesc = `${profile.business_idea!.niche} ${profile.business_idea!.revenue_model}`.toLowerCase();
   const isExistingBusiness = ["already sell", "already have", "customers", "making money", "revenue", "sales", "clients"].some(k => bizDesc.includes(k));
 
-  const systemPrompt = `You are a conversational AI mentor in a venture studio, helping a teenager design their business venture through dialogue. You are NOT a textbook. You are a smart, encouraging co-founder who teaches by asking questions and building on what the student says.
+  const gradeTier = ((profileData as Record<string, unknown>)?.grade_tier as GradeTier) ?? "high_school";
+  const gradeAdaptation = getMentorAdaptation(gradeTier);
+
+  const systemPrompt = `You are a conversational AI mentor in a venture studio, helping a student design their business venture through dialogue. You are NOT a textbook. You are a smart, encouraging co-founder who teaches by asking questions and building on what the student says.
+
+${gradeAdaptation}
 
 === SOCRATIC DISCIPLINE (read this BEFORE every response — non-negotiable) ===
 

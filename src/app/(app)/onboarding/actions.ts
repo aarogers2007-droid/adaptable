@@ -2,7 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { sendMessage } from "@/lib/ai";
-import type { IkigaiDraft, BusinessIdea } from "@/lib/types";
+import type { IkigaiDraft, BusinessIdea, GradeTier } from "@/lib/types";
+import { getIkigaiAdaptation } from "@/lib/grade-adaptation";
 
 const STEP_PROMPTS: Record<number, (draft: IkigaiDraft) => string> = {
   1: () =>
@@ -114,7 +115,7 @@ export async function synthesizeBusinessIdea(
     // account), use the name they typed in the demo wizard, falling back to
     // "You" if they skipped it. Otherwise look it up from the auth'd profile.
     let studentName = "Student";
-    let isYoungStudent = false;
+    let studentGradeTier: GradeTier = "high_school";
     if (demoMode) {
       const safeName = (options?.firstName ?? "")
         .replace(/[^a-zA-Z\s'\-]/g, "")
@@ -182,8 +183,8 @@ export async function synthesizeBusinessIdea(
         if (nameData?.full_name) {
           studentName = (nameData.full_name as string).split(" ")[0];
         }
-        if (nameData?.grade_tier === "elementary") {
-          isYoungStudent = true;
+        if (nameData?.grade_tier) {
+          studentGradeTier = nameData.grade_tier as GradeTier;
         }
       }
     }
@@ -239,7 +240,7 @@ Return a JSON object with exactly these fields:
       messages: [
         {
           role: "user",
-          content: `${isYoungStudent ? "THIS STUDENT IS 12 OR YOUNGER. Rule 11 (Young Student Guard) applies — zero startup capital, skill/time-based ideas only.\n\n" : ""}The student's name is ${studentName}. Based on their Ikigai:
+          content: `${studentGradeTier !== "high_school" ? getIkigaiAdaptation(studentGradeTier) + "\n\n" : ""}The student's name is ${studentName}. Based on their Ikigai:
 - What they LOVE: ${(draft.passions ?? []).join(", ")}
 - What they're GOOD AT: ${(draft.skills ?? []).join(", ")}
 - What the WORLD NEEDS: ${(draft.needs ?? []).join(", ")}

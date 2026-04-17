@@ -367,12 +367,14 @@ export default async function ParentViewPage({
   const businessIdea = typedStudent.business_idea as BusinessIdea | null;
   const ikigaiResult = typedStudent.ikigai_result as IkigaiResult | null;
   const studentFirstName = typedStudent.full_name?.split(" ")[0] ?? "Your student";
-  const gradeTierLabel =
-    typedStudent.grade_tier === "middle_school"
-      ? "Middle School"
-      : typedStudent.grade_tier === "elementary"
-        ? "Elementary"
-        : "High School";
+  const gradeTierLabels: Record<string, string> = {
+    lower_elementary: "Lower Elementary (K-2)",
+    upper_elementary: "Upper Elementary (3-5)",
+    elementary: "Elementary",
+    middle_school: "Middle School",
+    high_school: "High School",
+  };
+  const gradeTierLabel = gradeTierLabels[typedStudent.grade_tier ?? "high_school"] ?? "High School";
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">

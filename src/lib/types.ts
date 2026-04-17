@@ -13,7 +13,7 @@ export type { ConsistencyResult } from "./character-consistency";
 
 export type UserRole = "student" | "instructor" | "org_admin";
 export type ProgressStatus = "not_started" | "in_progress" | "completed";
-export type GradeTier = "elementary" | "middle_school" | "high_school";
+export type GradeTier = "lower_elementary" | "upper_elementary" | "middle_school" | "high_school";
 
 export interface Organization {
   id: string;
