@@ -42,6 +42,7 @@ import type { BusinessIdea } from "@/lib/types";
 import IkigaiRevealDemo from "./IkigaiRevealDemo";
 import DemoAchievements from "./DemoAchievements";
 import DemoCardDesigner from "./DemoCardDesigner";
+import BusinessPlanFolder from "@/components/business-plan/BusinessPlanFolder";
 
 // ── Demo data ──
 const ELSA = {
@@ -480,40 +481,10 @@ export default function DemoShowcase() {
         </div>
       </Section>
 
-      {/* ═══ 5. BUSINESS PLAN — Using real CSS patterns ═══ */}
-      <Section label="The Output" title="Auto-Assembled Business Plan" description="Students never 'write a business plan.' It assembles itself from their decisions and conversations across all 22 lessons.">
-        <div className="mx-auto max-w-[620px]">
-          <div className="space-y-6">
-            {[
-              { n: 1, t: "Vision", b: `${ELSA_STUDIO.niche}. Born from ${ELSA.first}'s Ikigai — her love of painting, her teaching ability, and her community's need for affordable art education.` },
-              { n: 2, t: "Target Customer", b: `${ELSA_STUDIO.target}. Revenue: ${ELSA_STUDIO.revenue}.` },
-              { n: 3, t: "Key Decisions", decisions: true },
-            ].map((s) => (
-              <div key={s.n} className="stagger-enter flex gap-4" style={{ animationDelay: `${s.n * 100}ms` }}>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)] text-sm font-bold text-white">{s.n}</span>
-                <div>
-                  <h4 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">{s.t}</h4>
-                  {s.decisions ? (
-                    <div className="mt-2 space-y-2">
-                      {DECISIONS.map((d, i) => (
-                        <p key={i} className="text-sm text-[var(--text-secondary)] leading-relaxed border-l-2 border-[var(--border)] pl-3">&ldquo;{d.text}&rdquo;</p>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="mt-1 text-base text-[var(--text-secondary)] leading-relaxed">{s.b}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-[var(--border)]">
-            <p className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider mb-3">The Pitch</p>
-            <p className="text-xl font-medium font-[family-name:var(--font-display)] text-[var(--text-primary)] leading-relaxed italic">
-              &ldquo;{bizName}{" "}gives teens a place to create, learn, and earn through art — because everyone deserves to express themselves, regardless of what they can afford.&rdquo;
-            </p>
-            <p className="mt-3 text-sm text-[var(--text-muted)]">&mdash; {ELSA.first}, Founder of {bizName}</p>
-          </div>
+      {/* ═══ 5. BUSINESS PLAN — Interactive manila folder ═══ */}
+      <Section label="The Output" title="Auto-Assembled Business Plan" description="Students never 'write a business plan.' It assembles itself from their decisions and conversations across all 22 lessons. Click the folder to explore.">
+        <div className="mx-auto max-w-[680px] flex justify-center">
+          <BusinessPlanFolder />
         </div>
       </Section>
 
