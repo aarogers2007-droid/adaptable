@@ -135,7 +135,13 @@ export default function DemoShowcase() {
     setTimeout(() => {
       setEntered(true);
       window.scrollTo({ top: 0 });
-    }, 600); // match the quote fade-out duration
+      // Double-rAF: wait for React to render the DOM, then force animations
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          distance.forceVisible();
+        });
+      });
+    }, 600);
   };
 
   // Tab state — applies on both mobile and desktop
