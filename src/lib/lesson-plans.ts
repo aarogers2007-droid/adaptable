@@ -726,3 +726,77 @@ export function getLessonPlan(
     ) ?? null
   );
 }
+
+/**
+ * Grade-tier adapted lesson plan.
+ *
+ * Instead of duplicating 22 lesson plans × 4 tiers, we transform the
+ * existing high-school-level plans at request time. The transformation
+ * adds a LESSON ADAPTATION section to the objective that instructs the
+ * AI how to adjust its checkpoint questions and mastery evaluation for
+ * the student's grade level.
+ *
+ * The AI mentor already has per-tier vocabulary/tone rules from
+ * grade-adaptation.ts. This function adds lesson-specific guidance so
+ * the AI knows to simplify checkpoint questions and accept simpler
+ * mastery demonstrations from younger students.
+ */
+import type { GradeTier } from "@/lib/types";
+
+const LESSON_ADAPTATIONS: Record<Exclude<GradeTier, "high_school">, string> = {
+  lower_elementary: `
+LESSON ADAPTATION (K-2, ages 5-8):
+- Reduce to 2 checkpoints maximum. Skip the most abstract checkpoint.
+- Rephrase every checkpoint question using words a 6-year-old knows.
+  Instead of "articulate your value proposition" → "tell me what you'd give someone who pays you"
+  Instead of "identify your target customer" → "who would want to buy this?"
+  Instead of "competitive positioning" → "does anyone else do something like this?"
+- Accept MUCH simpler mastery signals. A 6-year-old saying "I'd sell lemonade to my neighbors"
+  IS mastery of target customer identification. Don't push for more specificity.
+- Don't reference frameworks by name (no Sinek, no Peter Thiel, no Mom Test, no Lean Canvas).
+  Teach the CONCEPT in kid words without naming the framework.
+- The opener should be 1-2 excited sentences, not a paragraph.
+- Completion = the student demonstrated basic understanding in their own words. Not precision.
+- Always frame things as fun: "Let's play a game!" "Imagine this!" "That's so cool!"`,
+
+  upper_elementary: `
+LESSON ADAPTATION (3-5, ages 8-11):
+- Keep all 3 checkpoints but simplify the language.
+- Rephrase questions using simple words. Define any business term you use.
+  Instead of "revenue model" → "how would someone pay you? Like per item, or per hour?"
+  Instead of "competitive differentiation" → "what makes yours special compared to others?"
+- Accept moderately simple mastery signals. A 10-year-old identifying "kids at my school who like art"
+  as a target customer IS sufficient. Don't demand demographic precision.
+- Can mention frameworks but explain them simply: "There's a cool idea called the Golden Circle..."
+- Opener can be 2-3 sentences. Conversational and encouraging.
+- Completion = student shows understanding through examples, even if explanations are simple.`,
+
+  middle_school: `
+LESSON ADAPTATION (6-8, ages 11-14):
+- Keep all checkpoints as written.
+- Slightly simplify jargon. Instead of "competitive positioning" say "where you fit compared to others."
+- Can name frameworks but briefly explain them when first introduced.
+- Accept teen-level mastery signals. Specific but doesn't need to be business-school level.
+- Opener can be full length. Match their energy.
+- Completion = student demonstrates real understanding, can give specific examples from their own business.`,
+};
+
+export function getAdaptedLessonPlan(
+  moduleSequence: number,
+  lessonSequence: number,
+  gradeTier: GradeTier
+): LessonPlan | null {
+  const plan = getLessonPlan(moduleSequence, lessonSequence);
+  if (!plan) return null;
+  if (gradeTier === "high_school") return plan;
+
+  const adaptation = LESSON_ADAPTATIONS[gradeTier];
+  if (!adaptation) return plan;
+
+  // Inject the adaptation into the objective so the AI sees it
+  // when evaluating checkpoints and mastery
+  return {
+    ...plan,
+    objective: plan.objective + "\n" + adaptation,
+  };
+}

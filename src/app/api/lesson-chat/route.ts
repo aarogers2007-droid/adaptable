@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { streamMessage } from "@/lib/ai";
-import { getLessonPlan } from "@/lib/lesson-plans";
+import { getLessonPlan, getAdaptedLessonPlan } from "@/lib/lesson-plans";
 import { learningProfilePrompt, type LearningProfile, DEFAULT_LEARNING_PROFILE } from "@/lib/learning-profile";
 import { getRelevantKnowledgeWithMeta, type RetrievedChunkMeta, type StudentContext } from "@/lib/knowledge-retrieval";
 import type { Profile, GradeTier } from "@/lib/types";
@@ -214,8 +214,10 @@ export async function POST(request: Request) {
     return new Response("Complete onboarding first", { status: 400 });
   }
 
-  // Get lesson plan
-  const plan = getLessonPlan(moduleSequence, lessonSequence);
+  const gradeTier = ((profileData as Record<string, unknown>)?.grade_tier as GradeTier) ?? "high_school";
+
+  // Get lesson plan adapted to student's grade tier
+  const plan = getAdaptedLessonPlan(moduleSequence, lessonSequence, gradeTier);
   if (!plan) {
     console.error("[lesson-chat] 404 — no lesson plan", { moduleSequence, lessonSequence, types: { m: typeof moduleSequence, l: typeof lessonSequence } });
     return new Response("Lesson plan not found", { status: 404 });
@@ -364,7 +366,6 @@ export async function POST(request: Request) {
   const bizDesc = `${profile.business_idea!.niche} ${profile.business_idea!.revenue_model}`.toLowerCase();
   const isExistingBusiness = ["already sell", "already have", "customers", "making money", "revenue", "sales", "clients"].some(k => bizDesc.includes(k));
 
-  const gradeTier = ((profileData as Record<string, unknown>)?.grade_tier as GradeTier) ?? "high_school";
   const gradeAdaptation = getMentorAdaptation(gradeTier);
 
   const systemPrompt = `You are a conversational AI mentor in a venture studio, helping a student design their business venture through dialogue. You are NOT a textbook. You are a smart, encouraging co-founder who teaches by asking questions and building on what the student says.
