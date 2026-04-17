@@ -174,30 +174,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
     />
   ));
 
-  const PageNav = ({ back, next }: { back?: number | "close"; next?: number | "close" }) => (
-    <div className="mt-8 pt-4 border-t border-[#E8E4DA] flex justify-between items-center">
-      {back !== undefined ? (
-        <button
-          onClick={() => (back === "close" ? closeFolder() : goPage(back as number))}
-          className="bg-transparent border border-[var(--border)] rounded-lg px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer transition-all hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)]"
-        >
-          &larr; Back
-        </button>
-      ) : (
-        <span />
-      )}
-      <div className="flex gap-[6px]">{dots}</div>
-      {next !== undefined ? (
-        <button
-          onClick={() => (next === "close" ? closeFolder() : goPage(next as number))}
-          className="bg-transparent border border-[var(--border)] rounded-lg px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer transition-all hover:bg-[var(--primary)] hover:text-white hover:border-[var(--primary)]"
-        >
-          {next === "close" ? "Close folder" : "Next \u2192"}
-        </button>
-      ) : null}
-    </div>
-  );
-
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div className="mb-4 last:mb-0">
       <div className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.05em] mb-[3px]">{label}</div>
@@ -242,10 +218,10 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
     </div>
   );
 
-  // Page wrapper with paper styling
+  // Page wrapper with paper styling — fixed height, scrollable content
   const Page = ({ index, children }: { index: number; children: React.ReactNode }) => (
     <div
-      className={`${currentPage === index ? "block" : "hidden"} relative min-h-[660px] m-5 p-10 rounded-sm animate-[pageIn_0.35s_ease]`}
+      className={`${currentPage === index ? "block" : "hidden"} relative h-[680px] m-5 mb-0 rounded-sm animate-[pageIn_0.35s_ease]`}
       style={{
         background: "#FFFEF9",
         boxShadow: "0 1px 2px rgba(0,0,0,0.04), 1px 0 0 #E8E4DA, 2px 0 0 #F5F0E8, 3px 0 0 #E8E4DA, 4px 0 0 #F0EBE2",
@@ -255,8 +231,8 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
       <div className="absolute inset-0 pointer-events-none" style={{ background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, #E8E4DA 27px, #E8E4DA 28px)", opacity: 0.3, borderRadius: "inherit" }} />
       {/* Red margin */}
       <div className="absolute left-7 top-0 bottom-0 w-px pointer-events-none" style={{ background: "#E8B4B4", opacity: 0.35 }} />
-      {/* Content */}
-      <div className="relative z-[1]">{children}</div>
+      {/* Content — scrollable if it overflows */}
+      <div className="relative z-[1] h-full overflow-y-auto p-10 scrollbar-thin">{children}</div>
     </div>
   );
 
@@ -320,7 +296,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <Field label="What We Do">{d.whatWeDo}</Field>
             <Field label="Why This Matters to Me">{d.whyMatters}</Field>
             <Field label="The Golden Circle"><strong>WHY:</strong> {d.goldenCircle.why} <strong>HOW:</strong> {d.goldenCircle.how} <strong>WHAT:</strong> {d.goldenCircle.what}</Field>
-            <PageNav next={1} />
           </Page>
 
           {/* Page 2: Customer */}
@@ -331,7 +306,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <Field label="Customer Profile"><strong>{d.customerProfile.split(".")[0]}.</strong>{d.customerProfile.slice(d.customerProfile.indexOf(".") + 1)}</Field>
             <Field label="Revenue Model">{d.revenueModel}</Field>
             <Field label="Interview Insights"><span className="inline-block px-[9px] py-[2px] rounded-full text-[10px] font-semibold" style={{ background: "rgba(13,148,136,0.08)", color: "var(--primary)" }}>{d.interviewCount} interviews completed</span><br />{d.interviewInsights}</Field>
-            <PageNav back={0} next={2} />
           </Page>
 
           {/* Page 3: Competition */}
@@ -340,7 +314,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Competition &amp; Differentiation</div>
             <Decision lesson="Research Your Competition" text={d.competitors} />
             <Decision lesson="Define Your Target Customer" text={d.realCompetition} />
-            <PageNav back={1} next={3} />
           </Page>
 
           {/* Page 4: Brand */}
@@ -350,7 +323,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <Field label="Brand Voice"><strong>Gut-feeling words:</strong> {d.brandWords}<br /><strong>We are NOT:</strong> {d.brandNot}</Field>
             <Field label="Business Name">{d.businessNameChoice}</Field>
             <Field label="Visual Identity">{d.visualIdentity}</Field>
-            <PageNav back={2} next={4} />
           </Page>
 
           {/* Page 5: Marketing */}
@@ -364,7 +336,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
               <div className="font-[family-name:var(--font-display)] text-[17px] font-medium text-[var(--text-primary)] leading-[1.65] italic">&ldquo;{d.pitchText}&rdquo;</div>
               <div className="mt-3 text-xs font-medium text-[var(--text-muted)]">&mdash; {d.studentName.split(" ")[0]}, Founder of {d.businessName}</div>
             </div>
-            <PageNav back={3} next={5} />
           </Page>
 
           {/* Page 6: Numbers */}
@@ -374,7 +345,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <Field label="Cost Per Portrait (8&times;10 watercolor)">{d.costBreakdown}</Field>
             <Field label="Pricing Rationale">{d.pricingRationale}</Field>
             <Field label="Tracking System">{d.trackingSystem}</Field>
-            <PageNav back={4} next={6} />
           </Page>
 
           {/* Page 7: Launch */}
@@ -385,7 +355,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <Decision lesson="First Customer Protocol" text={d.firstCustomer} />
             <Decision lesson="Getting Feedback" text={d.feedback} />
             <Decision lesson="After the First Sale" text={d.afterSale} />
-            <PageNav back={5} next={7} />
           </Page>
 
           {/* Page 8: Timeline */}
@@ -411,9 +380,45 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
                 <div className="text-[13px] italic text-[var(--text-secondary)] leading-[1.6]">&ldquo;{d.foundersLog}&rdquo;</div>
               </div>
             </div>
-            <PageNav back={6} next="close" />
           </Page>
         </div>
+
+        {/* Static nav bar — always at the bottom of the folder, never moves */}
+        {isOpen && (
+          <div className="flex justify-between items-center px-9 py-4 border-t border-[#E8E4DA] mx-5">
+            {currentPage > 0 ? (
+              <button
+                onClick={() => currentPage === 0 ? closeFolder() : goPage(currentPage - 1)}
+                className="bg-transparent border border-[var(--border,#E7E5E4)] rounded-lg px-4 py-2 text-xs font-semibold text-[var(--text-secondary,#57534E)] cursor-pointer transition-all hover:bg-[var(--primary,#0D9488)] hover:text-white hover:border-[var(--primary,#0D9488)]"
+              >
+                &larr; Back
+              </button>
+            ) : (
+              <button
+                onClick={closeFolder}
+                className="bg-transparent border border-[var(--border,#E7E5E4)] rounded-lg px-4 py-2 text-xs font-semibold text-[var(--text-secondary,#57534E)] cursor-pointer transition-all hover:bg-[var(--primary,#0D9488)] hover:text-white hover:border-[var(--primary,#0D9488)]"
+              >
+                &larr; Close
+              </button>
+            )}
+            <div className="flex gap-[6px]">{dots}</div>
+            {currentPage < TOTAL_PAGES - 1 ? (
+              <button
+                onClick={() => goPage(currentPage + 1)}
+                className="bg-transparent border border-[var(--border,#E7E5E4)] rounded-lg px-4 py-2 text-xs font-semibold text-[var(--text-secondary,#57534E)] cursor-pointer transition-all hover:bg-[var(--primary,#0D9488)] hover:text-white hover:border-[var(--primary,#0D9488)]"
+              >
+                Next &rarr;
+              </button>
+            ) : (
+              <button
+                onClick={closeFolder}
+                className="bg-transparent border border-[var(--border,#E7E5E4)] rounded-lg px-4 py-2 text-xs font-semibold text-[var(--text-secondary,#57534E)] cursor-pointer transition-all hover:bg-[var(--primary,#0D9488)] hover:text-white hover:border-[var(--primary,#0D9488)]"
+              >
+                Close folder
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Keyframe for page animation */}
