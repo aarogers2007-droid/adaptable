@@ -710,7 +710,7 @@ export default function DemoShowcase() {
       {entered && activeTab === "prove" && (
       <section
         ref={numbers.ref}
-        style={{ padding: "89px 34px", background: "#111827" }}
+        style={{ padding: "89px 34px" }}
       >
         <div className="mx-auto max-w-[800px]">
           <p
@@ -721,18 +721,18 @@ export default function DemoShowcase() {
           </p>
           <h2
             className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#F9FAFB" }}
+            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
           >
             Built to measure before we had 10,000 students
           </h2>
-          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#9CA3AF" }}>
+          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
             We built an eval harness before we built marketing. Every prompt change is graded against synthetic student personas, judged by an independent model. Here&apos;s what the latest run shows.
           </p>
 
           {/* Confidence meter */}
           <div
-            className="rounded-xl border border-white/10 p-8"
-            style={{ marginTop: "55px", background: "rgba(255,255,255,0.05)" }}
+            className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-8"
+            style={{ marginTop: "55px" }}
           >
             <p style={{ fontSize: "13px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
               Self-confidence: &ldquo;Could YOU start a business?&rdquo;
@@ -741,9 +741,9 @@ export default function DemoShowcase() {
               <div className="text-center">
                 <div
                   className="mx-auto rounded-lg transition-all duration-1000"
-                  style={{ width: "55px", height: `${confidenceBefore * 34}px`, background: "rgba(255,255,255,0.15)", minHeight: "8px" }}
+                  style={{ width: "55px", height: `${confidenceBefore * 34}px`, background: "#E5E7EB", minHeight: "8px" }}
                 />
-                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
+                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#111827" }}>
                   {confidenceBefore}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
                 </p>
                 <p style={{ fontSize: "11px", color: "#9CA3AF" }}>Before</p>
@@ -756,18 +756,18 @@ export default function DemoShowcase() {
                   className="mx-auto rounded-lg transition-all duration-[1400ms]"
                   style={{ width: "55px", height: `${confidenceAfter * 34}px`, background: "linear-gradient(180deg, #14B8A6, #0D9488)", minHeight: "8px" }}
                 />
-                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
+                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#111827" }}>
                   {confidenceAfter}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
                 </p>
                 <p style={{ fontSize: "11px", color: "#0D9488" }}>After</p>
               </div>
             </div>
-            <p className="mt-5 text-center" style={{ fontSize: "13px", color: "#9CA3AF" }}>
+            <p className="mt-5 text-center" style={{ fontSize: "13px", color: "#4B5563" }}>
               +{numbers.visible ? "1.15" : "0"} average gain. 100% of simulated students gained.
             </p>
           </div>
 
-          {/* Stats — #14: 2-column instead of 3-column anti-pattern */}
+          {/* Stats */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[
               { label: "Understanding gain", value: "+1.53", sub: "on a 5-point scale. 100% gained." },
@@ -775,27 +775,26 @@ export default function DemoShowcase() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-xl border border-white/10 p-5"
-                style={{ background: "rgba(255,255,255,0.05)" }}
+                className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-5"
               >
                 <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
                   {stat.label}
                 </p>
-                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#F9FAFB" }}>
+                <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#111827" }}>
                   {stat.value}
                 </p>
-                <p className="mt-1" style={{ fontSize: "13px", color: "#9CA3AF" }}>{stat.sub}</p>
+                <p className="mt-1" style={{ fontSize: "13px", color: "#4B5563" }}>{stat.sub}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#9CA3AF" }}>
+          <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#4B5563" }}>
             60 synthetic student personas across 3 motivation levels. Synthesizer: Claude Sonnet. Judge: Claude Opus (cross-model, eliminates self-preference bias). These are simulated upper bounds, not real-teen rates — but the shape of the result is what matters: when the wizard works, it changes how kids think about themselves before it changes what they do.
           </p>
 
-          {/* #10: Standards alignment */}
-          <div className="mt-8 rounded-xl border border-white/10 p-5" style={{ background: "rgba(255,255,255,0.05)" }}>
-            <p style={{ fontSize: "13px", color: "#F9FAFB" }}>
+          {/* Standards alignment */}
+          <div className="mt-8 rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5">
+            <p style={{ fontSize: "13px", color: "#111827" }}>
               All 22 lessons aligned to <strong>NBEA</strong>, <strong>Common Core</strong>, <strong>ISTE</strong>, and <strong>Jump$tart</strong> standards. Detailed curriculum mapping available for administrators.
             </p>
           </div>
