@@ -757,7 +757,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoM
                     autoComplete="off"
                     spellCheck={false}
                     aria-label="Business name (editable)"
-                    className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] text-[32px] font-bold leading-tight text-[var(--text-primary)] outline-none border-b-2 border-dashed border-[var(--border)] focus:border-[var(--primary)] focus:border-solid transition-colors px-0 py-0.5"
+                    className="ikigai-name-input mt-2 w-full bg-transparent font-[family-name:var(--font-display)] text-[32px] font-bold leading-tight text-[var(--text-primary)] outline-none border-2 border-dashed border-[var(--border)] rounded-xl focus:border-[var(--primary)] focus:border-solid transition-colors px-4 py-3"
                   />
                   <p className="mt-2 text-base text-[var(--text-secondary)]">
                     {businessIdea.niche}
