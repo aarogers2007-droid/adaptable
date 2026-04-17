@@ -175,7 +175,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
   ));
 
   const PageNav = ({ back, next }: { back?: number | "close"; next?: number | "close" }) => (
-    <div className="absolute bottom-5 left-9 right-9 flex justify-between items-center z-[5]">
+    <div className="mt-8 pt-4 border-t border-[#E8E4DA] flex justify-between items-center">
       {back !== undefined ? (
         <button
           onClick={() => (back === "close" ? closeFolder() : goPage(back as number))}
@@ -206,14 +206,14 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
   );
 
   const Decision = ({ lesson, text }: { lesson: string; text: string }) => (
-    <div className="py-[10px] border-b border-[var(--paper-line)] last:border-b-0">
+    <div className="py-[10px] border-b border-[#E8E4DA] last:border-b-0">
       <div className="text-[10px] text-[var(--text-muted)] font-medium mb-[2px]">{lesson}</div>
       <div className="text-[13px] text-[var(--text-primary)] leading-[1.55]">{text}</div>
     </div>
   );
 
   const TaskRow = ({ week, index, text }: { week: string; index: number; text: string }) => (
-    <label className="flex items-start gap-2 py-[7px] border-b border-[var(--paper-line)] last:border-b-0 cursor-pointer">
+    <label className="flex items-start gap-2 py-[7px] border-b border-[#E8E4DA] last:border-b-0 cursor-pointer">
       <input
         type="checkbox"
         checked={weekProgress[week][index]}
@@ -245,13 +245,14 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
   // Page wrapper with paper styling
   const Page = ({ index, children }: { index: number; children: React.ReactNode }) => (
     <div
-      className={`${currentPage === index ? "block" : "hidden"} relative min-h-[660px] m-5 p-10 pb-20 rounded-sm bg-[var(--paper)] animate-[pageIn_0.35s_ease]`}
+      className={`${currentPage === index ? "block" : "hidden"} relative min-h-[660px] m-5 p-10 rounded-sm animate-[pageIn_0.35s_ease]`}
       style={{
-        boxShadow: "0 1px 2px rgba(0,0,0,0.04), 1px 0 0 var(--paper-line), 2px 0 0 #F5F0E8, 3px 0 0 var(--paper-line), 4px 0 0 #F0EBE2",
+        background: "#FFFEF9",
+        boxShadow: "0 1px 2px rgba(0,0,0,0.04), 1px 0 0 #E8E4DA, 2px 0 0 #F5F0E8, 3px 0 0 #E8E4DA, 4px 0 0 #F0EBE2",
       }}
     >
       {/* Ruled lines */}
-      <div className="absolute inset-0 pointer-events-none rounded-inherit" style={{ background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, var(--paper-line) 27px, var(--paper-line) 28px)", opacity: 0.3 }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, #E8E4DA 27px, #E8E4DA 28px)", opacity: 0.3, borderRadius: "inherit" }} />
       {/* Red margin */}
       <div className="absolute left-7 top-0 bottom-0 w-px pointer-events-none" style={{ background: "#E8B4B4", opacity: 0.35 }} />
       {/* Content */}
@@ -311,10 +312,10 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 1 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Vision</div>
             <div className="grid grid-cols-2 gap-[6px] mb-5">
-              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--love)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">What I Love</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.love}</div></div>
-              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--good-at)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">What I&apos;m Good At</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.goodAt}</div></div>
-              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--needs)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">What People Need</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.needs}</div></div>
-              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--paid)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">How I Get Paid</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.paid}</div></div>
+              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--love, #F5E642)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">What I Love</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.love}</div></div>
+              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--good-at, #A8DB5A)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">What I&apos;m Good At</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.goodAt}</div></div>
+              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--needs, #F4A79D)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">What People Need</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.needs}</div></div>
+              <div className="rounded-[10px] p-[12px_14px]" style={{ background: "var(--paid, #6DD5D0)" }}><div className="text-[10px] font-semibold uppercase tracking-[0.04em] opacity-65 mb-1">How I Get Paid</div><div className="text-xs leading-[1.5] text-[#1C1917]">{d.ikigai.paid}</div></div>
             </div>
             <Field label="What We Do">{d.whatWeDo}</Field>
             <Field label="Why This Matters to Me">{d.whyMatters}</Field>
@@ -392,10 +393,10 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 8 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Your 4-Week Launch Plan</div>
             <p className="text-[13px] text-[var(--text-secondary)] mb-4 leading-[1.5]">Everything you decided across 22 lessons, organized into a month of real action. Check off each task as you go.</p>
-            <WeekBlock week="w1" label="Week 1 \u2014" title="Ship to One Person" tasks={d.week1Tasks} />
-            <WeekBlock week="w2" label="Week 2 \u2014" title="Get Customers #2 and #3" tasks={d.week2Tasks} />
-            <WeekBlock week="w3" label="Week 3 \u2014" title="Build the System" tasks={d.week3Tasks} />
-            <WeekBlock week="w4" label="Week 4 \u2014" title="Decide What\u2019s Next" tasks={d.week4Tasks} />
+            <WeekBlock week="w1" label={"Week 1 \u2014"} title="Ship to One Person" tasks={d.week1Tasks} />
+            <WeekBlock week="w2" label={"Week 2 \u2014"} title="Get Customers #2 and #3" tasks={d.week2Tasks} />
+            <WeekBlock week="w3" label={"Week 3 \u2014"} title="Build the System" tasks={d.week3Tasks} />
+            <WeekBlock week="w4" label={"Week 4 \u2014"} title={"Decide What\u2019s Next"} tasks={d.week4Tasks} />
             {/* Progress bar */}
             <div className="mt-5">
               <div className="h-[6px] bg-[var(--bg-muted,#F5F5F4)] rounded-full overflow-hidden">
