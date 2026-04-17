@@ -166,8 +166,11 @@ export default function DemoShowcase() {
 
   const selectTab = (key: DemoTab) => {
     setActiveTab(key);
+    // Double-rAF: first frame lets React render, second fires animations
     requestAnimationFrame(() => {
-      tabAnimations[key].forEach((fn) => fn());
+      requestAnimationFrame(() => {
+        tabAnimations[key].forEach((fn) => fn());
+      });
       tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   };
