@@ -269,7 +269,7 @@ export default function DemoShowcase() {
               >
                 Day 1
               </p>
-              <div className="mx-auto w-full max-w-[320px] opacity-40">
+              <div className="mx-auto w-full max-w-[480px] opacity-40">
                 <div style={{ aspectRatio: "1 / 1", position: "relative" }}>
                   <svg viewBox="0 0 100 100" className="w-full h-full">
                     <circle cx="50" cy="30.9" r="20" fill="#F5E642" opacity="0.35" />
@@ -299,7 +299,7 @@ export default function DemoShowcase() {
               >
                 Day 30
               </p>
-              <div className="mx-auto w-full max-w-[320px]">
+              <div className="mx-auto w-full max-w-[480px]">
                 <GoldenIkigai />
               </div>
               <p className="mt-8 font-[family-name:var(--font-display)] font-semibold" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
