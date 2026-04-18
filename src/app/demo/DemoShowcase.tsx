@@ -353,8 +353,6 @@ export default function DemoShowcase() {
               <p className="mt-8 font-[family-name:var(--font-display)] font-semibold" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
                 {ELSA_STUDIO.name}
               </p>
-              <p style={{ fontSize: "13px", color: "#4B5563" }}>{ELSA_STUDIO.target}</p>
-              <p style={{ fontSize: "13px", color: "#4B5563" }}>{ELSA_STUDIO.revenue}</p>
             </div>
           </div>
 
