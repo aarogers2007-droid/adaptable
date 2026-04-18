@@ -315,7 +315,7 @@ export default function DemoShowcase() {
                 className="font-[family-name:var(--font-display)] mb-5"
                 style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#9CA3AF" }}
               >
-                Day 1
+                Before Adaptable
               </p>
               <div className="mx-auto w-full max-w-[480px] opacity-40">
                 <div style={{ aspectRatio: "1 / 1", position: "relative" }}>
@@ -345,7 +345,7 @@ export default function DemoShowcase() {
                 className="font-[family-name:var(--font-display)] mb-5"
                 style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
               >
-                Day 30
+                Day 1
               </p>
               <div className="mx-auto w-full max-w-[480px]">
                 <GoldenIkigai />
