@@ -90,20 +90,21 @@ function useTypewriter(text: string, active: boolean, speed = 35) {
 }
 
 // ── Animated counter hook ──
-function useCounter(target: number, active: boolean, duration = 1200) {
+function useCounter(target: number, active: boolean, duration = 1200, decimals = 0) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
     if (!active) return;
+    const factor = Math.pow(10, decimals);
     const start = performance.now();
     const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(target * eased));
+      setValue(Math.round(target * eased * factor) / factor);
       if (progress < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [target, active, duration]);
+  }, [target, active, duration, decimals]);
 
   return value;
 }
@@ -203,8 +204,9 @@ export default function DemoShowcase() {
   );
 
   // Confidence meter
-  const confidenceBefore = useCounter(2, numbers.visible, 800);
-  const confidenceAfter = useCounter(4, numbers.visible, 1400);
+  // Updated from 2026-04-17 eval run (59 completed paths)
+  const confidenceBefore = useCounter(2.6, numbers.visible, 800, 1);
+  const confidenceAfter = useCounter(3.7, numbers.visible, 1400, 1);
 
   // ── Ceremony overlay ──
   if (showCeremony && !ceremonyDone) {
@@ -741,10 +743,10 @@ export default function DemoShowcase() {
               <div className="text-center">
                 <div
                   className="mx-auto rounded-lg transition-all duration-1000"
-                  style={{ width: "55px", height: `${confidenceBefore * 34}px`, background: "#E5E7EB", minHeight: "8px" }}
+                  style={{ width: "55px", height: `${confidenceBefore * 26}px`, background: "#E5E7EB", minHeight: "8px" }}
                 />
                 <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#111827" }}>
-                  {confidenceBefore}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
+                  {confidenceBefore.toFixed(1)}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
                 </p>
                 <p style={{ fontSize: "11px", color: "#9CA3AF" }}>Before</p>
               </div>
@@ -754,24 +756,24 @@ export default function DemoShowcase() {
               <div className="text-center">
                 <div
                   className="mx-auto rounded-lg transition-all duration-[1400ms]"
-                  style={{ width: "55px", height: `${confidenceAfter * 34}px`, background: "linear-gradient(180deg, #14B8A6, #0D9488)", minHeight: "8px" }}
+                  style={{ width: "55px", height: `${confidenceAfter * 26}px`, background: "linear-gradient(180deg, #14B8A6, #0D9488)", minHeight: "8px" }}
                 />
                 <p className="mt-3 font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "34px", color: "#111827" }}>
-                  {confidenceAfter}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
+                  {confidenceAfter.toFixed(1)}<span style={{ fontSize: "16px", color: "#9CA3AF" }}>/5</span>
                 </p>
                 <p style={{ fontSize: "11px", color: "#0D9488" }}>After</p>
               </div>
             </div>
             <p className="mt-5 text-center" style={{ fontSize: "13px", color: "#4B5563" }}>
-              +{numbers.visible ? "1.15" : "0"} average gain. 100% of simulated students gained.
+              +{numbers.visible ? "1.09" : "0"} average gain. 93% of simulated students gained.
             </p>
           </div>
 
           {/* Stats */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[
-              { label: "Understanding gain", value: "+1.53", sub: "on a 5-point scale. 100% gained." },
-              { label: "Alien to accessible", value: "97%", sub: "flipped from 'business isn't for me' to 'this could be me.'" },
+              { label: "Understanding gain", value: "+1.48", sub: "on a 5-point scale. 100% gained understanding." },
+              { label: "Alien to accessible", value: "93%", sub: "flipped from 'business is for other people' to 'this could be me.'" },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -789,7 +791,7 @@ export default function DemoShowcase() {
           </div>
 
           <p className="mt-8" style={{ fontSize: "13px", lineHeight: 1.618, color: "#4B5563" }}>
-            60 synthetic student personas across 3 motivation levels. Synthesizer: Claude Sonnet. Judge: Claude Opus (cross-model, eliminates self-preference bias). These are simulated upper bounds, not real-teen rates — but the shape of the result is what matters: when the wizard works, it changes how kids think about themselves before it changes what they do.
+            20 personas across 3 motivation levels (low/medium/high) = 59 completed paths. Synthesizer: Claude Sonnet. Judge: Claude Opus (cross-model, eliminates self-preference bias). 75% decisively moved by independent judge verdict, 25% partly moved, 0% unmoved. These are simulated upper bounds, not real-teen rates — but the shape of the result is what matters: when the wizard works, it changes how kids think about themselves before it changes what they do.
           </p>
 
           {/* Standards alignment */}
