@@ -774,6 +774,8 @@ export default function DemoShowcase() {
             {[
               { label: "Understanding gain", value: "+1.48", sub: "on a 5-point scale. 100% gained understanding." },
               { label: "Alien to accessible", value: "93%", sub: "flipped from 'business is for other people' to 'this could be me.'" },
+              { label: "RAG faithfulness", value: "0.83", sub: "AI mentor grounds responses in verified knowledge, not training data." },
+              { label: "Decisively moved", value: "75%", sub: "independent Opus judge verdict. 25% partly moved. 0% unmoved." },
             ].map((stat) => (
               <div
                 key={stat.label}
