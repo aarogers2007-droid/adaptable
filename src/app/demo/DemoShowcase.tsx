@@ -390,7 +390,7 @@ export default function DemoShowcase() {
             Try it yourself
           </h2>
           <p className="mx-auto mt-5 max-w-[520px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            Walk the actual Ikigai wizard. Same steps, same questions, same AI synthesis a real student gets. In about 3 minutes you&apos;ll have your own venture.
+            Walk the actual Ikigai wizard. Same steps, same questions, same AI synthesis a real student gets. In less than two minutes you&apos;ll have your own venture.
           </p>
           <button
             onClick={() => { setShowDiyWizard(true); setDiyResult(null); }}
