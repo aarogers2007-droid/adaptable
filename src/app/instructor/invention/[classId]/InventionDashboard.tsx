@@ -246,6 +246,29 @@ export default function InventionDashboard({
 
         {tab === "groups" && (
           <div className="mt-8 space-y-6">
+            {/* Print options — only visible when groups exist */}
+            {data.groups.length > 0 && (
+              <div className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+                <span className="text-sm font-medium text-[var(--text-primary)]">Print:</span>
+                <a
+                  href={`/instructor/invention/${classId}/print/roster`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg border border-[var(--border-strong)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
+                >
+                  Print Group Roster
+                </a>
+                <a
+                  href={`/instructor/invention/${classId}/print/slips`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg border border-[var(--border-strong)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
+                >
+                  Print Student Slips
+                </a>
+              </div>
+            )}
+
             {data.groups.length === 0 ? (
               <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-8 text-center">
                 <p className="text-sm text-[var(--text-secondary)]">
