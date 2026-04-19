@@ -103,8 +103,18 @@ export default function SignupPage() {
       // Enrollment will need to be done manually — don't block onboarding
     }
 
-    // Under-13s land on a "waiting for parent" page; everyone else goes to onboarding.
-    router.push(isUnder13 ? "/parental-consent-pending" : "/onboarding");
+    // Determine destination based on session type
+    let destination = "/onboarding";
+    try {
+      const pending = sessionStorage.getItem("pendingClassJoin");
+      if (pending) {
+        const info = JSON.parse(pending);
+        if (info.sessionType === "invention") destination = "/invention";
+      }
+    } catch { /* fall through to default */ }
+
+    // Under-13s land on a "waiting for parent" page; everyone else goes to their flow.
+    router.push(isUnder13 ? "/parental-consent-pending" : destination);
   }
 
   async function handleGoogleSignup() {

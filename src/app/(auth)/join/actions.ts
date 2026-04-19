@@ -43,7 +43,7 @@ export async function validateInviteCode(code: string) {
 
   const { data: invite, error } = await supabase
     .from("invite_codes")
-    .select("id, code, class_id, expires_at, max_uses, current_uses, classes(name, org_id)")
+    .select("id, code, class_id, expires_at, max_uses, current_uses, classes(name, org_id, session_type)")
     .eq("code", trimmed)
     .single();
 
@@ -59,12 +59,13 @@ export async function validateInviteCode(code: string) {
     return { error: "This invite code has reached its limit. Ask your instructor for a new one." };
   }
 
-  const classData = invite.classes as unknown as { name: string; org_id: string };
+  const classData = invite.classes as unknown as { name: string; org_id: string; session_type: string };
 
   return {
     className: classData.name,
     classId: invite.class_id,
     orgId: classData.org_id,
+    sessionType: classData.session_type ?? "curriculum",
   };
 }
 

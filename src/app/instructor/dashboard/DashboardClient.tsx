@@ -38,6 +38,7 @@ export interface ClassData {
   flags: ClassFlag[];
   streaksEnabled: boolean;
   voiceEnabled: boolean;
+  sessionType?: string;
 }
 
 interface DashboardClientProps {
@@ -222,6 +223,22 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
                     </button>
                   ))}
                 </div>
+
+                {/* Invention mode banner */}
+                {activeClass.sessionType === "invention" && (
+                  <div className="mb-6 rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">This is an Invention Mode class</p>
+                      <p className="mt-1 text-xs text-[var(--text-secondary)]">Manage the five-circle wizard, grouping algorithm, and group reveals.</p>
+                    </div>
+                    <a
+                      href={`/instructor/invention/${activeClass.id}`}
+                      className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] transition-colors shrink-0"
+                    >
+                      Invention Dashboard
+                    </a>
+                  </div>
+                )}
 
                 {/* Sub-tab content */}
                 {activeSubTab === "students" && (

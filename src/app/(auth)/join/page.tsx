@@ -14,6 +14,7 @@ export default function JoinClassPage() {
     className: string;
     classId: string;
     orgId: string;
+    sessionType: string;
   } | null>(null);
   const router = useRouter();
   const supabase = createClient();
@@ -35,6 +36,7 @@ export default function JoinClassPage() {
       className: result.className!,
       classId: result.classId!,
       orgId: result.orgId!,
+      sessionType: result.sessionType ?? "curriculum",
     });
     setLoading(false);
   }
@@ -70,7 +72,7 @@ export default function JoinClassPage() {
       return;
     }
 
-    router.push("/onboarding");
+    router.push(classInfo.sessionType === "invention" ? "/invention" : "/onboarding");
   }
 
   return (

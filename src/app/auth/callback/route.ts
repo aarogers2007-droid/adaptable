@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   // Validate redirect path to prevent open redirects
   const rawNext = searchParams.get("next") ?? "/dashboard";
-  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent"];
+  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention"];
   const next = (rawNext.startsWith("/") && !rawNext.startsWith("//") && SAFE_PREFIXES.some(p => rawNext.startsWith(p)))
     ? rawNext
     : "/dashboard";
@@ -50,7 +50,19 @@ export async function GET(request: Request) {
           return NextResponse.redirect(`${origin}/join`);
         }
 
-        // Has org but no business idea — start/resume the Ikigai wizard.
+        // Has org but no business idea — check session type to determine flow.
+        const { data: enrollment } = await supabase
+          .from("class_enrollments")
+          .select("class_id, classes(session_type)")
+          .eq("student_id", user.id)
+          .limit(1)
+          .single();
+
+        const sessionType = (enrollment?.classes as unknown as { session_type: string } | null)?.session_type;
+        if (sessionType === "invention") {
+          return NextResponse.redirect(`${origin}/invention`);
+        }
+
         return NextResponse.redirect(`${origin}/onboarding`);
       }
 
