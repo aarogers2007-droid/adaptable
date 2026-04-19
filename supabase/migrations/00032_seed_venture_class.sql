@@ -11,7 +11,7 @@
 
 -- 1. Create organization
 INSERT INTO organizations (id, name)
-VALUES ('a0000000-0000-0000-0000-venturelab01', 'VentureLab')
+VALUES ('a0000000-0000-0000-0000-00000000ab01', 'VentureLab')
 ON CONFLICT (id) DO NOTHING;
 
 -- 2. Create the invention class
@@ -21,7 +21,7 @@ ON CONFLICT (id) DO NOTHING;
 DO $$
 DECLARE
   _admin_id uuid;
-  _class_id uuid := 'c0000000-0000-0000-0000-invention001';
+  _class_id uuid := 'c0000000-0000-0000-0000-000000000c01';
 BEGIN
   -- Try to find an existing org_admin or instructor for VentureLab
   SELECT id INTO _admin_id
@@ -39,7 +39,7 @@ BEGIN
   INSERT INTO classes (id, org_id, instructor_id, name, description, session_type, grouping_config)
   VALUES (
     _class_id,
-    'a0000000-0000-0000-0000-venturelab01',
+    'a0000000-0000-0000-0000-00000000ab01',
     _admin_id,
     'VentureLab Invention Day',
     'May 13 invention event — 165 middle school students',
