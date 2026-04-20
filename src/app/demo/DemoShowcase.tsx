@@ -31,6 +31,8 @@ import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { BusinessIdea } from "@/lib/types";
 import DemoCardDesigner from "./DemoCardDesigner";
+import InventionIkigai from "@/components/InventionIkigai";
+import DemoInventionMode from "./DemoInventionMode";
 import BusinessPlanFolder from "@/components/business-plan/BusinessPlanFolder";
 
 // ── Demo data ──
@@ -110,7 +112,7 @@ function useCounter(target: number, active: boolean, duration = 1200, decimals =
 }
 
 // ── Tab type ──
-type DemoTab = "start" | "learn" | "build" | "prove" | "guide" | "graduate";
+type DemoTab = "start" | "learn" | "build" | "prove" | "guide" | "graduate" | "invention";
 
 const TABS: { key: DemoTab; label: string }[] = [
   { key: "start", label: "Start" },
@@ -119,6 +121,7 @@ const TABS: { key: DemoTab; label: string }[] = [
   { key: "prove", label: "Prove" },
   { key: "guide", label: "Guide" },
   { key: "graduate", label: "Graduate" },
+  { key: "invention", label: "Invention Mode" },
 ];
 
 export default function DemoShowcase() {
@@ -163,6 +166,7 @@ export default function DemoShowcase() {
     prove: [numbers.forceVisible],
     guide: [],
     graduate: [],
+    invention: [],
   };
 
   const selectTab = (key: DemoTab) => {
@@ -1128,6 +1132,11 @@ export default function DemoShowcase() {
         </p>
       </section>
       </>
+      )}
+
+      {/* ═══ TAB: INVENTION MODE ═══ */}
+      {entered && activeTab === "invention" && (
+        <DemoInventionMode />
       )}
 
       {/* ── Full-screen DIY wizard overlay ── */}
