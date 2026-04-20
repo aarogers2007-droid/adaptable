@@ -154,6 +154,31 @@ export default function InventionDashboard({
 
         {tab === "overview" && (
           <div className="mt-8 space-y-8">
+            {/* Shareable link */}
+            <div className="rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5">
+              <p className="text-xs font-semibold text-[var(--primary)] uppercase tracking-wider mb-2">Shareable Link</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-3">Send this to participants, schools, or parents. It&apos;s the single entry point for all students.</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={typeof window !== "undefined" ? `${window.location.origin}/venture` : "/venture"}
+                  className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm font-mono text-[var(--text-primary)] outline-none"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = `${window.location.origin}/venture`;
+                    navigator.clipboard.writeText(url);
+                  }}
+                  className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-dark)] transition-colors shrink-0"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+
             {/* Completion meter */}
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
               <div className="flex items-center justify-between mb-3">

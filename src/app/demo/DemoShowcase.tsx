@@ -230,6 +230,36 @@ export default function DemoShowcase() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
 
+      {/* ═══ PERSISTENT NAV — always visible ═══ */}
+      <nav className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4">
+        <Link
+          href="/"
+          className="font-[family-name:var(--font-display)] text-lg font-bold"
+          style={{ color: entered ? "var(--primary)" : "#F9FAFB" }}
+        >
+          Adaptable
+        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/for-schools"
+            className="text-sm transition-colors hover:opacity-80"
+            style={{ color: entered ? "var(--text-secondary)" : "#9CA3AF" }}
+          >
+            For Schools
+          </Link>
+          <Link
+            href="/login"
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            style={{
+              background: entered ? "var(--primary)" : "rgba(255,255,255,0.15)",
+              color: "#fff",
+            }}
+          >
+            Log In
+          </Link>
+        </div>
+      </nav>
+
       {/* ═══ QUOTE LANDING — full viewport, fades out on enter ═══ */}
       {!entered && (
         <section

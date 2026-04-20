@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { saveInventionProgress, completeInventionSession, getGroupAssignment } from "./actions";
+import InventionIkigai from "@/components/InventionIkigai";
 
 // ── Circle definitions ──
 
@@ -262,22 +263,27 @@ export default function InventionWizard({ studentName, existingSession }: Props)
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-12">
       <div className="mx-auto max-w-[600px]">
-        {/* Progress indicator */}
-        <div className="mb-8 flex items-center gap-2">
-          {[1, 2, 3, 4, 5].map((s) => (
-            <div
-              key={s}
-              className="h-2 flex-1 rounded-full transition-colors"
-              style={{
-                background: s < step ? "#0D9488" : s === step ? "#14B8A6" : "#E5E7EB",
-              }}
-            />
-          ))}
+        {/* Pentagon progress diagram */}
+        <div className="mb-6">
+          <InventionIkigai
+            currentCircle={step}
+            completedCircles={
+              [1, 2, 3, 4, 5].filter((s) => {
+                if (s >= step) return false;
+                if (s === 1) return !!circle1;
+                if (s === 2) return !!circle2;
+                if (s === 3) return circle3Chips.length > 0;
+                if (s === 4) return !!circle4;
+                if (s === 5) return circle5.length > 0;
+                return false;
+              })
+            }
+            onCircleClick={(c) => {
+              // Only navigate to completed circles
+              if (c < step) setStep(c);
+            }}
+          />
         </div>
-
-        <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
-          Circle {step} of 5
-        </p>
 
         {/* ── Circle 1: The Wish ── */}
         {step === 1 && (
@@ -477,7 +483,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
             disabled={!canProceed() || saving}
             className="rounded-lg bg-[var(--primary)] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
           >
-            {saving ? "Saving..." : step === 5 ? "Submit" : "Next"}
+            {saving ? "Saving..." : step === 5 ? "Complete Ikigai" : "Next"}
           </button>
         </div>
       </div>
