@@ -61,7 +61,7 @@ export default function InventionIkigai({
           const isActive = currentCircle === circle.num;
           const isCompleted = completedCircles.includes(circle.num);
           const isReachable = isCompleted || isActive;
-          const isClickable = onCircleClick && isCompleted && !isActive;
+          const isClickable = !!onCircleClick && !isActive;
 
           const fillOpacity = isActive ? 0.35 : isCompleted ? 0.2 : 0.12;
           const strokeWidth = isActive ? 2.5 : 2;
