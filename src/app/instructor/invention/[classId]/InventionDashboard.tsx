@@ -785,7 +785,11 @@ function AlgorithmStream({
   }, [rawChars, viewMode, running]);
 
   function handleFullscreen() {
-    terminalRef.current?.requestFullscreen?.();
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      terminalRef.current?.requestFullscreen?.();
+    }
   }
 
   return (
