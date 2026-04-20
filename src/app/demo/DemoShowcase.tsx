@@ -1178,35 +1178,54 @@ export default function DemoShowcase() {
       {entered && activeTab === "summary" && (
         <section style={{ padding: "89px 34px" }}>
           <div className="mx-auto max-w-[700px]">
+            <h2 className="font-[family-name:var(--font-display)] text-center font-semibold mb-8" style={{ fontSize: "34px", color: "var(--text-primary)" }}>
+              Summary
+            </h2>
             <article
-              className="rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 md:p-8"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 md:p-10"
               style={{ fontFamily: '"Times New Roman", Times, serif', lineHeight: 1.75, fontSize: "17px", color: "var(--text-primary)" }}
             >
-              <p>
-                Adaptable takes a teenager who has never thought about starting a business and walks them from a blank page to their first real sale. An Ikigai-based wizard generates a specific, executable business idea in under two minutes, grounded in what the student already loves and is already good at. From there, a one-to-one AI mentor delivers 22 conversation-style lessons across six modules — asking questions instead of lecturing, referencing the student&apos;s business by name, and gating progression on demonstrated understanding rather than completion.
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>The Core Experience</h3>
+              <p style={{ textIndent: "2em" }}>
+                Adaptable takes a teenager who has never thought about starting a business and walks them from <strong>a blank page to their first real sale</strong>. An Ikigai-based wizard generates a specific, executable business idea in <strong>under two minutes</strong>, grounded in what the student already loves and is already good at. From there, a <strong>one-to-one AI mentor</strong> delivers 22 conversation-style lessons across six modules — asking questions instead of lecturing, referencing the student&apos;s business by name, and gating progression on <strong>demonstrated understanding</strong> rather than completion.
               </p>
-              <p className="mt-4">
-                The platform adapts to four grade tiers: K-2 (zero capital, neighborhood only), 3-5 (under $10, school and local), 6-8 (under $50, online included), and 9-12 (under $100, full range). Each tier adjusts vocabulary, sentence length, tone, examples, and business scope. A student in second grade gets a fundamentally different experience than a junior in high school, but both walk away with something real.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>Grade Adaptation</h3>
+              <p style={{ textIndent: "2em" }}>
+                The platform adapts to <strong>four grade tiers</strong>: K-2 (zero capital, neighborhood only), 3-5 (under $10, school and local), 6-8 (under $50, online included), and 9-12 (under $100, full range). Each tier adjusts <strong>vocabulary, sentence length, tone, examples, and business scope</strong>. A student in second grade gets a fundamentally different experience than a junior in high school, but both walk away with something real.
               </p>
-              <p className="mt-4">
-                The AI mentor draws from a curated knowledge base of 38 fact-checked entries covering real entrepreneurship frameworks — Lean Canvas, Jobs-to-be-Done, Mom Test, Golden Circle, Build-Measure-Learn, value-based pricing. Retrieval is hybrid: tag-based candidate fetch plus per-message semantic re-ranking via pgvector so each student gets the most relevant context for their specific question and business. Every claim passes the Adaptable Factual Floor: traceable to a source a 16-year-old could verify in 60 seconds.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>Knowledge &amp; Retrieval</h3>
+              <p style={{ textIndent: "2em" }}>
+                The AI mentor draws from a curated knowledge base of <strong>38 fact-checked entries</strong> covering real entrepreneurship frameworks — Lean Canvas, Jobs-to-be-Done, Mom Test, Golden Circle, Build-Measure-Learn, value-based pricing. Retrieval is <strong>hybrid</strong>: tag-based candidate fetch plus per-message semantic re-ranking via pgvector so each student gets the most relevant context for their specific question and business. Every claim passes the <strong>Adaptable Factual Floor</strong>: traceable to a source a 16-year-old could verify in 60 seconds.
               </p>
-              <p className="mt-4">
-                The Founder&apos;s Mirror shows students their own behavior back to them. After every lesson, one observation and one question. Maximum 40 words. No advice. No praise. Over 22 lessons, those reflections accumulate into a private Founder&apos;s Log that no teacher sees, no algorithm analyzes, and no leaderboard ranks.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>The Founder&apos;s Mirror</h3>
+              <p style={{ textIndent: "2em" }}>
+                The Founder&apos;s Mirror shows students their own behavior back to them. After every lesson, <strong>one observation and one question</strong>. Maximum 40 words. No advice. No praise. Over 22 lessons, those reflections accumulate into a private <strong>Founder&apos;s Log</strong> that no teacher sees, no algorithm analyzes, and no leaderboard ranks.
               </p>
-              <p className="mt-4">
-                For events, Invention Mode replaces the business curriculum with a five-circle discovery wizard — The Wish, The Mind, The Lens, The Scale, The Voice — designed to map how students think, what they know, and how they communicate. A five-step grouping algorithm then sorts 165 students into balanced teams optimized across category, archetype, knowledge diversity, ambition scale, and communication style. Admins see real-time completion, run the algorithm with a live terminal replay, and manage groups with one-click overrides.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>Invention Mode</h3>
+              <p style={{ textIndent: "2em" }}>
+                For events, <strong>Invention Mode</strong> replaces the business curriculum with a five-circle discovery wizard — The Wish, The Mind, The Lens, The Scale, The Voice — designed to map how students think, what they know, and how they communicate. A <strong>five-step grouping algorithm</strong> then sorts 165 students into balanced teams optimized across category, archetype, knowledge diversity, ambition scale, and communication style. Admins see real-time completion, run the algorithm with a <strong>live terminal replay</strong>, and manage groups with one-click overrides.
               </p>
-              <p className="mt-4">
-                Two layers of content moderation run on every student input — keyword-based detection plus ML classification. Crisis signals fire real-time teacher alerts. The AI never uses profanity, never reveals its instructions, and surfaces a parent-involvement prompt for real-world commerce. COPPA compliance is built in with age-gated parental consent.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>Safety &amp; Compliance</h3>
+              <p style={{ textIndent: "2em" }}>
+                <strong>Two layers of content moderation</strong> run on every student input — keyword-based detection plus ML classification. Crisis signals fire <strong>real-time teacher alerts</strong>. The AI never uses profanity, never reveals its instructions, and surfaces a parent-involvement prompt for real-world commerce. <strong>COPPA compliance</strong> is built in with age-gated parental consent.
               </p>
-              <p className="mt-4">
-                Every prompt change runs through a regression test suite before shipping. 60 synthetic student personas across 3 motivation levels, judged by an independent model. The eval system is the product&apos;s immune system — it catches regressions before students ever see them.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>Eval-Driven Development</h3>
+              <p style={{ textIndent: "2em" }}>
+                Every prompt change runs through a <strong>regression test suite</strong> before shipping. 60 synthetic student personas across 3 motivation levels, judged by an independent model. The eval system is the product&apos;s <strong>immune system</strong> — it catches regressions before students ever see them.
               </p>
-              <p className="mt-4">
-                The mission is transformation, not education. A kid walks in thinking entrepreneurship is something other people do, and walks out with a business, a private record of their own growth, and the confidence that comes from building something real.
+
+              <h3 className="font-[family-name:var(--font-display)] font-semibold mt-8 mb-3" style={{ fontSize: "20px", fontFamily: "var(--font-display, system-ui)" }}>The Mission</h3>
+              <p style={{ textIndent: "2em" }}>
+                The mission is <strong>transformation, not education</strong>. A kid walks in thinking entrepreneurship is something other people do, and walks out with a business, a private record of their own growth, and the confidence that comes from building something real.
               </p>
-              <div className="pt-4 mt-4 border-t border-[var(--border)]">
+
+              <div className="pt-4 mt-6 border-t border-[var(--border)]">
                 <p className="text-sm italic" style={{ color: "var(--text-secondary)", fontFamily: '"Times New Roman", Times, serif' }}>
                   — AJ Rogers, founder, age 19
                 </p>
