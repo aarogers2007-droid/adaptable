@@ -154,6 +154,23 @@ export default async function AJDashboard() {
           </h2>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 overflow-x-auto">
             <FlowDiagram />
+            {/* Legend */}
+            <div className="mt-6 flex flex-wrap gap-x-8 gap-y-3 border-t border-[var(--border)] pt-4">
+              <p className="w-full text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Key</p>
+              {/* Colors */}
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#9CA3AF" }} /><span className="text-xs text-[var(--text-secondary)]">Public pages</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#60A5FA" }} /><span className="text-xs text-[var(--text-secondary)]">Auth flow</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#C084FC" }} /><span className="text-xs text-[var(--text-secondary)]">Invention mode</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#F5E642" }} /><span className="text-xs text-[var(--text-secondary)]">Curriculum onboarding</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#4ADE80" }} /><span className="text-xs text-[var(--text-secondary)]">Student experience</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#F59E0B" }} /><span className="text-xs text-[var(--text-secondary)]">Completion</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#0D9488" }} /><span className="text-xs text-[var(--text-secondary)]">Reflection</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#F87171" }} /><span className="text-xs text-[var(--text-secondary)]">Admin</span></div>
+              {/* Arrows */}
+              <div className="flex items-center gap-2"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--border-strong)" strokeWidth="1.5" /></svg><span className="text-xs text-[var(--text-secondary)]">Natural navigation</span></div>
+              <div className="flex items-center gap-2"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#60A5FA" strokeWidth="1.5" strokeDasharray="6 4" /></svg><span className="text-xs text-[var(--text-secondary)]">Auth redirect</span></div>
+              <div className="flex items-center gap-2"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#F87171" strokeWidth="1.5" strokeDasharray="2 3" /></svg><span className="text-xs text-[var(--text-secondary)]">Admin route</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -162,164 +179,118 @@ export default async function AJDashboard() {
 }
 
 function FlowDiagram() {
-  // Box positions: [x, y, w, h, label, color]
-  const boxes: Array<[number, number, number, number, string, string]> = [
-    // Entry points (top row)
-    [20, 20, 100, 36, "Landing /", "#9CA3AF"],
-    [160, 20, 100, 36, "For Schools", "#9CA3AF"],
-    [300, 20, 100, 36, "Demo", "#9CA3AF"],
-    [440, 20, 100, 36, "VENTURE", "#C084FC"],
+  const W = 130, H = 44, GAP_X = 20, GAP_Y = 30;
+  const ROW_Y = (r: number) => 20 + r * (H + GAP_Y);
 
-    // Auth (second row)
-    [90, 90, 80, 36, "Login", "#60A5FA"],
-    [200, 90, 80, 36, "Signup", "#60A5FA"],
-    [320, 90, 80, 36, "Join", "#60A5FA"],
-    [440, 90, 80, 36, "Teacher\nSignup", "#60A5FA"],
+  const boxes: Array<{ x: number; y: number; w: number; h: number; label: string; color: string }> = [
+    // Row 0: Entry points
+    { x: 20, y: ROW_Y(0), w: W, h: H, label: "Landing /", color: "#9CA3AF" },
+    { x: 20 + (W + GAP_X), y: ROW_Y(0), w: W, h: H, label: "For Schools", color: "#9CA3AF" },
+    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(0), w: W, h: H, label: "Demo", color: "#9CA3AF" },
+    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(0), w: W, h: H, label: "VENTURE", color: "#C084FC" },
 
-    // Onboarding (third row)
-    [80, 170, 110, 36, "Ikigai Wizard", "#F5E642"],
-    [240, 170, 110, 36, "Invention\nWizard", "#C084FC"],
-    [420, 170, 110, 36, "Teacher\nOnboarding", "#60A5FA"],
+    // Row 1: Auth
+    { x: 20, y: ROW_Y(1), w: W, h: H, label: "Login", color: "#60A5FA" },
+    { x: 20 + (W + GAP_X), y: ROW_Y(1), w: W, h: H, label: "Student Signup", color: "#60A5FA" },
+    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(1), w: W, h: H, label: "Join Class", color: "#60A5FA" },
+    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(1), w: W, h: H, label: "Teacher Signup", color: "#60A5FA" },
 
-    // Main experiences (fourth row)
-    [20, 260, 100, 36, "Dashboard", "#4ADE80"],
-    [140, 260, 80, 36, "Lessons", "#4ADE80"],
-    [240, 260, 80, 36, "AI Guide", "#4ADE80"],
-    [340, 260, 80, 36, "Plan", "#4ADE80"],
-    [440, 260, 80, 36, "Card", "#4ADE80"],
-    [540, 260, 100, 36, "Achievements", "#4ADE80"],
+    // Row 2: Onboarding
+    { x: 20, y: ROW_Y(2), w: W, h: H, label: "Ikigai Wizard", color: "#F5E642" },
+    { x: 20 + (W + GAP_X), y: ROW_Y(2), w: W, h: H, label: "Invention Wizard", color: "#C084FC" },
+    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(2), w: W, h: H, label: "Teacher Onboarding", color: "#60A5FA" },
 
-    // Completion (fifth row)
-    [140, 340, 120, 36, "Completion\nCeremony", "#F59E0B"],
-    [300, 340, 100, 36, "Founder's\nLog", "#0D9488"],
+    // Row 3: Main
+    { x: 20, y: ROW_Y(3), w: W, h: H, label: "Dashboard", color: "#4ADE80" },
+    { x: 20 + (W + GAP_X), y: ROW_Y(3), w: W, h: H, label: "Lessons", color: "#4ADE80" },
+    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(3), w: W, h: H, label: "AI Guide", color: "#4ADE80" },
+    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(3), w: W, h: H, label: "Plan / Card", color: "#4ADE80" },
 
-    // Admin (right column)
-    [560, 90, 110, 36, "Instructor\nDashboard", "#F87171"],
-    [560, 170, 110, 36, "Invention\nAdmin", "#C084FC"],
-    [560, 250, 100, 36, "Admin", "#F87171"],
+    // Row 4: Rewards + Admin
+    { x: 20, y: ROW_Y(4), w: W, h: H, label: "Achievements", color: "#4ADE80" },
+    { x: 20 + (W + GAP_X), y: ROW_Y(4), w: W, h: H, label: "Completion", color: "#F59E0B" },
+    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(4), w: W, h: H, label: "Founder's Log", color: "#0D9488" },
+    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(4), w: W, h: H, label: "Parent View", color: "#9CA3AF" },
 
-    // External
-    [440, 340, 100, 36, "Parent View", "#9CA3AF"],
+    // Row 5: Admin
+    { x: 20, y: ROW_Y(5), w: W, h: H, label: "Instructor Dash", color: "#F87171" },
+    { x: 20 + (W + GAP_X), y: ROW_Y(5), w: W, h: H, label: "Invention Admin", color: "#C084FC" },
+    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(5), w: W, h: H, label: "Platform Admin", color: "#F87171" },
   ];
 
-  // Arrows: [fromBoxIdx, toBoxIdx]
-  const arrows: Array<[number, number]> = [
-    // Landing → Login, Signup
-    [0, 4], [0, 5],
-    // For Schools → Login, Demo
-    [1, 4], [1, 2],
-    // Demo → Login
-    [2, 4],
-    // VENTURE → Signup, Invention Wizard
-    [3, 5], [3, 9],
-    // Login → Dashboard, Instructor, Admin
-    [4, 11], [4, 19], [4, 21],
+  // Arrow types: "nav" = solid (natural flow), "auth" = dashed (sign-in redirect), "admin" = dotted (admin route)
+  const arrows: Array<{ from: number; to: number; type: "nav" | "auth" | "admin" }> = [
+    // Entry → Auth (user clicks sign in)
+    { from: 0, to: 4, type: "auth" }, { from: 1, to: 4, type: "auth" }, { from: 2, to: 4, type: "auth" }, { from: 3, to: 5, type: "auth" },
+    // Login → destinations (auth redirect)
+    { from: 4, to: 11, type: "auth" }, { from: 4, to: 19, type: "admin" }, { from: 4, to: 21, type: "admin" },
     // Signup → Join
-    [5, 6],
-    // Join → Ikigai or Invention
-    [6, 8], [6, 9],
-    // Teacher Signup → Teacher Onboarding
-    [7, 10],
-    // Ikigai → Dashboard
-    [8, 11],
-    // Invention → Completion (group screen)
-    [9, 16],
-    // Teacher Onboarding → Instructor Dashboard
-    [10, 19],
-    // Dashboard → Lessons, AI Guide, Plan, Card, Achievements
-    [11, 12], [11, 13], [11, 14], [11, 15], [11, 16],
-    // Lessons → Completion
-    [12, 17],
-    // Dashboard → Founder's Log
-    [11, 18],
-    // Instructor → Invention Admin
-    [19, 20],
+    { from: 5, to: 6, type: "nav" },
+    // Join → Wizards
+    { from: 6, to: 8, type: "nav" }, { from: 6, to: 9, type: "nav" },
+    // Teacher flows
+    { from: 7, to: 10, type: "nav" }, { from: 10, to: 19, type: "admin" },
+    // Wizards → destinations
+    { from: 8, to: 11, type: "nav" }, { from: 9, to: 16, type: "nav" },
+    // Dashboard navigation
+    { from: 11, to: 12, type: "nav" }, { from: 11, to: 13, type: "nav" }, { from: 11, to: 14, type: "nav" }, { from: 11, to: 15, type: "nav" },
+    { from: 12, to: 16, type: "nav" }, { from: 11, to: 17, type: "nav" },
+    // Admin
+    { from: 19, to: 20, type: "admin" },
   ];
 
-  function boxCenter(idx: number): [number, number] {
-    const b = boxes[idx];
-    return [b[0] + b[2] / 2, b[1] + b[3] / 2];
-  }
-
-  function boxBottom(idx: number): [number, number] {
-    const b = boxes[idx];
-    return [b[0] + b[2] / 2, b[1] + b[3]];
-  }
-
-  function boxTop(idx: number): [number, number] {
-    const b = boxes[idx];
-    return [b[0] + b[2] / 2, b[1]];
-  }
+  const totalW = 20 + 4 * (W + GAP_X);
+  const totalH = ROW_Y(5) + H + 20;
 
   return (
-    <svg viewBox="0 0 700 400" className="w-full" style={{ minWidth: "700px", height: "auto" }}>
+    <svg viewBox={`0 0 ${totalW} ${totalH}`} className="w-full" style={{ minWidth: `${totalW}px`, height: "auto" }}>
       <defs>
-        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-          <polygon points="0 0, 8 3, 0 6" fill="#9CA3AF" />
+        <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="var(--text-muted)" />
         </marker>
       </defs>
 
-      {/* Arrows */}
-      {arrows.map(([from, to], i) => {
-        const [x1, y1] = boxBottom(from);
-        const [x2, y2] = boxTop(to);
-        // If same row, use centers
-        const sameRow = Math.abs(boxes[from][1] - boxes[to][1]) < 10;
-        let fx: number, fy: number, tx: number, ty: number;
+      {/* Row labels */}
+      {[
+        { y: ROW_Y(0), label: "Entry" },
+        { y: ROW_Y(1), label: "Auth" },
+        { y: ROW_Y(2), label: "Onboarding" },
+        { y: ROW_Y(3), label: "Experience" },
+        { y: ROW_Y(4), label: "Completion" },
+        { y: ROW_Y(5), label: "Admin" },
+      ].map((r, i) => (
+        <text key={i} x={8} y={r.y + H / 2} textAnchor="end" dominantBaseline="middle"
+          fontSize="7" fill="var(--text-muted)" fontWeight="600" fontFamily="var(--font-body, system-ui)"
+          transform={`rotate(-90, 8, ${r.y + H / 2})`}>{r.label}</text>
+      ))}
+
+      {arrows.map((a, i) => {
+        const f = boxes[a.from], t = boxes[a.to];
+        const sameRow = f.y === t.y;
+        let x1: number, y1: number, x2: number, y2: number;
         if (sameRow) {
-          const [cx1, cy1] = boxCenter(from);
-          const [cx2, cy2] = boxCenter(to);
-          fx = boxes[from][0] + (cx2 > cx1 ? boxes[from][2] : 0);
-          fy = cy1;
-          tx = boxes[to][0] + (cx2 > cx1 ? 0 : boxes[to][2]);
-          ty = cy2;
+          const ltr = t.x > f.x;
+          x1 = ltr ? f.x + f.w : f.x; y1 = f.y + f.h / 2;
+          x2 = ltr ? t.x : t.x + t.w; y2 = t.y + t.h / 2;
         } else {
-          fx = x1; fy = y1; tx = x2; ty = y2;
+          x1 = f.x + f.w / 2; y1 = f.y + f.h;
+          x2 = t.x + t.w / 2; y2 = t.y;
         }
+        const dash = a.type === "auth" ? "6 4" : a.type === "admin" ? "2 3" : "none";
+        const color = a.type === "auth" ? "#60A5FA" : a.type === "admin" ? "#F87171" : "var(--border-strong)";
         return (
-          <line
-            key={i}
-            x1={fx} y1={fy} x2={tx} y2={ty}
-            stroke="#D1D5DB" strokeWidth="1" markerEnd="url(#arrowhead)"
-            opacity="0.6"
-          />
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+            stroke={color} strokeWidth="1.5" strokeDasharray={dash} markerEnd="url(#ah)" opacity="0.5" />
         );
       })}
 
-      {/* Boxes */}
-      {boxes.map(([x, y, w, h, label, color], i) => (
+      {boxes.map((b, i) => (
         <g key={i}>
-          <rect
-            x={x} y={y} width={w} height={h}
-            rx="6" ry="6"
-            fill="var(--bg)"
-            stroke={color}
-            strokeWidth="1.5"
-          />
-          {label.includes("\n") ? (
-            label.split("\n").map((line, li) => (
-              <text
-                key={li}
-                x={x + w / 2} y={y + h / 2 + (li - 0.5) * 11}
-                textAnchor="middle" dominantBaseline="middle"
-                fontSize="8" fontWeight="500"
-                fill="var(--text-primary)"
-                fontFamily="var(--font-body, system-ui)"
-              >
-                {line}
-              </text>
-            ))
-          ) : (
-            <text
-              x={x + w / 2} y={y + h / 2}
-              textAnchor="middle" dominantBaseline="middle"
-              fontSize="8" fontWeight="500"
-              fill="var(--text-primary)"
-              fontFamily="var(--font-body, system-ui)"
-            >
-              {label}
-            </text>
-          )}
+          <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="8" fill="var(--bg)" stroke={b.color} strokeWidth="2" />
+          <text x={b.x + b.w / 2} y={b.y + b.h / 2} textAnchor="middle" dominantBaseline="middle"
+            fontSize="11" fontWeight="500" fill="var(--text-primary)" fontFamily="var(--font-body, system-ui)">
+            {b.label}
+          </text>
         </g>
       ))}
     </svg>
