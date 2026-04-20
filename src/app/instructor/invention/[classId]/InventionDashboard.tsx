@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { triggerGrouping, revealGroups, moveStudent, loadInventionDashboard } from "./actions";
 
 interface DashboardData {
@@ -53,7 +53,7 @@ export default function InventionDashboard({
   const [moveState, setMoveState] = useState<{ studentId: string; fromGroup: number } | null>(null);
   const [moveTarget, setMoveTarget] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"overview" | "groups">("overview");
+  const [tab, setTab] = useState<"overview" | "groups" | "algorithm">("overview");
 
   const completionPct = data.totalEnrolled > 0
     ? Math.round((data.completedCount / data.totalEnrolled) * 100)
@@ -130,6 +130,17 @@ export default function InventionDashboard({
             >
               Groups
             </button>
+            {data.groups.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setTab("algorithm")}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                  tab === "algorithm" ? "bg-[var(--primary)] text-white" : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+                }`}
+              >
+                Algorithm
+              </button>
+            )}
           </div>
         </div>
 
@@ -403,11 +414,49 @@ export default function InventionDashboard({
                           ))}
                         </div>
                       )}
+
+                      {/* Staff suggestions for gaps */}
+                      {!comp.all_criteria_met && (
+                        <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                          <p className="text-xs font-semibold text-blue-700 mb-1">Staff support suggestions</p>
+                          {(comp.missing_archetypes ?? []).map((arch: string) => (
+                            <p key={arch} className="text-xs text-blue-600">
+                              {arch === "builder" && "Assign a staff mentor with prototyping/maker skills to help this group turn ideas into tangible models."}
+                              {arch === "empath" && "Assign a staff mentor who can guide empathy exercises — help this group interview real users and understand their needs."}
+                              {arch === "systems_thinker" && "Assign a staff mentor with root-cause analysis skills — help this group map the system around their problem before jumping to solutions."}
+                              {arch === "connector" && "Assign a staff mentor with cross-disciplinary knowledge — help this group find existing solutions they can adapt."}
+                              {arch === "storyteller" && "Assign a staff mentor who can coach presentation skills — help this group frame their invention as a compelling story."}
+                            </p>
+                          ))}
+                          {!comp.has_visual && (
+                            <p className="text-xs text-blue-600">
+                              No visual communicator — assign a staff mentor who can help with sketching, prototyping, or poster design.
+                            </p>
+                          )}
+                          {!comp.has_verbal && (
+                            <p className="text-xs text-blue-600">
+                              No verbal communicator — assign a staff mentor who can coach this group on pitching and writing out their concept.
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </>
             )}
+          </div>
+        )}
+
+        {/* Algorithm stream tab */}
+        {tab === "algorithm" && data.groups.length > 0 && (
+          <div className="mt-8">
+            <AlgorithmStream
+              groups={data.groups}
+              studentMap={data.studentMap}
+              circle1Counts={data.circle1Counts}
+              circle2Counts={data.circle2Counts}
+            />
           </div>
         )}
 
@@ -461,5 +510,249 @@ export default function InventionDashboard({
         )}
       </div>
     </main>
+  );
+}
+
+// ── Algorithm Stream Terminal ──
+
+function AlgorithmStream({
+  groups,
+  studentMap,
+  circle1Counts,
+  circle2Counts,
+}: {
+  groups: DashboardData["groups"];
+  studentMap: DashboardData["studentMap"];
+  circle1Counts: Record<string, number>;
+  circle2Counts: Record<string, number>;
+}) {
+  const [lines, setLines] = useState<Array<{ text: string; cls: string }>>([]);
+  const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(false);
+  const [speed, setSpeed] = useState(1); // 0.5x, 1x, 2x, 4x
+  const speedRef = useRef(speed);
+  const outputRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { speedRef.current = speed; }, [speed]);
+
+  function buildScript(): Array<{ text: string; cls: string; delay: number }> {
+    const s: Array<{ text: string; cls: string; delay: number }> = [];
+    const totalStudents = groups.reduce((sum, g) => sum + g.student_ids.length, 0);
+
+    s.push({ text: "$ venture-group --class VENTURE --run", cls: "data", delay: 500 });
+    s.push({ text: "", cls: "", delay: 300 });
+    s.push({ text: `Initializing grouping algorithm for VENTURE...`, cls: "", delay: 250 });
+    s.push({ text: `Loading ${totalStudents} student profiles...`, cls: "", delay: 400 });
+    s.push({ text: `Configuration: group_size=5, threshold=80%`, cls: "", delay: 200 });
+    s.push({ text: "", cls: "", delay: 250 });
+
+    // Step 1
+    s.push({ text: "── Step 1: Sorting by invention category (The Wish) ──", cls: "step", delay: 500 });
+    for (const [cat, count] of Object.entries(circle1Counts).sort((a, b) => b[1] - a[1])) {
+      const label = CATEGORY_LABELS[cat] ?? cat;
+      s.push({ text: `  ${label.padEnd(30)} — ${count} students identified`, cls: "data", delay: 150 });
+    }
+    s.push({ text: `  ✓ ${Object.keys(circle1Counts).length} category pools formed`, cls: "pass", delay: 350 });
+    s.push({ text: "", cls: "", delay: 250 });
+
+    // Step 2
+    s.push({ text: "── Step 2: Distributing archetypes (The Mind) ──", cls: "step", delay: 500 });
+    s.push({ text: "  Target per group: Builder + Empath + Systems Thinker (minimum)", cls: "", delay: 250 });
+    s.push({ text: "", cls: "", delay: 150 });
+
+    for (const group of groups) {
+      const comp = group.composition_log ?? {};
+      s.push({ text: `  Group ${group.group_number} (${CATEGORY_LABELS[comp.category] ?? comp.category ?? "mixed"}):`, cls: "data", delay: 250 });
+      for (const sid of group.student_ids) {
+        const name = (studentMap[sid]?.name ?? "Unknown").padEnd(20);
+        const archIdx = (comp.archetypes ?? [])[ group.student_ids.indexOf(sid) ];
+        s.push({ text: `    ${name} → ${ARCHETYPE_LABELS[archIdx] ?? archIdx ?? "—"}`, cls: "", delay: 80 });
+      }
+      const missing = comp.missing_archetypes ?? [];
+      if (missing.length === 0) {
+        s.push({ text: "    ✓ Builder + Empath + Systems Thinker present", cls: "pass", delay: 250 });
+      } else {
+        s.push({ text: `    ⚠ Missing: ${missing.map((m: string) => ARCHETYPE_LABELS[m] ?? m).join(", ")}`, cls: "warn", delay: 300 });
+      }
+      s.push({ text: "", cls: "", delay: 100 });
+    }
+
+    // Step 3
+    s.push({ text: "── Step 3: Evaluating chip diversity (The Lens) ──", cls: "step", delay: 500 });
+    for (const group of groups) {
+      const comp = group.composition_log ?? {};
+      const div = Math.round((comp.chip_diversity ?? 0) * 100);
+      s.push({ text: `  Group ${group.group_number}: ${div}% chip diversity`, cls: div >= 60 ? "pass" : "", delay: 150 });
+    }
+    s.push({ text: "", cls: "", delay: 250 });
+
+    // Step 4
+    s.push({ text: "── Step 4: Checking scale balance (The Scale) ──", cls: "step", delay: 500 });
+    for (const group of groups) {
+      const comp = group.composition_log ?? {};
+      const dist = comp.scale_distribution ?? {};
+      const balanced = Object.values(dist).every((v: any) => v <= 3);
+      if (balanced) {
+        s.push({ text: `  Group ${group.group_number}: ✓ balanced`, cls: "pass", delay: 150 });
+      } else {
+        const over = Object.entries(dist).find(([, v]) => (v as number) > 3);
+        s.push({ text: `  Group ${group.group_number}: ⚠ ${over?.[0]} overrepresented (${over?.[1]}×) — accepted with note`, cls: "warn", delay: 300 });
+      }
+    }
+    s.push({ text: "", cls: "", delay: 250 });
+
+    // Step 5
+    s.push({ text: "── Step 5: Checking voice coverage (The Voice) ──", cls: "step", delay: 500 });
+    for (const group of groups) {
+      const comp = group.composition_log ?? {};
+      const vis = comp.has_visual ? "✓" : "✗";
+      const verb = comp.has_verbal ? "✓" : "✗";
+      const cls = comp.has_visual && comp.has_verbal ? "pass" : "warn";
+      s.push({ text: `  Group ${group.group_number}: visual ${vis}  verbal ${verb}`, cls, delay: 200 });
+    }
+    s.push({ text: "", cls: "", delay: 300 });
+
+    // Summary
+    s.push({ text: "═══════════════════════════════════════════════════", cls: "step", delay: 250 });
+    s.push({ text: "", cls: "", delay: 150 });
+    const allMet = groups.filter(g => g.composition_log?.all_criteria_met).length;
+    const withNotes = groups.length - allMet;
+    s.push({ text: `Algorithm complete. ${groups.length} groups formed.`, cls: "final", delay: 400 });
+    s.push({ text: `${allMet} groups met all 5 criteria.`, cls: "final", delay: 250 });
+    if (withNotes > 0) {
+      s.push({ text: `${withNotes} groups accepted with notes.`, cls: "warn", delay: 250 });
+    }
+    s.push({ text: "", cls: "", delay: 150 });
+    s.push({ text: "Groups written to invention_groups. Ready for admin review.", cls: "final", delay: 400 });
+
+    return s;
+  }
+
+  async function runStream() {
+    if (running) return;
+    setRunning(true);
+    setDone(false);
+    setLines([]);
+
+    const script = buildScript();
+
+    for (const line of script) {
+      const delay = line.delay / speedRef.current;
+      if (line.text === "") {
+        setLines(prev => [...prev, { text: "\u00A0", cls: "" }]);
+        await new Promise(r => setTimeout(r, delay));
+      } else {
+        // Typewriter: add chars progressively
+        for (let c = 1; c <= line.text.length; c++) {
+          setLines(prev => {
+            const copy = [...prev];
+            if (copy.length > 0 && copy[copy.length - 1].cls === line.cls + " typing") {
+              copy[copy.length - 1] = { text: line.text.slice(0, c), cls: line.cls + " typing" };
+            } else {
+              copy.push({ text: line.text.slice(0, c), cls: line.cls + " typing" });
+            }
+            return copy;
+          });
+          await new Promise(r => setTimeout(r, (20 + Math.random() * 15) / speedRef.current));
+        }
+        // Finalize line (remove typing marker)
+        setLines(prev => {
+          const copy = [...prev];
+          copy[copy.length - 1] = { text: line.text, cls: line.cls };
+          return copy;
+        });
+        await new Promise(r => setTimeout(r, delay));
+      }
+
+      // Auto-scroll
+      if (outputRef.current) outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+
+    setRunning(false);
+    setDone(true);
+  }
+
+  const SPEEDS = [0.5, 1, 2, 4];
+
+  const colorMap: Record<string, string> = {
+    step: "#C084FC",
+    data: "#F0EDE8",
+    pass: "#4ADE80",
+    warn: "#FBBF24",
+    final: "#C084FC",
+  };
+
+  return (
+    <div>
+      {/* Terminal */}
+      <div className="rounded-xl border border-[#2A2A2A] overflow-hidden" style={{ background: "#0A0A0A" }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A]" style={{ background: "#1A1A1A" }}>
+          <div className="flex gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ background: "#F87171" }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: "#FBBF24" }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: "#4ADE80" }} />
+          </div>
+          <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>VENTURE — Grouping Algorithm</span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={runStream}
+              disabled={running}
+              className="rounded px-3 py-1 text-xs font-medium border transition-colors"
+              style={{
+                fontFamily: "monospace",
+                borderColor: running ? "#2A2A2A" : "#C084FC",
+                color: running ? "#4A4A4A" : "#C084FC",
+                background: "#1A1A1A",
+                cursor: running ? "not-allowed" : "pointer",
+              }}
+            >
+              {running ? "Running..." : done ? "Replay" : "Run Algorithm"}
+            </button>
+          </div>
+        </div>
+
+        {/* Output */}
+        <div
+          ref={outputRef}
+          className="overflow-y-auto"
+          style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8 }}
+        >
+          {lines.map((line, i) => (
+            <div key={i} style={{ color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A", fontWeight: line.cls.includes("final") ? 700 : 400 }}>
+              {line.text}
+              {i === lines.length - 1 && running && (
+                <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+              )}
+            </div>
+          ))}
+          {lines.length === 0 && !running && (
+            <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
+          )}
+        </div>
+      </div>
+
+      {/* Speed controls */}
+      <div className="flex items-center justify-center gap-3 mt-4">
+        <span className="text-xs text-[var(--text-muted)]">Speed:</span>
+        {SPEEDS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setSpeed(s)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              speed === s
+                ? "bg-[var(--primary)] text-white"
+                : "border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+            }`}
+          >
+            {s}x
+          </button>
+        ))}
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }` }} />
+    </div>
   );
 }
