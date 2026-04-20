@@ -733,22 +733,25 @@ function AlgorithmStream({
   const rawFullText = RAW_SOURCE_LINES.map(l => l.code).join("\n");
   const rawTotalChars = rawFullText.length;
 
-  // Drive raw typewriter alongside log stream
+  // Drive raw typewriter — slower and more cinematic for non-technical viewers
   useEffect(() => {
     if (!running) return;
-    // Type raw source chars in sync with the log stream
     let frame: number;
     let charIdx = 0;
-    const baseSpeed = 8; // ms per char base
     const tick = () => {
-      charIdx += Math.ceil(2 / speedRef.current + Math.random() * 2);
+      // Vary speed: faster on whitespace/brackets, slower on keywords
+      const ch = rawFullText[charIdx] ?? "";
+      const isWhitespace = ch === " " || ch === "\n";
+      const advance = isWhitespace ? 2 : 1;
+      const delay = isWhitespace ? 12 : (28 + Math.random() * 18); // 28-46ms per visible char
+      charIdx += advance;
       if (charIdx > rawTotalChars) charIdx = rawTotalChars;
       setRawChars(charIdx);
       if (charIdx < rawTotalChars && running) {
-        frame = window.setTimeout(tick, baseSpeed / speedRef.current);
+        frame = window.setTimeout(tick, delay / speedRef.current);
       }
     };
-    frame = window.setTimeout(tick, 200);
+    frame = window.setTimeout(tick, 400);
     return () => clearTimeout(frame);
   }, [running, rawTotalChars]);
 
@@ -853,21 +856,26 @@ function AlgorithmStream({
             <div style={{ padding: "16px", color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the source code.</div>
           ) : (
             rawDisplayLines.map((line, i) => {
-              const srcLine = RAW_SOURCE_LINES[i];
+              const isLastLine = i === rawDisplayLines.length - 1;
+              const isComplete = !isLastLine || rawChars >= rawTotalChars;
               return (
                 <div
                   key={i}
                   style={{ padding: "0 12px", display: "flex", gap: "10px" }}
                 >
-                  <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none" }}>
+                  <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none", fontSize: "10px" }}>
                     {i + 1}
                   </span>
-                  <span style={{ color: "#D1D5DB", whiteSpace: "pre" }}>
-                    {line}
-                    {i === rawDisplayLines.length - 1 && running && rawChars < rawTotalChars && (
-                      <span style={{ display: "inline-block", width: "6px", height: "13px", background: "#C084FC", marginLeft: "1px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
-                    )}
-                  </span>
+                  {isComplete ? (
+                    <span style={{ whiteSpace: "pre" }} dangerouslySetInnerHTML={{ __html: colorizeCode(line) || "&nbsp;" }} />
+                  ) : (
+                    <span style={{ color: "#D1D5DB", whiteSpace: "pre" }}>
+                      {line}
+                      {running && rawChars < rawTotalChars && (
+                        <span style={{ display: "inline-block", width: "6px", height: "13px", background: "#C084FC", marginLeft: "1px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+                      )}
+                    </span>
+                  )}
                 </div>
               );
             })
@@ -902,25 +910,25 @@ function AlgorithmStream({
 // ── Raw Source View — syntax-highlighted algorithm source with step highlighting ──
 
 const RAW_SOURCE_LINES: Array<{ code: string; step: number }> = [
-  { code: 'import "server-only";', step: -1 },
-  { code: 'import { createClient } from "@/lib/supabase/server";', step: -1 },
+  { code: 'import [REDACTED];', step: -1 },
+  { code: 'import { createClient } from [REDACTED];', step: -1 },
   { code: '', step: -1 },
   { code: '// Invention Mode Grouping Algorithm', step: -1 },
-  { code: '// Five-step sort: category → archetype → chips → scale → voice', step: -1 },
+  { code: '// Five-step sort: category \u2192 archetype \u2192 chips \u2192 scale \u2192 voice', step: -1 },
   { code: '', step: -1 },
   { code: 'const VISUAL_CHIPS = ["Draw it", "Build a prototype", "Build a slide or poster"];', step: -1 },
   { code: 'const VERBAL_CHIPS = ["Explain it out loud", "Write it out"];', step: -1 },
   { code: 'const TARGET_ARCHETYPES = ["builder", "empath", "systems_thinker"];', step: -1 },
   { code: '', step: -1 },
   { code: 'export async function runGroupingAlgorithm(classCode, groupSize = 5) {', step: 0 },
-  { code: '  const supabase = await createClient();', step: 0 },
-  { code: '  const { data: sessions } = await supabase', step: 0 },
+  { code: '  const db = await createClient();', step: 0 },
+  { code: '  const { data: sessions } = await db', step: 0 },
   { code: '    .from("invention_sessions")', step: 0 },
   { code: '    .select("student_id, circle_1_category, ...")', step: 0 },
   { code: '    .eq("class_code", classCode)', step: 0 },
   { code: '    .not("completed_at", "is", null);', step: 0 },
   { code: '', step: -1 },
-  { code: '  // ── Step 1: Primary sort on Circle 1 (category pools) ──', step: 1 },
+  { code: '  // \u2500\u2500 Step 1: Primary sort on Circle 1 (category pools) \u2500\u2500', step: 1 },
   { code: '  const pools = new Map();', step: 1 },
   { code: '  for (const s of students) {', step: 1 },
   { code: '    const pool = pools.get(s.circle_1_category) ?? [];', step: 1 },
@@ -928,39 +936,39 @@ const RAW_SOURCE_LINES: Array<{ code: string; step: number }> = [
   { code: '    pools.set(s.circle_1_category, pool);', step: 1 },
   { code: '  }', step: 1 },
   { code: '', step: -1 },
-  { code: '  // ── Step 2: Form groups — archetype distribution ──', step: 2 },
+  { code: '  // \u2500\u2500 Step 2: Form groups \u2014 archetype distribution \u2500\u2500', step: 2 },
   { code: '  for (const [category, pool] of pools) {', step: 2 },
   { code: '    const remaining = [...pool];', step: 2 },
   { code: '    while (remaining.length > 0) {', step: 2 },
   { code: '      if (remaining.length < 3) { /* merge into last group */ }', step: 2 },
   { code: '      for (const archetype of TARGET_ARCHETYPES) {', step: 2 },
-  { code: '        const idx = remaining.findIndex(s => s.circle_2_archetype === archetype);', step: 2 },
+  { code: '        const idx = remaining.findIndex(s => s.archetype === archetype);', step: 2 },
   { code: '        if (idx !== -1) group.push(remaining.splice(idx, 1)[0]);', step: 2 },
   { code: '      }', step: 2 },
-  { code: '      // Fill remaining — prioritize archetype diversity', step: 2 },
+  { code: '      // Fill remaining \u2014 prioritize archetype diversity', step: 2 },
   { code: '      while (group.length < targetSize && remaining.length > 0) {', step: 2 },
-  { code: '        const diverseIdx = remaining.findIndex(s => !used.has(s.archetype));', step: 2 },
-  { code: '        if (diverseIdx !== -1) group.push(remaining.splice(diverseIdx, 1)[0]);', step: 2 },
+  { code: '        const diverse = remaining.findIndex(s => !used.has(s.archetype));', step: 2 },
+  { code: '        if (diverse !== -1) group.push(remaining.splice(diverse, 1)[0]);', step: 2 },
   { code: '        else group.push(remaining.shift());', step: 2 },
   { code: '      }', step: 2 },
   { code: '    }', step: 2 },
   { code: '  }', step: 2 },
   { code: '', step: -1 },
-  { code: '  // ── Step 3: Chip diversity scoring ──', step: 3 },
+  { code: '  // \u2500\u2500 Step 3: Chip diversity scoring \u2500\u2500', step: 3 },
   { code: '  const allChips = group.flatMap(s => s.circle_3_chips);', step: 3 },
   { code: '  const chipDiversity = new Set(allChips).size / allChips.length;', step: 3 },
   { code: '', step: -1 },
-  { code: '  // ── Step 4: Scale balance check ──', step: 4 },
+  { code: '  // \u2500\u2500 Step 4: Scale balance check \u2500\u2500', step: 4 },
   { code: '  const scaleDist = {};', step: 4 },
   { code: '  for (const s of group)', step: 4 },
-  { code: '    scaleDist[s.circle_4_scale] = (scaleDist[s.circle_4_scale] ?? 0) + 1;', step: 4 },
+  { code: '    scaleDist[s.scale] = (scaleDist[s.scale] ?? 0) + 1;', step: 4 },
   { code: '  const balanced = Object.values(scaleDist).every(c => c <= 3);', step: 4 },
   { code: '', step: -1 },
-  { code: '  // ── Step 5: Voice coverage & cross-group swaps ──', step: 5 },
+  { code: '  // \u2500\u2500 Step 5: Voice coverage & cross-group swaps \u2500\u2500', step: 5 },
   { code: '  const hasVisual = group.some(s =>', step: 5 },
-  { code: '    s.circle_5_voice.some(v => VISUAL_CHIPS.includes(v)));', step: 5 },
+  { code: '    s.voice.some(v => VISUAL_CHIPS.includes(v)));', step: 5 },
   { code: '  const hasVerbal = group.some(s =>', step: 5 },
-  { code: '    s.circle_5_voice.some(v => VERBAL_CHIPS.includes(v)));', step: 5 },
+  { code: '    s.voice.some(v => VERBAL_CHIPS.includes(v)));', step: 5 },
   { code: '  // Cross-group swaps for voice coverage', step: 5 },
   { code: '  for (const group of poolGroups) {', step: 5 },
   { code: '    if (group.has_visual && group.has_verbal) continue;', step: 5 },
@@ -969,22 +977,40 @@ const RAW_SOURCE_LINES: Array<{ code: string; step: number }> = [
   { code: '    other.student_ids[i] = swapId;', step: 5 },
   { code: '  }', step: 5 },
   { code: '', step: -1 },
-  { code: '  // ── Write results to database ──', step: 6 },
-  { code: '  await supabase.from("invention_groups").delete().eq("class_code", classCode);', step: 6 },
+  { code: '  // \u2500\u2500 Write results to database \u2500\u2500', step: 6 },
+  { code: '  await db.from([REDACTED]).delete().eq("class_code", classCode);', step: 6 },
   { code: '  for (const group of allGroups) {', step: 6 },
-  { code: '    await supabase.from("invention_groups").insert({', step: 6 },
-  { code: '      class_code: classCode, group_number: group.group_number,', step: 6 },
-  { code: '      student_ids: group.student_ids, composition_log: group.composition,', step: 6 },
+  { code: '    await db.from([REDACTED]).insert({', step: 6 },
+  { code: '      class_code, group_number, student_ids, composition_log', step: 6 },
   { code: '    });', step: 6 },
   { code: '    for (const studentId of group.student_ids) {', step: 6 },
-  { code: '      await supabase.from("invention_sessions")', step: 6 },
-  { code: '        .update({ group_number: group.group_number })', step: 6 },
-  { code: '        .eq("student_id", studentId);', step: 6 },
+  { code: '      await db.from([REDACTED])', step: 6 },
+  { code: '        .update({ group_number }).eq("student_id", studentId);', step: 6 },
   { code: '    }', step: 6 },
   { code: '  }', step: 6 },
   { code: '  return { log };', step: -1 },
   { code: '}', step: -1 },
 ];
 
-// RawSourceView and highlightSyntax removed — raw mode now uses
-// character-by-character typewriter directly in AlgorithmStream
+// Syntax colorizer for raw view — cinematic, not a real parser
+function colorizeCode(line: string): string {
+  if (!line) return "";
+  let s = line
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Comments (must run first)
+  s = s.replace(/(\/\/.*$)/gm, '<span style="color:#6B7280;font-style:italic">$1</span>');
+  s = s.replace(/(\/\*.*?\*\/)/g, '<span style="color:#6B7280;font-style:italic">$1</span>');
+  // [REDACTED] markers
+  s = s.replace(/(\[REDACTED\])/g, '<span style="color:#F87171">$1</span>');
+  // Strings
+  s = s.replace(/("(?:[^"\\]|\\.)*")/g, '<span style="color:#A78BFA">$1</span>');
+  // Keywords
+  s = s.replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|continue)\b/g, '<span style="color:#C084FC">$1</span>');
+  // Types / builtins
+  s = s.replace(/\b(Map|Set|Object|null|true|false|undefined)\b/g, '<span style="color:#60A5FA">$1</span>');
+  // Numbers
+  s = s.replace(/\b(\d+)\b/g, '<span style="color:#FBBF24">$1</span>');
+  // Function-like calls
+  s = s.replace(/\b(findIndex|flatMap|some|includes|every|splice|push|shift|get|set|from|select|eq|not|delete|insert|update|values|reverse|find|filter|reduce|join|map)\b/g, '<span style="color:#2DD4BF">$1</span>');
+  return s;
+}
