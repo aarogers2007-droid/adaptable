@@ -1,17 +1,8 @@
 "use client";
 
 /**
- * Pentagon Ikigai Diagram for Invention Mode.
- *
- * Five circles in an upward-pointing pentagon arrangement.
- * Used as:
- *   - Persistent progress/navigation in the invention wizard
- *   - Illustrative centerpiece on the /venture landing page
- *
- * Props:
- *   currentCircle: 1-5 (which circle the student is on, 0 = none/landing)
- *   completedCircles: array of completed circle numbers
- *   onCircleClick: optional — if provided, completed circles are clickable
+ * Invention Ikigai — five circles in a pentagon arrangement.
+ * Edges touch but don't overlap. Each circle is clickable when onCircleClick is provided.
  */
 
 interface InventionIkigaiProps {
@@ -28,22 +19,17 @@ const CIRCLES = [
   { num: 5, name: "The Voice", color: "#F87171" },
 ];
 
-// Pentagon with big circles, edges touching.
-// R=20. Adjacent center distance = 40 (exactly 2R = touching).
-// Regular pentagon inscribed in a circle of radius 26 from center (50,50).
-// Pentagon vertices at angles: -90°, -18°, 54°, 126°, 198° (pointing up).
-// PR chosen so side length = 2R = 40 (edges touch exactly)
-// side = 2 * PR * sin(π/5) → PR = 40 / (2 * sin(36°)) ≈ 34
-const PR = 34;
-const CX = 50, CY = 50;
-const angles = [-90, -18, 54, 126, 198].map(a => a * Math.PI / 180);
-const POSITIONS = angles.map(a => ({
-  cx: Math.round((CX + PR * Math.cos(a)) * 10) / 10,
-  cy: Math.round((CY + PR * Math.sin(a)) * 10) / 10,
-}));
-// Computed: (50,22), (74.7,39.9), (65.3,69.1), (34.7,69.1), (25.3,39.9)
+// Handcrafted positions in a 200×200 viewBox for clean rendering.
+// Pentagon pointing up, circles R=28, edges touching.
+const POSITIONS = [
+  { cx: 100, cy: 32 },   // 1: top center
+  { cx: 38, cy: 62 },    // 2: upper-left
+  { cx: 162, cy: 62 },   // 3: upper-right
+  { cx: 55, cy: 132 },   // 4: lower-left
+  { cx: 145, cy: 132 },  // 5: lower-right
+];
 
-const R = 20;
+const R = 28;
 
 export default function InventionIkigai({
   currentCircle = 0,
@@ -51,25 +37,16 @@ export default function InventionIkigai({
   onCircleClick,
 }: InventionIkigaiProps) {
   return (
-    <div
-      className="relative mx-auto w-full"
-      style={{ maxWidth: "520px", aspectRatio: "1 / 1" }}
-    >
-      <svg
-        viewBox="0 0 100 100"
-        className="w-full h-full"
-        style={{ overflow: "visible" }}
-      >
-        {/* Render circles */}
+    <div className="relative mx-auto w-full" style={{ maxWidth: "420px" }}>
+      <svg viewBox="0 0 200 170" className="w-full h-auto" style={{ overflow: "visible" }}>
         {CIRCLES.map((circle, i) => {
           const pos = POSITIONS[i];
           const isActive = currentCircle === circle.num;
           const isCompleted = completedCircles.includes(circle.num);
-          const isReachable = isCompleted || isActive;
           const isClickable = !!onCircleClick && !isActive;
 
           const fillOpacity = isActive ? 0.35 : isCompleted ? 0.2 : 0.12;
-          const strokeWidth = isActive ? 2.5 : 2;
+          const strokeWidth = isActive ? 3 : 2;
           const strokeOpacity = isActive ? 1 : isCompleted ? 0.8 : 0.4;
 
           return (
@@ -86,7 +63,6 @@ export default function InventionIkigai({
                 }
               }}
             >
-              {/* Circle fill */}
               <circle
                 cx={pos.cx}
                 cy={pos.cy}
@@ -98,21 +74,21 @@ export default function InventionIkigai({
                 strokeOpacity={strokeOpacity}
                 style={{
                   transition: "fill-opacity 0.3s, stroke-width 0.3s, stroke-opacity 0.3s",
-                  filter: isActive ? `drop-shadow(0 0 6px ${circle.color}50)` : "none",
+                  filter: isActive ? `drop-shadow(0 0 8px ${circle.color}60)` : "none",
                 }}
               />
 
               {/* Number */}
               <text
                 x={pos.cx}
-                y={pos.cy - 4}
+                y={pos.cy - 5}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill={isReachable ? "#F9FAFB" : "#9CA3AF"}
-                fontSize="7"
+                fill={isCompleted || isActive ? "#F9FAFB" : "#9CA3AF"}
+                fontSize="12"
                 fontWeight="700"
                 fontFamily="var(--font-display, system-ui)"
-                style={{ transition: "fill 0.3s" }}
+                style={{ transition: "fill 0.3s", pointerEvents: "none" }}
               >
                 {circle.num}
               </text>
@@ -120,27 +96,27 @@ export default function InventionIkigai({
               {/* Name */}
               <text
                 x={pos.cx}
-                y={pos.cy + 5}
+                y={pos.cy + 8}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill={isReachable ? "#E5E7EB" : "#6B7280"}
-                fontSize="4.5"
+                fill={isCompleted || isActive ? "#E5E7EB" : "#6B7280"}
+                fontSize="7.5"
                 fontWeight="400"
                 fontFamily="var(--font-display, system-ui)"
-                style={{ transition: "fill 0.3s" }}
+                style={{ transition: "fill 0.3s", pointerEvents: "none" }}
               >
                 {circle.name}
               </text>
 
-              {/* Completed indicator — small filled dot */}
+              {/* Completed dot */}
               {isCompleted && !isActive && (
                 <circle
                   cx={pos.cx + R * 0.55}
                   cy={pos.cy - R * 0.55}
-                  r="2"
+                  r="4"
                   fill={circle.color}
                   stroke="#111827"
-                  strokeWidth="0.8"
+                  strokeWidth="1.5"
                 />
               )}
             </g>

@@ -145,13 +145,14 @@ export default function DemoInventionMode() {
           </h2>
 
           <div className="mt-8 rounded-xl border border-[#2A2A2A] overflow-hidden" style={{ background: "#0A0A0A" }}>
+            {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A]" style={{ background: "#1A1A1A" }}>
               <div className="flex gap-2">
                 <div className="w-3 h-3 rounded-full" style={{ background: "#F87171" }} />
                 <div className="w-3 h-3 rounded-full" style={{ background: "#FBBF24" }} />
                 <div className="w-3 h-3 rounded-full" style={{ background: "#4ADE80" }} />
               </div>
-              <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>VENTURE \u2014 Grouping Algorithm</span>
+              <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>Grouping Algorithm</span>
               <button
                 onClick={runTerminal}
                 disabled={termRunning}
@@ -161,6 +162,7 @@ export default function DemoInventionMode() {
                 {termRunning ? "Running..." : termDone ? "Replay" : "Run Algorithm"}
               </button>
             </div>
+            {/* Body */}
             <div ref={termRef} className="overflow-y-auto" style={{ height: "340px", padding: "14px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8 }}>
               {termLines.map((line, i) => (
                 <div key={i} style={{ color: line.color || "#9A9A9A", fontWeight: line.bold ? 700 : 400 }}>{line.text}</div>
@@ -168,6 +170,17 @@ export default function DemoInventionMode() {
               {termLines.length === 0 && !termRunning && (
                 <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
               )}
+            </div>
+            {/* Footer — speed + toggle */}
+            <div className="flex items-center justify-end gap-4 px-4 py-2 border-t border-[#2A2A2A]" style={{ background: "#1A1A1A" }}>
+              <div className="flex items-center gap-2">
+                <span style={{ fontFamily: "monospace", fontSize: "10px", color: "#4A4A4A" }}>Speed</span>
+                <input type="range" min={0} max={3} defaultValue={1} className="w-16 h-1 appearance-none rounded-full cursor-pointer" style={{ background: "#2A2A2A", accentColor: "#C084FC" }} />
+              </div>
+              <div className="flex gap-1 rounded-md p-0.5" style={{ background: "#2A2A2A" }}>
+                <span className="rounded px-3 py-1 text-[10px] font-medium" style={{ fontFamily: "monospace", background: "#3A3A3A", color: "#E8E8E8" }}>Normal</span>
+                <span className="rounded px-3 py-1 text-[10px] font-medium" style={{ fontFamily: "monospace", color: "#6A6A6A" }}>Raw</span>
+              </div>
             </div>
           </div>
         </div>
