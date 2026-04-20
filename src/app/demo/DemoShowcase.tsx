@@ -134,10 +134,24 @@ export default function DemoShowcase() {
   const [entered, setEntered] = useState(false);
   const [quoteFading, setQuoteFading] = useState(false);
 
+  // Auto-skip quote if user has already seen it, or failsafe after 5s
+  useEffect(() => {
+    if (sessionStorage.getItem("demo-entered") === "1") {
+      setEntered(true);
+      return;
+    }
+    // Failsafe: if quote button somehow doesn't work, auto-enter after 5s
+    const failsafe = setTimeout(() => {
+      if (!entered) { setEntered(true); sessionStorage.setItem("demo-entered", "1"); }
+    }, 5000);
+    return () => clearTimeout(failsafe);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleEnter = () => {
     setQuoteFading(true);
     setTimeout(() => {
       setEntered(true);
+      sessionStorage.setItem("demo-entered", "1");
       window.scrollTo({ top: 0 });
       // Double-rAF: wait for React to render the DOM, then force animations
       requestAnimationFrame(() => {
