@@ -40,6 +40,38 @@ export async function saveInventionProgress(data: {
   if (!inviteCode) return { error: "No class code found" };
   const classCode = inviteCode.code;
 
+  // ── Content moderation on free text inputs ──
+  if (data.circle_3_freetext && data.circle_3_freetext.trim().length > 0) {
+    const { moderateContent } = await import("@/lib/content-moderation");
+    const check = moderateContent(data.circle_3_freetext);
+    if (!check.safe) return { error: check.reason ?? "That content isn't appropriate. Try rephrasing." };
+
+    // Crisis detection — doesn't block, but fires teacher alert
+    const { detectCrisis } = await import("@/lib/crisis-detection");
+    const crisisCheck = detectCrisis(data.circle_3_freetext);
+    if (crisisCheck.detected) {
+      // Fire teacher alert (non-blocking)
+      import("@/lib/teacher-alerts").then(async ({ alertCrisis }) => {
+        await alertCrisis(
+          supabase,
+          user.id,
+          crisisCheck.type ?? "hopelessness",
+          crisisCheck.matchedPattern ?? "",
+          data.circle_3_freetext!,
+          "invention-wizard"
+        );
+      }).catch(() => {});
+      // Don't block the student — continue saving
+    }
+  }
+
+  // Moderate idea_freetext if present (legacy field, may still be submitted)
+  if (data.idea_freetext && data.idea_freetext.trim().length > 0) {
+    const { moderateContent } = await import("@/lib/content-moderation");
+    const check = moderateContent(data.idea_freetext);
+    if (!check.safe) return { error: check.reason ?? "That content isn't appropriate. Try rephrasing." };
+  }
+
   // Upsert the invention session
   const { error: upsertError } = await supabase
     .from("invention_sessions")
