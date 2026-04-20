@@ -121,7 +121,7 @@ const TABS: { key: DemoTab; label: string }[] = [
   { key: "prove", label: "Prove" },
   { key: "guide", label: "Guide" },
   { key: "graduate", label: "Graduate" },
-  { key: "invention", label: "Invention Mode" },
+  { key: "invention", label: "Invention" },
 ];
 
 export default function DemoShowcase() {
