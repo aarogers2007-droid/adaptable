@@ -58,19 +58,6 @@ export default function InventionIkigai({
                 }}
                 onClick={() => isClickable && onCircleClick?.(circle.num)}
               />
-              <text
-                x={pos.cx}
-                y={pos.cy + 0.5}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={circle.color}
-                fontSize="8"
-                fontWeight="700"
-                fontFamily="var(--font-display, system-ui)"
-                style={{ pointerEvents: "none" }}
-              >
-                {circle.num}
-              </text>
             </g>
           );
         })}
