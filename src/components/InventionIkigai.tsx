@@ -31,14 +31,14 @@ const CIRCLES = [
 // Pentagon layout — positions as percentages of viewBox (0-100)
 // Pentagon points upward: top center, mid-left, mid-right, bottom-left, bottom-right
 const POSITIONS = [
-  { cx: 50, cy: 18 },  // 1: top center
-  { cx: 18, cy: 40 },  // 2: mid-left
-  { cx: 82, cy: 40 },  // 3: mid-right
-  { cx: 28, cy: 74 },  // 4: bottom-left
-  { cx: 72, cy: 74 },  // 5: bottom-right
+  { cx: 50, cy: 14 },  // 1: top center
+  { cx: 14, cy: 38 },  // 2: mid-left
+  { cx: 86, cy: 38 },  // 3: mid-right
+  { cx: 24, cy: 78 },  // 4: bottom-left
+  { cx: 76, cy: 78 },  // 5: bottom-right
 ];
 
-const R = 15; // circle radius — no overlap
+const R = 12; // circle radius — clear separation
 
 export default function InventionIkigai({
   currentCircle = 0,
@@ -104,7 +104,7 @@ export default function InventionIkigai({
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill={isReachable ? "#F9FAFB" : "#9CA3AF"}
-                fontSize="6"
+                fontSize="5"
                 fontWeight="700"
                 fontFamily="var(--font-display, system-ui)"
                 style={{ transition: "fill 0.3s" }}
@@ -119,7 +119,7 @@ export default function InventionIkigai({
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill={isReachable ? "#E5E7EB" : "#6B7280"}
-                fontSize="3.8"
+                fontSize="3.2"
                 fontWeight="400"
                 fontFamily="var(--font-display, system-ui)"
                 style={{ transition: "fill 0.3s" }}
