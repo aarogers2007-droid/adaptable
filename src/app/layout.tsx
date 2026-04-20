@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} ${playfairDisplay.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} ${playfairDisplay.variable}`}>
       <head>
         <link
           href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
