@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   // Validate redirect path to prevent open redirects
   const rawNext = searchParams.get("next") ?? "/dashboard";
-  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention"];
+  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention", "/aj"];
   const next = (rawNext.startsWith("/") && !rawNext.startsWith("//") && SAFE_PREFIXES.some(p => rawNext.startsWith(p)))
     ? rawNext
     : "/dashboard";
@@ -31,6 +31,11 @@ export async function GET(request: Request) {
           .select("business_idea, org_id, role, is_platform_owner")
           .eq("id", user.id)
           .single();
+
+        // ── AJ's direct route ──
+        if (user.email === "aarogers2007@gmail.com") {
+          return NextResponse.redirect(`${origin}/aj`);
+        }
 
         // ── ADMIN ROUTING — admins don't need onboarding ──
         if ((profile as any)?.is_platform_owner) {
