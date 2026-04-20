@@ -64,9 +64,9 @@ export default function InventionIkigai({
                 y={pos.cy + 0.5}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill="#fff"
-                fontSize="9"
-                fontWeight="700"
+                fill="#111827"
+                fontSize="10"
+                fontWeight="800"
                 fontFamily="var(--font-display, system-ui)"
                 style={{ pointerEvents: "none" }}
               >
