@@ -21,12 +21,13 @@ const R = 15;
 const S = 25.52;
 const CX = 50;
 const CY = 48;
+// Clockwise from top: 1=top, 2=upper-right, 3=lower-right, 4=lower-left, 5=upper-left
 const POS = [
   { cx: CX, cy: CY - S },                                                          // 1: top
-  { cx: CX + S * Math.cos(198 * Math.PI / 180), cy: CY + S * Math.sin(198 * Math.PI / 180) }, // 2: upper-left
-  { cx: CX + S * Math.cos(-18 * Math.PI / 180), cy: CY + S * Math.sin(-18 * Math.PI / 180) }, // 3: upper-right
+  { cx: CX + S * Math.cos(-18 * Math.PI / 180), cy: CY + S * Math.sin(-18 * Math.PI / 180) }, // 2: upper-right
+  { cx: CX + S * Math.cos(54 * Math.PI / 180), cy: CY + S * Math.sin(54 * Math.PI / 180) },   // 3: lower-right
   { cx: CX + S * Math.cos(126 * Math.PI / 180), cy: CY + S * Math.sin(126 * Math.PI / 180) }, // 4: lower-left
-  { cx: CX + S * Math.cos(54 * Math.PI / 180), cy: CY + S * Math.sin(54 * Math.PI / 180) },   // 5: lower-right
+  { cx: CX + S * Math.cos(198 * Math.PI / 180), cy: CY + S * Math.sin(198 * Math.PI / 180) }, // 5: upper-left
 ];
 
 export default function InventionIkigai({
