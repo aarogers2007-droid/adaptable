@@ -54,7 +54,7 @@ export default function InventionDashboard({
   const [moveState, setMoveState] = useState<{ studentId: string; fromGroup: number } | null>(null);
   const [moveTarget, setMoveTarget] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"overview" | "groups" | "algorithm">("overview");
+  const [tab, setTab] = useState<"overview" | "groups">("overview");
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
 
@@ -139,12 +139,15 @@ export default function InventionDashboard({
             {data.groups.length > 0 && (
               <button
                 type="button"
-                onClick={() => setTab("algorithm")}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  tab === "algorithm" ? "bg-[var(--primary)] text-white" : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
-                }`}
+                onClick={() => setTerminalOpen(true)}
+                className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105"
+                style={{
+                  background: "#C084FC",
+                  boxShadow: "0 0 12px rgba(192,132,252,0.4), 0 0 30px rgba(192,132,252,0.15)",
+                  animation: "purpleGlow 2s ease-in-out infinite alternate",
+                }}
               >
-                Algorithm
+                View Algorithm
               </button>
             )}
           </div>
@@ -479,33 +482,17 @@ export default function InventionDashboard({
           </div>
         )}
 
-        {/* Algorithm tab */}
-        {tab === "algorithm" && data.groups.length > 0 && (
+        {/* Algorithm terminal — opens over current tab content */}
+        {terminalOpen && data.groups.length > 0 && (
           <div className="mt-8">
-            {!terminalOpen ? (
-              <div className="flex items-center justify-center py-20">
-                <button
-                  type="button"
-                  onClick={() => setTerminalOpen(true)}
-                  className="rounded-xl px-8 py-4 font-[family-name:var(--font-display)] text-base font-semibold text-white transition-all hover:scale-105"
-                  style={{
-                    background: "#C084FC",
-                    boxShadow: "0 0 24px rgba(192,132,252,0.4), 0 0 60px rgba(192,132,252,0.15)",
-                  }}
-                >
-                  View Grouping Algorithm
-                </button>
-              </div>
-            ) : (
-              <AlgorithmStream
-                groups={data.groups}
-                studentMap={data.studentMap}
-                circle1Counts={data.circle1Counts}
-                circle2Counts={data.circle2Counts}
-                algorithmLog={algorithmLog}
-                onClose={() => setTerminalOpen(false)}
-              />
-            )}
+            <AlgorithmStream
+              groups={data.groups}
+              studentMap={data.studentMap}
+              circle1Counts={data.circle1Counts}
+              circle2Counts={data.circle2Counts}
+              algorithmLog={algorithmLog}
+              onClose={() => setTerminalOpen(false)}
+            />
           </div>
         )}
 
@@ -937,6 +924,10 @@ function AlgorithmStream({
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes purpleGlow {
+          0% { box-shadow: 0 0 12px rgba(192,132,252,0.3), 0 0 30px rgba(192,132,252,0.1); }
+          100% { box-shadow: 0 0 18px rgba(192,132,252,0.5), 0 0 45px rgba(192,132,252,0.2); }
+        }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #C084FC; cursor: pointer; }
         input[type="range"]::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: #C084FC; border: none; cursor: pointer; }
       ` }} />
