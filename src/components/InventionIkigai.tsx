@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * Invention Ikigai — five circles in a pentagon.
- * Borders TOUCH. No overlap. No gap.
- */
-
 interface InventionIkigaiProps {
   currentCircle?: number;
   completedCircles?: number[];
@@ -12,35 +7,26 @@ interface InventionIkigaiProps {
 }
 
 const CIRCLES = [
-  { num: 1, name: "The Wish", color: "#C084FC" },
-  { num: 2, name: "The Mind", color: "#60A5FA" },
-  { num: 3, name: "The Lens", color: "#2DD4BF" },
-  { num: 4, name: "The Scale", color: "#FBBF24" },
-  { num: 5, name: "The Voice", color: "#F87171" },
+  { num: 1, color: "#C084FC" },
+  { num: 2, color: "#60A5FA" },
+  { num: 3, color: "#2DD4BF" },
+  { num: 4, color: "#FBBF24" },
+  { num: 5, color: "#F87171" },
 ];
 
-// r=16. Pentagon side = 2r = 32 (borders touch exactly).
-// Pentagon inscribing radius = side / (2 * sin(π/5)) = 32 / 1.176 = 27.2
-// Center at (50, 52) to vertically center in viewBox.
-// Angles: -90° (top), -18° (upper-right), 54° (lower-right), 126° (lower-left), 198° (upper-left)
-const R = 16;
-const PR = 27.2;
+// r=15. Side of pentagon = 30 (exactly 2r, borders kiss, ZERO overlap).
+// Inscribing radius = 30 / (2 * sin(36°)) = 25.52
+// Center (50, 48). Angles reordered: top, upper-left, upper-right, lower-left, lower-right.
+const R = 15;
+const S = 25.52;
 const CX = 50;
-const CY = 52;
-const POSITIONS = [
-  { cx: CX + PR * Math.cos(-90 * Math.PI / 180), cy: CY + PR * Math.sin(-90 * Math.PI / 180) },   // top
-  { cx: CX + PR * Math.cos(-18 * Math.PI / 180), cy: CY + PR * Math.sin(-18 * Math.PI / 180) },   // upper-right
-  { cx: CX + PR * Math.cos(54 * Math.PI / 180), cy: CY + PR * Math.sin(54 * Math.PI / 180) },     // lower-right
-  { cx: CX + PR * Math.cos(126 * Math.PI / 180), cy: CY + PR * Math.sin(126 * Math.PI / 180) },   // lower-left
-  { cx: CX + PR * Math.cos(198 * Math.PI / 180), cy: CY + PR * Math.sin(198 * Math.PI / 180) },   // upper-left
-];
-// Reorder to match circle numbering: 1=top, 2=upper-left, 3=upper-right, 4=lower-left, 5=lower-right
+const CY = 48;
 const POS = [
-  POSITIONS[0], // 1: top
-  POSITIONS[4], // 2: upper-left
-  POSITIONS[1], // 3: upper-right
-  POSITIONS[3], // 4: lower-left
-  POSITIONS[2], // 5: lower-right
+  { cx: CX, cy: CY - S },                                                          // 1: top
+  { cx: CX + S * Math.cos(198 * Math.PI / 180), cy: CY + S * Math.sin(198 * Math.PI / 180) }, // 2: upper-left
+  { cx: CX + S * Math.cos(-18 * Math.PI / 180), cy: CY + S * Math.sin(-18 * Math.PI / 180) }, // 3: upper-right
+  { cx: CX + S * Math.cos(126 * Math.PI / 180), cy: CY + S * Math.sin(126 * Math.PI / 180) }, // 4: lower-left
+  { cx: CX + S * Math.cos(54 * Math.PI / 180), cy: CY + S * Math.sin(54 * Math.PI / 180) },   // 5: lower-right
 ];
 
 export default function InventionIkigai({
@@ -50,11 +36,10 @@ export default function InventionIkigai({
 }: InventionIkigaiProps) {
   return (
     <div className="relative mx-auto w-full max-w-[480px]" style={{ aspectRatio: "1 / 1" }}>
-      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full overflow-visible">
+      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
         {CIRCLES.map((circle, i) => {
           const pos = POS[i];
           const isActive = currentCircle === circle.num;
-          const isCompleted = completedCircles.includes(circle.num);
           const isClickable = !!onCircleClick && !isActive;
 
           return (
@@ -64,42 +49,27 @@ export default function InventionIkigai({
                 cy={pos.cy}
                 r={R}
                 fill={circle.color}
-                fillOpacity={isActive ? 0.35 : isCompleted ? 0.25 : 0.18}
+                fillOpacity={isActive ? 0.35 : 0.2}
                 stroke={circle.color}
                 strokeWidth={isActive ? 2.5 : 2}
-                strokeOpacity={1}
                 style={{
                   cursor: isClickable ? "pointer" : "default",
-                  transition: "fill-opacity 0.3s",
                   filter: isActive ? `drop-shadow(0 0 4px ${circle.color})` : "none",
                 }}
                 onClick={() => isClickable && onCircleClick?.(circle.num)}
               />
               <text
                 x={pos.cx}
-                y={pos.cy - 3}
+                y={pos.cy + 0.5}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill="#111827"
-                fontSize="6.5"
+                fill={circle.color}
+                fontSize="8"
                 fontWeight="700"
                 fontFamily="var(--font-display, system-ui)"
                 style={{ pointerEvents: "none" }}
               >
                 {circle.num}
-              </text>
-              <text
-                x={pos.cx}
-                y={pos.cy + 4.5}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="#111827"
-                fontSize="3.5"
-                fontWeight="500"
-                fontFamily="var(--font-display, system-ui)"
-                style={{ pointerEvents: "none" }}
-              >
-                {circle.name}
               </text>
             </g>
           );
