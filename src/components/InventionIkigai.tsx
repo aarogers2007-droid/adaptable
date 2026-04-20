@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * Invention Ikigai — five circles in a pentagon arrangement.
- * Edges touch but don't overlap. Each circle is clickable when onCircleClick is provided.
+ * Invention Ikigai — five circles in a pentagon, same visual style
+ * as the 4-circle Ikigai on /for-schools. Circles overlap slightly
+ * at edges. Labels outside. Clickable when onCircleClick provided.
  */
 
 interface InventionIkigaiProps {
@@ -19,16 +20,26 @@ const CIRCLES = [
   { num: 5, name: "The Voice", color: "#F87171" },
 ];
 
-// ViewBox 300x300. Big circles (R=50), tight pentagon, edges kissing.
+// Same approach as the 4-circle Ikigai: viewBox 100x100, r=18,
+// pentagon inscribed at radius 24 from center (50,50).
+// Adjacent circles overlap slightly (distance ~28, diameter 36).
+const R = 18;
 const POSITIONS = [
-  { cx: 150, cy: 58 },   // 1: top center
-  { cx: 62, cy: 118 },   // 2: upper-left
-  { cx: 238, cy: 118 },  // 3: upper-right
-  { cx: 88, cy: 218 },   // 4: lower-left
-  { cx: 212, cy: 218 },  // 5: lower-right
+  { cx: 50, cy: 27 },    // 1: top
+  { cx: 27, cy: 44 },    // 2: upper-left
+  { cx: 73, cy: 44 },    // 3: upper-right
+  { cx: 33, cy: 70 },    // 4: lower-left
+  { cx: 67, cy: 70 },    // 5: lower-right
 ];
 
-const R = 50;
+// Labels positioned outside each circle
+const LABELS = [
+  { text: "The Wish", x: 50, y: 5, anchor: "middle" as const },
+  { text: "The Mind", x: 4, y: 38, anchor: "start" as const },
+  { text: "The Lens", x: 96, y: 38, anchor: "end" as const },
+  { text: "The Scale", x: 10, y: 88, anchor: "start" as const },
+  { text: "The Voice", x: 90, y: 88, anchor: "end" as const },
+];
 
 export default function InventionIkigai({
   currentCircle = 0,
@@ -36,80 +47,81 @@ export default function InventionIkigai({
   onCircleClick,
 }: InventionIkigaiProps) {
   return (
-    <div className="relative mx-auto w-full" style={{ maxWidth: "500px" }}>
-      <svg viewBox="0 0 300 280" className="w-full h-auto" style={{ overflow: "visible" }}>
+    <div
+      className="relative mx-auto w-full max-w-[480px]"
+      style={{ aspectRatio: "1 / 1" }}
+    >
+      <svg
+        className="absolute inset-0 w-full h-full overflow-visible"
+        viewBox="0 0 100 100"
+        style={{ zIndex: 1 }}
+      >
+        {/* Circles */}
         {CIRCLES.map((circle, i) => {
           const pos = POSITIONS[i];
           const isActive = currentCircle === circle.num;
           const isCompleted = completedCircles.includes(circle.num);
           const isClickable = !!onCircleClick && !isActive;
-
-          const fillOpacity = isActive ? 0.4 : isCompleted ? 0.3 : 0.2;
-          const strokeWidth = isActive ? 4 : 2.5;
-          const strokeOpacity = 1;
+          const opacity = isActive ? 0.7 : isCompleted ? 0.55 : 0.45;
 
           return (
-            <g
+            <circle
               key={circle.num}
-              style={{ cursor: isClickable ? "pointer" : "default" }}
-              onClick={() => isClickable && onCircleClick?.(circle.num)}
-              role={isClickable ? "button" : undefined}
-              tabIndex={isClickable ? 0 : undefined}
-              onKeyDown={(e) => {
-                if (isClickable && (e.key === "Enter" || e.key === " ")) {
-                  e.preventDefault();
-                  onCircleClick?.(circle.num);
-                }
+              cx={pos.cx}
+              cy={pos.cy}
+              r={R}
+              fill={circle.color}
+              opacity={opacity}
+              stroke={isActive ? circle.color : "none"}
+              strokeWidth={isActive ? 1.5 : 0}
+              style={{
+                cursor: isClickable ? "pointer" : "default",
+                transition: "opacity 0.3s",
+                filter: isActive ? `drop-shadow(0 0 6px ${circle.color})` : "none",
               }}
-            >
-              <circle
-                cx={pos.cx}
-                cy={pos.cy}
-                r={R}
-                fill={circle.color}
-                fillOpacity={fillOpacity}
-                stroke={circle.color}
-                strokeWidth={strokeWidth}
-                strokeOpacity={strokeOpacity}
-                style={{
-                  transition: "fill-opacity 0.3s, stroke-width 0.3s, stroke-opacity 0.3s",
-                  filter: isActive ? `drop-shadow(0 0 8px ${circle.color}60)` : "none",
-                }}
-              />
-
-              {/* Number */}
-              <text
-                x={pos.cx}
-                y={pos.cy - 8}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="#111827"
-                fontSize="22"
-                fontWeight="700"
-                fontFamily="var(--font-display, system-ui)"
-                style={{ pointerEvents: "none" }}
-              >
-                {circle.num}
-              </text>
-
-              {/* Name */}
-              <text
-                x={pos.cx}
-                y={pos.cy + 14}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="#111827"
-                fontSize="13"
-                fontWeight="500"
-                fontFamily="var(--font-display, system-ui)"
-                style={{ pointerEvents: "none" }}
-              >
-                {circle.name}
-              </text>
-
-            </g>
+              onClick={() => isClickable && onCircleClick?.(circle.num)}
+            />
           );
         })}
+
+        {/* Numbers inside circles */}
+        {CIRCLES.map((circle, i) => {
+          const pos = POSITIONS[i];
+          return (
+            <text
+              key={`n${circle.num}`}
+              x={pos.cx}
+              y={pos.cy + 1}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#fff"
+              fontSize="8"
+              fontWeight="700"
+              fontFamily="var(--font-display, system-ui)"
+              style={{ pointerEvents: "none" }}
+            >
+              {circle.num}
+            </text>
+          );
+        })}
+
+        {/* Labels outside circles */}
+        {LABELS.map((label, i) => (
+          <text
+            key={`l${i}`}
+            x={label.x}
+            y={label.y}
+            textAnchor={label.anchor}
+            dominantBaseline="middle"
+            fill="var(--text-primary, #111827)"
+            fontSize="5.5"
+            fontWeight="600"
+            fontFamily="var(--font-display, system-ui)"
+            style={{ pointerEvents: "none" }}
+          >
+            {label.text}
+          </text>
+        ))}
       </svg>
     </div>
   );
