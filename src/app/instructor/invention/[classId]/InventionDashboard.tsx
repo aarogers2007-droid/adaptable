@@ -546,6 +546,11 @@ export default function InventionDashboard({
 
 // ── Algorithm Stream Terminal ──
 
+function isNearBottom(el: HTMLElement | null): boolean {
+  if (!el) return true;
+  return el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+}
+
 function AlgorithmStream({
   groups,
   studentMap,
@@ -561,11 +566,13 @@ function AlgorithmStream({
 }) {
   const [viewMode, setViewMode] = useState<"normal" | "raw">("normal");
   const [lines, setLines] = useState<Array<{ text: string; cls: string }>>([]);
+  const [rawChars, setRawChars] = useState(0); // how many chars to show in raw mode
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
-  const [speed, setSpeed] = useState(1); // 0.5x, 1x, 2x, 4x
+  const [speed, setSpeed] = useState(1);
   const speedRef = useRef(speed);
   const outputRef = useRef<HTMLDivElement>(null);
+  const rawRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { speedRef.current = speed; }, [speed]);
 
@@ -658,6 +665,8 @@ function AlgorithmStream({
     }
     s.push({ text: "", cls: "", delay: 150 });
     s.push({ text: "Groups written to invention_groups. Ready for admin review.", cls: "final", delay: 400 });
+    s.push({ text: "", cls: "", delay: 800 });
+    s.push({ text: '"Have a great day" — AJ Rogers', cls: "easter", delay: 0 });
 
     return s;
   }
@@ -667,6 +676,7 @@ function AlgorithmStream({
     setRunning(true);
     setDone(false);
     setLines([]);
+    setRawChars(0);
 
     const script = buildScript();
 
@@ -698,8 +708,10 @@ function AlgorithmStream({
         await new Promise(r => setTimeout(r, delay));
       }
 
-      // Auto-scroll
-      if (outputRef.current) outputRef.current.scrollTop = outputRef.current.scrollHeight;
+      // Auto-scroll only if user hasn't scrolled up
+      if (isNearBottom(outputRef.current)) {
+        outputRef.current!.scrollTop = outputRef.current!.scrollHeight;
+      }
     }
 
     setRunning(false);
@@ -714,55 +726,67 @@ function AlgorithmStream({
     pass: "#4ADE80",
     warn: "#FBBF24",
     final: "#C084FC",
+    easter: "#A78BFA",
   };
 
-  // Raw mode: track which step is active based on log replay progress
-  const [rawActiveStep, setRawActiveStep] = useState(-1);
-  const rawRef = useRef<HTMLDivElement>(null);
+  // Raw mode: typewriter for source code
+  const rawFullText = RAW_SOURCE_LINES.map(l => l.code).join("\n");
+  const rawTotalChars = rawFullText.length;
 
-  // Track step from log lines as they print
+  // Drive raw typewriter alongside log stream
   useEffect(() => {
-    if (viewMode !== "raw" || !running) return;
-    // Determine step from last printed line's content
-    const lastLine = lines[lines.length - 1]?.text ?? "";
-    if (lastLine.includes("Step 1")) setRawActiveStep(1);
-    else if (lastLine.includes("Step 2")) setRawActiveStep(2);
-    else if (lastLine.includes("Step 3")) setRawActiveStep(3);
-    else if (lastLine.includes("Step 4")) setRawActiveStep(4);
-    else if (lastLine.includes("Step 5")) setRawActiveStep(5);
-    else if (lastLine.includes("Writing results")) setRawActiveStep(6);
-    else if (lastLine.includes("Algorithm complete")) setRawActiveStep(-1);
-  }, [lines, running, viewMode]);
+    if (!running) return;
+    // Type raw source chars in sync with the log stream
+    let frame: number;
+    let charIdx = 0;
+    const baseSpeed = 8; // ms per char base
+    const tick = () => {
+      charIdx += Math.ceil(2 / speedRef.current + Math.random() * 2);
+      if (charIdx > rawTotalChars) charIdx = rawTotalChars;
+      setRawChars(charIdx);
+      if (charIdx < rawTotalChars && running) {
+        frame = window.setTimeout(tick, baseSpeed / speedRef.current);
+      }
+    };
+    frame = window.setTimeout(tick, 200);
+    return () => clearTimeout(frame);
+  }, [running, rawTotalChars]);
 
-  // Auto-scroll raw source to active step
+  // Compute which raw lines/chars to show
+  const rawDisplayText = rawFullText.slice(0, rawChars);
+  const rawDisplayLines = rawDisplayText.split("\n");
+
+  // Auto-scroll raw only if near bottom
   useEffect(() => {
-    if (viewMode !== "raw" || rawActiveStep < 0 || !rawRef.current) return;
-    const el = rawRef.current.querySelector(`[data-step-start="${rawActiveStep}"]`);
-    el?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [rawActiveStep, viewMode]);
+    if (viewMode === "raw" && running && isNearBottom(rawRef.current)) {
+      rawRef.current!.scrollTop = rawRef.current!.scrollHeight;
+    }
+  }, [rawChars, viewMode, running]);
 
   return (
     <div>
-      {/* Mode toggle above terminal */}
-      <div className="flex items-center justify-center gap-1 mb-3 rounded-lg p-1" style={{ background: "var(--bg-muted)", display: "inline-flex" }}>
-        <button
-          type="button"
-          onClick={() => setViewMode("normal")}
-          className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
-            viewMode === "normal" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
-          }`}
-        >
-          Normal
-        </button>
-        <button
-          type="button"
-          onClick={() => setViewMode("raw")}
-          className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
-            viewMode === "raw" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
-          }`}
-        >
-          Raw
-        </button>
+      {/* Mode toggle — centered above terminal */}
+      <div className="flex justify-center mb-3">
+        <div className="flex gap-1 rounded-lg p-1" style={{ background: "var(--bg-muted)" }}>
+          <button
+            type="button"
+            onClick={() => setViewMode("normal")}
+            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
+              viewMode === "normal" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
+            }`}
+          >
+            Normal
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("raw")}
+            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
+              viewMode === "raw" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
+            }`}
+          >
+            Raw
+          </button>
+        </div>
       </div>
 
       {/* Terminal */}
@@ -796,37 +820,59 @@ function AlgorithmStream({
           </div>
         </div>
 
-        {/* Normal mode: log output */}
-        {viewMode === "normal" && (
-          <div
-            ref={outputRef}
-            className="overflow-y-auto"
-            style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8 }}
-          >
-            {lines.map((line, i) => (
-              <div key={i} style={{ color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A", fontWeight: line.cls.includes("final") ? 700 : 400 }}>
-                {line.text}
-                {i === lines.length - 1 && running && (
-                  <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
-                )}
-              </div>
-            ))}
-            {lines.length === 0 && !running && (
-              <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
-            )}
-          </div>
-        )}
+        {/* Normal mode: log output — always rendered, hidden via display */}
+        <div
+          ref={outputRef}
+          className="overflow-y-auto"
+          style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8, display: viewMode === "normal" ? "block" : "none" }}
+        >
+          {lines.map((line, i) => (
+            <div key={i} style={{
+              color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A",
+              fontWeight: line.cls.includes("final") || line.cls.includes("easter") ? 700 : 400,
+              fontStyle: line.cls.includes("easter") ? "italic" : "normal",
+            }}>
+              {line.text}
+              {i === lines.length - 1 && running && (
+                <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+              )}
+            </div>
+          ))}
+          {lines.length === 0 && !running && (
+            <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
+          )}
+        </div>
 
-        {/* Raw mode: source code with step highlighting */}
-        {viewMode === "raw" && (
-          <div
-            ref={rawRef}
-            className="overflow-y-auto"
-            style={{ height: "480px", padding: "12px 0", fontFamily: "monospace", fontSize: "11px", lineHeight: 1.7 }}
-          >
-            <RawSourceView activeStep={rawActiveStep} />
-          </div>
-        )}
+        {/* Raw mode: source code typed character by character — always rendered, hidden via display */}
+        <div
+          ref={rawRef}
+          className="overflow-y-auto"
+          style={{ height: "480px", padding: "12px 0", fontFamily: "monospace", fontSize: "11px", lineHeight: 1.7, display: viewMode === "raw" ? "block" : "none" }}
+        >
+          {rawChars === 0 && !running ? (
+            <div style={{ padding: "16px", color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the source code.</div>
+          ) : (
+            rawDisplayLines.map((line, i) => {
+              const srcLine = RAW_SOURCE_LINES[i];
+              return (
+                <div
+                  key={i}
+                  style={{ padding: "0 12px", display: "flex", gap: "10px" }}
+                >
+                  <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none" }}>
+                    {i + 1}
+                  </span>
+                  <span style={{ color: "#D1D5DB", whiteSpace: "pre" }}>
+                    {line}
+                    {i === rawDisplayLines.length - 1 && running && rawChars < rawTotalChars && (
+                      <span style={{ display: "inline-block", width: "6px", height: "13px", background: "#C084FC", marginLeft: "1px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+                    )}
+                  </span>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* Speed controls */}
@@ -940,43 +986,5 @@ const RAW_SOURCE_LINES: Array<{ code: string; step: number }> = [
   { code: '}', step: -1 },
 ];
 
-function highlightSyntax(code: string): string {
-  if (!code) return "&nbsp;";
-  return code
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/(\/\/.*$)/gm, '<span style="color:#6B7280">$1</span>')
-    .replace(/("(?:[^"\\]|\\.)*")/g, '<span style="color:#A78BFA">$1</span>')
-    .replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|interface|type)\b/g, '<span style="color:#C084FC">$1</span>')
-    .replace(/\b(string|number|boolean|null|undefined|true|false|Map|Set|Object)\b/g, '<span style="color:#60A5FA">$1</span>');
-}
-
-function RawSourceView({ activeStep }: { activeStep: number }) {
-  return (
-    <>
-      {RAW_SOURCE_LINES.map((line, i) => {
-        const isActive = activeStep >= 0 && line.step === activeStep;
-        return (
-          <div
-            key={i}
-            data-step-start={line.step === activeStep ? activeStep : undefined}
-            style={{
-              padding: "0 12px",
-              display: "flex",
-              gap: "12px",
-              background: isActive ? "rgba(192, 132, 252, 0.12)" : "transparent",
-              transition: "background 0.4s ease",
-            }}
-          >
-            <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none" }}>
-              {i + 1}
-            </span>
-            <span
-              style={{ color: "#D1D5DB", whiteSpace: "pre" }}
-              dangerouslySetInnerHTML={{ __html: highlightSyntax(line.code) }}
-            />
-          </div>
-        );
-      })}
-    </>
-  );
-}
+// RawSourceView and highlightSyntax removed — raw mode now uses
+// character-by-character typewriter directly in AlgorithmStream
