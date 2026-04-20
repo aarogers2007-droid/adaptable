@@ -977,9 +977,12 @@ export default function DemoShowcase() {
             Teachers see everything. Parents see enough.
           </h2>
 
-          <div className="grid gap-8 lg:grid-cols-5" style={{ marginTop: "55px" }}>
-            {/* Instructor dashboard — 3/5 */}
-            <div className="lg:col-span-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+          {/* Teacher Dashboard */}
+          <div style={{ marginTop: "55px" }}>
+            <p className="font-[family-name:var(--font-display)] mb-4" style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}>
+              Teacher Dashboard
+            </p>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
               <div className="p-5 border-b border-[var(--border)]">
                 <h3 className="font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>
                   Entrepreneurship — Period 3
@@ -1042,8 +1045,17 @@ export default function DemoShowcase() {
               </div>
             </div>
 
-            {/* Parent view — 2/5 — #7: fixed progress ring math */}
-            <div className="lg:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm self-start">
+          </div>
+
+          {/* Parent View */}
+          <div style={{ marginTop: "55px" }}>
+            <p className="font-[family-name:var(--font-display)] mb-4" style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}>
+              Parent View
+            </p>
+            <p className="mb-4 max-w-[500px]" style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.618 }}>
+              Parents see their child&apos;s progress, business idea, and how to help — all behind a PIN. Designed for 60 seconds of context.
+            </p>
+            <div className="max-w-[480px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
               <div className="p-5 flex items-center gap-4 border-b border-[var(--border)]">
                 <div className="relative" style={{ width: "55px", height: "55px" }}>
                   <svg viewBox="0 0 120 120" className="w-full h-full">
