@@ -978,11 +978,11 @@ export default function DemoShowcase() {
           </h2>
 
           {/* Teacher Dashboard */}
-          <div style={{ marginTop: "55px" }}>
-            <p className="font-[family-name:var(--font-display)] mb-4" style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}>
+          <div className="text-center" style={{ marginTop: "55px" }}>
+            <h3 className="font-[family-name:var(--font-display)] font-semibold mb-6" style={{ fontSize: "24px", color: "#111827" }}>
               Teacher Dashboard
-            </p>
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+            </h3>
+            <div className="mx-auto max-w-[700px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm text-left">
               <div className="p-5 border-b border-[var(--border)]">
                 <h3 className="font-[family-name:var(--font-display)] font-bold" style={{ fontSize: "16px", color: "#111827" }}>
                   Entrepreneurship — Period 3
@@ -1048,14 +1048,14 @@ export default function DemoShowcase() {
           </div>
 
           {/* Parent View */}
-          <div style={{ marginTop: "55px" }}>
-            <p className="font-[family-name:var(--font-display)] mb-4" style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}>
+          <div className="text-center" style={{ marginTop: "55px" }}>
+            <h3 className="font-[family-name:var(--font-display)] font-semibold mb-2" style={{ fontSize: "24px", color: "#111827" }}>
               Parent View
-            </p>
-            <p className="mb-4 max-w-[500px]" style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.618 }}>
+            </h3>
+            <p className="mb-6 mx-auto max-w-[500px]" style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.618 }}>
               Parents see their child&apos;s progress, business idea, and how to help — all behind a PIN. Designed for 60 seconds of context.
             </p>
-            <div className="max-w-[480px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm">
+            <div className="mx-auto max-w-[480px] rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden shadow-sm text-left">
               <div className="p-5 flex items-center gap-4 border-b border-[var(--border)]">
                 <div className="relative" style={{ width: "55px", height: "55px" }}>
                   <svg viewBox="0 0 120 120" className="w-full h-full">
