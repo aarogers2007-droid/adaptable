@@ -45,7 +45,32 @@
   --info: #3B82F6;
 }
 
-/* Dark theme — deferred to v2. Do not add .dark class to HTML. */
+/* Dark theme */
+html.dark {
+  --text-primary: #F9FAFB;
+  --text-secondary: #D1D5DB;
+  --text-muted: #6B7280;
+
+  --bg: #111827;
+  --bg-subtle: #1F2937;
+  --bg-muted: #374151;
+
+  --border: #374151;
+  --border-strong: #4B5563;
+
+  --primary: #14B8A6;
+  --primary-light: #2DD4BF;
+  --primary-dark: #0D9488;
+  --accent: #FBBF24;
+  --accent-light: #FCD34D;
+
+  --success: #34D399;
+  --warning: #FBBF24;
+  --error: #F87171;
+  --info: #60A5FA;
+
+  color-scheme: dark;
+}
 
 /* Shared tier and tint tokens */
 :root {

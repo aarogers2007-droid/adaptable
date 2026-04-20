@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -76,7 +77,8 @@ export default async function AdminPage() {
           <Link href="/instructor/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             Instructor View
           </Link>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle />
             <form action="/auth/signout" method="POST">
               <button className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">Sign out</button>
             </form>

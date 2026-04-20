@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 interface AppNavProps {
   isAdmin: boolean;
@@ -125,6 +126,8 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
             {studentName && (
               <span className="text-sm text-[var(--text-muted)]">{studentName}</span>
             )}
+
+            <ThemeToggle />
 
             {!previewMode && (
               <form action="/auth/signout" method="POST">

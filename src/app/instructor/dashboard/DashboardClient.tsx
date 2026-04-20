@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import InviteCodeBanner from "./InviteCodeBanner";
 import StudentTable from "./StudentTable";
 import LiveFeed from "./LiveFeed";
@@ -104,6 +105,7 @@ export default function DashboardClient({ classes, totalLessons }: DashboardClie
             >
               How it works
             </button>
+            <ThemeToggle />
             <form action="/auth/signout" method="POST">
               <button className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]">
                 Sign out

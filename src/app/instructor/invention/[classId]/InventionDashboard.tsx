@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { triggerGrouping, revealGroups, moveStudent, loadInventionDashboard } from "./actions";
 
 interface DashboardData {
@@ -111,7 +112,8 @@ export default function InventionDashboard({
               {data.classCode} Dashboard
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <button
               type="button"
               onClick={() => setTab("overview")}
