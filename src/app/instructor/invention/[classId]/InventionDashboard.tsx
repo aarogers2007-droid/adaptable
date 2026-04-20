@@ -56,6 +56,7 @@ export default function InventionDashboard({
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"overview" | "groups" | "algorithm">("overview");
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
+  const [terminalOpen, setTerminalOpen] = useState(false);
 
   const completionPct = data.totalEnrolled > 0
     ? Math.round((data.completedCount / data.totalEnrolled) * 100)
@@ -478,16 +479,33 @@ export default function InventionDashboard({
           </div>
         )}
 
-        {/* Algorithm stream tab */}
+        {/* Algorithm tab */}
         {tab === "algorithm" && data.groups.length > 0 && (
           <div className="mt-8">
-            <AlgorithmStream
-              groups={data.groups}
-              studentMap={data.studentMap}
-              circle1Counts={data.circle1Counts}
-              circle2Counts={data.circle2Counts}
-              algorithmLog={algorithmLog}
-            />
+            {!terminalOpen ? (
+              <div className="flex items-center justify-center py-20">
+                <button
+                  type="button"
+                  onClick={() => setTerminalOpen(true)}
+                  className="rounded-xl px-8 py-4 font-[family-name:var(--font-display)] text-base font-semibold text-white transition-all hover:scale-105"
+                  style={{
+                    background: "#C084FC",
+                    boxShadow: "0 0 24px rgba(192,132,252,0.4), 0 0 60px rgba(192,132,252,0.15)",
+                  }}
+                >
+                  View Grouping Algorithm
+                </button>
+              </div>
+            ) : (
+              <AlgorithmStream
+                groups={data.groups}
+                studentMap={data.studentMap}
+                circle1Counts={data.circle1Counts}
+                circle2Counts={data.circle2Counts}
+                algorithmLog={algorithmLog}
+                onClose={() => setTerminalOpen(false)}
+              />
+            )}
           </div>
         )}
 
@@ -557,18 +575,21 @@ function AlgorithmStream({
   circle1Counts,
   circle2Counts,
   algorithmLog,
+  onClose,
 }: {
   groups: DashboardData["groups"];
   studentMap: DashboardData["studentMap"];
   circle1Counts: Record<string, number>;
   circle2Counts: Record<string, number>;
   algorithmLog: any;
+  onClose: () => void;
 }) {
   const [viewMode, setViewMode] = useState<"normal" | "raw">("normal");
   const [lines, setLines] = useState<Array<{ text: string; cls: string }>>([]);
-  const [rawChars, setRawChars] = useState(0); // how many chars to show in raw mode
+  const [rawChars, setRawChars] = useState(0);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
+  const terminalRef = useRef<HTMLDivElement>(null);
   const [speed, setSpeed] = useState(1);
   const speedRef = useRef(speed);
   const outputRef = useRef<HTMLDivElement>(null);
@@ -776,143 +797,149 @@ function AlgorithmStream({
     }
   }, [rawChars, viewMode, running]);
 
+  function handleFullscreen() {
+    terminalRef.current?.requestFullscreen?.();
+  }
+
   return (
-    <div>
-      {/* Mode toggle — centered above terminal */}
-      <div className="flex justify-center mb-3">
-        <div className="flex gap-1 rounded-lg p-1" style={{ background: "var(--bg-muted)" }}>
+    <div ref={terminalRef} className="rounded-xl border border-[#2A2A2A] overflow-hidden" style={{ background: "#0A0A0A" }}>
+      {/* Header with functional window buttons */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A]" style={{ background: "#1A1A1A" }}>
+        <div className="flex gap-2">
+          <button type="button" onClick={onClose} className="w-3 h-3 rounded-full border-0 cursor-pointer" style={{ background: "#F87171" }} title="Close" />
+          <button type="button" onClick={onClose} className="w-3 h-3 rounded-full border-0 cursor-pointer" style={{ background: "#FBBF24" }} title="Minimize" />
+          <button type="button" onClick={handleFullscreen} className="w-3 h-3 rounded-full border-0 cursor-pointer" style={{ background: "#4ADE80" }} title="Fullscreen" />
+        </div>
+        <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>
+          {viewMode === "raw" ? "invention-grouping.ts" : "VENTURE — Grouping Algorithm"}
+        </span>
+        <button
+          type="button"
+          onClick={runStream}
+          disabled={running}
+          className="rounded px-3 py-1 text-xs font-medium border transition-colors"
+          style={{
+            fontFamily: "monospace",
+            borderColor: running ? "#2A2A2A" : "#C084FC",
+            color: running ? "#4A4A4A" : "#C084FC",
+            background: "#1A1A1A",
+            cursor: running ? "not-allowed" : "pointer",
+          }}
+        >
+          {running ? "Running..." : done ? "Replay" : "Run Algorithm"}
+        </button>
+      </div>
+
+      {/* Normal mode — always rendered, hidden via display */}
+      <div
+        ref={outputRef}
+        className="overflow-y-auto"
+        style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8, display: viewMode === "normal" ? "block" : "none" }}
+      >
+        {lines.map((line, i) => (
+          <div key={i} style={{
+            color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A",
+            fontWeight: line.cls.includes("final") || line.cls.includes("easter") ? 700 : 400,
+            fontStyle: line.cls.includes("easter") ? "italic" : "normal",
+          }}>
+            {line.text}
+            {i === lines.length - 1 && running && (
+              <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+            )}
+          </div>
+        ))}
+        {lines.length === 0 && !running && (
+          <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
+        )}
+      </div>
+
+      {/* Raw mode — always rendered, hidden via display */}
+      <div
+        ref={rawRef}
+        className="overflow-y-auto"
+        style={{ height: "480px", padding: "12px 0", fontFamily: "monospace", fontSize: "11px", lineHeight: 1.7, display: viewMode === "raw" ? "block" : "none" }}
+      >
+        {rawChars === 0 && !running ? (
+          <div style={{ padding: "16px", color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the source code.</div>
+        ) : (
+          rawDisplayLines.map((line, i) => {
+            const isLastLine = i === rawDisplayLines.length - 1;
+            const isComplete = !isLastLine || rawChars >= rawTotalChars;
+            return (
+              <div key={i} style={{ padding: "0 12px", display: "flex", gap: "10px" }}>
+                <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none", fontSize: "10px" }}>
+                  {i + 1}
+                </span>
+                {isComplete ? (
+                  <span style={{ whiteSpace: "pre", color: "#E8E8E8" }} dangerouslySetInnerHTML={{ __html: colorizeCode(line) || "&nbsp;" }} />
+                ) : (
+                  <span style={{ color: "#E8E8E8", whiteSpace: "pre" }}>
+                    {line}
+                    {running && rawChars < rawTotalChars && (
+                      <span style={{ display: "inline-block", width: "6px", height: "13px", background: "#C084FC", marginLeft: "1px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+                    )}
+                  </span>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Bottom bar — inside terminal: pill toggle + speed slider */}
+      <div className="flex items-center justify-end gap-4 px-4 py-2 border-t border-[#2A2A2A]" style={{ background: "#1A1A1A" }}>
+        {/* Speed slider */}
+        <div className="flex items-center gap-2">
+          <span style={{ fontFamily: "monospace", fontSize: "10px", color: "#4A4A4A" }}>Speed</span>
+          <input
+            type="range"
+            min={0}
+            max={3}
+            value={SPEEDS.indexOf(speed)}
+            onChange={(e) => setSpeed(SPEEDS[parseInt(e.target.value)])}
+            className="w-16 h-1 appearance-none rounded-full cursor-pointer"
+            style={{ background: `linear-gradient(to right, #C084FC ${(SPEEDS.indexOf(speed) / 3) * 100}%, #2A2A2A ${(SPEEDS.indexOf(speed) / 3) * 100}%)`, accentColor: "#C084FC" }}
+          />
+        </div>
+
+        {/* Normal / Raw toggle */}
+        <div className="flex gap-1 rounded-md p-0.5" style={{ background: "#2A2A2A" }}>
           <button
             type="button"
             onClick={() => setViewMode("normal")}
-            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
-              viewMode === "normal" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
-            }`}
+            className="rounded px-3 py-1 transition-colors"
+            style={{
+              fontFamily: "monospace",
+              fontSize: "10px",
+              fontWeight: 500,
+              background: viewMode === "normal" ? "#3A3A3A" : "transparent",
+              color: viewMode === "normal" ? "#E8E8E8" : "#6A6A6A",
+            }}
           >
             Normal
           </button>
           <button
             type="button"
             onClick={() => setViewMode("raw")}
-            className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
-              viewMode === "raw" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
-            }`}
+            className="rounded px-3 py-1 transition-colors"
+            style={{
+              fontFamily: "monospace",
+              fontSize: "10px",
+              fontWeight: 500,
+              background: viewMode === "raw" ? "#3A3A3A" : "transparent",
+              color: viewMode === "raw" ? "#E8E8E8" : "#6A6A6A",
+            }}
           >
             Raw
           </button>
         </div>
       </div>
 
-      {/* Terminal */}
-      <div className="rounded-xl border border-[#2A2A2A] overflow-hidden" style={{ background: "#0A0A0A" }}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A]" style={{ background: "#1A1A1A" }}>
-          <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ background: "#F87171" }} />
-            <div className="w-3 h-3 rounded-full" style={{ background: "#FBBF24" }} />
-            <div className="w-3 h-3 rounded-full" style={{ background: "#4ADE80" }} />
-          </div>
-          <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>
-            {viewMode === "raw" ? "invention-grouping.ts" : "VENTURE — Grouping Algorithm"}
-          </span>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={runStream}
-              disabled={running}
-              className="rounded px-3 py-1 text-xs font-medium border transition-colors"
-              style={{
-                fontFamily: "monospace",
-                borderColor: running ? "#2A2A2A" : "#C084FC",
-                color: running ? "#4A4A4A" : "#C084FC",
-                background: "#1A1A1A",
-                cursor: running ? "not-allowed" : "pointer",
-              }}
-            >
-              {running ? "Running..." : done ? "Replay" : "Run Algorithm"}
-            </button>
-          </div>
-        </div>
-
-        {/* Normal mode: log output — always rendered, hidden via display */}
-        <div
-          ref={outputRef}
-          className="overflow-y-auto"
-          style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8, display: viewMode === "normal" ? "block" : "none" }}
-        >
-          {lines.map((line, i) => (
-            <div key={i} style={{
-              color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A",
-              fontWeight: line.cls.includes("final") || line.cls.includes("easter") ? 700 : 400,
-              fontStyle: line.cls.includes("easter") ? "italic" : "normal",
-            }}>
-              {line.text}
-              {i === lines.length - 1 && running && (
-                <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
-              )}
-            </div>
-          ))}
-          {lines.length === 0 && !running && (
-            <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
-          )}
-        </div>
-
-        {/* Raw mode: source code typed character by character — always rendered, hidden via display */}
-        <div
-          ref={rawRef}
-          className="overflow-y-auto"
-          style={{ height: "480px", padding: "12px 0", fontFamily: "monospace", fontSize: "11px", lineHeight: 1.7, display: viewMode === "raw" ? "block" : "none" }}
-        >
-          {rawChars === 0 && !running ? (
-            <div style={{ padding: "16px", color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the source code.</div>
-          ) : (
-            rawDisplayLines.map((line, i) => {
-              const isLastLine = i === rawDisplayLines.length - 1;
-              const isComplete = !isLastLine || rawChars >= rawTotalChars;
-              return (
-                <div
-                  key={i}
-                  style={{ padding: "0 12px", display: "flex", gap: "10px" }}
-                >
-                  <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none", fontSize: "10px" }}>
-                    {i + 1}
-                  </span>
-                  {isComplete ? (
-                    <span style={{ whiteSpace: "pre", color: "#E8E8E8" }} dangerouslySetInnerHTML={{ __html: colorizeCode(line) || "&nbsp;" }} />
-                  ) : (
-                    <span style={{ color: "#E8E8E8", whiteSpace: "pre" }}>
-                      {line}
-                      {running && rawChars < rawTotalChars && (
-                        <span style={{ display: "inline-block", width: "6px", height: "13px", background: "#C084FC", marginLeft: "1px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
-                      )}
-                    </span>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-
-      {/* Speed controls */}
-      <div className="flex items-center justify-center gap-3 mt-4">
-        <span className="text-xs text-[var(--text-muted)]">Speed:</span>
-        {SPEEDS.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setSpeed(s)}
-            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              speed === s
-                ? "bg-[var(--primary)] text-white"
-                : "border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
-            }`}
-          >
-            {s}x
-          </button>
-        ))}
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #C084FC; cursor: pointer; }
+        input[type="range"]::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: #C084FC; border: none; cursor: pointer; }
+      ` }} />
     </div>
   );
 }
