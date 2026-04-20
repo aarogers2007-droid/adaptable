@@ -3,23 +3,28 @@
 import { createClient } from "@/lib/supabase/server";
 import { runGroupingAlgorithm } from "@/lib/invention-grouping";
 
+type AdminLevel = "platform_owner" | "instructor" | "co_admin";
+
 /**
  * Verify the current user is an admin for this invention class.
+ * Returns the permission level so actions can scope behavior.
  */
 async function verifyAdmin(classId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated", supabase, user: null };
+  if (!user) return { error: "Not authenticated", supabase, user: null, level: null as AdminLevel | null };
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, is_platform_owner")
     .eq("id", user.id)
     .single();
 
-  if (!profile) return { error: "Profile not found", supabase, user: null };
+  if (!profile) return { error: "Profile not found", supabase, user: null, level: null as AdminLevel | null };
 
-  // Check: instructor who owns the class, org_admin, or co-admin
+  // Platform owners have unrestricted access to all classes
+  const isPlatformOwner = (profile as any).is_platform_owner === true;
+
   const { data: cls } = await supabase
     .from("classes")
     .select("instructor_id, org_id, session_type, grouping_config")
@@ -27,7 +32,7 @@ async function verifyAdmin(classId: string) {
     .single();
 
   if (!cls || cls.session_type !== "invention") {
-    return { error: "Class not found or not invention mode", supabase, user: null };
+    return { error: "Class not found or not invention mode", supabase, user: null, level: null as AdminLevel | null };
   }
 
   const isInstructor = cls.instructor_id === user.id;
@@ -35,11 +40,15 @@ async function verifyAdmin(classId: string) {
   const coAdminIds = (cls.grouping_config as any)?.co_admin_ids ?? [];
   const isCoAdmin = coAdminIds.includes(user.id);
 
-  if (!isInstructor && !isOrgAdmin && !isCoAdmin) {
-    return { error: "Not authorized", supabase, user: null };
+  if (!isPlatformOwner && !isInstructor && !isOrgAdmin && !isCoAdmin) {
+    return { error: "Not authorized", supabase, user: null, level: null as AdminLevel | null };
   }
 
-  return { supabase, user, cls };
+  const level: AdminLevel = isPlatformOwner ? "platform_owner"
+    : (isInstructor || isOrgAdmin) ? "instructor"
+    : "co_admin";
+
+  return { supabase, user, cls, level };
 }
 
 /**
@@ -116,6 +125,7 @@ export async function loadInventionDashboard(classId: string) {
 
   return {
     classCode,
+    adminLevel: auth.level,
     totalEnrolled,
     completedCount: completed.length,
     inProgressCount: inProgress.length,
@@ -143,6 +153,11 @@ export async function loadInventionDashboard(classId: string) {
 export async function triggerGrouping(classId: string) {
   const auth = await verifyAdmin(classId);
   if (auth.error) return { error: auth.error };
+
+  // Co-admins cannot run or re-run the grouping algorithm
+  if (auth.level === "co_admin") {
+    return { error: "Co-admins cannot run the grouping algorithm. Contact the platform administrator." };
+  }
 
   const { supabase } = auth;
 

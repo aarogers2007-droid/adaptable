@@ -29,6 +29,53 @@ export default function LoginPage() {
       return;
     }
 
+    // Role-based routing after login
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, is_platform_owner")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.is_platform_owner) {
+        router.push("/admin");
+        return;
+      }
+
+      if (profile?.role === "org_admin") {
+        router.push("/instructor/dashboard");
+        return;
+      }
+
+      if (profile?.role === "instructor") {
+        // Check if this instructor is a co-admin on an invention class
+        const { data: enrolledClasses } = await supabase
+          .from("classes")
+          .select("id, session_type, grouping_config")
+          .or(`instructor_id.eq.${user.id}`);
+
+        // Also check co-admin access
+        const { data: allClasses } = await supabase
+          .from("classes")
+          .select("id, session_type, grouping_config")
+          .eq("session_type", "invention");
+
+        const coAdminClass = allClasses?.find((c) => {
+          const ids = (c.grouping_config as any)?.co_admin_ids ?? [];
+          return ids.includes(user.id);
+        });
+
+        if (coAdminClass) {
+          router.push(`/instructor/invention/${coAdminClass.id}`);
+          return;
+        }
+
+        router.push("/instructor/dashboard");
+        return;
+      }
+    }
+
     router.push("/dashboard");
   }
 
@@ -146,13 +193,16 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-            New here?{" "}
+            Student?{" "}
             <Link
               href="/join"
               className="font-medium text-[var(--primary)] hover:underline"
             >
               Join a class
             </Link>
+          </p>
+          <p className="mt-2 text-center text-xs text-[var(--text-muted)]">
+            Contact your program administrator if you need access.
           </p>
         </div>
       </div>

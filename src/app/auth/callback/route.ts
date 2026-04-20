@@ -28,9 +28,17 @@ export async function GET(request: Request) {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("business_idea, org_id")
+          .select("business_idea, org_id, role, is_platform_owner")
           .eq("id", user.id)
           .single();
+
+        // ── ADMIN ROUTING — admins don't need onboarding ──
+        if ((profile as any)?.is_platform_owner) {
+          return NextResponse.redirect(`${origin}/admin`);
+        }
+        if (profile?.role === "instructor" || profile?.role === "org_admin") {
+          return NextResponse.redirect(`${origin}/instructor/dashboard`);
+        }
 
         // ── PROGRESS-FIRST RULE ──
         // If they have a business_idea, they have already completed

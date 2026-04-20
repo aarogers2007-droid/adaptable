@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Profile, Lesson, StudentProgress } from "@/lib/types";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -11,30 +12,56 @@ export default async function AdminPage() {
 
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, is_platform_owner, full_name, business_idea")
     .eq("id", user.id)
     .single();
 
-  if (!profileData || profileData.role !== "org_admin") {
+  // Platform owner gets this dashboard. Regular org_admin gets redirected.
+  if (!(profileData as any)?.is_platform_owner) {
+    if (profileData?.role === "org_admin") {
+      redirect("/instructor/dashboard");
+    }
     redirect("/dashboard");
   }
 
-  const [lessonsRes, progressRes, profileRes] = await Promise.all([
-    supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
-    supabase.from("student_progress").select("*").eq("student_id", user.id),
-    supabase.from("profiles").select("business_idea, full_name, ikigai_result").eq("id", user.id).single(),
+  // ── Load platform-wide data ──
+  const [classesRes, profilesRes, inventionSessionsRes, progressRes, lessonsRes] = await Promise.all([
+    supabase.from("classes").select("id, name, session_type, instructor_id, org_id").order("created_at"),
+    supabase.from("profiles").select("id, full_name, email, role, is_platform_owner, org_id").in("role", ["instructor", "org_admin"]),
+    supabase.from("invention_sessions").select("id, completed_at"),
+    supabase.from("student_progress").select("id, status"),
+    supabase.from("lessons").select("id").order("module_sequence").order("lesson_sequence"),
   ]);
 
-  const lessons = (lessonsRes.data ?? []) as unknown as Lesson[];
-  const progress = (progressRes.data ?? []) as unknown as StudentProgress[];
-  const profile = profileRes.data as unknown as Profile | null;
+  const classes = classesRes.data ?? [];
+  const admins = profilesRes.data ?? [];
 
-  // Group by module
-  const modules = new Map<string, Lesson[]>();
-  for (const lesson of lessons) {
-    if (!modules.has(lesson.module_name)) modules.set(lesson.module_name, []);
-    modules.get(lesson.module_name)!.push(lesson);
+  // Enrollment counts per class
+  const enrollmentCounts: Record<string, number> = {};
+  for (const cls of classes) {
+    const { count } = await supabase
+      .from("class_enrollments")
+      .select("id", { count: "exact", head: true })
+      .eq("class_id", cls.id);
+    enrollmentCounts[cls.id] = count ?? 0;
   }
+
+  // Invite codes per class
+  const inviteCodes: Record<string, string> = {};
+  for (const cls of classes) {
+    const { data: code } = await supabase
+      .from("invite_codes")
+      .select("code")
+      .eq("class_id", cls.id)
+      .limit(1)
+      .single();
+    if (code) inviteCodes[cls.id] = code.code;
+  }
+
+  // Stats
+  const totalStudents = Object.values(enrollmentCounts).reduce((a, b) => a + b, 0);
+  const completedInventions = inventionSessionsRes.data?.filter((s) => s.completed_at).length ?? 0;
+  const completedLessons = progressRes.data?.filter((p) => p.status === "completed").length ?? 0;
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
@@ -44,16 +71,10 @@ export default async function AdminPage() {
             Adaptable
           </span>
           <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
-            Admin
+            Platform Admin
           </span>
-          <Link href="/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-            Student View
-          </Link>
           <Link href="/instructor/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             Instructor View
-          </Link>
-          <Link href="/admin/feedback" className="text-sm font-medium text-[var(--accent)] hover:text-[var(--text-primary)]">
-            💭 Tester Feedback
           </Link>
           <div className="ml-auto">
             <form action="/auth/signout" method="POST">
@@ -64,96 +85,130 @@ export default async function AdminPage() {
       </nav>
 
       <div className="mx-auto max-w-[1200px] px-6 py-8">
-        <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold">Admin Playground</h1>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          View any lesson, reset progress, test the experience.
-        </p>
+        <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+          Platform Dashboard
+        </h1>
 
-        {/* Quick actions */}
-        <AdminActions hasBusinessIdea={!!profile?.business_idea} />
-
-        {/* Current state */}
+        {/* Stats */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
-            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Business Idea</p>
-            <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
-              {profile?.business_idea?.name ?? "Not set"}
-            </p>
-            {profile?.business_idea && (
-              <p className="text-xs text-[var(--text-muted)]">{profile.business_idea.niche}</p>
-            )}
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Total Students</p>
+            <p className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">{totalStudents}</p>
           </div>
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
-            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Lessons Completed</p>
-            <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
-              {progress.filter((p) => p.status === "completed").length} / {lessons.length}
-            </p>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Completed Inventions</p>
+            <p className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">{completedInventions}</p>
           </div>
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
-            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Profile Name</p>
-            <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
-              {profile?.full_name ?? "Not set"}
-            </p>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Completed Curriculum Lessons</p>
+            <p className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">{completedLessons}</p>
           </div>
         </div>
 
-        {/* All lessons (no gating) */}
-        <div className="mt-8 space-y-6">
-          {[...modules.entries()].map(([moduleName, moduleLessons]) => (
-            <div key={moduleName}>
-              <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-                {moduleName}
-              </h2>
-              <div className="mt-3 space-y-2">
-                {moduleLessons.map((lesson) => {
-                  const lp = progress.find((p) => p.lesson_id === lesson.id);
-                  const status = lp?.status ?? "not_started";
-                  const hasConversation = !!(lp?.artifacts as Record<string, unknown>)?.conversation;
+        {/* Classes */}
+        <div className="mt-8">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
+            All Classes
+          </h2>
+          <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[var(--border)]">
+                  {["Class", "Code", "Type", "Students", ""].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)]">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {classes.map((cls) => (
+                  <tr key={cls.id} className="border-b border-[var(--border)]">
+                    <td className="px-4 py-3 text-sm font-medium text-[var(--text-primary)]">{cls.name}</td>
+                    <td className="px-4 py-3">
+                      <span className="rounded bg-[var(--bg-muted)] px-2 py-0.5 font-mono text-xs text-[var(--text-primary)]">
+                        {inviteCodes[cls.id] ?? "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        cls.session_type === "invention"
+                          ? "bg-purple-100 text-purple-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}>
+                        {cls.session_type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-[var(--text-primary)]">{enrollmentCounts[cls.id] ?? 0}</td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={cls.session_type === "invention"
+                          ? `/instructor/invention/${cls.id}`
+                          : "/instructor/dashboard"}
+                        className="text-xs font-medium text-[var(--primary)] hover:underline"
+                      >
+                        Dashboard
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Admin accounts */}
+        <div className="mt-8">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
+            Instructors &amp; Admins
+          </h2>
+          <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-[var(--border)]">
+                  {["Name", "Email", "Role", "Scope"].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-medium text-[var(--text-muted)]">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map((admin) => {
+                  // Find which classes this admin has access to
+                  const ownedClasses = classes.filter((c) => c.instructor_id === admin.id);
+                  const coAdminClasses = classes.filter((c) => {
+                    const ids = ((c as any).grouping_config as any)?.co_admin_ids ?? [];
+                    return ids.includes(admin.id);
+                  });
+                  const scopeStr = (admin as any).is_platform_owner
+                    ? "All classes"
+                    : [...ownedClasses.map((c) => c.name), ...coAdminClasses.map((c) => `${c.name} (co-admin)`)].join(", ") || "No classes";
 
                   return (
-                    <div
-                      key={lesson.id}
-                      className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3"
-                    >
-                      <span className="text-sm">
-                        {status === "completed" ? "✓" : status === "in_progress" ? "◐" : "○"}
-                      </span>
-                      <div className="flex-1">
-                        <Link
-                          href={`/lessons/${lesson.id}`}
-                          className="text-sm font-medium text-[var(--text-primary)] hover:text-[var(--primary)]"
-                        >
-                          {lesson.title}
-                        </Link>
-                        <div className="flex gap-2 mt-0.5">
-                          <span className={`text-xs px-1.5 py-0.5 rounded ${
-                            status === "completed"
-                              ? "bg-emerald-50 text-emerald-600"
-                              : status === "in_progress"
-                              ? "bg-blue-50 text-blue-600"
-                              : "bg-gray-50 text-gray-400"
-                          }`}>
-                            {status.replace("_", " ")}
-                          </span>
-                          {hasConversation && (
-                            <span className="text-xs px-1.5 py-0.5 rounded bg-purple-50 text-purple-600">
-                              has conversation
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <Link
-                        href={`/lessons/${lesson.id}`}
-                        className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium hover:bg-[var(--bg-muted)] transition-colors"
-                      >
-                        Open
-                      </Link>
-                    </div>
+                    <tr key={admin.id} className="border-b border-[var(--border)]">
+                      <td className="px-4 py-3 text-sm font-medium text-[var(--text-primary)]">{admin.full_name ?? "—"}</td>
+                      <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{admin.email}</td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          (admin as any).is_platform_owner
+                            ? "bg-amber-100 text-amber-700"
+                            : admin.role === "org_admin"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}>
+                          {(admin as any).is_platform_owner ? "Platform Owner" : admin.role === "org_admin" ? "Org Admin" : "Instructor"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{scopeStr}</td>
+                    </tr>
                   );
                 })}
-              </div>
-            </div>
-          ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Dev tools — keep existing AdminActions for testing */}
+        <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-3">Dev Tools</p>
+          <AdminActions hasBusinessIdea={!!profileData?.business_idea} />
         </div>
       </div>
     </main>

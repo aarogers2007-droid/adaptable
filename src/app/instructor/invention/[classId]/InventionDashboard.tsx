@@ -5,6 +5,7 @@ import { triggerGrouping, revealGroups, moveStudent, loadInventionDashboard } fr
 
 interface DashboardData {
   classCode: string;
+  adminLevel: "platform_owner" | "instructor" | "co_admin" | null;
   totalEnrolled: number;
   completedCount: number;
   inProgressCount: number;
@@ -227,20 +228,30 @@ export default function InventionDashboard({
               </div>
             )}
 
-            {/* Grouping trigger */}
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 text-center">
-              <p className="text-sm text-[var(--text-secondary)] mb-4">
-                Grouping threshold: {data.groupingThreshold}% — currently at {completionPct}%
-              </p>
-              <button
-                type="button"
-                onClick={handleRunGrouping}
-                disabled={!thresholdMet || groupingInProgress}
-                className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-              >
-                {groupingInProgress ? "Running algorithm..." : thresholdMet ? "Run Grouping Algorithm" : `Waiting for ${data.groupingThreshold}% completion`}
-              </button>
-            </div>
+            {/* Grouping trigger — hidden for co-admins */}
+            {data.adminLevel === "co_admin" ? (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 text-center">
+                <p className="text-sm text-[var(--text-secondary)]">
+                  {data.groups.length > 0
+                    ? "Groups have been generated."
+                    : "Grouping is managed by the platform administrator."}
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 text-center">
+                <p className="text-sm text-[var(--text-secondary)] mb-4">
+                  Grouping threshold: {data.groupingThreshold}% — currently at {completionPct}%
+                </p>
+                <button
+                  type="button"
+                  onClick={handleRunGrouping}
+                  disabled={!thresholdMet || groupingInProgress}
+                  className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                >
+                  {groupingInProgress ? "Running algorithm..." : thresholdMet ? "Run Grouping Algorithm" : `Waiting for ${data.groupingThreshold}% completion`}
+                </button>
+              </div>
+            )}
           </div>
         )}
 

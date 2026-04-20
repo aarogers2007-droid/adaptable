@@ -1,0 +1,52 @@
+-- Admin account setup for Invention Mode.
+--
+-- This migration:
+--   1. Adds is_platform_owner flag to profiles
+--   2. Documents the manual steps needed in Supabase dashboard
+--
+-- MANUAL STEPS AFTER RUNNING THIS MIGRATION:
+--
+--   Step 1: Create two auth users in the Supabase Dashboard (Authentication > Users > Add User):
+--     a) AJ Rogers — email: aarogers2007@gmail.com, set a password
+--     b) Cristal Glangchai — email: cristal@venturelabignite.org, set a password
+--
+--   Step 2: Copy both user UUIDs from the Supabase dashboard. Then run these SQL commands
+--           in the Supabase SQL Editor, replacing the placeholder UUIDs:
+--
+--     -- AJ Rogers: platform owner, full access
+--     UPDATE profiles
+--       SET role = 'org_admin',
+--           is_platform_owner = true,
+--           org_id = 'a0000000-0000-0000-0000-00000000ab01',
+--           full_name = 'AJ Rogers'
+--       WHERE email = 'aarogers2007@gmail.com';
+--
+--     -- Cristal Glangchai: instructor scoped to VENTURE class
+--     UPDATE profiles
+--       SET role = 'instructor',
+--           org_id = 'a0000000-0000-0000-0000-00000000ab01',
+--           full_name = 'Cristal Glangchai'
+--       WHERE email = 'cristal@venturelabignite.org';
+--
+--     -- Update the VENTURE class instructor_id to AJ's UUID
+--     UPDATE classes
+--       SET instructor_id = (SELECT id FROM profiles WHERE email = 'aarogers2007@gmail.com')
+--       WHERE id = 'c0000000-0000-0000-0000-000000000c01';
+--
+--     -- Add Cristal as co-admin on the VENTURE class
+--     UPDATE classes
+--       SET grouping_config = jsonb_set(
+--           grouping_config,
+--           '{co_admin_ids}',
+--           jsonb_build_array(
+--             (SELECT id::text FROM profiles WHERE email = 'cristal@venturelabignite.org')
+--           )
+--         )
+--       WHERE id = 'c0000000-0000-0000-0000-000000000c01';
+--
+
+------------------------------------------------------------
+-- 1. Add is_platform_owner to profiles
+------------------------------------------------------------
+ALTER TABLE profiles
+  ADD COLUMN IF NOT EXISTS is_platform_owner boolean NOT NULL DEFAULT false;
