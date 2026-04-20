@@ -250,7 +250,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
           <p className="text-sm font-medium" style={{ color: "rgba(0,0,0,0.5)" }}>
             Circle {activeCircle.num} of 5
           </p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold" style={{ color: "#111827" }}>
+          <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold" style={{ color: "#111827" }}>
             {activeCircle.question}
           </h2>
           {(step === 3 || step === 5) && (
@@ -260,7 +260,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
 
         {/* Content */}
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
-          <div className="w-full max-w-[560px]">
+          <div className="w-full max-w-[680px]">
 
             {/* Circle 1: Category cards */}
             {step === 1 && (
@@ -270,7 +270,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     key={card.id}
                     type="button"
                     onClick={() => setCircle1(card.id)}
-                    className={`chip-enter rounded-xl p-4 text-left transition-all duration-150 ${
+                    className={`chip-enter rounded-2xl p-6 text-left transition-all duration-150 ${
                       circle1 === card.id
                         ? "bg-[#111827] text-white shadow-lg scale-105"
                         : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
@@ -292,7 +292,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     key={card.id}
                     type="button"
                     onClick={() => setCircle2(card.id)}
-                    className={`chip-enter w-full rounded-xl p-5 text-left transition-all duration-150 ${
+                    className={`chip-enter w-full rounded-2xl p-6 text-left transition-all duration-150 ${
                       circle2 === card.id
                         ? "bg-[#111827] text-white shadow-lg scale-[1.02]"
                         : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
@@ -320,7 +320,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                           if (selected) setCircle3Chips(circle3Chips.filter(c => c !== chip));
                           else if (circle3Chips.length < 2) setCircle3Chips([...circle3Chips, chip]);
                         }}
-                        className={`chip-enter rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
+                        className={`chip-enter rounded-full px-6 py-3 text-base font-medium transition-all duration-150 ${
                           selected
                             ? "bg-[#111827] text-white shadow-lg scale-105"
                             : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
@@ -357,7 +357,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     key={card.id}
                     type="button"
                     onClick={() => setCircle4(card.id)}
-                    className={`chip-enter w-full rounded-xl p-5 text-left transition-all duration-150 ${
+                    className={`chip-enter w-full rounded-2xl p-6 text-left transition-all duration-150 ${
                       circle4 === card.id
                         ? "bg-[#111827] text-white shadow-lg scale-[1.02]"
                         : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
@@ -384,7 +384,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                         if (selected) setCircle5(circle5.filter(c => c !== chip));
                         else if (circle5.length < 2) setCircle5([...circle5, chip]);
                       }}
-                      className={`chip-enter rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
+                      className={`chip-enter rounded-full px-6 py-3 text-base font-medium transition-all duration-150 ${
                         selected
                           ? "bg-[#111827] text-white shadow-lg scale-105"
                           : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
@@ -453,7 +453,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
   // ── Pentagon diagram view (step 0) ──
   return (
     <main className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-[500px]">
+      <div className="w-full max-w-[600px]">
         <InventionIkigai
           currentCircle={0}
           completedCircles={getCompleted()}

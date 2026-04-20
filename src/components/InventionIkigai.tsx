@@ -48,7 +48,7 @@ export default function InventionIkigai({
   return (
     <div
       className="relative mx-auto w-full"
-      style={{ maxWidth: "420px", aspectRatio: "1 / 0.95" }}
+      style={{ maxWidth: "520px", aspectRatio: "1 / 0.95" }}
     >
       <svg
         viewBox="0 0 100 95"
