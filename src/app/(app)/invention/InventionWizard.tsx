@@ -229,7 +229,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
         <div className="px-6 pt-6">
           <button
             onClick={() => setStep(0)}
-            className="rounded-lg bg-white/30 px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-white/50 transition-colors"
+            className="rounded-lg bg-white/30 px-4 py-2 text-sm font-medium hover:bg-white/50 transition-colors"
+            style={{ color: "#111827" }}
           >
             &larr; Back
           </button>
@@ -237,14 +238,14 @@ export default function InventionWizard({ studentName, existingSession }: Props)
 
         {/* Title */}
         <div className="px-6 pt-8 pb-2 text-center">
-          <p className="text-sm font-medium text-[var(--text-primary)]/60">
+          <p className="text-sm font-medium" style={{ color: "rgba(0,0,0,0.5)" }}>
             Circle {activeCircle.num} of 5
           </p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
+          <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-bold" style={{ color: "#111827" }}>
             {activeCircle.question}
           </h2>
           {(step === 3 || step === 5) && (
-            <p className="mt-2 text-sm text-[var(--text-primary)]/50">Pick up to two.</p>
+            <p className="mt-2 text-sm" style={{ color: "rgba(0,0,0,0.45)" }}>Pick up to two.</p>
           )}
         </div>
 
@@ -262,8 +263,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     onClick={() => setCircle1(card.id)}
                     className={`chip-enter rounded-xl p-4 text-left transition-all duration-150 ${
                       circle1 === card.id
-                        ? "bg-[var(--text-primary)] text-white shadow-lg scale-105"
-                        : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
+                        ? "bg-[#111827] text-white shadow-lg scale-105"
+                        : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
                     }`}
                     style={{ animationDelay: `${idx * 60}ms` }}
                   >
@@ -284,8 +285,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     onClick={() => setCircle2(card.id)}
                     className={`chip-enter w-full rounded-xl p-5 text-left transition-all duration-150 ${
                       circle2 === card.id
-                        ? "bg-[var(--text-primary)] text-white shadow-lg scale-[1.02]"
-                        : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
+                        ? "bg-[#111827] text-white shadow-lg scale-[1.02]"
+                        : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
                     }`}
                     style={{ animationDelay: `${idx * 60}ms` }}
                   >
@@ -312,8 +313,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                         }}
                         className={`chip-enter rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
                           selected
-                            ? "bg-[var(--text-primary)] text-white shadow-lg scale-105"
-                            : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
+                            ? "bg-[#111827] text-white shadow-lg scale-105"
+                            : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
                         }`}
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
@@ -324,7 +325,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                   })}
                 </div>
                 <div className="mt-8 mx-auto max-w-[400px]">
-                  <p className="text-sm text-[var(--text-primary)]/60 mb-2 text-center">
+                  <p className="text-sm mb-2 text-center" style={{ color: "rgba(0,0,0,0.5)" }}>
                     Tell us more (optional)
                   </p>
                   <input
@@ -349,8 +350,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     onClick={() => setCircle4(card.id)}
                     className={`chip-enter w-full rounded-xl p-5 text-left transition-all duration-150 ${
                       circle4 === card.id
-                        ? "bg-[var(--text-primary)] text-white shadow-lg scale-[1.02]"
-                        : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
+                        ? "bg-[#111827] text-white shadow-lg scale-[1.02]"
+                        : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
                     }`}
                     style={{ animationDelay: `${idx * 60}ms` }}
                   >
@@ -376,8 +377,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                       }}
                       className={`chip-enter rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
                         selected
-                          ? "bg-[var(--text-primary)] text-white shadow-lg scale-105"
-                          : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
+                          ? "bg-[#111827] text-white shadow-lg scale-105"
+                          : "bg-white/70 text-[#111827] hover:bg-white hover:shadow-md"
                       }`}
                       style={{ animationDelay: `${idx * 60}ms` }}
                     >
@@ -402,7 +403,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
             <button
               onClick={handleComplete}
               disabled={!canDone() || saving}
-              className="rounded-xl bg-[var(--text-primary)] px-10 py-3.5 text-base font-semibold text-white hover:opacity-90 disabled:opacity-30 transition-all shadow-lg"
+              className="rounded-xl px-10 py-3.5 text-base font-semibold text-white hover:opacity-90 disabled:opacity-30 transition-all shadow-lg"
+              style={{ background: "#111827" }}
             >
               {saving ? "Saving..." : "Complete Ikigai"}
             </button>
@@ -410,7 +412,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
             <button
               onClick={handleDone}
               disabled={!canDone() || saving}
-              className="rounded-xl bg-[var(--text-primary)] px-10 py-3.5 text-base font-semibold text-white hover:opacity-90 disabled:opacity-30 transition-all shadow-lg"
+              className="rounded-xl px-10 py-3.5 text-base font-semibold text-white hover:opacity-90 disabled:opacity-30 transition-all shadow-lg"
+              style={{ background: "#111827" }}
             >
               {saving ? "Saving..." : "Done"}
             </button>
