@@ -677,6 +677,7 @@ function AlgorithmStream({
     setDone(false);
     setLines([]);
     setRawChars(0);
+    rawUserScrolled.current = false;
 
     const script = buildScript();
 
@@ -708,9 +709,9 @@ function AlgorithmStream({
         await new Promise(r => setTimeout(r, delay));
       }
 
-      // Auto-scroll only if user hasn't scrolled up
-      if (isNearBottom(outputRef.current)) {
-        outputRef.current!.scrollTop = outputRef.current!.scrollHeight;
+      // Auto-scroll only if user hasn't scrolled away
+      if (outputRef.current && isNearBottom(outputRef.current)) {
+        outputRef.current.scrollTop = outputRef.current.scrollHeight;
       }
     }
 
@@ -759,10 +760,19 @@ function AlgorithmStream({
   const rawDisplayText = rawFullText.slice(0, rawChars);
   const rawDisplayLines = rawDisplayText.split("\n");
 
-  // Auto-scroll raw only if near bottom
+  // Auto-scroll raw only if user hasn't scrolled up
+  const rawUserScrolled = useRef(false);
   useEffect(() => {
-    if (viewMode === "raw" && running && isNearBottom(rawRef.current)) {
-      rawRef.current!.scrollTop = rawRef.current!.scrollHeight;
+    const el = rawRef.current;
+    if (!el) return;
+    const handler = () => { rawUserScrolled.current = !isNearBottom(el); };
+    el.addEventListener("scroll", handler);
+    return () => el.removeEventListener("scroll", handler);
+  }, []);
+
+  useEffect(() => {
+    if (viewMode === "raw" && running && !rawUserScrolled.current && rawRef.current) {
+      rawRef.current.scrollTop = rawRef.current.scrollHeight;
     }
   }, [rawChars, viewMode, running]);
 
@@ -867,9 +877,9 @@ function AlgorithmStream({
                     {i + 1}
                   </span>
                   {isComplete ? (
-                    <span style={{ whiteSpace: "pre" }} dangerouslySetInnerHTML={{ __html: colorizeCode(line) || "&nbsp;" }} />
+                    <span style={{ whiteSpace: "pre", color: "#E8E8E8" }} dangerouslySetInnerHTML={{ __html: colorizeCode(line) || "&nbsp;" }} />
                   ) : (
-                    <span style={{ color: "#D1D5DB", whiteSpace: "pre" }}>
+                    <span style={{ color: "#E8E8E8", whiteSpace: "pre" }}>
                       {line}
                       {running && rawChars < rawTotalChars && (
                         <span style={{ display: "inline-block", width: "6px", height: "13px", background: "#C084FC", marginLeft: "1px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
@@ -995,22 +1005,35 @@ const RAW_SOURCE_LINES: Array<{ code: string; step: number }> = [
 // Syntax colorizer for raw view — cinematic, not a real parser
 function colorizeCode(line: string): string {
   if (!line) return "";
-  let s = line
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  // Comments (must run first)
-  s = s.replace(/(\/\/.*$)/gm, '<span style="color:#6B7280;font-style:italic">$1</span>');
-  s = s.replace(/(\/\*.*?\*\/)/g, '<span style="color:#6B7280;font-style:italic">$1</span>');
-  // [REDACTED] markers
-  s = s.replace(/(\[REDACTED\])/g, '<span style="color:#F87171">$1</span>');
-  // Strings
-  s = s.replace(/("(?:[^"\\]|\\.)*")/g, '<span style="color:#A78BFA">$1</span>');
-  // Keywords
-  s = s.replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|continue)\b/g, '<span style="color:#C084FC">$1</span>');
-  // Types / builtins
-  s = s.replace(/\b(Map|Set|Object|null|true|false|undefined)\b/g, '<span style="color:#60A5FA">$1</span>');
-  // Numbers
-  s = s.replace(/\b(\d+)\b/g, '<span style="color:#FBBF24">$1</span>');
-  // Function-like calls
-  s = s.replace(/\b(findIndex|flatMap|some|includes|every|splice|push|shift|get|set|from|select|eq|not|delete|insert|update|values|reverse|find|filter|reduce|join|map)\b/g, '<span style="color:#2DD4BF">$1</span>');
+  // Escape HTML first
+  let s = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  // If it's a comment line, color the whole thing and return early
+  if (s.trimStart().startsWith("//")) {
+    return `<span style="color:#8B8B8B;font-style:italic">${s}</span>`;
+  }
+
+  // [REDACTED] markers — bright red
+  s = s.replace(/(\[REDACTED\])/g, '<span style="color:#F87171;font-weight:600">$1</span>');
+
+  // Strings — purple (before keywords so keywords inside strings don't get colored)
+  s = s.replace(/(&quot;(?:[^&]|&[^q]|&q[^u])*?&quot;|"(?:[^"\\]|\\.)*")/g, '<span style="color:#C4B5FD">$1</span>');
+
+  // Keywords — bright purple
+  s = s.replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|continue)\b/g, '<span style="color:#D8B4FE">$1</span>');
+
+  // Types / builtins — blue
+  s = s.replace(/\b(Map|Set|Object|null|true|false|undefined)\b/g, '<span style="color:#93C5FD">$1</span>');
+
+  // Numbers — amber
+  s = s.replace(/\b(\d+)\b/g, '<span style="color:#FCD34D">$1</span>');
+
+  // Method calls — teal (only color the method name, not parens)
+  s = s.replace(/\.(findIndex|flatMap|some|includes|every|splice|push|shift|get|set|from|select|eq|not|delete|insert|update|values|reverse|find|filter|has|length)\b/g,
+    '.<span style="color:#5EEAD4">$1</span>');
+
+  // Standalone function calls
+  s = s.replace(/\b(createClient)\b/g, '<span style="color:#5EEAD4">$1</span>');
+
   return s;
 }
