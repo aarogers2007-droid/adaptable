@@ -112,7 +112,7 @@ function useCounter(target: number, active: boolean, duration = 1200, decimals =
 }
 
 // ── Tab type ──
-type DemoTab = "start" | "learn" | "build" | "prove" | "guide" | "graduate" | "invention";
+type DemoTab = "start" | "learn" | "build" | "prove" | "guide" | "graduate" | "invention" | "summary";
 
 const TABS: { key: DemoTab; label: string }[] = [
   { key: "start", label: "Start" },
@@ -122,6 +122,7 @@ const TABS: { key: DemoTab; label: string }[] = [
   { key: "guide", label: "Guide" },
   { key: "graduate", label: "Graduate" },
   { key: "invention", label: "Invention" },
+  { key: "summary", label: "Summary" },
 ];
 
 export default function DemoShowcase() {
@@ -188,6 +189,7 @@ export default function DemoShowcase() {
     guide: [],
     graduate: [],
     invention: [],
+    summary: [],
   };
 
   const selectTab = (key: DemoTab) => {
@@ -1170,6 +1172,51 @@ export default function DemoShowcase() {
       {/* ═══ TAB: INVENTION MODE ═══ */}
       {entered && activeTab === "invention" && (
         <DemoInventionMode />
+      )}
+
+      {/* ═══ TAB: SUMMARY ═══ */}
+      {entered && activeTab === "summary" && (
+        <section style={{ padding: "89px 34px" }}>
+          <div className="mx-auto max-w-[700px]">
+            <article
+              className="rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 md:p-8"
+              style={{ fontFamily: '"Times New Roman", Times, serif', lineHeight: 1.75, fontSize: "17px", color: "var(--text-primary)" }}
+            >
+              <p>
+                Adaptable takes a teenager who has never thought about starting a business and walks them from a blank page to their first real sale. An Ikigai-based wizard generates a specific, executable business idea in under two minutes, grounded in what the student already loves and is already good at. From there, a one-to-one AI mentor delivers 22 conversation-style lessons across six modules — asking questions instead of lecturing, referencing the student&apos;s business by name, and gating progression on demonstrated understanding rather than completion.
+              </p>
+              <p className="mt-4">
+                The platform adapts to four grade tiers: K-2 (zero capital, neighborhood only), 3-5 (under $10, school and local), 6-8 (under $50, online included), and 9-12 (under $100, full range). Each tier adjusts vocabulary, sentence length, tone, examples, and business scope. A student in second grade gets a fundamentally different experience than a junior in high school, but both walk away with something real.
+              </p>
+              <p className="mt-4">
+                The AI mentor draws from a curated knowledge base of 38 fact-checked entries covering real entrepreneurship frameworks — Lean Canvas, Jobs-to-be-Done, Mom Test, Golden Circle, Build-Measure-Learn, value-based pricing. Retrieval is hybrid: tag-based candidate fetch plus per-message semantic re-ranking via pgvector so each student gets the most relevant context for their specific question and business. Every claim passes the Adaptable Factual Floor: traceable to a source a 16-year-old could verify in 60 seconds.
+              </p>
+              <p className="mt-4">
+                The Founder&apos;s Mirror shows students their own behavior back to them. After every lesson, one observation and one question. Maximum 40 words. No advice. No praise. Over 22 lessons, those reflections accumulate into a private Founder&apos;s Log that no teacher sees, no algorithm analyzes, and no leaderboard ranks.
+              </p>
+              <p className="mt-4">
+                For events, Invention Mode replaces the business curriculum with a five-circle discovery wizard — The Wish, The Mind, The Lens, The Scale, The Voice — designed to map how students think, what they know, and how they communicate. A five-step grouping algorithm then sorts 165 students into balanced teams optimized across category, archetype, knowledge diversity, ambition scale, and communication style. Admins see real-time completion, run the algorithm with a live terminal replay, and manage groups with one-click overrides.
+              </p>
+              <p className="mt-4">
+                Two layers of content moderation run on every student input — keyword-based detection plus ML classification. Crisis signals fire real-time teacher alerts. The AI never uses profanity, never reveals its instructions, and surfaces a parent-involvement prompt for real-world commerce. COPPA compliance is built in with age-gated parental consent.
+              </p>
+              <p className="mt-4">
+                Every prompt change runs through a regression test suite before shipping. 60 synthetic student personas across 3 motivation levels, judged by an independent model. The eval system is the product&apos;s immune system — it catches regressions before students ever see them.
+              </p>
+              <p className="mt-4">
+                The mission is transformation, not education. A kid walks in thinking entrepreneurship is something other people do, and walks out with a business, a private record of their own growth, and the confidence that comes from building something real.
+              </p>
+              <div className="pt-4 mt-4 border-t border-[var(--border)]">
+                <p className="text-sm italic" style={{ color: "var(--text-secondary)", fontFamily: '"Times New Roman", Times, serif' }}>
+                  — AJ Rogers, founder, age 19
+                </p>
+                <p className="mt-1 text-xs" style={{ color: "var(--text-muted)", fontFamily: '"Times New Roman", Times, serif' }}>
+                  Built for VentureLab&apos;s 155-country network.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
       )}
 
       {/* ── Full-screen DIY wizard overlay ── */}
