@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ForceLightMode from "@/components/ui/ForceLightMode";
 
 export const metadata: Metadata = {
   title: "Adaptable for Schools — AI-Native Entrepreneurship Education",
@@ -311,6 +312,7 @@ function IkigaiDiagram() {
 export default function ForSchoolsPage() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
+      <ForceLightMode />
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-4">

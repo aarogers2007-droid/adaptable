@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import InventionIkigai from "@/components/InventionIkigai";
 
 interface Props {
@@ -11,6 +12,12 @@ interface Props {
 
 export default function VentureLanding({ isAuthenticated, isEnrolled }: Props) {
   const router = useRouter();
+
+  // Public page — always light mode
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+    return () => { if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark"); };
+  }, []);
 
   function handleBegin() {
     if (isEnrolled) {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import DemoShowcase from "./DemoShowcase";
+import ForceLightMode from "@/components/ui/ForceLightMode";
 
 export const metadata: Metadata = {
   title: "Adaptable — Experience the Platform",
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function DemoPage() {
-  return <DemoShowcase />;
+  return (
+    <>
+      <ForceLightMode />
+      <DemoShowcase />
+    </>
+  );
 }
