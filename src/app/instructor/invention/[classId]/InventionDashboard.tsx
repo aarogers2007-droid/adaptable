@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import RawView from "./RawView";
 import { triggerGrouping, revealGroups, moveStudent, loadInventionDashboard } from "./actions";
 
 interface DashboardData {
@@ -55,6 +56,8 @@ export default function InventionDashboard({
   const [moveTarget, setMoveTarget] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"overview" | "groups" | "algorithm">("overview");
+  const [rawViewOpen, setRawViewOpen] = useState(false);
+  const [algorithmLog, setAlgorithmLog] = useState<any>(null);
 
   const completionPct = data.totalEnrolled > 0
     ? Math.round((data.completedCount / data.totalEnrolled) * 100)
@@ -69,6 +72,8 @@ export default function InventionDashboard({
     if (result.error) {
       setError(result.error);
     } else {
+      // Store the algorithm log for Raw View replay
+      if (result.log) setAlgorithmLog(result.log);
       // Reload data
       const fresh = await loadInventionDashboard(classId);
       if (!fresh.error) setData(fresh as DashboardData);
@@ -315,6 +320,28 @@ export default function InventionDashboard({
                 >
                   Print Student Slips
                 </a>
+              </div>
+            )}
+
+            {/* Raw View toggle */}
+            {data.groups.length > 0 && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setRawViewOpen(!rawViewOpen)}
+                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                    rawViewOpen
+                      ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
+                      : "border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+                  }`}
+                >
+                  {rawViewOpen ? "Hide Raw View" : "Raw View"}
+                </button>
+                {rawViewOpen && (
+                  <div className="mt-4">
+                    <RawView algorithmLog={algorithmLog} />
+                  </div>
+                )}
               </div>
             )}
 
