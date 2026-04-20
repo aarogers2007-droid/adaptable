@@ -964,18 +964,13 @@ export default function DemoShowcase() {
       {entered && activeTab === "guide" && (
       <section style={{ padding: "89px 34px" }}>
         <div className="mx-auto max-w-[1000px]">
-          <p
-            className="font-[family-name:var(--font-display)]"
-            style={{ fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", color: "#0D9488" }}
-          >
-            For educators and parents
-          </p>
           <h2
-            className="mt-3 font-[family-name:var(--font-display)] font-semibold"
+            className="font-[family-name:var(--font-display)] font-semibold text-center"
             style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
           >
             Teachers see everything. Parents see enough.
           </h2>
+          <div className="mx-auto mt-5 w-16 h-px" style={{ background: "#E5E7EB" }} />
 
           {/* Teacher Dashboard */}
           <div className="text-center" style={{ marginTop: "55px" }}>
