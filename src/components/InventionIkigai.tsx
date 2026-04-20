@@ -44,9 +44,9 @@ export default function InventionIkigai({
           const isCompleted = completedCircles.includes(circle.num);
           const isClickable = !!onCircleClick && !isActive;
 
-          const fillOpacity = isActive ? 0.35 : isCompleted ? 0.2 : 0.12;
+          const fillOpacity = isActive ? 0.4 : isCompleted ? 0.3 : 0.2;
           const strokeWidth = isActive ? 4 : 2.5;
-          const strokeOpacity = isActive ? 1 : isCompleted ? 0.8 : 0.4;
+          const strokeOpacity = 1;
 
           return (
             <g
@@ -83,11 +83,11 @@ export default function InventionIkigai({
                 y={pos.cy - 8}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill={isCompleted || isActive ? "#F9FAFB" : "#9CA3AF"}
+                fill="#111827"
                 fontSize="22"
                 fontWeight="700"
                 fontFamily="var(--font-display, system-ui)"
-                style={{ transition: "fill 0.3s", pointerEvents: "none" }}
+                style={{ pointerEvents: "none" }}
               >
                 {circle.num}
               </text>
@@ -98,11 +98,11 @@ export default function InventionIkigai({
                 y={pos.cy + 14}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill={isCompleted || isActive ? "#E5E7EB" : "#6B7280"}
+                fill="#111827"
                 fontSize="13"
-                fontWeight="400"
+                fontWeight="500"
                 fontFamily="var(--font-display, system-ui)"
-                style={{ transition: "fill 0.3s", pointerEvents: "none" }}
+                style={{ pointerEvents: "none" }}
               >
                 {circle.name}
               </text>
