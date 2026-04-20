@@ -28,23 +28,38 @@ export default function SignupPage() {
   const supabase = createClient();
 
   const age = computeAge(dob);
-  const isUnder13 = age !== null && age < 13;
   const isUnder18 = age !== null && age < 18;
-  const tooYoung = age !== null && age < 12; // hard floor
+
+  // Invention mode uses a different COPPA threshold (under 11) and age floor (11)
+  // Curriculum mode keeps the existing thresholds (under 13, floor 12)
+  function isInventionMode(): boolean {
+    try {
+      const pending = sessionStorage.getItem("pendingClassJoin");
+      if (!pending) return false;
+      return JSON.parse(pending).sessionType === "invention";
+    } catch { return false; }
+  }
+
+  const inventionMode = isInventionMode();
+  const consentAge = inventionMode ? 11 : 13;
+  const ageFloor = inventionMode ? 11 : 12;
+  const needsConsent = age !== null && age < consentAge;
+  const tooYoung = age !== null && age < ageFloor;
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
-    // Hard age floor: 12+
     if (tooYoung) {
-      setError("Adaptable is for students age 12 and older. If you're younger, please come back when you're 12.");
+      setError(inventionMode
+        ? "This event is for students age 11 and older."
+        : "Adaptable is for students age 12 and older. If you're younger, please come back when you're 12.");
       return;
     }
 
-    // Under-13s require a parent email for COPPA-verifiable consent
-    if (isUnder13 && !parentEmail) {
-      setError("Because you're under 13, we need a parent or guardian's email to send a consent request.");
+    // Parental consent required for students under the threshold
+    if (needsConsent && !parentEmail) {
+      setError(`Because you're under ${consentAge}, we need a parent or guardian's email to send a consent request.`);
       return;
     }
 
@@ -66,7 +81,7 @@ export default function SignupPage() {
 
     // Save DOB + initial consent state on the profile
     if (authData.user) {
-      const consentStatus = isUnder13 ? "pending_parental" : "not_required";
+      const consentStatus = needsConsent ? "pending_parental" : "not_required";
       await supabase
         .from("profiles")
         .update({
@@ -77,7 +92,7 @@ export default function SignupPage() {
 
       // For under-13s, kick off the parental consent email flow.
       // (Server-side; the action checks rate limits and handles the email send.)
-      if (isUnder13 && parentEmail) {
+      if (needsConsent && parentEmail) {
         try {
           const { startParentalConsent } = await import("@/lib/parental-consent");
           await startParentalConsent(authData.user.id, parentEmail);
@@ -114,7 +129,7 @@ export default function SignupPage() {
     } catch { /* fall through to default */ }
 
     // Under-13s land on a "waiting for parent" page; everyone else goes to their flow.
-    router.push(isUnder13 ? "/parental-consent-pending" : destination);
+    router.push(needsConsent ? "/parental-consent-pending" : destination);
   }
 
   async function handleGoogleSignup() {
@@ -231,17 +246,17 @@ export default function SignupPage() {
               </p>
             </div>
 
-            {isUnder13 && !tooYoung && (
+            {needsConsent && !tooYoung && (
               <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
                 <p className="text-xs font-semibold text-amber-900">A parent or guardian needs to say yes</p>
                 <p className="mt-1 text-xs text-amber-800">
-                  Because you&apos;re under 13, we need to send a quick approval request to a parent or guardian.
+                  Because you&apos;re under {consentAge}, we need to send a quick approval request to a parent or guardian.
                   They&apos;ll get an email with a link.
                 </p>
                 <input
                   id="parent_email"
                   type="email"
-                  required={isUnder13}
+                  required={needsConsent}
                   value={parentEmail}
                   onChange={(e) => setParentEmail(e.target.value)}
                   className="mt-3 block w-full rounded-lg border border-amber-300 px-3 py-2 text-sm outline-none transition-colors focus:border-amber-600 focus:ring-2 focus:ring-amber-500/15"
@@ -256,7 +271,7 @@ export default function SignupPage() {
               </div>
             )}
 
-            {age !== null && isUnder18 && !isUnder13 && (
+            {age !== null && isUnder18 && !needsConsent && (
               <p className="text-xs text-[var(--text-muted)]">
                 Your account is good to go. We&apos;ll let you know if anything in your activity needs a parent&apos;s eye.
               </p>

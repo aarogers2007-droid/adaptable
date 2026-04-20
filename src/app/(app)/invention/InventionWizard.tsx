@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { saveInventionProgress, synthesizeInvention, getGroupAssignment } from "./actions";
+import { saveInventionProgress, completeInventionSession, getGroupAssignment } from "./actions";
 
 // ── Circle definitions ──
 
@@ -54,16 +54,12 @@ const CIRCLE_5_CHIPS = [
   "Explain it out loud to someone",
 ];
 
-// ── Types ──
+// ── Label lookups ──
+const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(CIRCLE_1_CARDS.map((c) => [c.id, c.label]));
+const ARCHETYPE_LABEL: Record<string, string> = Object.fromEntries(CIRCLE_2_CARDS.map((c) => [c.id, c.label]));
+const SCALE_LABEL: Record<string, string> = Object.fromEntries(CIRCLE_4_CARDS.map((c) => [c.id, `${c.label} — ${c.desc}`]));
 
-interface InventionIdea {
-  title: string;
-  tagline: string;
-  problem: string;
-  mechanism: string;
-  who_it_helps: string;
-  why_it_matters: string;
-}
+// ── Types ──
 
 interface ExistingSession {
   circle_1_category?: string | null;
@@ -73,7 +69,6 @@ interface ExistingSession {
   circle_3_freetext?: string | null;
   circle_4_scale?: string | null;
   circle_5_voice?: string[] | null;
-  synthesized_idea?: string | null;
   group_number?: number | null;
   completed_at?: string | null;
 }
@@ -84,14 +79,12 @@ interface Props {
 }
 
 export default function InventionWizard({ studentName, existingSession }: Props) {
-  // If already completed, show result
-  const alreadyDone = existingSession?.completed_at && existingSession?.synthesized_idea;
+  const alreadyDone = !!existingSession?.completed_at;
 
-  // Determine starting step from existing session
   function getStartingStep(): number {
-    if (alreadyDone) return 6; // result screen
+    if (alreadyDone) return 6;
     if (!existingSession) return 1;
-    if (existingSession.circle_5_voice?.length) return 6; // all circles done, needs synthesis
+    if (existingSession.circle_5_voice?.length) return 6; // all circles done
     if (existingSession.circle_4_scale) return 5;
     if (existingSession.circle_3_chips?.length) return 4;
     if (existingSession.circle_2_archetype) return 3;
@@ -101,7 +94,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
 
   const [step, setStep] = useState(getStartingStep);
 
-  // Circle state — hydrate from existing session
+  // Circle state
   const [circle1, setCircle1] = useState(existingSession?.circle_1_category ?? "");
   const [ideaText, setIdeaText] = useState(existingSession?.idea_freetext ?? "");
   const [circle2, setCircle2] = useState(existingSession?.circle_2_archetype ?? "");
@@ -110,23 +103,15 @@ export default function InventionWizard({ studentName, existingSession }: Props)
   const [circle4, setCircle4] = useState(existingSession?.circle_4_scale ?? "");
   const [circle5, setCircle5] = useState<string[]>(existingSession?.circle_5_voice ?? []);
 
-  // Synthesis state
-  const [synthesizing, setSynthesizing] = useState(false);
-  const [idea, setIdea] = useState<InventionIdea | null>(() => {
-    if (existingSession?.synthesized_idea) {
-      try { return JSON.parse(existingSession.synthesized_idea); } catch { return null; }
-    }
-    return null;
-  });
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // Group assignment
   const [groupNumber, setGroupNumber] = useState<number | null>(existingSession?.group_number ?? null);
   const [groupRevealed, setGroupRevealed] = useState(false);
 
-  // Check group on load
   useEffect(() => {
-    if (alreadyDone) {
+    if (alreadyDone || step === 6) {
       getGroupAssignment().then((res) => {
         if (res.groupNumber) {
           setGroupNumber(res.groupNumber);
@@ -134,9 +119,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
         }
       });
     }
-  }, [alreadyDone]);
-
-  const [saving, setSaving] = useState(false);
+  }, [alreadyDone, step]);
 
   async function handleNext() {
     setSaving(true);
@@ -150,35 +133,24 @@ export default function InventionWizard({ studentName, existingSession }: Props)
     if (step === 5) { data.circle_5_voice = circle5; }
 
     const result = await saveInventionProgress(data as any);
-    setSaving(false);
 
     if (result.error) {
       setError(result.error);
+      setSaving(false);
       return;
     }
 
     if (step === 5) {
-      // All circles done — trigger synthesis
-      setSynthesizing(true);
-      const synthResult = await synthesizeInvention({
-        circle_1_category: circle1,
-        idea_freetext: ideaText,
-        circle_2_archetype: circle2,
-        circle_3_chips: circle3Chips,
-        circle_3_freetext: circle3Text,
-        circle_4_scale: circle4,
-        circle_5_voice: circle5,
-      });
-      setSynthesizing(false);
-
-      if (synthResult.error) {
-        setError(synthResult.error);
+      // All circles done — mark session complete (no synthesis)
+      const completeResult = await completeInventionSession();
+      setSaving(false);
+      if (completeResult.error) {
+        setError(completeResult.error);
         return;
       }
-
-      setIdea(synthResult.idea);
       setStep(6);
     } else {
+      setSaving(false);
       setStep(step + 1);
     }
   }
@@ -192,68 +164,95 @@ export default function InventionWizard({ studentName, existingSession }: Props)
     return false;
   }
 
-  // ── Result screen ──
-  if ((step === 6 && idea) || alreadyDone) {
-    const displayIdea = idea ?? (existingSession?.synthesized_idea ? JSON.parse(existingSession.synthesized_idea) : null);
-    if (!displayIdea) return null;
-
+  // ── Completion screen ──
+  if (step === 6 || alreadyDone) {
     return (
       <main className="min-h-screen bg-[var(--bg)] px-6 py-16">
         <div className="mx-auto max-w-[600px]">
-          <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
-            Your invention
-          </p>
-          <h1 className="mt-3 font-[family-name:var(--font-display)] text-[34px] font-bold leading-tight text-[var(--text-primary)]">
-            {displayIdea.title}
-          </h1>
-          <p className="mt-3 text-lg text-[var(--text-secondary)]" style={{ lineHeight: 1.618 }}>
-            {displayIdea.tagline}
-          </p>
 
-          <div className="mt-8 space-y-6">
-            {[
-              { label: "The problem", value: displayIdea.problem },
-              { label: "How it works", value: displayIdea.mechanism },
-              { label: "Who it helps", value: displayIdea.who_it_helps },
-              { label: "Why it matters", value: displayIdea.why_it_matters },
-            ].map((item) => (
-              <div key={item.label}>
-                <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#9CA3AF" }}>
-                  {item.label}
-                </p>
-                <p className="mt-1 text-base text-[var(--text-primary)]" style={{ lineHeight: 1.618 }}>
-                  {item.value}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Group assignment */}
-          <div className="mt-10 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6 text-center">
+          {/* Group number — most prominent element */}
+          <div className="rounded-xl border-2 border-[var(--primary)] bg-[var(--primary)]/5 p-8 text-center">
             {groupRevealed && groupNumber ? (
-              <p className="text-lg font-semibold text-[var(--text-primary)]">
-                You are in Group {groupNumber}
-              </p>
+              <>
+                <p className="font-[family-name:var(--font-display)] text-[48px] font-bold text-[var(--primary)]">
+                  Group {groupNumber}
+                </p>
+                <p className="mt-3 text-base text-[var(--text-primary)]" style={{ lineHeight: 1.618 }}>
+                  Remember this number — you will need it on May 13.
+                </p>
+              </>
             ) : (
-              <p className="text-sm text-[var(--text-secondary)]" style={{ lineHeight: 1.618 }}>
+              <p className="text-base text-[var(--text-secondary)]" style={{ lineHeight: 1.618 }}>
                 Your group will be assigned before May 13. Check back here closer to the event.
               </p>
             )}
           </div>
-        </div>
-      </main>
-    );
-  }
 
-  // ── Synthesizing screen ──
-  if (synthesizing) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
-        <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
-          <p className="mt-4 text-sm text-[var(--text-secondary)]">
-            Generating your invention concept...
-          </p>
+          {/* Answer summary */}
+          <div className="mt-10 space-y-6">
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+                Circle 1 — The Wish
+              </p>
+              <p className="mt-2 text-sm text-[var(--text-primary)]">
+                {CATEGORY_LABEL[circle1 || existingSession?.circle_1_category || ""] || circle1 || existingSession?.circle_1_category || "—"}
+              </p>
+              {(ideaText || existingSession?.idea_freetext) && (
+                <p className="mt-1 text-sm text-[var(--text-secondary)] italic">
+                  &ldquo;{ideaText || existingSession?.idea_freetext}&rdquo;
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+                Circle 2 — The Mind
+              </p>
+              <p className="mt-2 text-sm text-[var(--text-primary)]">
+                {ARCHETYPE_LABEL[circle2 || existingSession?.circle_2_archetype || ""] || circle2 || existingSession?.circle_2_archetype || "—"}
+              </p>
+            </div>
+
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+                Circle 3 — The Lens
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(circle3Chips.length > 0 ? circle3Chips : existingSession?.circle_3_chips ?? []).map((chip) => (
+                  <span key={chip} className="rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-1 text-sm text-[var(--text-primary)]">
+                    {chip}
+                  </span>
+                ))}
+              </div>
+              {(circle3Text || existingSession?.circle_3_freetext) && (
+                <p className="mt-2 text-sm text-[var(--text-secondary)] italic">
+                  &ldquo;{circle3Text || existingSession?.circle_3_freetext}&rdquo;
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+                Circle 4 — The Scale
+              </p>
+              <p className="mt-2 text-sm text-[var(--text-primary)]">
+                {SCALE_LABEL[circle4 || existingSession?.circle_4_scale || ""] || circle4 || existingSession?.circle_4_scale || "—"}
+              </p>
+            </div>
+
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
+                Circle 5 — The Voice
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(circle5.length > 0 ? circle5 : existingSession?.circle_5_voice ?? []).map((chip) => (
+                  <span key={chip} className="rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-1 text-sm text-[var(--text-primary)]">
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -276,7 +275,6 @@ export default function InventionWizard({ studentName, existingSession }: Props)
           ))}
         </div>
 
-        {/* Step label */}
         <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>
           Circle {step} of 5
         </p>
@@ -304,7 +302,6 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                 </button>
               ))}
             </div>
-
             <div className="mt-6">
               <label className="block text-sm font-medium text-[var(--text-primary)]">
                 Describe your idea in one sentence. What does it do and who does it help?
@@ -363,11 +360,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     key={chip}
                     type="button"
                     onClick={() => {
-                      if (selected) {
-                        setCircle3Chips(circle3Chips.filter((c) => c !== chip));
-                      } else if (circle3Chips.length < 2) {
-                        setCircle3Chips([...circle3Chips, chip]);
-                      }
+                      if (selected) setCircle3Chips(circle3Chips.filter((c) => c !== chip));
+                      else if (circle3Chips.length < 2) setCircle3Chips([...circle3Chips, chip]);
                     }}
                     className={`rounded-full border px-4 py-2 text-sm transition-all ${
                       selected
@@ -380,7 +374,6 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                 );
               })}
             </div>
-
             <div className="mt-6">
               <label className="block text-sm font-medium text-[var(--text-primary)]">
                 Tell us more. What specifically do you know about this that someone else wouldn&apos;t?
@@ -441,11 +434,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     key={chip}
                     type="button"
                     onClick={() => {
-                      if (selected) {
-                        setCircle5(circle5.filter((c) => c !== chip));
-                      } else if (circle5.length < 2) {
-                        setCircle5([...circle5, chip]);
-                      }
+                      if (selected) setCircle5(circle5.filter((c) => c !== chip));
+                      else if (circle5.length < 2) setCircle5([...circle5, chip]);
                     }}
                     className={`rounded-full border px-4 py-2 text-sm transition-all ${
                       selected
@@ -487,7 +477,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
             disabled={!canProceed() || saving}
             className="rounded-lg bg-[var(--primary)] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
           >
-            {saving ? "Saving..." : step === 5 ? "Generate My Invention" : "Next"}
+            {saving ? "Saving..." : step === 5 ? "Submit" : "Next"}
           </button>
         </div>
       </div>
