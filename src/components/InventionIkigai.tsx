@@ -107,17 +107,6 @@ export default function InventionIkigai({
                 {circle.name}
               </text>
 
-              {/* Completed dot */}
-              {isCompleted && !isActive && (
-                <circle
-                  cx={pos.cx + R * 0.55}
-                  cy={pos.cy - R * 0.55}
-                  r="6"
-                  fill={circle.color}
-                  stroke="#111827"
-                  strokeWidth="2"
-                />
-              )}
             </g>
           );
         })}
