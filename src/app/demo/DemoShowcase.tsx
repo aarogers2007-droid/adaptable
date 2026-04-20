@@ -1229,9 +1229,6 @@ export default function DemoShowcase() {
                 <p className="text-sm italic" style={{ color: "var(--text-secondary)", fontFamily: '"Times New Roman", Times, serif' }}>
                   — AJ Rogers, founder, age 19
                 </p>
-                <p className="mt-1 text-xs" style={{ color: "var(--text-muted)", fontFamily: '"Times New Roman", Times, serif' }}>
-                  Built for VentureLab&apos;s 155-country network.
-                </p>
               </div>
             </article>
           </div>
