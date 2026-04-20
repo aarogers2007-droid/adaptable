@@ -343,7 +343,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
                     onChange={e => setCircle3Text(e.target.value.slice(0, 80))}
                     maxLength={80}
                     className="w-full rounded-lg bg-white/70 px-4 py-3 text-sm outline-none placeholder:text-[var(--text-muted)] focus:bg-white focus:shadow-md transition-all"
-                    placeholder="e.g., I've lived with Type 1 diabetes since I was 8"
+                    placeholder="e.g., I've lived in 3 countries"
                   />
                 </div>
               </div>
