@@ -101,6 +101,15 @@ export default function InventionWizard({ studentName, existingSession }: Props)
 
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [exiting, setExiting] = useState(false);
+
+  function exitToDigram() {
+    setExiting(true);
+    setTimeout(() => {
+      setExiting(false);
+      setStep(0);
+    }, 400);
+  }
 
   // Group
   const [groupNumber, setGroupNumber] = useState<number | null>(existingSession?.group_number ?? null);
@@ -146,8 +155,8 @@ export default function InventionWizard({ studentName, existingSession }: Props)
     setSaving(false);
     if (result.error) { setError(result.error); return; }
 
-    // Back to diagram
-    setStep(0);
+    // Zoom out back to diagram
+    exitToDigram();
   }
 
   async function handleComplete() {
@@ -215,7 +224,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
   if (activeCircle) {
     return (
       <div
-        className={`fixed inset-0 z-50 flex flex-col overflow-y-auto ${animating ? "ikigai-expand" : ""}`}
+        className={`fixed inset-0 z-50 flex flex-col overflow-y-auto ${animating ? "ikigai-expand" : ""} ${exiting ? "ikigai-collapse" : ""}`}
         style={{
           backgroundColor: activeCircle.color,
           backgroundImage: `
@@ -228,7 +237,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
         {/* Back button */}
         <div className="px-6 pt-6">
           <button
-            onClick={() => setStep(0)}
+            onClick={exitToDigram}
             className="rounded-lg bg-white/30 px-4 py-2 text-sm font-medium hover:bg-white/50 transition-colors"
             style={{ color: "#111827" }}
           >
@@ -426,6 +435,11 @@ export default function InventionWizard({ studentName, existingSession }: Props)
             to { transform: scale(1); opacity: 1; border-radius: 0; }
           }
           .ikigai-expand { animation: ikigai-expand 400ms ease-out forwards; }
+          @keyframes ikigai-collapse {
+            from { transform: scale(1); opacity: 1; border-radius: 0; }
+            to { transform: scale(0.3); opacity: 0; border-radius: 50%; }
+          }
+          .ikigai-collapse { animation: ikigai-collapse 400ms ease-in forwards; }
           @keyframes chip-in {
             from { opacity: 0; transform: scale(0.85) translateY(6px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
