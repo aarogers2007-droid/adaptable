@@ -234,8 +234,8 @@ export default function DemoShowcase() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
 
-      {/* ═══ PERSISTENT NAV — always visible ═══ */}
-      <nav className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4">
+      {/* ═══ NAV — only visible on quote landing, hidden after entry ═══ */}
+      <nav className={`absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 ${entered ? "hidden" : ""}`}>
         <Link
           href="/"
           className="font-[family-name:var(--font-display)] text-lg font-bold"
@@ -305,7 +305,8 @@ export default function DemoShowcase() {
           role="tablist"
           aria-label="Demo sections"
         >
-          <div className="mx-auto flex max-w-[1200px] gap-1 overflow-x-auto px-3 py-3 md:justify-center md:gap-2 md:px-6 md:py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-1 overflow-x-auto px-3 py-3 md:px-6 md:py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <Link href="/" className="mr-3 shrink-0 font-[family-name:var(--font-display)] text-base font-bold text-[var(--primary)] hidden md:block">Adaptable</Link>
             {TABS.map((t, i) => (
               <button
                 key={t.key}
@@ -313,7 +314,7 @@ export default function DemoShowcase() {
                 role="tab"
                 aria-selected={activeTab === t.key}
                 onClick={() => selectTab(t.key)}
-                className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-all md:px-6 md:py-2.5 md:text-sm ${
+                className={`whitespace-nowrap rounded-lg px-4 py-2 font-[family-name:var(--font-display)] text-[13px] font-semibold transition-all md:px-5 md:py-2.5 md:text-sm ${
                   activeTab === t.key
                     ? "bg-[var(--primary)] text-white"
                     : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
@@ -326,6 +327,10 @@ export default function DemoShowcase() {
                 {t.label}
               </button>
             ))}
+            <div className="ml-auto flex shrink-0 items-center gap-3 hidden md:flex">
+              <Link href="/for-schools" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">For Schools</Link>
+              <Link href="/login" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white">Log In</Link>
+            </div>
           </div>
         </div>
       )}
