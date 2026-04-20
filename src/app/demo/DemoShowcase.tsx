@@ -138,6 +138,13 @@ export default function DemoShowcase() {
   useEffect(() => {
     if (sessionStorage.getItem("demo-entered") === "1") {
       setEntered(true);
+      // Force all scroll-triggered animations since we skipped the entry
+      requestAnimationFrame(() => {
+        distance.forceVisible();
+        conversation.forceVisible();
+        mirror.forceVisible();
+        numbers.forceVisible();
+      });
       return;
     }
     // Failsafe: if quote button somehow doesn't work, auto-enter after 5s
