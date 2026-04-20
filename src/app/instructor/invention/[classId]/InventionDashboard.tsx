@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import RawView from "./RawView";
 import { triggerGrouping, revealGroups, moveStudent, loadInventionDashboard } from "./actions";
 
 interface DashboardData {
@@ -56,7 +55,6 @@ export default function InventionDashboard({
   const [moveTarget, setMoveTarget] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"overview" | "groups" | "algorithm">("overview");
-  const [rawViewOpen, setRawViewOpen] = useState(false);
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
 
   const completionPct = data.totalEnrolled > 0
@@ -73,7 +71,7 @@ export default function InventionDashboard({
       setError(result.error);
     } else {
       // Store the algorithm log for Raw View replay
-      if (result.log) setAlgorithmLog(result.log);
+      if ("log" in result && result.log) setAlgorithmLog(result.log);
       // Reload data
       const fresh = await loadInventionDashboard(classId);
       if (!fresh.error) setData(fresh as DashboardData);
@@ -323,28 +321,6 @@ export default function InventionDashboard({
               </div>
             )}
 
-            {/* Raw View toggle */}
-            {data.groups.length > 0 && (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setRawViewOpen(!rawViewOpen)}
-                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
-                    rawViewOpen
-                      ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]"
-                      : "border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
-                  }`}
-                >
-                  {rawViewOpen ? "Hide Raw View" : "Raw View"}
-                </button>
-                {rawViewOpen && (
-                  <div className="mt-4">
-                    <RawView algorithmLog={algorithmLog} />
-                  </div>
-                )}
-              </div>
-            )}
-
             {data.groups.length === 0 ? (
               <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-8 text-center">
                 <p className="text-sm text-[var(--text-secondary)]">
@@ -510,6 +486,7 @@ export default function InventionDashboard({
               studentMap={data.studentMap}
               circle1Counts={data.circle1Counts}
               circle2Counts={data.circle2Counts}
+              algorithmLog={algorithmLog}
             />
           </div>
         )}
@@ -574,12 +551,15 @@ function AlgorithmStream({
   studentMap,
   circle1Counts,
   circle2Counts,
+  algorithmLog,
 }: {
   groups: DashboardData["groups"];
   studentMap: DashboardData["studentMap"];
   circle1Counts: Record<string, number>;
   circle2Counts: Record<string, number>;
+  algorithmLog: any;
 }) {
+  const [viewMode, setViewMode] = useState<"normal" | "raw">("normal");
   const [lines, setLines] = useState<Array<{ text: string; cls: string }>>([]);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
@@ -736,8 +716,55 @@ function AlgorithmStream({
     final: "#C084FC",
   };
 
+  // Raw mode: track which step is active based on log replay progress
+  const [rawActiveStep, setRawActiveStep] = useState(-1);
+  const rawRef = useRef<HTMLDivElement>(null);
+
+  // Track step from log lines as they print
+  useEffect(() => {
+    if (viewMode !== "raw" || !running) return;
+    // Determine step from last printed line's content
+    const lastLine = lines[lines.length - 1]?.text ?? "";
+    if (lastLine.includes("Step 1")) setRawActiveStep(1);
+    else if (lastLine.includes("Step 2")) setRawActiveStep(2);
+    else if (lastLine.includes("Step 3")) setRawActiveStep(3);
+    else if (lastLine.includes("Step 4")) setRawActiveStep(4);
+    else if (lastLine.includes("Step 5")) setRawActiveStep(5);
+    else if (lastLine.includes("Writing results")) setRawActiveStep(6);
+    else if (lastLine.includes("Algorithm complete")) setRawActiveStep(-1);
+  }, [lines, running, viewMode]);
+
+  // Auto-scroll raw source to active step
+  useEffect(() => {
+    if (viewMode !== "raw" || rawActiveStep < 0 || !rawRef.current) return;
+    const el = rawRef.current.querySelector(`[data-step-start="${rawActiveStep}"]`);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [rawActiveStep, viewMode]);
+
   return (
     <div>
+      {/* Mode toggle above terminal */}
+      <div className="flex items-center justify-center gap-1 mb-3 rounded-lg p-1" style={{ background: "var(--bg-muted)", display: "inline-flex" }}>
+        <button
+          type="button"
+          onClick={() => setViewMode("normal")}
+          className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
+            viewMode === "normal" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
+          }`}
+        >
+          Normal
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("raw")}
+          className={`rounded-md px-4 py-1.5 text-xs font-medium transition-colors ${
+            viewMode === "raw" ? "bg-[var(--bg)] text-[var(--text-primary)] shadow-sm" : "text-[var(--text-muted)]"
+          }`}
+        >
+          Raw
+        </button>
+      </div>
+
       {/* Terminal */}
       <div className="rounded-xl border border-[#2A2A2A] overflow-hidden" style={{ background: "#0A0A0A" }}>
         {/* Header */}
@@ -747,7 +774,9 @@ function AlgorithmStream({
             <div className="w-3 h-3 rounded-full" style={{ background: "#FBBF24" }} />
             <div className="w-3 h-3 rounded-full" style={{ background: "#4ADE80" }} />
           </div>
-          <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>VENTURE — Grouping Algorithm</span>
+          <span style={{ fontFamily: "monospace", fontSize: "12px", color: "#6A6A6A" }}>
+            {viewMode === "raw" ? "invention-grouping.ts" : "VENTURE — Grouping Algorithm"}
+          </span>
           <div className="flex gap-2">
             <button
               type="button"
@@ -767,24 +796,37 @@ function AlgorithmStream({
           </div>
         </div>
 
-        {/* Output */}
-        <div
-          ref={outputRef}
-          className="overflow-y-auto"
-          style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8 }}
-        >
-          {lines.map((line, i) => (
-            <div key={i} style={{ color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A", fontWeight: line.cls.includes("final") ? 700 : 400 }}>
-              {line.text}
-              {i === lines.length - 1 && running && (
-                <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
-              )}
-            </div>
-          ))}
-          {lines.length === 0 && !running && (
-            <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
-          )}
-        </div>
+        {/* Normal mode: log output */}
+        {viewMode === "normal" && (
+          <div
+            ref={outputRef}
+            className="overflow-y-auto"
+            style={{ height: "480px", padding: "16px", fontFamily: "monospace", fontSize: "12px", lineHeight: 1.8 }}
+          >
+            {lines.map((line, i) => (
+              <div key={i} style={{ color: colorMap[line.cls.replace(" typing", "")] ?? "#9A9A9A", fontWeight: line.cls.includes("final") ? 700 : 400 }}>
+                {line.text}
+                {i === lines.length - 1 && running && (
+                  <span style={{ display: "inline-block", width: "7px", height: "14px", background: "#C084FC", marginLeft: "2px", verticalAlign: "text-bottom", animation: "blink 0.8s step-end infinite" }} />
+                )}
+              </div>
+            ))}
+            {lines.length === 0 && !running && (
+              <div style={{ color: "#3A3A3A" }}>Click &ldquo;Run Algorithm&rdquo; to see the grouping process.</div>
+            )}
+          </div>
+        )}
+
+        {/* Raw mode: source code with step highlighting */}
+        {viewMode === "raw" && (
+          <div
+            ref={rawRef}
+            className="overflow-y-auto"
+            style={{ height: "480px", padding: "12px 0", fontFamily: "monospace", fontSize: "11px", lineHeight: 1.7 }}
+          >
+            <RawSourceView activeStep={rawActiveStep} />
+          </div>
+        )}
       </div>
 
       {/* Speed controls */}
@@ -808,5 +850,133 @@ function AlgorithmStream({
 
       <style dangerouslySetInnerHTML={{ __html: `@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }` }} />
     </div>
+  );
+}
+
+// ── Raw Source View — syntax-highlighted algorithm source with step highlighting ──
+
+const RAW_SOURCE_LINES: Array<{ code: string; step: number }> = [
+  { code: 'import "server-only";', step: -1 },
+  { code: 'import { createClient } from "@/lib/supabase/server";', step: -1 },
+  { code: '', step: -1 },
+  { code: '// Invention Mode Grouping Algorithm', step: -1 },
+  { code: '// Five-step sort: category → archetype → chips → scale → voice', step: -1 },
+  { code: '', step: -1 },
+  { code: 'const VISUAL_CHIPS = ["Draw it", "Build a prototype", "Build a slide or poster"];', step: -1 },
+  { code: 'const VERBAL_CHIPS = ["Explain it out loud", "Write it out"];', step: -1 },
+  { code: 'const TARGET_ARCHETYPES = ["builder", "empath", "systems_thinker"];', step: -1 },
+  { code: '', step: -1 },
+  { code: 'export async function runGroupingAlgorithm(classCode, groupSize = 5) {', step: 0 },
+  { code: '  const supabase = await createClient();', step: 0 },
+  { code: '  const { data: sessions } = await supabase', step: 0 },
+  { code: '    .from("invention_sessions")', step: 0 },
+  { code: '    .select("student_id, circle_1_category, ...")', step: 0 },
+  { code: '    .eq("class_code", classCode)', step: 0 },
+  { code: '    .not("completed_at", "is", null);', step: 0 },
+  { code: '', step: -1 },
+  { code: '  // ── Step 1: Primary sort on Circle 1 (category pools) ──', step: 1 },
+  { code: '  const pools = new Map();', step: 1 },
+  { code: '  for (const s of students) {', step: 1 },
+  { code: '    const pool = pools.get(s.circle_1_category) ?? [];', step: 1 },
+  { code: '    pool.push(s);', step: 1 },
+  { code: '    pools.set(s.circle_1_category, pool);', step: 1 },
+  { code: '  }', step: 1 },
+  { code: '', step: -1 },
+  { code: '  // ── Step 2: Form groups — archetype distribution ──', step: 2 },
+  { code: '  for (const [category, pool] of pools) {', step: 2 },
+  { code: '    const remaining = [...pool];', step: 2 },
+  { code: '    while (remaining.length > 0) {', step: 2 },
+  { code: '      if (remaining.length < 3) { /* merge into last group */ }', step: 2 },
+  { code: '      for (const archetype of TARGET_ARCHETYPES) {', step: 2 },
+  { code: '        const idx = remaining.findIndex(s => s.circle_2_archetype === archetype);', step: 2 },
+  { code: '        if (idx !== -1) group.push(remaining.splice(idx, 1)[0]);', step: 2 },
+  { code: '      }', step: 2 },
+  { code: '      // Fill remaining — prioritize archetype diversity', step: 2 },
+  { code: '      while (group.length < targetSize && remaining.length > 0) {', step: 2 },
+  { code: '        const diverseIdx = remaining.findIndex(s => !used.has(s.archetype));', step: 2 },
+  { code: '        if (diverseIdx !== -1) group.push(remaining.splice(diverseIdx, 1)[0]);', step: 2 },
+  { code: '        else group.push(remaining.shift());', step: 2 },
+  { code: '      }', step: 2 },
+  { code: '    }', step: 2 },
+  { code: '  }', step: 2 },
+  { code: '', step: -1 },
+  { code: '  // ── Step 3: Chip diversity scoring ──', step: 3 },
+  { code: '  const allChips = group.flatMap(s => s.circle_3_chips);', step: 3 },
+  { code: '  const chipDiversity = new Set(allChips).size / allChips.length;', step: 3 },
+  { code: '', step: -1 },
+  { code: '  // ── Step 4: Scale balance check ──', step: 4 },
+  { code: '  const scaleDist = {};', step: 4 },
+  { code: '  for (const s of group)', step: 4 },
+  { code: '    scaleDist[s.circle_4_scale] = (scaleDist[s.circle_4_scale] ?? 0) + 1;', step: 4 },
+  { code: '  const balanced = Object.values(scaleDist).every(c => c <= 3);', step: 4 },
+  { code: '', step: -1 },
+  { code: '  // ── Step 5: Voice coverage & cross-group swaps ──', step: 5 },
+  { code: '  const hasVisual = group.some(s =>', step: 5 },
+  { code: '    s.circle_5_voice.some(v => VISUAL_CHIPS.includes(v)));', step: 5 },
+  { code: '  const hasVerbal = group.some(s =>', step: 5 },
+  { code: '    s.circle_5_voice.some(v => VERBAL_CHIPS.includes(v)));', step: 5 },
+  { code: '  // Cross-group swaps for voice coverage', step: 5 },
+  { code: '  for (const group of poolGroups) {', step: 5 },
+  { code: '    if (group.has_visual && group.has_verbal) continue;', step: 5 },
+  { code: '    const swapId = group.student_ids[j];', step: 5 },
+  { code: '    group.student_ids[j] = candidateId;', step: 5 },
+  { code: '    other.student_ids[i] = swapId;', step: 5 },
+  { code: '  }', step: 5 },
+  { code: '', step: -1 },
+  { code: '  // ── Write results to database ──', step: 6 },
+  { code: '  await supabase.from("invention_groups").delete().eq("class_code", classCode);', step: 6 },
+  { code: '  for (const group of allGroups) {', step: 6 },
+  { code: '    await supabase.from("invention_groups").insert({', step: 6 },
+  { code: '      class_code: classCode, group_number: group.group_number,', step: 6 },
+  { code: '      student_ids: group.student_ids, composition_log: group.composition,', step: 6 },
+  { code: '    });', step: 6 },
+  { code: '    for (const studentId of group.student_ids) {', step: 6 },
+  { code: '      await supabase.from("invention_sessions")', step: 6 },
+  { code: '        .update({ group_number: group.group_number })', step: 6 },
+  { code: '        .eq("student_id", studentId);', step: 6 },
+  { code: '    }', step: 6 },
+  { code: '  }', step: 6 },
+  { code: '  return { log };', step: -1 },
+  { code: '}', step: -1 },
+];
+
+function highlightSyntax(code: string): string {
+  if (!code) return "&nbsp;";
+  return code
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/(\/\/.*$)/gm, '<span style="color:#6B7280">$1</span>')
+    .replace(/("(?:[^"\\]|\\.)*")/g, '<span style="color:#A78BFA">$1</span>')
+    .replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|interface|type)\b/g, '<span style="color:#C084FC">$1</span>')
+    .replace(/\b(string|number|boolean|null|undefined|true|false|Map|Set|Object)\b/g, '<span style="color:#60A5FA">$1</span>');
+}
+
+function RawSourceView({ activeStep }: { activeStep: number }) {
+  return (
+    <>
+      {RAW_SOURCE_LINES.map((line, i) => {
+        const isActive = activeStep >= 0 && line.step === activeStep;
+        return (
+          <div
+            key={i}
+            data-step-start={line.step === activeStep ? activeStep : undefined}
+            style={{
+              padding: "0 12px",
+              display: "flex",
+              gap: "12px",
+              background: isActive ? "rgba(192, 132, 252, 0.12)" : "transparent",
+              transition: "background 0.4s ease",
+            }}
+          >
+            <span style={{ color: "#3A3A3A", width: "28px", textAlign: "right", flexShrink: 0, userSelect: "none" }}>
+              {i + 1}
+            </span>
+            <span
+              style={{ color: "#D1D5DB", whiteSpace: "pre" }}
+              dangerouslySetInnerHTML={{ __html: highlightSyntax(line.code) }}
+            />
+          </div>
+        );
+      })}
+    </>
   );
 }

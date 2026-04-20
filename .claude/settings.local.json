@@ -44,7 +44,22 @@
       "Bash(git status:*)",
       "Bash(git push:*)",
       "Bash(vercel logs:*)",
-      "Bash(vercel inspect:*)"
+      "Bash(vercel inspect:*)",
+      "Bash(echo \"=== TypeScript / TSX \\(app code\\) ===\" find src -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" \\\\\\))",
+      "Bash(tail -1 find scripts -type f -name *.md)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse)",
+      "Bash($B text:*)",
+      "Bash($B console:*)",
+      "Bash($B screenshot:*)",
+      "Bash($B js:*)",
+      "Bash(URL=https://adaptable-aarogers2007-droids-projects.vercel.app)",
+      "Bash($B goto:*)",
+      "Bash($B wait:*)",
+      "Bash(bunx tsc:*)",
+      "Bash($B fill:*)",
+      "Bash(bunx tsx:*)",
+      "Skill(office-hours)",
+      "Skill(investigate)"
     ]
   }
 }

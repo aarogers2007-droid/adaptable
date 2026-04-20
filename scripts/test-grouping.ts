@@ -163,8 +163,8 @@ async function main() {
           const sDist: Record<string, number> = {};
           for (const s of expanded) sDist[s.circle_4_scale] = (sDist[s.circle_4_scale] ?? 0) + 1;
           lastPoolGroup.composition.scale_distribution = sDist;
-          lastPoolGroup.composition.has_visual = expanded.some(s => s.circle_5_voice.some(v => VISUAL_CHIPS.includes(v)));
-          lastPoolGroup.composition.has_verbal = expanded.some(s => s.circle_5_voice.some(v => VERBAL_CHIPS.includes(v)));
+          lastPoolGroup.composition.has_visual = expanded.some(s => s.circle_5_voice.some((v: string) => VISUAL_CHIPS.includes(v)));
+          lastPoolGroup.composition.has_verbal = expanded.some(s => s.circle_5_voice.some((v: string) => VERBAL_CHIPS.includes(v)));
           const ac = expanded.flatMap(s => s.circle_3_chips);
           lastPoolGroup.composition.chip_diversity = ac.length > 0 ? Math.round((new Set(ac).size / ac.length) * 100) / 100 : 0;
           const scaleOk = Object.values(sDist).every(c => c <= 3);
@@ -206,8 +206,8 @@ async function main() {
       const chipDiversity = allChips.length > 0 ? uniqueChips.size / allChips.length : 0;
       const scaleDist: Record<string, number> = {};
       for (const s of group) scaleDist[s.circle_4_scale] = (scaleDist[s.circle_4_scale] ?? 0) + 1;
-      const hasVisual = group.some(s => s.circle_5_voice.some(v => VISUAL_CHIPS.includes(v)));
-      const hasVerbal = group.some(s => s.circle_5_voice.some(v => VERBAL_CHIPS.includes(v)));
+      const hasVisual = group.some(s => s.circle_5_voice.some((v: string) => VISUAL_CHIPS.includes(v)));
+      const hasVerbal = group.some(s => s.circle_5_voice.some((v: string) => VERBAL_CHIPS.includes(v)));
       const archetypesInGroup = group.map(s => s.circle_2_archetype);
       const missingArchetypes = TARGET_ARCHETYPES.filter(a => !archetypesInGroup.includes(a));
       const scaleBalanced = Object.values(scaleDist).every(v => v <= 3);
@@ -254,15 +254,15 @@ async function main() {
           const candidateId = other.student_ids[i];
           const candidate = students.find(s => s.id === candidateId);
           if (!candidate) continue;
-          const cVis = candidate.circle_5_voice.some(v => VISUAL_CHIPS.includes(v));
-          const cVerb = candidate.circle_5_voice.some(v => VERBAL_CHIPS.includes(v));
+          const cVis = candidate.circle_5_voice.some((v: string) => VISUAL_CHIPS.includes(v));
+          const cVerb = candidate.circle_5_voice.some((v: string) => VERBAL_CHIPS.includes(v));
           if (needsVisual && !cVis) continue;
           if (needsVerbal && !cVerb) continue;
 
           const otherWithout = other.student_ids.filter(id => id !== candidateId);
           const otherStudents = otherWithout.map(id => students.find(s => s.id === id)!).filter(Boolean);
-          if (needsVisual && cVis && !otherStudents.some(s => s.circle_5_voice.some(v => VISUAL_CHIPS.includes(v)))) continue;
-          if (needsVerbal && cVerb && !otherStudents.some(s => s.circle_5_voice.some(v => VERBAL_CHIPS.includes(v)))) continue;
+          if (needsVisual && cVis && !otherStudents.some(s => s.circle_5_voice.some((v: string) => VISUAL_CHIPS.includes(v)))) continue;
+          if (needsVerbal && cVerb && !otherStudents.some(s => s.circle_5_voice.some((v: string) => VERBAL_CHIPS.includes(v)))) continue;
 
           for (let j = 0; j < group.student_ids.length; j++) {
             const originalId = group.student_ids[j]; // capture before overwrite
