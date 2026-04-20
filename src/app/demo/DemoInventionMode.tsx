@@ -91,7 +91,7 @@ export default function DemoInventionMode() {
           Invention Mode
         </p>
         <h2 className="mt-3 font-[family-name:var(--font-display)] font-semibold" style={{ fontSize: "34px", lineHeight: 1.618, color: "var(--text-primary)" }}>
-          A different kind of Ikigai
+          Ikigai, reimagined.
         </h2>
         <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "var(--text-secondary)" }}>
           For invention events, students answer five questions that map how they think, what they know, and how they communicate. No business ideas. No AI synthesis. Pure data collection for intelligent group formation.
