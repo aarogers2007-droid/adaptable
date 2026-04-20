@@ -96,10 +96,59 @@ export async function runGroupingAlgorithm(
   let groupCounter = 1;
 
   for (const [category, pool] of pools) {
-    // Sort pool by archetype to enable distribution
     const remaining = [...pool];
 
     while (remaining.length > 0) {
+      // If fewer than 3 students remain, merge them into the last group
+      // in this pool rather than creating a tiny group
+      if (remaining.length < 3 && allGroups.length > 0) {
+        const lastPoolGroup = [...allGroups].reverse().find(
+          (g) => g.composition.category === category
+        );
+        if (lastPoolGroup) {
+          for (const s of remaining) {
+            lastPoolGroup.student_ids.push(s.id);
+            lastPoolGroup.composition.archetypes.push(s.circle_2_archetype);
+          }
+          // Recompute composition for the expanded group
+          const expandedStudents = lastPoolGroup.student_ids.map(
+            (id) => students.find((st) => st.id === id)!
+          ).filter(Boolean);
+          const missingNow = TARGET_ARCHETYPES.filter(
+            (a) => !lastPoolGroup.composition.archetypes.includes(a)
+          );
+          lastPoolGroup.composition.missing_archetypes = missingNow;
+          const expandedScaleDist: Record<string, number> = {};
+          for (const s of expandedStudents) {
+            expandedScaleDist[s.circle_4_scale] = (expandedScaleDist[s.circle_4_scale] ?? 0) + 1;
+          }
+          lastPoolGroup.composition.scale_distribution = expandedScaleDist;
+          lastPoolGroup.composition.has_visual = expandedStudents.some((s) =>
+            s.circle_5_voice.some((v) => VISUAL_CHIPS.includes(v))
+          );
+          lastPoolGroup.composition.has_verbal = expandedStudents.some((s) =>
+            s.circle_5_voice.some((v) => VERBAL_CHIPS.includes(v))
+          );
+          const allChipsExpanded = expandedStudents.flatMap((s) => s.circle_3_chips);
+          const uniqueExpanded = new Set(allChipsExpanded);
+          lastPoolGroup.composition.chip_diversity = allChipsExpanded.length > 0
+            ? Math.round((uniqueExpanded.size / allChipsExpanded.length) * 100) / 100
+            : 0;
+          const scaleOk = Object.values(expandedScaleDist).every((c) => c <= 3);
+          const compromisesNow: string[] = [];
+          if (missingNow.length > 0) compromisesNow.push(`Missing archetypes: ${missingNow.join(", ")}`);
+          if (!scaleOk) compromisesNow.push("Scale imbalance: >3 students selected same scale option");
+          if (!lastPoolGroup.composition.has_visual) compromisesNow.push("No visual communicator (draw/prototype/poster)");
+          if (!lastPoolGroup.composition.has_verbal) compromisesNow.push("No verbal communicator (explain out loud/write)");
+          lastPoolGroup.composition.compromises = compromisesNow;
+          lastPoolGroup.composition.all_criteria_met =
+            missingNow.length === 0 && scaleOk && lastPoolGroup.composition.has_visual && lastPoolGroup.composition.has_verbal;
+
+          remaining.length = 0;
+          continue;
+        }
+      }
+
       const group: Student[] = [];
       const targetSize = Math.min(groupSize, remaining.length);
 
@@ -115,7 +164,6 @@ export async function runGroupingAlgorithm(
       // Fill remaining slots — prioritize archetype diversity
       const usedArchetypes = new Set(group.map((s) => s.circle_2_archetype));
       while (group.length < targetSize && remaining.length > 0) {
-        // Try to find an archetype not yet in the group
         const diverseIdx = remaining.findIndex(
           (s) => !usedArchetypes.has(s.circle_2_archetype)
         );
@@ -124,7 +172,6 @@ export async function runGroupingAlgorithm(
           usedArchetypes.add(s.circle_2_archetype);
           group.push(s);
         } else {
-          // No new archetypes available — just take the first remaining
           group.push(remaining.shift()!);
         }
       }
