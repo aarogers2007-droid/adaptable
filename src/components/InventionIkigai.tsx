@@ -28,19 +28,22 @@ const CIRCLES = [
   { num: 5, name: "The Voice", color: "#F87171" },
 ];
 
-// Pentagon layout — positions as percentages of viewBox (0-100)
-// Pentagon points upward: top center, mid-left, mid-right, bottom-left, bottom-right
-// Pentagon with circles touching but not overlapping.
-// R=17, centers placed so distance between adjacent pairs ≈ 2R (34).
-const POSITIONS = [
-  { cx: 50, cy: 17 },  // 1: top center
-  { cx: 19, cy: 40 },  // 2: mid-left
-  { cx: 81, cy: 40 },  // 3: mid-right
-  { cx: 29, cy: 73 },  // 4: bottom-left
-  { cx: 71, cy: 73 },  // 5: bottom-right
-];
+// Pentagon with big circles, edges touching.
+// R=20. Adjacent center distance = 40 (exactly 2R = touching).
+// Regular pentagon inscribed in a circle of radius 26 from center (50,50).
+// Pentagon vertices at angles: -90°, -18°, 54°, 126°, 198° (pointing up).
+// PR chosen so side length = 2R = 40 (edges touch exactly)
+// side = 2 * PR * sin(π/5) → PR = 40 / (2 * sin(36°)) ≈ 34
+const PR = 34;
+const CX = 50, CY = 50;
+const angles = [-90, -18, 54, 126, 198].map(a => a * Math.PI / 180);
+const POSITIONS = angles.map(a => ({
+  cx: Math.round((CX + PR * Math.cos(a)) * 10) / 10,
+  cy: Math.round((CY + PR * Math.sin(a)) * 10) / 10,
+}));
+// Computed: (50,22), (74.7,39.9), (65.3,69.1), (34.7,69.1), (25.3,39.9)
 
-const R = 17;
+const R = 20;
 
 export default function InventionIkigai({
   currentCircle = 0,
@@ -50,10 +53,10 @@ export default function InventionIkigai({
   return (
     <div
       className="relative mx-auto w-full"
-      style={{ maxWidth: "520px", aspectRatio: "1 / 0.95" }}
+      style={{ maxWidth: "520px", aspectRatio: "1 / 1" }}
     >
       <svg
-        viewBox="0 0 100 95"
+        viewBox="0 0 100 100"
         className="w-full h-full"
         style={{ overflow: "visible" }}
       >
@@ -102,11 +105,11 @@ export default function InventionIkigai({
               {/* Number */}
               <text
                 x={pos.cx}
-                y={pos.cy - 3}
+                y={pos.cy - 4}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill={isReachable ? "#F9FAFB" : "#9CA3AF"}
-                fontSize="6"
+                fontSize="7"
                 fontWeight="700"
                 fontFamily="var(--font-display, system-ui)"
                 style={{ transition: "fill 0.3s" }}
@@ -117,11 +120,11 @@ export default function InventionIkigai({
               {/* Name */}
               <text
                 x={pos.cx}
-                y={pos.cy + 4.5}
+                y={pos.cy + 5}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill={isReachable ? "#E5E7EB" : "#6B7280"}
-                fontSize="3.8"
+                fontSize="4.5"
                 fontWeight="400"
                 fontFamily="var(--font-display, system-ui)"
                 style={{ transition: "fill 0.3s" }}
