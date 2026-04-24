@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { triggerGrouping, revealGroups, moveStudent, loadInventionDashboard } from "./actions";
+import { triggerGrouping, revealGroups, moveStudent, removeStudent, loadInventionDashboard } from "./actions";
 
 interface DashboardData {
   classCode: string;
@@ -53,6 +53,7 @@ export default function InventionDashboard({
   const [revealConfirm, setRevealConfirm] = useState(false);
   const [moveState, setMoveState] = useState<{ studentId: string; fromGroup: number } | null>(null);
   const [moveTarget, setMoveTarget] = useState<number | null>(null);
+  const [removeConfirm, setRemoveConfirm] = useState<{ studentId: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"overview" | "groups">("overview");
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
@@ -101,6 +102,18 @@ export default function InventionDashboard({
     }
     setMoveState(null);
     setMoveTarget(null);
+  }
+
+  async function handleRemove() {
+    if (!removeConfirm) return;
+    const result = await removeStudent(classId, removeConfirm.studentId);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      const fresh = await loadInventionDashboard(classId);
+      if (!fresh.error) setData(fresh as DashboardData);
+    }
+    setRemoveConfirm(null);
   }
 
   return (
@@ -397,13 +410,24 @@ export default function InventionDashboard({
                             <span className="text-[var(--text-primary)]">
                               {data.studentMap[sid]?.name ?? sid.slice(0, 8)}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => setMoveState({ studentId: sid, fromGroup: group.group_number })}
-                              className="text-xs text-[var(--text-muted)] hover:text-[var(--primary)]"
-                            >
-                              Move
-                            </button>
+                            <div className="flex gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setMoveState({ studentId: sid, fromGroup: group.group_number })}
+                                className="text-xs text-[var(--text-muted)] hover:text-[var(--primary)]"
+                              >
+                                Move
+                              </button>
+                              {data.adminLevel !== "co_admin" && (
+                                <button
+                                  type="button"
+                                  onClick={() => setRemoveConfirm({ studentId: sid, name: data.studentMap[sid]?.name ?? "Student" })}
+                                  className="text-xs text-[var(--text-muted)] hover:text-[var(--error)]"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -539,6 +563,34 @@ export default function InventionDashboard({
                   className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                 >
                   Move
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Remove student confirmation */}
+        {removeConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+            <div className="rounded-xl bg-[var(--bg)] p-6 shadow-lg max-w-sm w-full mx-4">
+              <h3 className="font-semibold text-[var(--text-primary)]">Remove student</h3>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                Remove <strong>{removeConfirm.name}</strong> from this class? This deletes their invention session, removes them from their group, and unenrolls them. This cannot be undone.
+              </p>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRemoveConfirm(null)}
+                  className="rounded-lg border border-[var(--border-strong)] px-4 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="rounded-lg bg-[var(--error)] px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Remove Student
                 </button>
               </div>
             </div>

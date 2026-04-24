@@ -255,3 +255,70 @@ export async function moveStudent(classId: string, studentId: string, fromGroup:
 
   return { success: true };
 }
+
+/**
+ * Remove a student from the invention class entirely.
+ * Deletes their invention session, removes them from their group,
+ * and deletes their class enrollment. Co-admins cannot delete.
+ */
+export async function removeStudent(classId: string, studentId: string) {
+  const auth = await verifyAdmin(classId);
+  if (auth.error) return { error: auth.error };
+
+  if (auth.level === "co_admin") {
+    return { error: "Co-admins cannot remove students. Contact the platform administrator." };
+  }
+
+  const { supabase } = auth;
+
+  const { data: inviteCode } = await supabase
+    .from("invite_codes")
+    .select("code")
+    .eq("class_id", classId)
+    .limit(1)
+    .single();
+
+  if (!inviteCode) return { error: "No invite code found" };
+  const classCode = inviteCode.code;
+
+  // Get the student's group before deleting
+  const { data: session } = await supabase
+    .from("invention_sessions")
+    .select("group_number")
+    .eq("student_id", studentId)
+    .eq("class_code", classCode)
+    .single();
+
+  // Remove from group if assigned
+  if (session?.group_number) {
+    const { data: group } = await supabase
+      .from("invention_groups")
+      .select("id, student_ids")
+      .eq("class_code", classCode)
+      .eq("group_number", session.group_number)
+      .single();
+
+    if (group) {
+      await supabase
+        .from("invention_groups")
+        .update({ student_ids: group.student_ids.filter((id: string) => id !== studentId) })
+        .eq("id", group.id);
+    }
+  }
+
+  // Delete invention session
+  await supabase
+    .from("invention_sessions")
+    .delete()
+    .eq("student_id", studentId)
+    .eq("class_code", classCode);
+
+  // Delete class enrollment
+  await supabase
+    .from("class_enrollments")
+    .delete()
+    .eq("student_id", studentId)
+    .eq("class_id", classId);
+
+  return { success: true };
+}
