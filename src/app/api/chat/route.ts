@@ -130,6 +130,17 @@ export async function POST(request: Request) {
     return Response.json({ error: contentCheck.reason }, { status: 400 });
   }
 
+  // ML moderation — catches what regex misses (subtle toxicity, coded language)
+  // Falls back to safe:true on failure so it never blocks legitimate students
+  const { moderateContentML } = await import("@/lib/ml-moderation");
+  const mlCheck = await moderateContentML(message);
+  if (!mlCheck.safe) {
+    import("@/lib/teacher-alerts").then(({ alertContentFlag }) =>
+      alertContentFlag(supabase, user.id, message, mlCheck.category ?? "ml-flagged", "guide-chat")
+    ).catch(() => {});
+    return Response.json({ error: "That message couldn't be sent. Try rephrasing." }, { status: 400 });
+  }
+
   // Crisis detection — same pattern as lesson-chat.
   // If detected: fire URGENT teacher alert + return supportive response
   // with crisis resources. The guide continues — we don't abandon the student.
