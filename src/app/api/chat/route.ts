@@ -24,6 +24,9 @@ function buildFallbackSystemPrompt(
   studentName: string,
   knowledgeContext: string,
   crossLessonCtx: string,
+  stuckCtx: string = "",
+  guideMemoryCtx: string = "",
+  mirrorCtx: string = "",
 ) {
   return `You are a friendly, conversational AI mentor helping a teenager design their first venture. Think of yourself as their co-founder in a venture studio. They're planning and preparing to launch a real business. Talk like a smart older friend who's been through it, not a textbook or a search engine.
 
@@ -70,7 +73,7 @@ You have a curated knowledge base from Harvard, Y Combinator, Rick Rubin, and re
 
 ${businessContext}
 
-The student's name is ${studentName}. Use their first name.${knowledgeContext}${crossLessonCtx}`;
+The student's name is ${studentName}. Use their first name.${knowledgeContext}${crossLessonCtx}${stuckCtx}${guideMemoryCtx}${mirrorCtx}`;
 }
 
 /**
@@ -302,6 +305,89 @@ export async function POST(request: Request) {
     // Cross-lesson memory is optional
   }
 
+  // #2: Stuck detection — surface where the student is struggling
+  let stuckContext = "";
+  try {
+    const { data: inProgress } = await supabase
+      .from("student_progress")
+      .select("lesson_id, status, created_at, lessons(title, module_name, lesson_sequence)")
+      .eq("student_id", user.id)
+      .eq("status", "in_progress")
+      .order("created_at", { ascending: true })
+      .limit(1);
+
+    if (inProgress && inProgress.length > 0) {
+      const stuck = inProgress[0];
+      const lesson = stuck.lessons as unknown as { title: string; module_name: string; lesson_sequence: number } | null;
+      const startedAt = new Date(stuck.created_at as string);
+      const daysStuck = Math.floor((Date.now() - startedAt.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysStuck >= 2 && lesson) {
+        stuckContext = `\n\nSTUCK ALERT: The student has been on "${lesson.title}" (${lesson.module_name}, Lesson ${lesson.lesson_sequence}) for ${daysStuck} days without completing it. They may be struggling. If they don't bring it up, gently ask how it's going with that lesson after your first exchange. Don't lead with it — let them set the topic first, then weave it in naturally.`;
+      }
+    }
+  } catch { /* optional */ }
+
+  // #1: Guide conversation memory — load summaries of recent guide sessions
+  let guideMemory = "";
+  try {
+    const { data: recentConvos } = await supabase
+      .from("ai_conversations")
+      .select("messages, created_at")
+      .eq("student_id", user.id)
+      .eq("feature", "guide")
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (recentConvos && recentConvos.length > 0) {
+      const summaries = recentConvos
+        .filter((c) => c.messages && Array.isArray(c.messages) && c.messages.length > 2)
+        .map((c) => {
+          const msgs = c.messages as { role: string; content: string }[];
+          // Pull the student's key messages from this session
+          const studentMsgs = msgs
+            .filter((m) => m.role === "user" && m.content.length > 20)
+            .slice(0, 3)
+            .map((m) => m.content.slice(0, 150));
+          if (studentMsgs.length === 0) return null;
+          const daysAgo = Math.floor((Date.now() - new Date(c.created_at as string).getTime()) / (1000 * 60 * 60 * 24));
+          const when = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`;
+          return `[${when}] ${studentMsgs.join(" → ")}`;
+        })
+        .filter(Boolean);
+
+      if (summaries.length > 0) {
+        guideMemory = `\n\nPREVIOUS GUIDE CONVERSATIONS (what they asked you before — show you remember):\n${summaries.join("\n")}`;
+      }
+    }
+  } catch { /* optional */ }
+
+  // #3: Emotional continuity from Founder's Mirror
+  let mirrorContext = "";
+  try {
+    const { data: reflections } = await supabase
+      .from("founder_reflections")
+      .select("prompt, response, mood, created_at")
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (reflections && reflections.length > 0) {
+      const entries = reflections
+        .filter((r) => r.response && (r.response as string).length > 10)
+        .map((r) => {
+          const daysAgo = Math.floor((Date.now() - new Date(r.created_at as string).getTime()) / (1000 * 60 * 60 * 24));
+          const when = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`;
+          const mood = r.mood ? ` [mood: ${r.mood}]` : "";
+          return `[${when}${mood}] Mirror asked: "${(r.prompt as string).slice(0, 80)}" → They wrote: "${(r.response as string).slice(0, 150)}"`;
+        });
+
+      if (entries.length > 0) {
+        mirrorContext = `\n\nFOUNDER'S MIRROR REFLECTIONS (private emotional context — never quote these directly, but let them shape your tone and awareness. If they were frustrated recently, be gentler. If they came back from absence, acknowledge the return warmly):\n${entries.join("\n")}`;
+      }
+    }
+  } catch { /* optional — founder_reflections table may not exist */ }
+
   // Retrieve relevant knowledge — hybrid: tag candidates + semantic re-ranking
   // Uses the student's actual message + business context for per-message relevance
   let knowledgeContext = "";
@@ -403,9 +489,10 @@ export async function POST(request: Request) {
     if (engagementCtx) {
       systemPrompt += `\n\n${engagementCtx}`;
     }
-    if (crossLessonContext) {
-      systemPrompt += crossLessonContext;
-    }
+    if (crossLessonContext) systemPrompt += crossLessonContext;
+    if (stuckContext) systemPrompt += stuckContext;
+    if (guideMemory) systemPrompt += guideMemory;
+    if (mirrorContext) systemPrompt += mirrorContext;
   } else {
     // Graceful degradation: no characters seeded, use the original prompt
     systemPrompt = buildFallbackSystemPrompt(
@@ -413,6 +500,9 @@ export async function POST(request: Request) {
       profile?.full_name || "there",
       knowledgeContext,
       crossLessonContext,
+      stuckContext,
+      guideMemory,
+      mirrorContext,
     );
     if (engagementCtx) {
       systemPrompt += `\n\n${engagementCtx}`;
