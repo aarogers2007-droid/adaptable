@@ -23,6 +23,7 @@ function buildFallbackSystemPrompt(
   businessContext: string,
   studentName: string,
   knowledgeContext: string,
+  crossLessonCtx: string,
 ) {
   return `You are a friendly, conversational AI mentor helping a teenager design their first venture. Think of yourself as their co-founder in a venture studio. They're planning and preparing to launch a real business. Talk like a smart older friend who's been through it, not a textbook or a search engine.
 
@@ -69,7 +70,7 @@ You have a curated knowledge base from Harvard, Y Combinator, Rick Rubin, and re
 
 ${businessContext}
 
-The student's name is ${studentName}. Use their first name.${knowledgeContext}`;
+The student's name is ${studentName}. Use their first name.${knowledgeContext}${crossLessonCtx}`;
 }
 
 /**
@@ -268,6 +269,39 @@ export async function POST(request: Request) {
     if (ik.monetization) businessContext += `\n- How they GET PAID: ${ik.monetization}`;
   }
 
+  // Cross-lesson memory: pull key student responses from completed lessons
+  // so the guide knows what the student has already learned and decided
+  let crossLessonContext = "";
+  try {
+    const { data: allProgress } = await supabase
+      .from("student_progress")
+      .select("artifacts")
+      .eq("student_id", user.id)
+      .eq("status", "completed");
+
+    if (allProgress && allProgress.length > 0) {
+      const decisions = allProgress
+        .filter((p) => p.artifacts && (p.artifacts as Record<string, unknown>).conversation)
+        .map((p) => {
+          const conv = (p.artifacts as Record<string, unknown>).conversation as { role: string; content: string }[];
+          const studentResponses = conv
+            .filter((m) => m.role === "user" && m.content.length > 30)
+            .sort((a, b) => b.content.length - a.content.length)
+            .slice(0, 2)
+            .map((m) => m.content.slice(0, 200));
+          if (studentResponses.length === 0) return null;
+          return studentResponses.join(" | ");
+        })
+        .filter(Boolean);
+
+      if (decisions.length > 0) {
+        crossLessonContext = `\n\nWHAT THEY'VE SAID IN LESSONS (their own words from completed lessons — reference these, catch contradictions):\n${decisions.slice(0, 8).join("\n")}`;
+      }
+    }
+  } catch {
+    // Cross-lesson memory is optional
+  }
+
   // Retrieve relevant knowledge — hybrid: tag candidates + semantic re-ranking
   // Uses the student's actual message + business context for per-message relevance
   let knowledgeContext = "";
@@ -369,12 +403,16 @@ export async function POST(request: Request) {
     if (engagementCtx) {
       systemPrompt += `\n\n${engagementCtx}`;
     }
+    if (crossLessonContext) {
+      systemPrompt += crossLessonContext;
+    }
   } else {
     // Graceful degradation: no characters seeded, use the original prompt
     systemPrompt = buildFallbackSystemPrompt(
       businessContext,
       profile?.full_name || "there",
       knowledgeContext,
+      crossLessonContext,
     );
     if (engagementCtx) {
       systemPrompt += `\n\n${engagementCtx}`;
