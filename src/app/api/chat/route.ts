@@ -13,7 +13,7 @@ import {
   type StudentContext,
 } from "@/lib/character-system";
 import { getEngagementContext } from "@/lib/engagement-context";
-import { getRelevantKnowledge } from "@/lib/knowledge-retrieval";
+import { getRelevantKnowledgeWithMeta, type StudentContext as KBStudentContext } from "@/lib/knowledge-retrieval";
 
 // ---------------------------------------------------------------------------
 // Fallback system prompt (used when no character configs exist in the DB)
@@ -256,13 +256,26 @@ export async function POST(request: Request) {
     ? `The student's business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer}. Revenue model: ${profile.business_idea.revenue_model}.`
     : "The student hasn't created a business idea yet.";
 
-  // Retrieve relevant knowledge base content
+  // Retrieve relevant knowledge — hybrid: tag candidates + semantic re-ranking
+  // Uses the student's actual message + business context for per-message relevance
   let knowledgeContext = "";
   try {
-    // For the guide chat, use "general" tag to get broadly applicable knowledge
-    const knowledge = await getRelevantKnowledge("general", 2);
-    if (knowledge) {
-      knowledgeContext = "\n\nREFERENCE KNOWLEDGE (use these real examples and principles in your answers):\n" + knowledge;
+    const studentCtx: KBStudentContext = {
+      businessName: profile?.business_idea?.name ?? "their business",
+      niche: profile?.business_idea?.niche ?? "",
+      targetCustomer: profile?.business_idea?.target_customer ?? "",
+      lessonTitle: "AI Guide",
+      moduleName: "General",
+      studentMessage: message,
+    };
+    // Try multiple tags to cast a wider net for the guide
+    const tags = ["general", "niche", "customer-interviews", "marketing", "pricing", "competition"];
+    for (const tag of tags) {
+      const result = await getRelevantKnowledgeWithMeta(tag, studentCtx);
+      if (result.formatted) {
+        knowledgeContext = "\n\nKNOWLEDGE (weave in naturally, don't dump):\n" + result.formatted;
+        break;
+      }
     }
   } catch {
     // Knowledge base not available, continue without it
