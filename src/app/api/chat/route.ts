@@ -245,16 +245,28 @@ export async function POST(request: Request) {
   // Get profile for context
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name")
+    .select("business_idea, full_name, ikigai_result")
     .eq("id", user.id)
     .single();
 
-  const profile = profileData as unknown as Pick<Profile, "business_idea" | "full_name"> | null;
+  const profile = profileData as unknown as Pick<Profile, "business_idea" | "full_name"> & { ikigai_result?: { passions?: string[]; skills?: string[]; needs?: string[]; monetization?: string } } | null;
 
-  // Build context
-  const businessContext = profile?.business_idea
-    ? `The student's business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer}. Revenue model: ${profile.business_idea.revenue_model}.`
-    : "The student hasn't created a business idea yet.";
+  // Build context — business + ikigai
+  let businessContext = "";
+  if (profile?.business_idea) {
+    businessContext = `The student's business: "${profile.business_idea.name}" — ${profile.business_idea.niche} for ${profile.business_idea.target_customer}. Revenue model: ${profile.business_idea.revenue_model}.`;
+  } else {
+    businessContext = "The student hasn't created a business idea yet.";
+  }
+
+  if (profile?.ikigai_result) {
+    const ik = profile.ikigai_result;
+    businessContext += `\n\nTHEIR IKIGAI (what drives them — reference naturally, not as a list):`;
+    if (ik.passions?.length) businessContext += `\n- What they LOVE: ${ik.passions.join(", ")}`;
+    if (ik.skills?.length) businessContext += `\n- What they're GOOD AT: ${ik.skills.join(", ")}`;
+    if (ik.needs?.length) businessContext += `\n- What the WORLD NEEDS: ${ik.needs.join(", ")}`;
+    if (ik.monetization) businessContext += `\n- How they GET PAID: ${ik.monetization}`;
+  }
 
   // Retrieve relevant knowledge — hybrid: tag candidates + semantic re-ranking
   // Uses the student's actual message + business context for per-message relevance
