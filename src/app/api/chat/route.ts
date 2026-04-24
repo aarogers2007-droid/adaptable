@@ -130,6 +130,69 @@ export async function POST(request: Request) {
     return Response.json({ error: contentCheck.reason }, { status: 400 });
   }
 
+  // Crisis detection — same pattern as lesson-chat.
+  // If detected: fire URGENT teacher alert + return supportive response
+  // with crisis resources. The guide continues — we don't abandon the student.
+  const { detectCrisis, getCrisisResponse } = await import("@/lib/crisis-detection");
+  const crisisCheck = detectCrisis(message);
+  if (crisisCheck.detected) {
+    const { data: nameData } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+    const firstName = (nameData?.full_name as string | undefined)?.split(" ")[0] ?? "Hey";
+
+    // Fire URGENT teacher alert + email (non-blocking)
+    import("@/lib/teacher-alerts").then(async ({ alertCrisis }) => {
+      const result = await alertCrisis(
+        supabase,
+        user.id,
+        crisisCheck.type ?? "hopelessness",
+        crisisCheck.matchedPattern ?? "",
+        message,
+        "guide-chat"
+      );
+      if (!result || !result.instructorId) return;
+
+      const { data: instructor } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("id", result.instructorId)
+        .single();
+      if (!instructor?.email) return;
+
+      const { sendCrisisAlertEmail } = await import("@/lib/email");
+      await sendCrisisAlertEmail(supabase, {
+        to: instructor.email as string,
+        studentFirstName: firstName,
+        crisisType: crisisCheck.type ?? "hopelessness",
+        matchedPatternHint: (crisisCheck.matchedPattern ?? "").slice(0, 60),
+        alertId: result.alertId,
+        classId: result.classId,
+        timestamp: new Date().toISOString(),
+      });
+    }).catch((err) => console.error("[crisis] guide-chat alert failed:", err));
+
+    // Return supportive response with crisis resources
+    const supportiveText = getCrisisResponse(firstName);
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: supportiveText })}\n\n`));
+        controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
+  }
+
   // Validate conversationId format if provided
   if (conversationId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(conversationId)) {
     return new Response("Invalid conversation ID", { status: 400 });
