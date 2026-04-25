@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { saveInventionProgress, completeInventionSession, getGroupAssignment } from "./actions";
 import InventionIkigai from "@/components/InventionIkigai";
+import ForceLightMode from "@/components/ui/ForceLightMode";
 
 // ── Circle definitions ──
 
@@ -189,6 +190,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
   if (step === 6 || alreadyDone) {
     return (
       <main className="min-h-screen bg-[var(--bg)] px-6 py-16">
+        <ForceLightMode />
         <div className="mx-auto max-w-[600px]">
           <div className="rounded-xl border-2 border-[var(--primary)] bg-[var(--primary)]/5 p-8 text-center">
             {groupRevealed && groupNumber ? (
@@ -453,6 +455,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
   // ── Pentagon diagram view (step 0) ──
   return (
     <main className="min-h-screen bg-[var(--bg)] flex flex-col items-center justify-center px-6 py-12">
+      <ForceLightMode />
       <div className="w-full max-w-[600px]">
         <InventionIkigai
           currentCircle={0}
