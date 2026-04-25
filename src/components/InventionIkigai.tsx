@@ -36,7 +36,7 @@ export default function InventionIkigai({
   onCircleClick,
 }: InventionIkigaiProps) {
   return (
-    <div className="relative mx-auto w-full max-w-[480px]" style={{ aspectRatio: "1 / 1" }}>
+    <div className="relative mx-auto w-full max-w-[720px]" style={{ aspectRatio: "1 / 1" }}>
       <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
         {CIRCLES.map((circle, i) => {
           const pos = POS[i];
