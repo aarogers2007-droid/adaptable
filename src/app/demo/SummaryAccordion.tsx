@@ -58,13 +58,17 @@ export default function SummaryAccordion() {
     <div className="space-y-2">
       {SECTIONS.map((s, i) => {
         const isOpen = openIndex === i;
+        const panelId = `summary-panel-${i}`;
         return (
           <div
-            key={i}
+            key={s.title}
             className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] overflow-hidden transition-colors"
           >
             <button
+              type="button"
               onClick={() => toggle(i)}
+              aria-expanded={isOpen}
+              aria-controls={panelId}
               className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-[var(--bg-muted)] transition-colors"
             >
               <span
@@ -86,7 +90,10 @@ export default function SummaryAccordion() {
             </button>
 
             <div
-              className={`grid transition-all duration-200 ease-in-out ${
+              id={panelId}
+              role="region"
+              aria-hidden={!isOpen}
+              className={`grid transition-[grid-template-rows,opacity] duration-200 ease-in-out ${
                 isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
               }`}
             >
