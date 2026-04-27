@@ -659,7 +659,7 @@ button:active:not(:disabled) {
 }
 
 .ceremony-ik-wrap {
-  position: relative; width: min(520px, 70vh);
+  position: relative; width: min(520px, 70vh, 85vw);
   aspect-ratio: 1/1; z-index: 2;
 }
 
