@@ -60,7 +60,7 @@ export default function DemoCardDesigner({
   const [borderStyle, setBorderStyle] = useState<Border>("rounded");
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4 md:p-6">
       <p className="text-xs font-medium text-[var(--accent)] uppercase tracking-wider">
         Design the card live
       </p>
@@ -68,11 +68,9 @@ export default function DemoCardDesigner({
         Pick a color, accent, finish, and border. The card responds in real time. Move your cursor over the card to see the 3D tilt.
       </p>
 
-      <div className="mt-5 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">
-        {/* Card preview — wrapper locked to 1.75:1 (real US business card
-            dimensions, 3.5" × 2"). The Card3D inside also locks to 1.75:1
-            so it fills the wrapper exactly. */}
-        <div className="relative w-full" style={{ aspectRatio: "7 / 4", maxWidth: "500px" }}>
+      <div className="mt-5 grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 md:gap-6 items-start">
+        {/* Card preview */}
+        <div className="relative w-full mx-auto" style={{ aspectRatio: "7 / 4", maxWidth: "500px" }}>
           <Card3D
             businessName={businessName}
             niche={niche}
@@ -90,7 +88,7 @@ export default function DemoCardDesigner({
         </div>
 
         {/* Controls */}
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {/* Business name */}
           <div>
             <p className="text-xs font-medium text-[var(--text-primary)] mb-2">Name on card</p>

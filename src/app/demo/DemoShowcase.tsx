@@ -747,15 +747,15 @@ export default function DemoShowcase() {
           </p>
           <h2
             className="mt-3 font-[family-name:var(--font-display)] font-semibold"
-            style={{ fontSize: "34px", lineHeight: 1.618, color: "#111827" }}
+            style={{ fontSize: "24px", lineHeight: 1.618, color: "#111827" }}
           >
             A business card she designed
           </h2>
-          <p className="mt-3 max-w-[600px]" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
-            3D tilt, custom colors, finishes that unlock with progress. Pick any combination below.
+          <p className="mt-3 max-w-[600px] text-sm md:text-base" style={{ lineHeight: 1.618, color: "#4B5563" }}>
+            3D tilt, custom colors, finishes that unlock with progress.
           </p>
 
-          <div style={{ marginTop: "55px" }}>
+          <div style={{ marginTop: "34px" }}>
             <DemoCardDesigner
               studentName={ELSA.name}
               defaultBusinessName={ELSA_STUDIO.name}
