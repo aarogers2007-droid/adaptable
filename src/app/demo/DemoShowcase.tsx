@@ -993,7 +993,7 @@ export default function DemoShowcase() {
                   <thead>
                     <tr className="border-b border-[var(--border)]">
                       {["Student", "Business", "Progress", "Status"].map(h => (
-                        <th key={h} className="px-4 py-3 text-left" style={{ fontSize: "11px", fontWeight: 500, color: "#9CA3AF" }}>{h}</th>
+                        <th key={h} className="px-2 md:px-4 py-2 md:py-3 text-left whitespace-nowrap" style={{ fontSize: "11px", fontWeight: 500, color: "#9CA3AF" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -1005,18 +1005,18 @@ export default function DemoShowcase() {
                       { name: "Jaylen Carter", biz: "Cart Culture", pct: 25, status: "Inactive", sColor: "#DC2626" },
                     ].map((s, i) => (
                       <tr key={i} className="border-b border-[var(--border)]">
-                        <td className="px-4 py-3 font-medium" style={{ fontSize: "13px", color: "#111827" }}>{s.name}</td>
-                        <td className="px-4 py-3" style={{ fontSize: "13px", color: "#4B5563" }}>{s.biz}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-2 md:px-4 py-2 md:py-3 font-medium whitespace-nowrap" style={{ fontSize: "12px", color: "#111827" }}>{s.name}</td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ fontSize: "12px", color: "#4B5563" }}>{s.biz}</td>
+                        <td className="px-2 md:px-4 py-2 md:py-3">
                           <div className="flex items-center gap-2">
-                            <div className="h-1.5 w-16 rounded-full bg-[var(--bg-muted)]">
+                            <div className="h-1.5 w-12 md:w-16 rounded-full bg-[var(--bg-muted)]">
                               <div className="h-1.5 rounded-full" style={{ width: `${s.pct}%`, background: "linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0)" }} />
                             </div>
                             <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{s.pct}%</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <span className="rounded-full px-2 py-0.5" style={{ fontSize: "11px", fontWeight: 500, color: s.sColor, background: `${s.sColor}15` }}>
+                        <td className="px-2 md:px-4 py-2 md:py-3">
+                          <span className="rounded-full px-2 py-0.5 whitespace-nowrap" style={{ fontSize: "11px", fontWeight: 500, color: s.sColor, background: `${s.sColor}15` }}>
                             {s.status}
                           </span>
                         </td>
@@ -1363,16 +1363,16 @@ function GoldenIkigai() {
         <span className="font-[family-name:var(--font-display)] text-[9.5px] font-extrabold text-white/90 tracking-[0.15em] leading-tight">BUSINESS</span>
       </div>
 
-      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label hidden md:block" style={{ top: "16.5%", left: "5%" }}>
+      <div className="absolute font-[family-name:var(--font-display)] text-[9px] md:text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ top: "16.5%", left: "5%" }}>
         What you love
       </div>
-      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label hidden md:block" style={{ bottom: "14.5%", left: "5%" }}>
+      <div className="absolute font-[family-name:var(--font-display)] text-[9px] md:text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ bottom: "14.5%", left: "5%" }}>
         What you&apos;re<br />good at
       </div>
-      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label hidden md:block" style={{ top: "14.5%", right: "5%", textAlign: "right" }}>
+      <div className="absolute font-[family-name:var(--font-display)] text-[9px] md:text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ top: "14.5%", right: "5%", textAlign: "right" }}>
         What the world<br />needs
       </div>
-      <div className="absolute font-[family-name:var(--font-display)] text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label hidden md:block" style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}>
+      <div className="absolute font-[family-name:var(--font-display)] text-[9px] md:text-[17px] font-bold text-[var(--text-primary)] leading-tight pointer-events-none ikigai-hero-label" style={{ bottom: "14.5%", right: "5%", textAlign: "right" }}>
         What you can<br />be paid for
       </div>
     </div>
