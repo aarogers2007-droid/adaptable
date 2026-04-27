@@ -252,7 +252,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
         style={{
           background: "var(--manila, #D4B896)",
           borderRadius: "4px 12px 12px 12px",
-          minHeight: "700px",
+          minHeight: "min(700px, 85vh)",
           boxShadow: "0 2px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 var(--manila-light, #E8D5B8)",
         }}
       >
@@ -264,7 +264,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
         {/* ═══ COVER ═══ */}
         <div
           onClick={openFolder}
-          className={`absolute inset-0 flex flex-col items-center justify-center p-[60px_40px] cursor-pointer z-10 transition-all duration-500 ${isOpen ? "opacity-0 pointer-events-none -translate-y-[10px]" : ""}`}
+          className={`absolute inset-0 flex flex-col items-center justify-center p-[30px_20px] md:p-[60px_40px] cursor-pointer z-10 transition-all duration-500 ${isOpen ? "opacity-0 pointer-events-none -translate-y-[10px]" : ""}`}
         >
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] opacity-60" style={{ color: "var(--text-folder, #6B5B3E)" }}>Business Plan</div>
           <div className="mt-6 font-[family-name:var(--font-display)] text-4xl font-bold text-center leading-[1.15]" style={{ color: "var(--text-folder, #6B5B3E)" }}>{d.studentName}</div>
@@ -281,7 +281,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
         </div>
 
         {/* ═══ PAGES ═══ */}
-        <div className={`relative min-h-[700px] transition-opacity duration-500 delay-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
+        <div className={`relative min-h-[500px] md:min-h-[700px] transition-opacity duration-500 delay-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
 
           {/* Page 1: Vision & Ikigai */}
           <Page index={0}>
