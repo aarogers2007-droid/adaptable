@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ForceLightMode from "@/components/ui/ForceLightMode";
+import MobileTabs from "./MobileTabs";
 
 export const metadata: Metadata = {
   title: "Adaptable for Schools — AI-Native Entrepreneurship Education",
@@ -370,19 +371,19 @@ export default function ForSchoolsPage() {
       {/* Hero */}
       <section className="border-b border-[var(--border)] bg-[var(--bg-subtle)]">
         <div className="mx-auto max-w-[1200px] px-6 py-16 md:py-20">
-          <div className="grid items-center gap-12 md:grid-cols-2">
+          <div className="flex items-center gap-6 md:gap-12">
             {/* Left: copy */}
-            <div className="animate-[fade-up_600ms_ease-out_both]">
-              <p className="text-sm font-medium uppercase tracking-wider text-[var(--primary)]">
+            <div className="flex-1 min-w-0 animate-[fade-up_600ms_ease-out_both]">
+              <p className="text-xs md:text-sm font-medium uppercase tracking-wider text-[var(--primary)]">
                 Built for VentureLab
               </p>
-              <h1 className="mt-3 font-[family-name:var(--font-display)] text-[32px] font-bold leading-[1.1] text-[var(--text-primary)] md:text-[48px]">
+              <h1 className="mt-2 md:mt-3 font-[family-name:var(--font-display)] text-[22px] font-bold leading-[1.15] text-[var(--text-primary)] md:text-[48px]">
                 Every student designs a real business.
               </h1>
-              <p className="mt-5 text-lg leading-relaxed text-[var(--text-secondary)] md:text-xl">
-                An AI-native curriculum that adapts to every student's idea, pace, and learning style.
+              <p className="mt-3 md:mt-5 text-sm md:text-xl leading-relaxed text-[var(--text-secondary)]">
+                An AI-native curriculum that adapts to every student&apos;s idea, pace, and learning style.
               </p>
-              <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2">
+              <div className="mt-3 md:mt-4 hidden md:flex flex-wrap items-center gap-x-2 gap-y-2">
                 {["Discover what they care about", "Validate a real idea", "Interview customers", "Set pricing", "Build a launch plan"].map((step, i, arr) => (
                   <span key={step} className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--text-secondary)]">{step}</span>
@@ -390,24 +391,24 @@ export default function ForSchoolsPage() {
                   </span>
                 ))}
               </div>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-5 md:mt-8 flex flex-wrap items-center gap-3 md:gap-4">
                 <Link
                   href="/demo"
-                  className="rounded-lg bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] active:scale-[0.98] transition-all duration-150"
+                  className="rounded-lg bg-[var(--accent)] px-4 md:px-6 py-2.5 md:py-3 text-xs md:text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--accent-light)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] active:scale-[0.98] transition-all duration-150"
                 >
                   See the Demo
                 </Link>
                 <Link
                   href="/standards"
-                  className="rounded-lg border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
+                  className="rounded-lg border border-[var(--border-strong)] px-4 md:px-6 py-2.5 md:py-3 text-xs md:text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
                 >
                   View Curriculum Alignment
                 </Link>
               </div>
             </div>
 
-            {/* Right: Ikigai diagram */}
-            <div className="flex justify-center">
+            {/* Right: Ikigai diagram — scaled down on mobile */}
+            <div className="shrink-0 w-[140px] md:w-auto md:flex-1 flex justify-center">
               <IkigaiDiagram />
             </div>
           </div>
@@ -428,6 +429,9 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      <MobileTabs>
+      {/* Child 0: How It Works */}
+      <div>
       {/* How It Works — vertical timeline. Two-column on lg+: sticky heading on
             the left, timeline on the right. Single column under lg. */}
       <section id="how-it-works" className="border-b border-[var(--border)]">
@@ -497,7 +501,10 @@ export default function ForSchoolsPage() {
           </div>
         </div>
       </section>
+      </div>
 
+      {/* Child 1: Teacher Tools */}
+      <div>
       {/* Teacher Tools — two-tier layout */}
       <section id="teacher-tools" className="border-b border-[var(--border)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
@@ -558,6 +565,10 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      </div>
+
+      {/* Child 2: Standards */}
+      <div>
       {/* Trust: Standards + Safety combined */}
       <section id="standards" className="border-b border-[var(--border)] bg-[var(--bg-subtle)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
@@ -612,6 +623,10 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      </div>
+
+      {/* Child 3: FAQ */}
+      <div>
       {/* FAQ — sticky heading left, list right on lg+ */}
       <section id="faq" className="border-b border-[var(--border)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
@@ -642,6 +657,10 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      </div>
+
+      {/* Child 4: CTA */}
+      <div>
       {/* See the Demo CTA — dark teal with amber button */}
       <section id="request-demo" className="bg-[var(--bg)]">
         <div className="mx-auto max-w-[1200px] px-6 py-20">
@@ -666,6 +685,9 @@ export default function ForSchoolsPage() {
           </div>
         </div>
       </section>
+
+      </div>
+      </MobileTabs>
 
       {/* Footer */}
       <footer className="border-t border-[var(--border)] bg-[var(--bg)]">

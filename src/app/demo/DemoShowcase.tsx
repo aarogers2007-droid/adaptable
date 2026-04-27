@@ -364,7 +364,7 @@ export default function DemoShowcase() {
       {entered && activeTab === "start" && (
       <section ref={distance.ref} style={{ padding: "89px 34px", animation: "fadeSlideIn 600ms ease-out 300ms both" }}>
         <div className="mx-auto max-w-[1000px]">
-          <div className="grid grid-cols-1 gap-13 md:grid-cols-2 items-center" style={{ gap: "89px" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center" style={{ gap: "34px" }}>
             {/* Before: blank Ikigai */}
             <div
               className="text-center transition-all duration-700"
@@ -379,7 +379,7 @@ export default function DemoShowcase() {
               >
                 Before Adaptable
               </p>
-              <div className="mx-auto w-full max-w-[480px] opacity-40">
+              <div className="mx-auto w-full max-w-[240px] md:max-w-[480px] opacity-40">
                 <div style={{ aspectRatio: "1 / 1", position: "relative" }}>
                   <svg viewBox="0 0 100 100" className="w-full h-full">
                     <circle cx="50" cy="30.9" r="20" fill="#F5E642" opacity="0.35" />
@@ -409,7 +409,7 @@ export default function DemoShowcase() {
               >
                 Day 1
               </p>
-              <div className="mx-auto w-full max-w-[480px]">
+              <div className="mx-auto w-full max-w-[240px] md:max-w-[480px]">
                 <GoldenIkigai />
               </div>
               <p className="mt-8 font-[family-name:var(--font-display)] font-semibold" style={{ fontSize: "16px", lineHeight: 1.618, color: "#111827" }}>
