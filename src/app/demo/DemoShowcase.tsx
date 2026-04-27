@@ -262,26 +262,20 @@ export default function DemoShowcase() {
       <nav className={`absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 md:px-6 md:py-4 ${entered ? "hidden" : ""}`}>
         <Link
           href="/"
-          className="font-[family-name:var(--font-display)] text-sm md:text-lg font-bold"
-          style={{ color: "#F9FAFB" }}
+          className="font-[family-name:var(--font-display)] text-sm md:text-lg font-bold text-[var(--text-primary)]"
         >
           Adaptable
         </Link>
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           <Link
             href="/for-schools"
-            className="text-xs md:text-sm transition-colors hover:opacity-80"
-            style={{ color: "#9CA3AF" }}
+            className="text-xs md:text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
           >
             For Schools
           </Link>
           <Link
             href="/login"
-            className="rounded-lg px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium transition-colors"
-            style={{
-              background: entered ? "var(--primary)" : "rgba(255,255,255,0.15)",
-              color: "#fff",
-            }}
+            className="rounded-lg bg-[var(--primary)] px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white transition-colors"
           >
             Log In
           </Link>
@@ -351,7 +345,7 @@ export default function DemoShowcase() {
                 {t.label}
               </button>
             ))}
-            <div className="ml-auto flex shrink-0 items-center gap-3 hidden md:flex">
+            <div className="ml-auto flex shrink-0 items-center gap-3">
               <Link href="/for-schools" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">For Schools</Link>
               <Link href="/login" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white">Log In</Link>
             </div>
