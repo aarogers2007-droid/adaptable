@@ -252,7 +252,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
         style={{
           background: "var(--manila, #D4B896)",
           borderRadius: "4px 12px 12px 12px",
-          minHeight: "min(700px, 85vh)",
+          minHeight: "min(700px, 60vh)",
           boxShadow: "0 2px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 var(--manila-light, #E8D5B8)",
         }}
       >
@@ -267,11 +267,11 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
           className={`absolute inset-0 flex flex-col items-center justify-center p-[30px_20px] md:p-[60px_40px] cursor-pointer z-10 transition-all duration-500 ${isOpen ? "opacity-0 pointer-events-none -translate-y-[10px]" : ""}`}
         >
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] opacity-60" style={{ color: "var(--text-folder, #6B5B3E)" }}>Business Plan</div>
-          <div className="mt-6 font-[family-name:var(--font-display)] text-4xl font-bold text-center leading-[1.15]" style={{ color: "var(--text-folder, #6B5B3E)" }}>{d.studentName}</div>
+          <div className="mt-4 md:mt-6 font-[family-name:var(--font-display)] text-2xl md:text-4xl font-bold text-center leading-[1.15]" style={{ color: "var(--text-folder, #6B5B3E)" }}>{d.studentName}</div>
           <div className="mt-2 text-base opacity-70" style={{ color: "var(--text-folder, #6B5B3E)" }}>{d.businessName}</div>
           <div className="mt-[6px] text-[13px] opacity-45" style={{ color: "var(--text-folder, #6B5B3E)" }}>Created {d.dateCreated}</div>
           {/* Ikigai circles */}
-          <div className="mt-[60px] relative w-[180px] h-[180px]">
+          <div className="mt-[30px] md:mt-[60px] relative w-[120px] h-[120px] md:w-[180px] md:h-[180px]">
             <div className="absolute w-[110px] h-[110px] rounded-full opacity-35 top-0 left-1/2 -translate-x-1/2" style={{ background: "var(--love, #F5E642)" }} />
             <div className="absolute w-[110px] h-[110px] rounded-full opacity-35 top-[35px] left-0" style={{ background: "var(--good-at, #A8DB5A)" }} />
             <div className="absolute w-[110px] h-[110px] rounded-full opacity-35 top-[35px] right-0" style={{ background: "var(--needs, #F4A79D)" }} />
@@ -281,7 +281,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
         </div>
 
         {/* ═══ PAGES ═══ */}
-        <div className={`relative min-h-[500px] md:min-h-[700px] transition-opacity duration-500 delay-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
+        <div className={`relative min-h-[400px] md:min-h-[700px] transition-opacity duration-500 delay-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
 
           {/* Page 1: Vision & Ikigai */}
           <Page index={0}>
