@@ -84,11 +84,11 @@ export default function TeacherSignupPage() {
               id="password"
               type="password"
               required
-              minLength={6}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
             />
           </div>
 

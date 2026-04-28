@@ -162,10 +162,12 @@ export default function DemoShowcase() {
       setEntered(true);
       sessionStorage.setItem("demo-entered", "1");
       window.scrollTo({ top: 0 });
-      // Double-rAF: wait for React to render the DOM, then force animations
+      // Triple-rAF: React commit → paint → force animations
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          distance.forceVisible();
+          requestAnimationFrame(() => {
+            distance.forceVisible();
+          });
         });
       });
     }, 600);
@@ -195,14 +197,19 @@ export default function DemoShowcase() {
 
   const selectTab = (key: DemoTab) => {
     setActiveTab(key);
-    // Double-rAF: first frame lets React render, second fires animations
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        tabAnimations[key].forEach((fn) => fn());
-      });
-      tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  // Fire scroll-triggered animations after React commits the tab's DOM
+  useEffect(() => {
+    if (!entered) return;
+    const fns = tabAnimations[activeTab];
+    if (fns.length === 0) return;
+    // rAF ensures the conditionally-rendered tab content is in the DOM
+    requestAnimationFrame(() => {
+      fns.forEach((fn) => fn());
+    });
+  }, [entered, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Typewriter texts
   const chatLine1 = useTypewriter(

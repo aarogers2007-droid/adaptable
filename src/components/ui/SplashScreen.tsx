@@ -29,7 +29,13 @@ export default function SplashScreen({ children, preview, onDone }: SplashScreen
   const [phase, setPhase] = useState<"scatter" | "assembled" | "fade" | "done">("scatter");
 
   useEffect(() => {
-    if (!preview && sessionStorage.getItem("splash-seen")) {
+    try {
+      if (!preview && sessionStorage.getItem("splash-seen")) {
+        setPhase("done");
+        return;
+      }
+    } catch {
+      // sessionStorage unavailable (headless, privacy mode) — skip splash
       setPhase("done");
       return;
     }
@@ -41,7 +47,7 @@ export default function SplashScreen({ children, preview, onDone }: SplashScreen
     // Done
     const t3 = setTimeout(() => {
       setPhase("done");
-      if (!preview) sessionStorage.setItem("splash-seen", "1");
+      try { if (!preview) sessionStorage.setItem("splash-seen", "1"); } catch {}
       onDone?.();
     }, 4800);
 
