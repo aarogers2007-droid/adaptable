@@ -355,8 +355,8 @@ export default function DemoShowcase() {
               ))}
             </div>
             <div className="ml-2 flex shrink-0 items-center gap-2 md:ml-3 md:gap-3">
-              <Link href="/for-schools" className="whitespace-nowrap text-xs md:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">For Schools</Link>
-              <Link href="/login" className="whitespace-nowrap rounded-lg bg-[var(--primary)] px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white">Log In</Link>
+              <Link href="/for-schools" className="inline-flex items-center whitespace-nowrap rounded-lg px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors">For Schools</Link>
+              <Link href="/login" className="inline-flex items-center whitespace-nowrap rounded-lg bg-[var(--primary)] px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white">Log In</Link>
             </div>
           </div>
         </div>
