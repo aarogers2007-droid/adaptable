@@ -70,6 +70,21 @@ export async function saveInventionProgress(data: {
     const { moderateContent } = await import("@/lib/content-moderation");
     const check = moderateContent(data.idea_freetext);
     if (!check.safe) return { error: check.reason ?? "That content isn't appropriate. Try rephrasing." };
+
+    const { detectCrisis } = await import("@/lib/crisis-detection");
+    const crisisCheck = detectCrisis(data.idea_freetext);
+    if (crisisCheck.detected) {
+      import("@/lib/teacher-alerts").then(async ({ alertCrisis }) => {
+        await alertCrisis(
+          supabase,
+          user.id,
+          crisisCheck.type ?? "hopelessness",
+          crisisCheck.matchedPattern ?? "",
+          data.idea_freetext!,
+          "invention-wizard"
+        );
+      }).catch(() => {});
+    }
   }
 
   // Upsert the invention session
