@@ -36,7 +36,6 @@ async function main() {
   const { data: classes } = await supabase.from("classes").select("*").limit(1);
   if (!classes?.length) { console.log("No classes found"); return; }
   const classId = classes[0].id;
-  const orgId = classes[0].org_id;
   console.log("Class:", classes[0].name, classId);
 
   // Get teacher (org_admin)

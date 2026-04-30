@@ -36,6 +36,7 @@ export default function CompletionConfetti() {
       duration: 2 + Math.random() * 3,
     }));
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- effect generates particles once on mount
     setParticles(newParticles);
 
     const timeout = setTimeout(() => setParticles([]), 5000);

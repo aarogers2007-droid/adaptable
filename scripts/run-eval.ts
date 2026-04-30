@@ -21,7 +21,7 @@
  */
 
 import { execSync } from "child_process";
-import { writeFileSync, readFileSync } from "fs";
+import { writeFileSync } from "fs";
 import path from "path";
 
 // ── Baselines (10% regression threshold = score × 0.90) ──

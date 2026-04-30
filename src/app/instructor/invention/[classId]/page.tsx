@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { loadInventionDashboard } from "./actions";
-import InventionDashboard from "./InventionDashboard";
+import InventionDashboard, { type DashboardData } from "./InventionDashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -26,5 +26,5 @@ export default async function InventionAdminPage({
     );
   }
 
-  return <InventionDashboard classId={classId} initialData={data as any} />;
+  return <InventionDashboard classId={classId} initialData={data as DashboardData} />;
 }

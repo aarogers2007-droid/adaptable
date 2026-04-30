@@ -179,7 +179,7 @@ function normalizeForModeration(text: string): string {
     .replace(/[\u0392\u03B2]/g, "B")  // Greek Β/β
     .replace(/[\u0391\u03B1]/g, "a")  // Greek Α/α
     // Common leetspeak
-    .replace(/[1!|]/g, (ch) => {
+    .replace(/[1!|]/g, () => {
       // Only replace when adjacent to letters (crude but effective)
       return "i";
     })
@@ -189,7 +189,7 @@ function normalizeForModeration(text: string): string {
     .replace(/[$]/g, "s")
     .replace(/[5]/g, "s")
     // Collapse whitespace (catches "f u c k" spacing trick)
-    .replace(/(\w)\s+(?=\w)/g, (match, p1) => {
+    .replace(/(\w)\s+(?=\w)/g, (match) => {
       // Only collapse single-char-space-single-char patterns
       if (match.length <= 3) return match.replace(/\s+/g, "");
       return match;

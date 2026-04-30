@@ -125,7 +125,7 @@ export default function JoinClassPage() {
           ) : (
             <div className="space-y-4">
               <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] p-4 text-center">
-                <p className="text-sm text-[var(--text-muted)]">You're joining</p>
+                <p className="text-sm text-[var(--text-muted)]">You&apos;re joining</p>
                 <p className="mt-1 font-[family-name:var(--font-display)] text-xl font-semibold">
                   {classInfo.className}
                 </p>

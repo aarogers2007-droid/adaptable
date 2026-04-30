@@ -23,7 +23,7 @@ async function verifyAdmin(classId: string) {
   if (!profile) return { error: "Profile not found", supabase, user: null, level: null as AdminLevel | null };
 
   // Platform owners have unrestricted access to all classes
-  const isPlatformOwner = (profile as any).is_platform_owner === true;
+  const isPlatformOwner = (profile as Record<string, unknown>).is_platform_owner === true;
 
   const { data: cls } = await supabase
     .from("classes")
@@ -37,7 +37,7 @@ async function verifyAdmin(classId: string) {
 
   const isInstructor = cls.instructor_id === user.id;
   const isOrgAdmin = profile.role === "org_admin";
-  const coAdminIds = (cls.grouping_config as any)?.co_admin_ids ?? [];
+  const coAdminIds = (cls.grouping_config as Record<string, unknown> | null)?.co_admin_ids as string[] ?? [];
   const isCoAdmin = coAdminIds.includes(user.id);
 
   if (!isPlatformOwner && !isInstructor && !isOrgAdmin && !isCoAdmin) {
@@ -121,7 +121,7 @@ export async function loadInventionDashboard(classId: string) {
     .eq("class_code", classCode)
     .order("group_number");
 
-  const config = cls!.grouping_config as any ?? {};
+  const config = (cls!.grouping_config as Record<string, unknown>) ?? {};
 
   return {
     classCode,
@@ -170,8 +170,8 @@ export async function triggerGrouping(classId: string) {
 
   if (!inviteCode) return { error: "No invite code found" };
 
-  const config = (auth.cls!.grouping_config as any) ?? {};
-  const groupSize = config.group_size ?? 5;
+  const config = (auth.cls!.grouping_config as Record<string, unknown>) ?? {};
+  const groupSize = (config.group_size as number) ?? 5;
 
   const result = await runGroupingAlgorithm(inviteCode.code, groupSize);
   return result;
@@ -185,7 +185,7 @@ export async function revealGroups(classId: string) {
   if (auth.error) return { error: auth.error };
 
   const { supabase } = auth;
-  const config = (auth.cls!.grouping_config as any) ?? {};
+  const config = (auth.cls!.grouping_config as Record<string, unknown>) ?? {};
 
   await supabase
     .from("classes")

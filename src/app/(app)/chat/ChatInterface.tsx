@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import Link from "next/link";
 import AppNav from "@/components/ui/AppNav";
 import CharacterIntro from "@/components/character/CharacterIntro";
 import CharacterAvatar from "@/components/character/CharacterAvatar";
@@ -10,14 +9,13 @@ import HandoffPrompt from "@/components/character/HandoffPrompt";
 import { acceptHandoff, markCharacterUnlocked } from "./character-actions";
 
 function TypewriterText({ text, streaming }: { text: string; streaming: boolean }) {
-  const [displayed, setDisplayed] = useState("");
+  const [streamedText, setStreamedText] = useState("");
   const indexRef = useRef(0);
   const rafRef = useRef<number>(0);
   const lastTimeRef = useRef(0);
 
   useEffect(() => {
     if (!streaming) {
-      setDisplayed(text);
       indexRef.current = text.length;
       return;
     }
@@ -29,7 +27,7 @@ function TypewriterText({ text, streaming }: { text: string; streaming: boolean 
         if (indexRef.current < text.length) {
           const next = Math.min(indexRef.current + CHARS_PER_TICK, text.length);
           indexRef.current = next;
-          setDisplayed(text.slice(0, next));
+          setStreamedText(text.slice(0, next));
         }
       }
       if (indexRef.current < text.length) {
@@ -39,6 +37,8 @@ function TypewriterText({ text, streaming }: { text: string; streaming: boolean 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, [text, streaming]);
+
+  const displayed = streaming ? streamedText : text;
 
   const paragraphs = displayed ? displayed.split(/\n\n+/).filter((p) => p.trim()) : [];
   return (

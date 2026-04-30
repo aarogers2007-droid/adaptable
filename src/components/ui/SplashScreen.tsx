@@ -31,11 +31,13 @@ export default function SplashScreen({ children, preview, onDone }: SplashScreen
   useEffect(() => {
     try {
       if (!preview && sessionStorage.getItem("splash-seen")) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only sync from sessionStorage
         setPhase("done");
         return;
       }
     } catch {
       // sessionStorage unavailable (headless, privacy mode) — skip splash
+       
       setPhase("done");
       return;
     }

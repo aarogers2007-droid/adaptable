@@ -29,7 +29,6 @@ export default function LeaderboardCard({
   title,
   icon,
   entries,
-  currentStudentId,
   metricLabel,
   onStudentClick,
 }: LeaderboardCardProps) {

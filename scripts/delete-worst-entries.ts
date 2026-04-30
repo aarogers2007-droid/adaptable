@@ -78,8 +78,8 @@ const WORST_TITLES = [
   // coverage to know if dropping these 5 broke anything structurally.
   console.log("== Coverage check after deletion (raw, ignoring verified flag) ==\n");
   let covered = 0;
-  let uncovered: string[] = [];
-  let thin: string[] = [];
+  const uncovered: string[] = [];
+  const thin: string[] = [];
 
   for (const plan of LESSON_PLANS) {
     const tags = plan.lesson_tags ?? [];

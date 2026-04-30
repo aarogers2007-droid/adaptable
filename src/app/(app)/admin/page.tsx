@@ -18,7 +18,7 @@ export default async function AdminPage() {
     .single();
 
   // Platform owner gets this dashboard. Regular org_admin gets redirected.
-  if (!(profileData as any)?.is_platform_owner) {
+  if (!(profileData as Record<string, unknown> | null)?.is_platform_owner) {
     if (profileData?.role === "org_admin") {
       redirect("/instructor/dashboard");
     }
@@ -26,12 +26,11 @@ export default async function AdminPage() {
   }
 
   // ── Load platform-wide data ──
-  const [classesRes, profilesRes, inventionSessionsRes, progressRes, lessonsRes] = await Promise.all([
+  const [classesRes, profilesRes, inventionSessionsRes, progressRes] = await Promise.all([
     supabase.from("classes").select("id, name, session_type, instructor_id, org_id").order("created_at"),
     supabase.from("profiles").select("id, full_name, email, role, is_platform_owner, org_id").in("role", ["instructor", "org_admin"]),
     supabase.from("invention_sessions").select("id, completed_at"),
     supabase.from("student_progress").select("id, status"),
-    supabase.from("lessons").select("id").order("module_sequence").order("lesson_sequence"),
   ]);
 
   const classes = classesRes.data ?? [];
@@ -176,10 +175,10 @@ export default async function AdminPage() {
                   // Find which classes this admin has access to
                   const ownedClasses = classes.filter((c) => c.instructor_id === admin.id);
                   const coAdminClasses = classes.filter((c) => {
-                    const ids = ((c as any).grouping_config as any)?.co_admin_ids ?? [];
+                    const ids = ((c as Record<string, unknown>).grouping_config as Record<string, unknown> | undefined)?.co_admin_ids as string[] ?? [];
                     return ids.includes(admin.id);
                   });
-                  const scopeStr = (admin as any).is_platform_owner
+                  const scopeStr = (admin as Record<string, unknown>).is_platform_owner
                     ? "All classes"
                     : [...ownedClasses.map((c) => c.name), ...coAdminClasses.map((c) => `${c.name} (co-admin)`)].join(", ") || "No classes";
 
@@ -189,13 +188,13 @@ export default async function AdminPage() {
                       <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{admin.email}</td>
                       <td className="px-4 py-3">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          (admin as any).is_platform_owner
+                          (admin as Record<string, unknown>).is_platform_owner
                             ? "bg-amber-100 text-amber-700"
                             : admin.role === "org_admin"
                             ? "bg-green-100 text-green-700"
                             : "bg-blue-100 text-blue-700"
                         }`}>
-                          {(admin as any).is_platform_owner ? "Platform Owner" : admin.role === "org_admin" ? "Org Admin" : "Instructor"}
+                          {(admin as Record<string, unknown>).is_platform_owner ? "Platform Owner" : admin.role === "org_admin" ? "Org Admin" : "Instructor"}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{scopeStr}</td>

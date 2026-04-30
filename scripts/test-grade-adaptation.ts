@@ -153,7 +153,6 @@ const TIER_CHECKS: Record<GradeTier, TierChecks> = {
 // ── Test runner ──
 
 async function testIkigaiSynthesis(student: TestStudent): Promise<{ idea: string; passed: boolean; issues: string[] }> {
-  const tierConfig = getTierConfig(student.tier);
   const ikigaiAdaptation = student.tier !== "high_school" ? getIkigaiAdaptation(student.tier) : "";
 
   const systemPrompt = `You help teenagers discover their business niche based on their Ikigai answers.

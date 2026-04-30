@@ -126,7 +126,7 @@ export default function InterviewSandbox({ personas, onComplete, niche }: Interv
           Interview Debrief
         </h2>
         <p className="mt-2 text-sm text-[var(--text-secondary)]">
-          Let's look at what you learned from each conversation.
+          Let&apos;s look at what you learned from each conversation.
         </p>
 
         <div className="mt-6 space-y-6">
@@ -156,8 +156,8 @@ export default function InterviewSandbox({ personas, onComplete, niche }: Interv
                 {hasLeadingQuestions && (
                   <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 mb-3">
                     <p className="text-xs text-amber-700">
-                      Some of your questions were opinion-based ("Would you..." / "Do you think...").
-                      Notice how those got vague, enthusiastic answers that don't actually tell you anything useful?
+                      Some of your questions were opinion-based (&quot;Would you...&quot; / &quot;Do you think...&quot;).
+                      Notice how those got vague, enthusiastic answers that don&apos;t actually tell you anything useful?
                     </p>
                   </div>
                 )}
@@ -324,7 +324,7 @@ export default function InterviewSandbox({ personas, onComplete, niche }: Interv
         <div className="shrink-0 border-t border-emerald-200 bg-emerald-50 px-6 py-4">
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <p className="text-sm text-[var(--success)]">
-              You've interviewed {completedCount} people. Ready to see what you learned?
+              You&apos;ve interviewed {completedCount} people. Ready to see what you learned?
             </p>
             <button
               onClick={() => setShowDebrief(true)}

@@ -35,7 +35,7 @@ export default async function PrintRosterPage({
 
   const isInstructor = cls.instructor_id === user.id;
   const isOrgAdmin = profile?.role === "org_admin";
-  const coAdminIds = (cls.grouping_config as any)?.co_admin_ids ?? [];
+  const coAdminIds = (cls.grouping_config as Record<string, unknown> | null)?.co_admin_ids as string[] ?? [];
   const isCoAdmin = coAdminIds.includes(user.id);
 
   if (!isInstructor && !isOrgAdmin && !isCoAdmin) {
@@ -145,7 +145,7 @@ export default async function PrintRosterPage({
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
           {(groups ?? []).map((group) => (
-            <div key={group.group_number} style={{ border: "2px solid #000", padding: "16px", pageBreakInside: "avoid", breakInside: "avoid" as any }}>
+            <div key={group.group_number} style={{ border: "2px solid #000", padding: "16px", pageBreakInside: "avoid", breakInside: "avoid" as React.CSSProperties["breakInside"] }}>
               <div style={{ textAlign: "center", fontSize: "48px", fontWeight: 800, lineHeight: 1.1, paddingBottom: "12px", borderBottom: "1px solid #ccc", marginBottom: "12px" }}>
                 {group.group_number}
               </div>

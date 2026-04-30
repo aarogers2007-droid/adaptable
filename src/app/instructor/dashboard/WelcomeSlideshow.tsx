@@ -42,6 +42,7 @@ export default function WelcomeSlideshow() {
   useEffect(() => {
     const welcomed = localStorage.getItem(STORAGE_KEY);
     if (!welcomed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only sync from localStorage
       setIsOpen(true);
     }
   }, []);

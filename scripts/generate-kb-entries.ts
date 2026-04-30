@@ -14,7 +14,7 @@
  * Usage: npx tsx scripts/generate-kb-entries.ts
  */
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import path from "path";
 
 const envFile = readFileSync(path.join(process.cwd(), ".env.local"), "utf-8");

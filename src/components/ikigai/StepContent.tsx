@@ -212,7 +212,7 @@ export default function StepContent({
         {/* Minimum input nudge */}
         {showNudge && (
           <p className="mb-3 text-sm text-[var(--text-primary)]/60 bg-white/40 rounded-lg px-4 py-2 text-center">
-            Just one? That's fine, but adding 1-2 more helps create a better business idea for you.
+            Just one? That&apos;s fine, but adding 1-2 more helps create a better business idea for you.
           </p>
         )}
 

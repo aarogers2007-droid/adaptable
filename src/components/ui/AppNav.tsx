@@ -2,8 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+
+// Extracted to module level to satisfy React compiler (no inline component creation during render)
+function NavLink({
+  href,
+  className,
+  children,
+  preview,
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+  preview: boolean;
+}) {
+  return preview ? (
+    <span className={className} aria-disabled="true">
+      {children}
+    </span>
+  ) : (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  );
+}
 
 interface AppNavProps {
   isAdmin: boolean;
@@ -37,27 +60,6 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
     return pathname === tab.href;
   }
 
-  // In preview mode, every nav link becomes a styled span so the demo
-  // visitor sees the full nav UI but clicking nothing ejects them.
-  const NavLink = ({
-    href,
-    className,
-    children,
-  }: {
-    href: string;
-    className?: string;
-    children: React.ReactNode;
-  }) =>
-    previewMode ? (
-      <span className={className} aria-disabled="true">
-        {children}
-      </span>
-    ) : (
-      <Link href={href} className={className}>
-        {children}
-      </Link>
-    );
-
   return (
     <>
       {/* Desktop nav */}
@@ -66,6 +68,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
           <NavLink
             href={adminMode ? "/admin" : "/dashboard"}
             className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)] mr-4"
+            preview={previewMode}
           >
             Adaptable
           </NavLink>
@@ -74,6 +77,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
             <NavLink
               key={tab.href}
               href={tab.href}
+              preview={previewMode}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors min-h-[44px] flex items-center ${
                 isActive(tab)
                   ? "bg-[var(--primary)]/10 text-[var(--primary)]"
@@ -146,6 +150,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
           <NavLink
             href="/dashboard"
             className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]"
+            preview={previewMode}
           >
             Adaptable
           </NavLink>

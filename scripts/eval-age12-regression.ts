@@ -288,8 +288,8 @@ async function main() {
   console.log(`Target: capital_required ≥ 4.0 avg (was 3.00 in v4 report)`);
   console.log("");
 
-  let allCapScores: number[] = [];
-  let allTotals: number[] = [];
+  const allCapScores: number[] = [];
+  const allTotals: number[] = [];
   let pass = true;
 
   for (const p of AGE12_PERSONAS) {

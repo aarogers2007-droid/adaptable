@@ -33,7 +33,7 @@ export async function saveInventionProgress(data: {
   const { data: inviteCode } = await supabase
     .from("invite_codes")
     .select("code")
-    .eq("class_id", (enrollment as any).class_id)
+    .eq("class_id", (enrollment as Record<string, unknown>).class_id as string)
     .limit(1)
     .single();
 
@@ -175,7 +175,7 @@ export async function getGroupAssignment() {
     .limit(1)
     .single();
 
-  const config = (inviteCode?.classes as unknown as { grouping_config: any })?.grouping_config;
+  const config = (inviteCode?.classes as unknown as { grouping_config: Record<string, unknown> } | undefined)?.grouping_config;
   const revealed = config?.groups_revealed === true;
 
   return {

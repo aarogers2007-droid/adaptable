@@ -102,7 +102,6 @@ export default function BusinessCardClient({
   const [activeTab, setActiveTab] = useState<Tab>("text");
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const unlockedFonts = CARD_FONTS.filter((f) => totalCharsWritten >= f.unlockAt);
   const nextLockFont = CARD_FONTS.find((f) => totalCharsWritten < f.unlockAt);
 
   useEffect(() => {

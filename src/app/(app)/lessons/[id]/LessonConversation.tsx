@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import MirrorModal from "@/components/mirror/MirrorModal";
 
@@ -15,14 +15,13 @@ import MirrorModal from "@/components/mirror/MirrorModal";
  * When not streaming, shows full text immediately.
  */
 function TypewriterText({ text, streaming }: { text: string; streaming: boolean }) {
-  const [displayed, setDisplayed] = useState("");
+  const [streamedText, setStreamedText] = useState("");
   const indexRef = useRef(0);
   const rafRef = useRef<number>(0);
   const lastTimeRef = useRef(0);
 
   useEffect(() => {
     if (!streaming) {
-      setDisplayed(text);
       indexRef.current = text.length;
       return;
     }
@@ -36,7 +35,7 @@ function TypewriterText({ text, streaming }: { text: string; streaming: boolean 
         if (indexRef.current < text.length) {
           const next = Math.min(indexRef.current + CHARS_PER_TICK, text.length);
           indexRef.current = next;
-          setDisplayed(text.slice(0, next));
+          setStreamedText(text.slice(0, next));
         }
       }
       if (indexRef.current < text.length) {
@@ -47,6 +46,8 @@ function TypewriterText({ text, streaming }: { text: string; streaming: boolean 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, [text, streaming]);
+
+  const displayed = streaming ? streamedText : text;
 
   const paragraphs = displayed ? displayed.split(/\n\n+/).filter((p) => p.trim()) : [];
 
@@ -100,7 +101,7 @@ interface LessonConversationProps {
 export default function LessonConversation({
   lessonId,
   lessonTitle,
-  moduleName,
+  moduleName: _moduleName,
   lessonSequence,
   moduleSequence,
   progressId,
@@ -130,7 +131,7 @@ export default function LessonConversation({
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(initialCompleted);
   const [checkpointsReached, setCheckpointsReached] = useState(initialCheckpoints);
-  const [adminMode, setAdminMode] = useState(initialIsAdmin);
+  const [adminMode] = useState(initialIsAdmin);
   const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting...", emotion: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
   const [showSandboxIntro, setShowSandboxIntro] = useState(false);
@@ -167,6 +168,7 @@ export default function LessonConversation({
   // Collapse goal after 3 messages to save space
   useEffect(() => {
     if (messages.length >= 4 && !goalCollapsed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- collapses goal panel after enough messages
       setGoalCollapsed(true);
     }
   }, [messages.length, goalCollapsed]);
@@ -175,6 +177,7 @@ export default function LessonConversation({
   useEffect(() => {
     if (checkpointsReached > prevCheckpointsRef.current) {
       prevCheckpointsRef.current = checkpointsReached;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- triggers celebration animation on checkpoint advance
       setCheckpointCelebration(true);
       setTimeout(() => setCheckpointCelebration(false), 2500);
     }
@@ -292,6 +295,7 @@ export default function LessonConversation({
 
   // Reset timer when messages change (new AI response)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetIdleTimer manages suggestion visibility via timeout
     resetIdleTimer();
     return () => {
       if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
@@ -317,7 +321,7 @@ export default function LessonConversation({
     }
   }
 
-  function useSuggestion(text: string) {
+  function applySuggestion(text: string) {
     setInput(text);
     setShowSuggestions(false);
     inputRef.current?.focus();
@@ -787,7 +791,7 @@ export default function LessonConversation({
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
-                    onClick={() => useSuggestion(s)}
+                    onClick={() => applySuggestion(s)}
                     aria-label={`Use suggestion: ${s}`}
                     className="chip-cascade rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
                     style={{ animationDelay: `${i * 200}ms` }}

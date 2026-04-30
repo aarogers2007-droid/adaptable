@@ -59,7 +59,7 @@ function computeStreak(dates: string[]): number {
 
   // Start counting from today or yesterday
   let streak = 0;
-  let expectedDate = new Date(todayStr + "T00:00:00Z");
+  const expectedDate = new Date(todayStr + "T00:00:00Z");
 
   // If the most recent check-in is not today, check yesterday
   if (uniqueDays[0] !== todayStr) {

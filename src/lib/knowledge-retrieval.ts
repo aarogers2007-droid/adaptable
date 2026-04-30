@@ -206,7 +206,7 @@ export async function getRelevantKnowledgeWithMeta(
  */
 export async function getRelevantKnowledge(
   lessonTag: string,
-  limit = 3
+  _limit = 3
 ): Promise<string> {
   const result = await getRelevantKnowledgeWithMeta(lessonTag);
   return result.formatted;

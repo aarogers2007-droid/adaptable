@@ -1,6 +1,79 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, type ReactNode } from "react";
+
+// ── Extracted sub-components (module-level to satisfy React compiler) ──
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="mb-4 last:mb-0">
+      <div className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.05em] mb-[3px]">{label}</div>
+      <div className="text-[13px] text-[var(--text-primary)] leading-[1.6]">{children}</div>
+    </div>
+  );
+}
+
+function Decision({ lesson, text }: { lesson: string; text: string }) {
+  return (
+    <div className="py-[10px] border-b border-[#E8E4DA] last:border-b-0">
+      <div className="text-[10px] text-[var(--text-muted)] font-medium mb-[2px]">{lesson}</div>
+      <div className="text-[13px] text-[var(--text-primary)] leading-[1.55]">{text}</div>
+    </div>
+  );
+}
+
+function TaskRow({ checked, onToggle, text }: { checked: boolean; onToggle: () => void; text: string }) {
+  return (
+    <label className="flex items-start gap-2 py-[7px] border-b border-[#E8E4DA] last:border-b-0 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onToggle}
+        className="appearance-none w-4 h-4 min-w-[16px] border-2 border-[#D6D3D1] rounded mt-[1px] cursor-pointer transition-all relative bg-white checked:bg-[var(--primary)] checked:border-[var(--primary)] after:content-['\\2713'] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:text-white after:text-[11px] after:font-bold after:opacity-0 checked:after:opacity-100"
+      />
+      <span className={`text-[12px] text-[var(--text-primary)] leading-[1.45] transition-opacity ${checked ? "line-through opacity-50" : ""}`}>
+        {text}
+      </span>
+    </label>
+  );
+}
+
+function WeekBlock({ week, label, title, tasks, checkedArr, doneCount, onToggle }: { week: string; label: string; title: string; tasks: string[]; checkedArr: boolean[]; doneCount: number; onToggle: (week: string, index: number) => void }) {
+  return (
+    <div className="mb-4">
+      <div className="font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--text-primary)] mb-2 flex justify-between items-center">
+        <span>
+          <span className="text-[10px] font-bold text-[var(--primary)] uppercase tracking-[0.08em]">{label}</span> {title}
+        </span>
+        <span className={`text-[11px] font-semibold ${doneCount === tasks.length ? "text-[var(--primary)]" : "text-[var(--text-muted)]"}`}>
+          {doneCount}/{tasks.length}
+        </span>
+      </div>
+      {tasks.map((t, i) => (
+        <TaskRow key={i} checked={checkedArr[i]} onToggle={() => onToggle(week, i)} text={t} />
+      ))}
+    </div>
+  );
+}
+
+function PlanPage({ active, children }: { active: boolean; children: ReactNode }) {
+  return (
+    <div
+      className={`${active ? "block" : "hidden"} relative h-[680px] m-5 mb-0 rounded-sm animate-[pageIn_0.35s_ease]`}
+      style={{
+        background: "#FFFEF9",
+        boxShadow: "0 1px 2px rgba(0,0,0,0.04), 1px 0 0 #E8E4DA, 2px 0 0 #F5F0E8, 3px 0 0 #E8E4DA, 4px 0 0 #F0EBE2",
+      }}
+    >
+      {/* Ruled lines */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, #E8E4DA 27px, #E8E4DA 28px)", opacity: 0.3, borderRadius: "inherit" }} />
+      {/* Red margin */}
+      <div className="absolute left-7 top-0 bottom-0 w-px pointer-events-none" style={{ background: "#E8B4B4", opacity: 0.35 }} />
+      {/* Content — scrollable if it overflows */}
+      <div className="relative z-[1] h-full overflow-y-auto p-10 scrollbar-thin">{children}</div>
+    </div>
+  );
+}
 
 /**
  * BusinessPlanFolder — manila folder preview of a student's completed business plan.
@@ -174,68 +247,6 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
     />
   ));
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div className="mb-4 last:mb-0">
-      <div className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.05em] mb-[3px]">{label}</div>
-      <div className="text-[13px] text-[var(--text-primary)] leading-[1.6]">{children}</div>
-    </div>
-  );
-
-  const Decision = ({ lesson, text }: { lesson: string; text: string }) => (
-    <div className="py-[10px] border-b border-[#E8E4DA] last:border-b-0">
-      <div className="text-[10px] text-[var(--text-muted)] font-medium mb-[2px]">{lesson}</div>
-      <div className="text-[13px] text-[var(--text-primary)] leading-[1.55]">{text}</div>
-    </div>
-  );
-
-  const TaskRow = ({ week, index, text }: { week: string; index: number; text: string }) => (
-    <label className="flex items-start gap-2 py-[7px] border-b border-[#E8E4DA] last:border-b-0 cursor-pointer">
-      <input
-        type="checkbox"
-        checked={weekProgress[week][index]}
-        onChange={() => toggleTask(week, index)}
-        className="appearance-none w-4 h-4 min-w-[16px] border-2 border-[#D6D3D1] rounded mt-[1px] cursor-pointer transition-all relative bg-white checked:bg-[var(--primary)] checked:border-[var(--primary)] after:content-['\\2713'] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:text-white after:text-[11px] after:font-bold after:opacity-0 checked:after:opacity-100"
-      />
-      <span className={`text-[12px] text-[var(--text-primary)] leading-[1.45] transition-opacity ${weekProgress[week][index] ? "line-through opacity-50" : ""}`}>
-        {text}
-      </span>
-    </label>
-  );
-
-  const WeekBlock = ({ week, label, title, tasks }: { week: string; label: string; title: string; tasks: string[] }) => (
-    <div className="mb-4">
-      <div className="font-[family-name:var(--font-display)] text-sm font-semibold text-[var(--text-primary)] mb-2 flex justify-between items-center">
-        <span>
-          <span className="text-[10px] font-bold text-[var(--primary)] uppercase tracking-[0.08em]">{label}</span> {title}
-        </span>
-        <span className={`text-[11px] font-semibold ${weekCount(week) === tasks.length ? "text-[var(--primary)]" : "text-[var(--text-muted)]"}`}>
-          {weekCount(week)}/{tasks.length}
-        </span>
-      </div>
-      {tasks.map((t, i) => (
-        <TaskRow key={i} week={week} index={i} text={t} />
-      ))}
-    </div>
-  );
-
-  // Page wrapper with paper styling — fixed height, scrollable content
-  const Page = ({ index, children }: { index: number; children: React.ReactNode }) => (
-    <div
-      className={`${currentPage === index ? "block" : "hidden"} relative h-[680px] m-5 mb-0 rounded-sm animate-[pageIn_0.35s_ease]`}
-      style={{
-        background: "#FFFEF9",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.04), 1px 0 0 #E8E4DA, 2px 0 0 #F5F0E8, 3px 0 0 #E8E4DA, 4px 0 0 #F0EBE2",
-      }}
-    >
-      {/* Ruled lines */}
-      <div className="absolute inset-0 pointer-events-none" style={{ background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, #E8E4DA 27px, #E8E4DA 28px)", opacity: 0.3, borderRadius: "inherit" }} />
-      {/* Red margin */}
-      <div className="absolute left-7 top-0 bottom-0 w-px pointer-events-none" style={{ background: "#E8B4B4", opacity: 0.35 }} />
-      {/* Content — scrollable if it overflows */}
-      <div className="relative z-[1] h-full overflow-y-auto p-10 scrollbar-thin">{children}</div>
-    </div>
-  );
-
   return (
     <div className="relative w-full max-w-[640px]">
       {/* Tab */}
@@ -284,7 +295,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
         <div className={`relative min-h-[400px] md:min-h-[700px] transition-opacity duration-500 delay-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
 
           {/* Page 1: Vision & Ikigai */}
-          <Page index={0}>
+          <PlanPage active={currentPage === 0}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 1 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Vision</div>
             <div className="grid grid-cols-2 gap-[6px] mb-5">
@@ -296,37 +307,37 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
             <Field label="What We Do">{d.whatWeDo}</Field>
             <Field label="Why This Matters to Me">{d.whyMatters}</Field>
             <Field label="The Golden Circle"><strong>WHY:</strong> {d.goldenCircle.why} <strong>HOW:</strong> {d.goldenCircle.how} <strong>WHAT:</strong> {d.goldenCircle.what}</Field>
-          </Page>
+          </PlanPage>
 
           {/* Page 2: Customer */}
-          <Page index={1}>
+          <PlanPage active={currentPage === 1}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 2 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Customer</div>
             <Field label="Target Customer">{d.targetCustomer}</Field>
             <Field label="Customer Profile"><strong>{d.customerProfile.split(".")[0]}.</strong>{d.customerProfile.slice(d.customerProfile.indexOf(".") + 1)}</Field>
             <Field label="Revenue Model">{d.revenueModel}</Field>
             <Field label="Interview Insights"><span className="inline-block px-[9px] py-[2px] rounded-full text-[10px] font-semibold" style={{ background: "rgba(13,148,136,0.08)", color: "var(--primary)" }}>{d.interviewCount} interviews completed</span><br />{d.interviewInsights}</Field>
-          </Page>
+          </PlanPage>
 
           {/* Page 3: Competition */}
-          <Page index={2}>
+          <PlanPage active={currentPage === 2}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 3 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Competition &amp; Differentiation</div>
             <Decision lesson="Research Your Competition" text={d.competitors} />
             <Decision lesson="Define Your Target Customer" text={d.realCompetition} />
-          </Page>
+          </PlanPage>
 
           {/* Page 4: Brand */}
-          <Page index={3}>
+          <PlanPage active={currentPage === 3}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 4 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Brand</div>
             <Field label="Brand Voice"><strong>Gut-feeling words:</strong> {d.brandWords}<br /><strong>We are NOT:</strong> {d.brandNot}</Field>
             <Field label="Business Name">{d.businessNameChoice}</Field>
             <Field label="Visual Identity">{d.visualIdentity}</Field>
-          </Page>
+          </PlanPage>
 
           {/* Page 5: Marketing */}
-          <Page index={4}>
+          <PlanPage active={currentPage === 4}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 5 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Marketing &amp; Sales</div>
             <Decision lesson="Zero-Budget Marketing" text={d.zeroBudget} />
@@ -336,36 +347,36 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
               <div className="font-[family-name:var(--font-display)] text-[17px] font-medium text-[var(--text-primary)] leading-[1.65] italic">&ldquo;{d.pitchText}&rdquo;</div>
               <div className="mt-3 text-xs font-medium text-[var(--text-muted)]">&mdash; {d.studentName.split(" ")[0]}, Founder of {d.businessName}</div>
             </div>
-          </Page>
+          </PlanPage>
 
           {/* Page 6: Numbers */}
-          <Page index={5}>
+          <PlanPage active={currentPage === 5}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 6 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">The Numbers</div>
             <Field label="Cost Per Portrait (8&times;10 watercolor)">{d.costBreakdown}</Field>
             <Field label="Pricing Rationale">{d.pricingRationale}</Field>
             <Field label="Tracking System">{d.trackingSystem}</Field>
-          </Page>
+          </PlanPage>
 
           {/* Page 7: Launch */}
-          <Page index={6}>
+          <PlanPage active={currentPage === 6}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 7 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Launch &amp; First Sale</div>
             <Decision lesson="Shipping Before I'm Ready" text={d.mvp} />
             <Decision lesson="First Customer Protocol" text={d.firstCustomer} />
             <Decision lesson="Getting Feedback" text={d.feedback} />
             <Decision lesson="After the First Sale" text={d.afterSale} />
-          </Page>
+          </PlanPage>
 
           {/* Page 8: Timeline */}
-          <Page index={7}>
+          <PlanPage active={currentPage === 7}>
             <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--primary)] mb-1">Page 8 of {TOTAL_PAGES}</div>
             <div className="font-[family-name:var(--font-display)] text-[22px] font-bold text-[var(--text-primary)] mb-5 leading-[1.25]">Your 4-Week Launch Plan</div>
             <p className="text-[13px] text-[var(--text-secondary)] mb-4 leading-[1.5]">Everything you decided across 22 lessons, organized into a month of real action. Check off each task as you go.</p>
-            <WeekBlock week="w1" label={"Week 1 \u2014"} title="Ship to One Person" tasks={d.week1Tasks} />
-            <WeekBlock week="w2" label={"Week 2 \u2014"} title="Get Customers #2 and #3" tasks={d.week2Tasks} />
-            <WeekBlock week="w3" label={"Week 3 \u2014"} title="Build the System" tasks={d.week3Tasks} />
-            <WeekBlock week="w4" label={"Week 4 \u2014"} title={"Decide What\u2019s Next"} tasks={d.week4Tasks} />
+            <WeekBlock week="w1" label={"Week 1 \u2014"} title="Ship to One Person" tasks={d.week1Tasks} checkedArr={weekProgress.w1} doneCount={weekCount("w1")} onToggle={toggleTask} />
+            <WeekBlock week="w2" label={"Week 2 \u2014"} title="Get Customers #2 and #3" tasks={d.week2Tasks} checkedArr={weekProgress.w2} doneCount={weekCount("w2")} onToggle={toggleTask} />
+            <WeekBlock week="w3" label={"Week 3 \u2014"} title="Build the System" tasks={d.week3Tasks} checkedArr={weekProgress.w3} doneCount={weekCount("w3")} onToggle={toggleTask} />
+            <WeekBlock week="w4" label={"Week 4 \u2014"} title={"Decide What\u2019s Next"} tasks={d.week4Tasks} checkedArr={weekProgress.w4} doneCount={weekCount("w4")} onToggle={toggleTask} />
             {/* Progress bar */}
             <div className="mt-5">
               <div className="h-[6px] bg-[var(--bg-muted,#F5F5F4)] rounded-full overflow-hidden">
@@ -380,7 +391,7 @@ export default function BusinessPlanFolder(props: BusinessPlanFolderProps) {
                 <div className="text-[13px] italic text-[var(--text-secondary)] leading-[1.6]">&ldquo;{d.foundersLog}&rdquo;</div>
               </div>
             </div>
-          </Page>
+          </PlanPage>
         </div>
 
         {/* Static nav bar — always at the bottom of the folder, never moves */}

@@ -19,11 +19,6 @@ interface ResearchData {
   quotes: { quote: string; source: string; context: string }[];
 }
 
-interface ChallengeData {
-  student_friendly_summary: string;
-  challenge_qa: { question: string; answer: string }[];
-  quality_score: number;
-}
 
 const TOPICS = [
   {

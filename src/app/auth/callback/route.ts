@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         }
 
         // ── ADMIN ROUTING — admins don't need onboarding ──
-        if ((profile as any)?.is_platform_owner) {
+        if ((profile as Record<string, unknown> | null)?.is_platform_owner) {
           return NextResponse.redirect(`${origin}/admin`);
         }
         if (profile?.role === "instructor" || profile?.role === "org_admin") {

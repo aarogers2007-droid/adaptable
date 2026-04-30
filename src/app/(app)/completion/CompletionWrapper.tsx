@@ -30,8 +30,10 @@ export default function CompletionWrapper({
     // Check if ceremony has been viewed before
     const viewed = sessionStorage.getItem("adaptable_ceremony_viewed");
     if (viewed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only sync from sessionStorage
       setCeremonyDone(true);
     } else {
+       
       setShowCeremony(true);
     }
   }, []);

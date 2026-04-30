@@ -113,7 +113,6 @@ export async function getMirrorAnalytics(): Promise<MirrorAnalytics> {
 
   // Unique students
   const studentIds = new Set(all.map((e) => e.student_id));
-  const studentsWithMultiple = [...new Map<string, number>()].length; // need to recount
   const studentCounts = new Map<string, number>();
   for (const e of all) {
     studentCounts.set(e.student_id, (studentCounts.get(e.student_id) ?? 0) + 1);

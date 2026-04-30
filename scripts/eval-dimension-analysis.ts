@@ -141,7 +141,7 @@ interface CellStats {
 type CrossTab = Record<PersonaGroup, Record<Dimension, CellStats>>;
 
 const crossTab: CrossTab = {} as CrossTab;
-const groupTotals: Record<PersonaGroup, { sum: number; n: number }> = {} as any;
+const groupTotals: Record<PersonaGroup, { sum: number; n: number }> = {} as Record<PersonaGroup, { sum: number; n: number }>;
 
 for (const group of GROUP_ORDER) {
   crossTab[group] = {} as Record<Dimension, CellStats>;

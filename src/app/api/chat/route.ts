@@ -8,8 +8,6 @@ import {
   detectHandoff,
   unlockCharacter,
   getUnlockedCharacters,
-  recordHandoff,
-  type CharacterConfig,
   type StudentContext,
 } from "@/lib/character-system";
 import { getEngagementContext } from "@/lib/engagement-context";
@@ -700,7 +698,7 @@ export async function POST(request: Request) {
 
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
-        } catch (err) {
+        } catch (_err) {
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ error: "Something went wrong. Try again." })}\n\n`)
           );

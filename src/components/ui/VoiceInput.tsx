@@ -33,7 +33,10 @@ export default function VoiceInput({
   enabled = true,
 }: VoiceInputProps) {
   const [state, setState] = useState<VoiceState>("idle");
-  const [supported, setSupported] = useState(true);
+  const [supported, setSupported] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  });
   const [transcript, setTranscript] = useState("");
   const [showHint, setShowHint] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -46,14 +49,7 @@ export default function VoiceInput({
     }
   }, []);
 
-  // Check browser support
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setSupported(false);
-    }
-  }, []);
+  // Browser support is now checked in the state initializer above
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {

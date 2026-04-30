@@ -44,6 +44,7 @@ export default function Confetti({ active }: { active: boolean }) {
       rotationSpeed: -3 + Math.random() * 6,
     }));
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- effect generates particles once on activation
     setParticles(newParticles);
 
     const timeout = setTimeout(() => setParticles([]), 2000);

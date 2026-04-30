@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { streamMessage } from "@/lib/ai";
-import { getLessonPlan, getAdaptedLessonPlan } from "@/lib/lesson-plans";
+import { getAdaptedLessonPlan } from "@/lib/lesson-plans";
 import { learningProfilePrompt, type LearningProfile, DEFAULT_LEARNING_PROFILE } from "@/lib/learning-profile";
 import { getRelevantKnowledgeWithMeta, type RetrievedChunkMeta, type StudentContext } from "@/lib/knowledge-retrieval";
 import type { Profile, GradeTier } from "@/lib/types";

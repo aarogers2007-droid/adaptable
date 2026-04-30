@@ -301,9 +301,9 @@ async function main() {
   console.log(`Target: no_forced_hybrid ≥ 4.5 avg (was 3.90 in v4 report)`);
   console.log("");
 
-  let allInsightScores: number[] = [];
-  let allHybridScores: number[] = [];
-  let allTotals: number[] = [];
+  const allInsightScores: number[] = [];
+  const allHybridScores: number[] = [];
+  const allTotals: number[] = [];
 
   for (const p of MULTI_PERSONAS) {
     console.log(`\n── ${p.id} — ${p.studentName} ──`);

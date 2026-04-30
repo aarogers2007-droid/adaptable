@@ -74,7 +74,7 @@ interface Props {
   existingSession: ExistingSession | null;
 }
 
-export default function InventionWizard({ studentName, existingSession }: Props) {
+export default function InventionWizard({ existingSession }: Props) {
   const alreadyDone = !!existingSession?.completed_at;
 
   function getStartingStep(): number {
@@ -152,7 +152,7 @@ export default function InventionWizard({ studentName, existingSession }: Props)
     if (step === 4) data.circle_4_scale = circle4;
     if (step === 5) data.circle_5_voice = circle5;
 
-    const result = await saveInventionProgress(data as any);
+    const result = await saveInventionProgress(data as Parameters<typeof saveInventionProgress>[0]);
     setSaving(false);
     if (result.error) { setError(result.error); return; }
 

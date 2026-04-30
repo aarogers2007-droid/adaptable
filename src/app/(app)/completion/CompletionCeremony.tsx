@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 const PHI = 1.618034;
 const BASE = 1000;
@@ -93,17 +93,6 @@ export default function CompletionCeremony({
         typeof ikigai.monetization === "string" ? ikigai.monetization : "Creative Services",
       ]
     : ["What you love", "What you're good at", "What the world needs", "How you earn"];
-
-  const transitionTo = useCallback(
-    async (to: Scene, duration = PHI * BASE) => {
-      setExitingScene(activeScene);
-      await sleep(duration);
-      if (!mountedRef.current) return;
-      setActiveScene(to);
-      setExitingScene(null);
-    },
-    [activeScene]
-  );
 
   // ─── MAIN SEQUENCE ───
   // Runs ONCE on mount. Must not depend on activeScene, or self-transitions

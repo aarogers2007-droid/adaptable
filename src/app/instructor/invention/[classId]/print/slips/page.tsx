@@ -35,7 +35,7 @@ export default async function PrintSlipsPage({
 
   const isInstructor = cls.instructor_id === user.id;
   const isOrgAdmin = profile?.role === "org_admin";
-  const coAdminIds = (cls.grouping_config as any)?.co_admin_ids ?? [];
+  const coAdminIds = (cls.grouping_config as Record<string, unknown> | null)?.co_admin_ids as string[] ?? [];
   const isCoAdmin = coAdminIds.includes(user.id);
 
   if (!isInstructor && !isOrgAdmin && !isCoAdmin) {
@@ -158,7 +158,7 @@ export default async function PrintSlipsPage({
                 padding: "20px 16px",
                 textAlign: "center",
                 pageBreakInside: "avoid",
-                breakInside: "avoid" as any,
+                breakInside: "avoid" as React.CSSProperties["breakInside"],
                 minHeight: "160px",
                 display: "flex",
                 flexDirection: "column",

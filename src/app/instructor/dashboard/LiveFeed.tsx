@@ -35,6 +35,7 @@ export default function LiveFeed({ items }: LiveFeedProps) {
   const [filter, setFilter] = useState<TimeFilter>("24h");
 
   const filteredItems = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity -- Date.now() is intentionally impure to compute time-based filters
     const now = Date.now();
     return items.filter((item) => {
       if (filter === "all") return true;

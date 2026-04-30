@@ -12,7 +12,7 @@ export default async function BusinessPlanPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [profileRes, lessonsRes, progressRes, decisionsRes, pitchRes] = await Promise.all([
+  const [profileRes, lessonsRes, progressRes, _decisionsRes, pitchRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
     supabase.from("student_progress").select("*").eq("student_id", user.id),

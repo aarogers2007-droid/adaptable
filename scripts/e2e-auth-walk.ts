@@ -212,7 +212,7 @@ async function main() {
   const lesson = lessonRow as { id: string; title: string; module_sequence: number; lesson_sequence: number };
 
   // Create a student_progress row so lesson-chat has somewhere to write
-  const { data: progressRow } = await sbAdmin
+  await sbAdmin
     .from("student_progress")
     .upsert({
       student_id: userId,
@@ -221,7 +221,6 @@ async function main() {
     }, { onConflict: "student_id,lesson_id" })
     .select()
     .single();
-  const progressId = (progressRow as { id: string } | null)?.id;
 
   // ── 7. CSRF env var sanity (THE bug we just fixed)
   // We can't easily test the CSRF check via HTTP because Next middleware

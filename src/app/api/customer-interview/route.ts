@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { streamMessage } from "@/lib/ai";
 import { generatePersonas } from "@/lib/customer-personas";
 import { moderateContent } from "@/lib/content-moderation";
-import { moderateOutput, OUTPUT_FALLBACK_MESSAGE } from "@/lib/output-moderation";
+import { moderateOutput } from "@/lib/output-moderation";
 import type { Profile } from "@/lib/types";
 
 export async function POST(request: Request) {

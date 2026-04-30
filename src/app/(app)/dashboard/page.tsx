@@ -46,12 +46,13 @@ export default async function DashboardPage() {
   const progress = (progressRes.data ?? []) as unknown as StudentProgress[];
   const latestCheckin = (checkinRes.data?.[0] ?? null) as unknown as MentorCheckin | null;
 
-  const { niche, name, target_customer, revenue_model } = profile.business_idea;
+  const { niche, name, target_customer } = profile.business_idea;
   const nextLesson = getNextLesson(lessons, progress);
   const completedCount = progress.filter((p) => p.status === "completed").length;
   const { percentage, completed, total } = calculateProgress(profile, lessons.length, completedCount);
 
   // Check if check-in is stale (>7 days)
+  // eslint-disable-next-line react-hooks/purity -- server component, not rendered in browser
   const checkinStale = !latestCheckin || (Date.now() - new Date(latestCheckin.created_at).getTime()) > 7 * 24 * 60 * 60 * 1000;
 
   // Compute check-in streak
@@ -154,13 +155,16 @@ export default async function DashboardPage() {
 
   // 2. Check for weekly review (if no absence trigger fired)
   if (!mirrorPrompt && profile.created_at) {
+    /* eslint-disable react-hooks/purity -- server component, not rendered in browser */
     const daysSinceJoin = Math.floor(
       (Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24)
     );
+    /* eslint-enable react-hooks/purity */
     if (daysSinceJoin > 0 && daysSinceJoin % 7 === 0) {
       const alreadyFired = await hasMirrorFiredToday("weekly_review");
       if (!alreadyFired) {
         // Count active days this week from usage logs
+        // eslint-disable-next-line react-hooks/purity -- server component, not rendered in browser
         const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         const thisWeekLogs = (usageLogs ?? []).filter(
           (l) => new Date(l.created_at) >= weekAgo
@@ -329,6 +333,7 @@ export default async function DashboardPage() {
         {/* Daily Check-In — hidden on day 1 (nothing to reflect on yet) */}
         {(() => {
           const createdAt = new Date(profile.created_at);
+          // eslint-disable-next-line react-hooks/purity -- server component, not rendered in browser
           const isDay1 = (Date.now() - createdAt.getTime()) < 24 * 60 * 60 * 1000;
           return !isDay1 ? (
             <div className="stagger-enter mt-4" style={{ animationDelay: "200ms" }}>

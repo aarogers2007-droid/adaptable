@@ -365,6 +365,7 @@ export default async function InstructorDashboardPage() {
     }
 
     // Active this week
+    // eslint-disable-next-line react-hooks/purity -- server component, not rendered in browser
     const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     const activeThisWeek = students.filter(
       (s) => s.lastActive && new Date(s.lastActive).getTime() > oneWeekAgo

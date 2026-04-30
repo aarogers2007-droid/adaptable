@@ -41,7 +41,7 @@ export default function LoginPage() {
         return;
       }
 
-      if ((profile as any)?.is_platform_owner) {
+      if ((profile as Record<string, unknown> | null)?.is_platform_owner) {
         router.push("/admin");
         return;
       }
@@ -67,7 +67,7 @@ export default function LoginPage() {
             .eq("session_type", "invention");
 
           const coAdminClass = allClasses?.find((c) => {
-            const ids = (c.grouping_config as any)?.co_admin_ids ?? [];
+            const ids = (c.grouping_config as Record<string, unknown> | null)?.co_admin_ids as string[] ?? [];
             return ids.includes(user.id);
           });
 

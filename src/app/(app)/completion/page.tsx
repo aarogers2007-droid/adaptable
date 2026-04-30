@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, StudentProgress, Lesson, BusinessIdea, IkigaiResult } from "@/lib/types";
-import { ACHIEVEMENTS, ACHIEVEMENT_MAP } from "@/lib/achievements";
+import { ACHIEVEMENT_MAP } from "@/lib/achievements";
 import Link from "next/link";
 import CompletionConfetti from "./CompletionConfetti";
 import AppNav from "@/components/ui/AppNav";
@@ -86,7 +85,7 @@ export default async function CompletionPage() {
             You did it, {studentName}!
           </h1>
           <p className="mt-3 text-lg text-[var(--text-secondary)]">
-            You didn't just learn about entrepreneurship. You designed a real venture.
+            You didn&apos;t just learn about entrepreneurship. You designed a real venture.
           </p>
         </div>
 
@@ -124,7 +123,7 @@ export default async function CompletionPage() {
                 <p className="mt-1 text-xs text-[var(--text-secondary)]">{ikigaiResult.passions.join(", ")}</p>
               </div>
               <div className="rounded-lg p-3" style={{ backgroundColor: "#ECFCCB" }}>
-                <p className="text-xs font-semibold text-[var(--text-primary)]">What I'm Good At</p>
+                <p className="text-xs font-semibold text-[var(--text-primary)]">What I&apos;m Good At</p>
                 <p className="mt-1 text-xs text-[var(--text-secondary)]">{ikigaiResult.skills.join(", ")}</p>
               </div>
               <div className="rounded-lg p-3" style={{ backgroundColor: "#FFE4E6" }}>
@@ -209,10 +208,10 @@ export default async function CompletionPage() {
         {/* What's next */}
         <section className="mt-8 rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 p-6 text-center">
           <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
-            What's next?
+            What&apos;s next?
           </h3>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            You've made every decision a real founder makes. Your business plan is ready.
+            You&apos;ve made every decision a real founder makes. Your business plan is ready.
             Share it with someone you trust, talk to real customers, and start building.
           </p>
         </section>

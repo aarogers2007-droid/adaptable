@@ -18,6 +18,7 @@ export default function WelcomeCinematic({
   useEffect(() => {
     // Check if already seen this session
     if (sessionStorage.getItem("welcome-seen")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only sync from sessionStorage
       setPhase("done");
       return;
     }

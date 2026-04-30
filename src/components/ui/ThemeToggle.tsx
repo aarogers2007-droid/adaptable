@@ -11,12 +11,14 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Read from localStorage or OS preference
+    // Read from localStorage or OS preference — must run client-side only
     const stored = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const isDark = stored === "dark" || (!stored && prefersDark);
-    setDark(isDark);
     document.documentElement.classList.toggle("dark", isDark);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only sync from browser APIs
+    setDark(isDark);
+     
     setMounted(true);
   }, []);
 

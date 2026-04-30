@@ -32,7 +32,7 @@ const POS = [
 
 export default function InventionIkigai({
   currentCircle = 0,
-  completedCircles = [],
+  completedCircles: _completedCircles = [],
   onCircleClick,
 }: InventionIkigaiProps) {
   return (

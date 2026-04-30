@@ -24,6 +24,7 @@ export default function TeacherOnboardingPage() {
   // Auto-generate code when class name changes
   useEffect(() => {
     if (className.trim().length < 2) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- resets dependent state when input is too short
       setClassCode("");
       return;
     }

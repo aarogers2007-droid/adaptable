@@ -10,12 +10,6 @@ interface FoundersLogEntry {
   created_at: string;
 }
 
-const TRIGGER_LABELS: Record<string, string> = {
-  lesson_completion: "After",
-  return_from_absence: "Welcome back",
-  weekly_review: "Weekly reflection",
-};
-
 /** Map emotion to background wash + border + dot color */
 const MOOD_STYLES: Record<string, { wash: string; border: string; dot: string }> = {
   engaged:    { wash: "bg-[#F0FDFA]", border: "border-l-[#0D9488]", dot: "bg-[#0D9488]" },

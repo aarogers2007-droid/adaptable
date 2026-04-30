@@ -297,7 +297,7 @@ function computeStreak(dates: string[]): number {
   const today = new Date();
   const todayStr = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-${String(today.getUTCDate()).padStart(2, "0")}`;
 
-  let expectedDate = new Date(todayStr + "T00:00:00Z");
+  const expectedDate = new Date(todayStr + "T00:00:00Z");
 
   if (uniqueDays[0] !== todayStr) {
     expectedDate.setUTCDate(expectedDate.getUTCDate() - 1);
@@ -397,9 +397,6 @@ export async function checkAndAwardAchievements(
 
   const completedProgress = progressRows.filter((p) => p.status === "completed");
   const completedLessonIds = new Set(completedProgress.map((p) => p.lesson_id));
-
-  // Build lesson_sequence lookup
-  const lessonSeqMap = new Map(lessons.map((l) => [l.id, l.lesson_sequence]));
 
   // ─── Determine newly earned achievements ───
 

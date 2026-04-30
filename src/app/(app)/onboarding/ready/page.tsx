@@ -33,7 +33,7 @@ export default async function ReadyPage() {
             Meet {name}
           </h1>
           <p className="mt-2 text-[var(--text-secondary)]">
-            {studentName}, you just created something real. Let's make it happen.
+            {studentName}, you just created something real. Let&apos;s make it happen.
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export default async function ReadyPage() {
             <p className="mt-1 text-sm text-[var(--text-primary)]">{target_customer}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-[var(--text-muted)]">How you'll make money</p>
+            <p className="text-xs font-medium text-[var(--text-muted)]">How you&apos;ll make money</p>
             <p className="mt-1 text-sm text-[var(--text-primary)]">{revenue_model}</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default async function ReadyPage() {
             <div className="flex gap-3 items-start rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">3</span>
               <div>
-                <p className="text-sm font-medium text-[var(--text-primary)]">You'll build a real business plan</p>
+                <p className="text-sm font-medium text-[var(--text-primary)]">You&apos;ll build a real business plan</p>
                 <p className="text-xs text-[var(--text-secondary)] mt-0.5">Every decision you make assembles into a business plan you can share with anyone. Plus a business card you earn along the way.</p>
               </div>
             </div>

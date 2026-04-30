@@ -31,7 +31,6 @@ import CompletionCeremony from "@/app/(app)/completion/CompletionCeremony";
 import IkigaiWizard from "@/components/ikigai/IkigaiWizard";
 import type { BusinessIdea } from "@/lib/types";
 import DemoCardDesigner from "./DemoCardDesigner";
-import InventionIkigai from "@/components/InventionIkigai";
 import DemoInventionMode from "./DemoInventionMode";
 import SummaryAccordion from "./SummaryAccordion";
 import BusinessPlanFolder from "@/components/business-plan/BusinessPlanFolder";
@@ -70,7 +69,7 @@ function useInView(threshold = 0.3) {
   }, [threshold]);
 
   const forceVisible = () => setVisible(true);
-  return { ref, visible, forceVisible };
+  return [ref, visible, forceVisible] as const;
 }
 
 // ── Typewriter effect hook ──
@@ -139,17 +138,17 @@ export default function DemoShowcase() {
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Scroll-triggered sections
-  const distance = useInView(0.3);
-  const conversation = useInView(0.2);
-  const mirror = useInView(0.3);
-  const numbers = useInView(0.2);
+  const [distanceRef, distanceVisible, distanceForceVisible] = useInView(0.3);
+  const [conversationRef, conversationVisible, conversationForceVisible] = useInView(0.2);
+  const [mirrorRef, mirrorVisible, mirrorForceVisible] = useInView(0.3);
+  const [numbersRef, numbersVisible, numbersForceVisible] = useInView(0.2);
 
   // Map tabs → scroll-triggered sections they contain
   const tabAnimations: Record<DemoTab, Array<() => void>> = {
-    start: [distance.forceVisible],
-    learn: [conversation.forceVisible, mirror.forceVisible],
+    start: [distanceForceVisible],
+    learn: [conversationForceVisible, mirrorForceVisible],
     build: [],
-    prove: [numbers.forceVisible],
+    prove: [numbersForceVisible],
     guide: [],
     graduate: [],
     invention: [],
@@ -173,23 +172,23 @@ export default function DemoShowcase() {
   // Typewriter texts
   const chatLine1 = useTypewriter(
     "I think it would be teens who love art but can't afford expensive classes or don't have art programs at school",
-    conversation.visible,
+    conversationVisible,
     30
   );
 
   const mirrorPrompt = useTypewriter(
     "You started this lesson three times before finishing it. What was different today?",
-    mirror.visible,
+    mirrorVisible,
     40
   );
 
   // Mirror response starts after the prompt finishes typing (80 chars × 40ms = ~3.2s + 1.2s pause)
   const [mirrorResponseReady, setMirrorResponseReady] = useState(false);
   useEffect(() => {
-    if (!mirror.visible) return;
+    if (!mirrorVisible) return;
     const timer = setTimeout(() => setMirrorResponseReady(true), 4400);
     return () => clearTimeout(timer);
-  }, [mirror.visible]);
+  }, [mirrorVisible]);
 
   const mirrorResponse = useTypewriter(
     "I think I was rushing the first two times. Today I actually read each question before answering...",
@@ -199,10 +198,10 @@ export default function DemoShowcase() {
 
   // Confidence meter
   // Updated from 2026-04-17 eval run (59 completed paths)
-  const confidenceBefore = useCounter(2.6, numbers.visible, 800, 1);
-  const confidenceAfter = useCounter(3.7, numbers.visible, 1400, 1);
-  const understandBefore = useCounter(2.1, numbers.visible, 800, 1);
-  const understandAfter = useCounter(3.6, numbers.visible, 1400, 1);
+  const confidenceBefore = useCounter(2.6, numbersVisible, 800, 1);
+  const confidenceAfter = useCounter(3.7, numbersVisible, 1400, 1);
+  const understandBefore = useCounter(2.1, numbersVisible, 800, 1);
+  const understandAfter = useCounter(3.6, numbersVisible, 1400, 1);
 
   // ── Ceremony overlay ──
   if (showCeremony && !ceremonyDone) {
@@ -266,15 +265,15 @@ export default function DemoShowcase() {
           TAB: START — Distance (Day 1 vs Day 30)
           ═══════════════════════════════════════════════════════════ */}
       {activeTab === "start" && (
-      <section ref={distance.ref} style={{ padding: "89px 34px", animation: "fadeSlideIn 600ms ease-out 300ms both" }}>
+      <section ref={distanceRef} style={{ padding: "89px 34px", animation: "fadeSlideIn 600ms ease-out 300ms both" }}>
         <div className="mx-auto max-w-[1000px]">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center" style={{ gap: "34px" }}>
             {/* Before: blank Ikigai */}
             <div
               className="text-center transition-all duration-700"
               style={{
-                opacity: distance.visible ? 1 : 0,
-                transform: distance.visible ? "translateY(0)" : "translateY(34px)",
+                opacity: distanceVisible ? 1 : 0,
+                transform: distanceVisible ? "translateY(0)" : "translateY(34px)",
               }}
             >
               <p
@@ -302,8 +301,8 @@ export default function DemoShowcase() {
             <div
               className="text-center transition-all duration-700"
               style={{
-                opacity: distance.visible ? 1 : 0,
-                transform: distance.visible ? "translateY(0)" : "translateY(34px)",
+                opacity: distanceVisible ? 1 : 0,
+                transform: distanceVisible ? "translateY(0)" : "translateY(34px)",
                 transitionDelay: "300ms",
               }}
             >
@@ -398,7 +397,7 @@ export default function DemoShowcase() {
       </section>
 
       {/* Conversation section */}
-      <section ref={conversation.ref} style={{ padding: "89px 34px" }}>
+      <section ref={conversationRef} style={{ padding: "89px 34px" }}>
         <div className="mx-auto max-w-[620px]">
           <p
             className="font-[family-name:var(--font-display)]"
@@ -453,13 +452,13 @@ export default function DemoShowcase() {
               {/* Student message — typewriter */}
               <div
                 className="transition-all duration-500"
-                style={{ opacity: conversation.visible ? 1 : 0, transitionDelay: "800ms" }}
+                style={{ opacity: conversationVisible ? 1 : 0, transitionDelay: "800ms" }}
               >
                 <div className="flex justify-end">
                   <div className="max-w-[80%] rounded-2xl bg-[var(--primary)] text-white px-5 py-3">
                     <p style={{ fontSize: "16px", lineHeight: 1.618 }}>
                       {chatLine1}
-                      {conversation.visible && chatLine1.length < 110 && <span className="animate-pulse">|</span>}
+                      {conversationVisible && chatLine1.length < 110 && <span className="animate-pulse">|</span>}
                     </p>
                   </div>
                 </div>
@@ -468,7 +467,7 @@ export default function DemoShowcase() {
               {/* AI response */}
               <div
                 className="transition-all duration-500"
-                style={{ opacity: conversation.visible ? 1 : 0, transitionDelay: "4500ms" }}
+                style={{ opacity: conversationVisible ? 1 : 0, transitionDelay: "4500ms" }}
               >
                 <div className="flex justify-start">
                   <div className="max-w-[85%]">
@@ -489,7 +488,7 @@ export default function DemoShowcase() {
               </div>
 
               {/* Checkpoint */}
-              <div className="transition-all duration-300" style={{ opacity: conversation.visible ? 1 : 0, transitionDelay: "5500ms" }}>
+              <div className="transition-all duration-300" style={{ opacity: conversationVisible ? 1 : 0, transitionDelay: "5500ms" }}>
                 <div className="checkpoint-celebration rounded-lg px-4 py-2.5 text-center" style={{ animation: "none", opacity: 1 }}>
                   <p className="font-semibold" style={{ fontSize: "13px", color: "#0D9488" }}>Checkpoint reached</p>
                   <p style={{ fontSize: "11px", color: "#9CA3AF" }}>2/4 complete</p>
@@ -506,7 +505,7 @@ export default function DemoShowcase() {
 
       {/* Mirror + Founder's Log section */}
       <section
-        ref={mirror.ref}
+        ref={mirrorRef}
         className="border-t border-[var(--border)]"
         style={{ padding: "89px 34px", background: "var(--bg-subtle)" }}
       >
@@ -538,7 +537,7 @@ export default function DemoShowcase() {
                 style={{ fontSize: "21px", fontWeight: 400, lineHeight: 1.618, color: "#111827" }}
               >
                 {mirrorPrompt}
-                {mirror.visible && mirrorPrompt.length < 80 && <span className="animate-pulse" style={{ color: "#0D9488" }}>|</span>}
+                {mirrorVisible && mirrorPrompt.length < 80 && <span className="animate-pulse" style={{ color: "#0D9488" }}>|</span>}
               </p>
             </div>
             <div className="bg-white px-7 pt-6 pb-7">
@@ -677,7 +676,7 @@ export default function DemoShowcase() {
           ═══════════════════════════════════════════════════════════ */}
       {activeTab === "prove" && (
       <section
-        ref={numbers.ref}
+        ref={numbersRef}
         style={{ padding: "89px 34px" }}
       >
         <div className="mx-auto max-w-[800px]">

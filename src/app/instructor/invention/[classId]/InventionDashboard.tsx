@@ -4,7 +4,16 @@ import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { triggerGrouping, revealGroups, moveStudent, removeStudent, loadInventionDashboard } from "./actions";
 
-interface DashboardData {
+interface CompositionLog {
+  category: string;
+  archetypes: string[];
+  missing_archetypes: string[];
+  chip_diversity: number;
+  compromises: string[];
+  [key: string]: unknown;
+}
+
+export interface DashboardData {
   classCode: string;
   adminLevel: "platform_owner" | "instructor" | "co_admin" | null;
   totalEnrolled: number;
@@ -13,7 +22,7 @@ interface DashboardData {
   circle1Counts: Record<string, number>;
   circle2Counts: Record<string, number>;
   studentMap: Record<string, { name: string; email: string }>;
-  groups: Array<{ group_number: number; student_ids: string[]; composition_log: any }>;
+  groups: Array<{ group_number: number; student_ids: string[]; composition_log: CompositionLog }>;
   groupingThreshold: number;
   groupsRevealed: boolean;
   inProgressStudents: Array<{
@@ -56,6 +65,7 @@ export default function InventionDashboard({
   const [removeConfirm, setRemoveConfirm] = useState<{ studentId: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"overview" | "groups">("overview");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
 
@@ -446,8 +456,8 @@ export default function InventionDashboard({
                         </div>
                         <div className="text-center">
                           <p className="text-[var(--text-muted)]">Scale</p>
-                          <p className={Object.values(comp.scale_distribution ?? {}).every((v: any) => v <= 3) ? "text-green-600 font-medium" : "text-amber-600 font-medium"}>
-                            {Object.values(comp.scale_distribution ?? {}).every((v: any) => v <= 3) ? "Pass" : "Review"}
+                          <p className={Object.values(comp.scale_distribution ?? {}).every((v: unknown) => (v as number) <= 3) ? "text-green-600 font-medium" : "text-amber-600 font-medium"}>
+                            {Object.values(comp.scale_distribution ?? {}).every((v: unknown) => (v as number) <= 3) ? "Pass" : "Review"}
                           </p>
                         </div>
                         <div className="text-center">
@@ -612,15 +622,15 @@ function AlgorithmStream({
   groups,
   studentMap,
   circle1Counts,
-  circle2Counts,
-  algorithmLog,
+  circle2Counts: _circle2Counts,
+  algorithmLog: _algorithmLog,
   onClose,
 }: {
   groups: DashboardData["groups"];
   studentMap: DashboardData["studentMap"];
   circle1Counts: Record<string, number>;
   circle2Counts: Record<string, number>;
-  algorithmLog: any;
+  algorithmLog: Record<string, unknown> | null;
   onClose: () => void;
 }) {
   const [viewMode, setViewMode] = useState<"normal" | "raw">("normal");
@@ -692,7 +702,7 @@ function AlgorithmStream({
     for (const group of groups) {
       const comp = group.composition_log ?? {};
       const dist = comp.scale_distribution ?? {};
-      const balanced = Object.values(dist).every((v: any) => v <= 3);
+      const balanced = Object.values(dist).every((v: unknown) => (v as number) <= 3);
       if (balanced) {
         s.push({ text: `  Group ${group.group_number}: ✓ balanced`, cls: "pass", delay: 150 });
       } else {
@@ -814,7 +824,7 @@ function AlgorithmStream({
     };
     frame = window.setTimeout(tick, 400);
     return () => clearTimeout(frame);
-  }, [running, rawTotalChars]);
+  }, [running, rawTotalChars]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Compute which raw lines/chars to show
   const rawDisplayText = rawFullText.slice(0, rawChars);

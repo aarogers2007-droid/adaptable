@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getLeaderboardData } from "@/lib/leaderboard";
-import type { Profile, ClassEnrollment } from "@/lib/types";
+import type { Profile } from "@/lib/types";
 import AppNav from "@/components/ui/AppNav";
 import LeaderboardClient from "./LeaderboardClient";
 
@@ -69,9 +69,11 @@ export default async function LeaderboardPage() {
   ]);
 
   // Late-joiner detection: if enrolled within the last 7 days, show "your pace" context
+  /* eslint-disable react-hooks/purity -- server component, not rendered in browser */
   const isRecentJoiner = profile.created_at
     ? (Date.now() - new Date(profile.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000
     : false;
+  /* eslint-enable react-hooks/purity */
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">

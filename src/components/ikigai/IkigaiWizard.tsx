@@ -70,7 +70,7 @@ interface IkigaiWizardProps {
   onDemoComplete?: (idea: BusinessIdea) => void;
 }
 
-export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoMode, onDemoComplete }: IkigaiWizardProps) {
+export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAdmin, demoMode, onDemoComplete }: IkigaiWizardProps) {
   const router = useRouter();
 
   const [studentName, setStudentName] = useState(initialName ?? "");
@@ -496,10 +496,10 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoM
         >
           <div className="max-w-md w-full text-center">
             <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
-              What's your name?
+              What&apos;s your name?
             </h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              We'll use this to personalize your business idea.
+              We&apos;ll use this to personalize your business idea.
             </p>
             <input
               type="text"
@@ -844,10 +844,10 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin, demoM
             <div className="mt-6">{(
                 <div className="max-w-md w-full mx-auto rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
                   <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
-                    What's your business idea?
+                    What&apos;s your business idea?
                   </h3>
                   <p className="mt-1 text-xs text-[var(--text-muted)]">
-                    Describe what you'd sell or offer. We'll set up your venture studio around it.
+                    Describe what you&apos;d sell or offer. We&apos;ll set up your venture studio around it.
                   </p>
                   <textarea
                     value={skipIdea}
