@@ -30,22 +30,22 @@ export default function VentureLanding({ isAuthenticated, isEnrolled }: Props) {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-16" style={{ background: "#111827" }}>
+    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-16" style={{ background: "#ffffff" }}>
       <div className="text-center max-w-[600px]">
         {/* Event title */}
         <p
           className="font-[family-name:var(--font-display)]"
-          style={{ fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#C084FC" }}
+          style={{ fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#7C3AED" }}
         >
           VentureLab
         </p>
         <h1
           className="mt-3 font-[family-name:var(--font-display)] font-bold"
-          style={{ fontSize: "34px", lineHeight: 1.3, color: "#F9FAFB" }}
+          style={{ fontSize: "34px", lineHeight: 1.3, color: "#111827" }}
         >
           Invention Mode
         </h1>
-        <p className="mt-2" style={{ fontSize: "16px", color: "#9CA3AF" }}>
+        <p className="mt-2" style={{ fontSize: "16px", color: "#6B7280" }}>
           May 13, 2026
         </p>
 
@@ -55,7 +55,7 @@ export default function VentureLanding({ isAuthenticated, isEnrolled }: Props) {
         </div>
 
         {/* Instructions */}
-        <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#D1D5DB" }}>
+        <p className="mt-8" style={{ fontSize: "16px", lineHeight: 1.618, color: "#4B5563" }}>
           Click on each circle and answer the questions honestly.
         </p>
 
@@ -65,14 +65,14 @@ export default function VentureLanding({ isAuthenticated, isEnrolled }: Props) {
           className="mt-8 rounded-lg px-10 py-4 font-semibold text-white transition-colors hover:brightness-110"
           style={{
             fontSize: "16px",
-            background: "#C084FC",
-            boxShadow: "0 0 21px rgba(192, 132, 252, 0.3), 0 0 55px rgba(192, 132, 252, 0.1)",
+            background: "#7C3AED",
+            boxShadow: "0 0 21px rgba(124, 58, 237, 0.3), 0 0 55px rgba(124, 58, 237, 0.1)",
           }}
         >
           Begin
         </button>
 
-        <p className="mt-6" style={{ fontSize: "12px", color: "#4B5563" }}>
+        <p className="mt-6" style={{ fontSize: "12px", color: "#9CA3AF" }}>
           You&apos;ll create an account to save your answers.
         </p>
       </div>
