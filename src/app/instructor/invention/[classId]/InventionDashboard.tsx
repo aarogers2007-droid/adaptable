@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { triggerGrouping, revealGroups, moveStudent, removeStudent, loadInventionDashboard } from "./actions";
+import { triggerGrouping, revealGroups, moveStudent, removeStudent, loadInventionDashboard, getGroupingPreview } from "./actions";
+import type { AlgorithmPreview } from "@/lib/invention-grouping";
 import AdminCardsTab from "./AdminCardsTab";
 
 interface CompositionLog {
@@ -81,6 +82,7 @@ export default function InventionDashboard({
   const [removeConfirm, setRemoveConfirm] = useState<{ studentId: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"overview" | "groups" | "cards">("overview");
+  const [preview, setPreview] = useState<AlgorithmPreview | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -90,6 +92,13 @@ export default function InventionDashboard({
     : 0;
 
   const thresholdMet = completionPct >= data.groupingThreshold;
+
+  // Fetch algorithm preview on mount and when completion count changes
+  useEffect(() => {
+    getGroupingPreview(classId).then((res) => {
+      if ("preview" in res && res.preview) setPreview(res.preview);
+    }).catch(() => {});
+  }, [classId, data.completedCount]);
 
   async function handleRunGrouping() {
     setGroupingInProgress(true);
@@ -331,18 +340,43 @@ export default function InventionDashboard({
                 </p>
               </div>
             ) : (
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 text-center">
-                <p className="text-sm text-[var(--text-secondary)] mb-4">
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
+                {/* Pre-run summary */}
+                {preview && (
+                  <div className="mb-5 space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-[var(--text-primary)]">{preview.completedCount} students ready</span>
+                      <span className="text-[var(--text-muted)]">· {preview.incompleteCount} incomplete</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full px-2 py-0.5 text-xs font-semibold text-white" style={{
+                        background: preview.mode === "LARGE" ? "#3B82F6" : preview.mode === "MEDIUM" ? "#F59E0B" : "#10B981"
+                      }}>
+                        {preview.modeLabel}
+                      </span>
+                    </div>
+                    <p className="text-[var(--text-secondary)]">
+                      Recommended: groups of {preview.recommendedGroupSize} → {preview.groupSizeDistribution}
+                    </p>
+                    {preview.warnings.map((w, i) => (
+                      <p key={i} className="text-xs text-amber-600">⚠ {w}</p>
+                    ))}
+                  </div>
+                )}
+
+                <p className="text-sm text-[var(--text-secondary)] mb-4 text-center">
                   Grouping threshold: {data.groupingThreshold}% — currently at {completionPct}%
                 </p>
-                <button
-                  type="button"
-                  onClick={handleRunGrouping}
-                  disabled={!thresholdMet || groupingInProgress}
-                  className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-                >
-                  {groupingInProgress ? "Running algorithm..." : thresholdMet ? "Run Grouping Algorithm" : `Waiting for ${data.groupingThreshold}% completion`}
-                </button>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={handleRunGrouping}
+                    disabled={!thresholdMet || groupingInProgress}
+                    className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                  >
+                    {groupingInProgress ? "Running algorithm..." : thresholdMet ? "Run Grouping Algorithm" : `Waiting for ${data.groupingThreshold}% completion`}
+                  </button>
+                </div>
               </div>
             )}
           </div>

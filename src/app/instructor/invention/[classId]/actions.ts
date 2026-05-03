@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { runGroupingAlgorithm } from "@/lib/invention-grouping";
+import { runGroupingAlgorithm, getAlgorithmPreview } from "@/lib/invention-grouping";
 
 type AdminLevel = "platform_owner" | "instructor" | "co_admin";
 
@@ -187,10 +187,32 @@ export async function triggerGrouping(classId: string) {
   if (!inviteCode) return { error: "No invite code found" };
 
   const config = (auth.cls!.grouping_config as Record<string, unknown>) ?? {};
-  const groupSize = (config.group_size as number) ?? 5;
+  // Pass groupSize only if explicitly set in config (override mode).
+  // Otherwise let the algorithm auto-recommend based on cohort size.
+  const groupSize = config.group_size as number | undefined;
 
   const result = await runGroupingAlgorithm(inviteCode.code, groupSize);
   return result;
+}
+
+/**
+ * Get a read-only preview of what the grouping algorithm would produce.
+ */
+export async function getGroupingPreview(classId: string) {
+  const auth = await verifyAdmin(classId);
+  if (auth.error) return { error: auth.error };
+
+  const { data: inviteCode } = await auth.supabase
+    .from("invite_codes")
+    .select("code")
+    .eq("class_id", classId)
+    .limit(1)
+    .single();
+
+  if (!inviteCode) return { error: "No invite code found" };
+
+  const preview = await getAlgorithmPreview(inviteCode.code);
+  return { preview };
 }
 
 /**
