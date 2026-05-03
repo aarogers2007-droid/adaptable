@@ -26,7 +26,7 @@ const FROM_ADDRESS = process.env.RESEND_FROM_ADDRESS ?? "alerts@adaptable.app";
 const APP_BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ??
   process.env.NEXT_PUBLIC_APP_URL ??
-  "https://adaptable.app";
+  "https://adaptable.one";
 
 export interface CrisisEmailParams {
   to: string;
@@ -147,6 +147,47 @@ async function logNotificationFailure(
     reason: reason.slice(0, 500),
     created_at: new Date().toISOString(),
   });
+}
+
+/**
+ * Send a parent notification that their child's thinker profile is ready.
+ * Only sends to verified parent emails from the COPPA consent flow.
+ */
+export async function sendCardReadyEmail(params: {
+  to: string;
+  studentFirstName: string;
+  shareableUrl: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  if (!resendClient) {
+    return { ok: false, error: "RESEND_API_KEY not set" };
+  }
+
+  const subject = `${escapeHtml(params.studentFirstName)}'s thinker profile is ready`;
+  const text = `Hi — ${params.studentFirstName} completed an activity today and their thinker profile is ready. Here is a link to see it:
+
+${params.shareableUrl}
+
+This link can be saved and shared with anyone.`;
+
+  try {
+    const result = await resendClient.emails.send({
+      from: FROM_ADDRESS,
+      to: params.to,
+      subject,
+      text,
+    });
+
+    if (result.error) {
+      console.error("[email] Card ready email failed:", result.error.message);
+      return { ok: false, error: result.error.message };
+    }
+
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[email] Card ready email exception:", msg);
+    return { ok: false, error: msg };
+  }
 }
 
 function escapeHtml(s: string): string {

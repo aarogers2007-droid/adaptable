@@ -29,6 +29,7 @@ export default async function InventionPage() {
     <InventionWizard
       studentName={profile?.full_name ?? ""}
       existingSession={session ?? null}
+      sessionId={session?.id ?? null}
     />
   );
 }

@@ -16,15 +16,16 @@ const anthropic = new Anthropic();
  * usage logging, and rate limiting.
  */
 
-export type AIFeature = "guide" | "ikigai" | "checkin" | "recommendations" | "pitch" | "moderation";
+export type AIFeature = "guide" | "ikigai" | "checkin" | "recommendations" | "pitch" | "moderation" | "card";
 
-const MODEL_MAP: Record<AIFeature, string> = {
+export const MODEL_MAP: Record<AIFeature, string> = {
   guide: "claude-sonnet-4-20250514",
   ikigai: "claude-sonnet-4-20250514",
   checkin: "claude-haiku-4-5-20251001",
   recommendations: "claude-haiku-4-5-20251001",
   pitch: "claude-sonnet-4-20250514",
   moderation: "claude-haiku-4-5-20251001",
+  card: "claude-haiku-4-5-20251001",
 };
 
 const MAX_TOKENS_MAP: Record<AIFeature, number> = {
@@ -34,6 +35,7 @@ const MAX_TOKENS_MAP: Record<AIFeature, number> = {
   recommendations: 1200,
   pitch: 1024,
   moderation: 200,
+  card: 600,
 };
 
 interface SendMessageOptions {

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { saveInventionProgress, completeInventionSession, getGroupAssignment } from "./actions";
 import InventionIkigai from "@/components/InventionIkigai";
 import ForceLightMode from "@/components/ui/ForceLightMode";
+import ArchetypeCardReveal from "./ArchetypeCardReveal";
 
 // ── Circle definitions ──
 
@@ -54,9 +55,6 @@ const CIRCLE_5_CHIPS = [
 ];
 
 // Label lookups
-const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(CIRCLE_1_CARDS.map(c => [c.id, c.label]));
-const ARCHETYPE_LABEL: Record<string, string> = Object.fromEntries(CIRCLE_2_CARDS.map(c => [c.id, c.label]));
-const SCALE_LABEL: Record<string, string> = Object.fromEntries(CIRCLE_4_CARDS.map(c => [c.id, `${c.label} — ${c.desc}`]));
 
 interface ExistingSession {
   circle_1_category?: string | null;
@@ -72,9 +70,10 @@ interface ExistingSession {
 interface Props {
   studentName: string;
   existingSession: ExistingSession | null;
+  sessionId: string | null;
 }
 
-export default function InventionWizard({ existingSession }: Props) {
+export default function InventionWizard({ studentName, existingSession, sessionId }: Props) {
   const alreadyDone = !!existingSession?.completed_at;
 
   function getStartingStep(): number {
@@ -186,39 +185,16 @@ export default function InventionWizard({ existingSession }: Props) {
   const allCirclesDone = getCompleted().length === 5;
   const activeCircle = step >= 1 && step <= 5 ? CIRCLES[step - 1] : null;
 
-  // ── Completion screen ──
-  if (step === 6 || alreadyDone) {
+  // ── Completion screen — archetype card reveal ──
+  if ((step === 6 || alreadyDone) && sessionId) {
+    const firstName = studentName?.split(" ")[0] ?? "Student";
     return (
-      <main className="min-h-screen bg-[var(--bg)] px-6 py-16">
-        <ForceLightMode />
-        <div className="mx-auto max-w-[600px]">
-          <div className="rounded-xl border-2 border-[var(--primary)] bg-[var(--primary)]/5 p-8 text-center">
-            {groupRevealed && groupNumber ? (
-              <>
-                <p className="font-[family-name:var(--font-display)] text-[48px] font-bold text-[var(--primary)]">Group {groupNumber}</p>
-                <p className="mt-3 text-base text-[var(--text-primary)]" style={{ lineHeight: 1.618 }}>Remember this number — you will need it on May 13.</p>
-              </>
-            ) : (
-              <p className="text-base text-[var(--text-secondary)]" style={{ lineHeight: 1.618 }}>Your group will be assigned before May 13. Check back here closer to the event.</p>
-            )}
-          </div>
-          <div className="mt-10 space-y-6">
-            {[
-              { label: "Circle 1 — The Wish", value: CATEGORY_LABEL[circle1 || existingSession?.circle_1_category || ""] || "—" },
-              { label: "Circle 2 — The Mind", value: ARCHETYPE_LABEL[circle2 || existingSession?.circle_2_archetype || ""] || "—" },
-              { label: "Circle 3 — The Lens", value: (circle3Chips.length > 0 ? circle3Chips : existingSession?.circle_3_chips ?? []).join(", ") || "—", sub: circle3Text || existingSession?.circle_3_freetext },
-              { label: "Circle 4 — The Scale", value: SCALE_LABEL[circle4 || existingSession?.circle_4_scale || ""] || "—" },
-              { label: "Circle 5 — The Voice", value: (circle5.length > 0 ? circle5 : existingSession?.circle_5_voice ?? []).join(", ") || "—" },
-            ].map(item => (
-              <div key={item.label}>
-                <p style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#0D9488" }}>{item.label}</p>
-                <p className="mt-2 text-sm text-[var(--text-primary)]">{item.value}</p>
-                {item.sub && <p className="mt-1 text-sm text-[var(--text-secondary)] italic">&ldquo;{item.sub}&rdquo;</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
+      <ArchetypeCardReveal
+        sessionId={sessionId}
+        groupNumber={groupNumber}
+        groupRevealed={groupRevealed}
+        studentFirstName={firstName}
+      />
     );
   }
 
