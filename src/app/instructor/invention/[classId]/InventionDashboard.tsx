@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { triggerGrouping, revealGroups, moveStudent, removeStudent, loadInventionDashboard } from "./actions";
+import AdminCardsTab from "./AdminCardsTab";
 
 interface CompositionLog {
   category: string;
@@ -28,6 +29,21 @@ export interface DashboardData {
   inProgressStudents: Array<{
     id: string; name: string;
     hasCircle1: boolean; hasCircle2: boolean; hasCircle3: boolean; hasCircle4: boolean; hasCircle5: boolean;
+  }>;
+  cardSessions: Array<{
+    sessionId: string;
+    studentId: string;
+    studentName: string;
+    groupNumber: number | null;
+    completed: boolean;
+    completedAt: string | null;
+    allCirclesDone: boolean;
+    generatedCard: {
+      title: string;
+      description: string;
+      insights: { wish: string; mind: string; lens: string; scale: string; voice: string };
+      shareable_slug: string;
+    } | null;
   }>;
 }
 
@@ -64,7 +80,7 @@ export default function InventionDashboard({
   const [moveTarget, setMoveTarget] = useState<number | null>(null);
   const [removeConfirm, setRemoveConfirm] = useState<{ studentId: string; name: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"overview" | "groups">("overview");
+  const [tab, setTab] = useState<"overview" | "groups" | "cards">("overview");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [algorithmLog, setAlgorithmLog] = useState<any>(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -158,6 +174,15 @@ export default function InventionDashboard({
               }`}
             >
               Groups
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("cards")}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                tab === "cards" ? "bg-[var(--primary)] text-white" : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+              }`}
+            >
+              Cards
             </button>
             {data.groups.length > 0 && (
               <button
@@ -514,6 +539,19 @@ export default function InventionDashboard({
               </>
             )}
           </div>
+        )}
+
+        {/* ── Cards tab ── */}
+        {tab === "cards" && (
+          <AdminCardsTab
+            cardSessions={data.cardSessions}
+            classCode={data.classCode}
+            isPlatformOwner={data.adminLevel === "platform_owner"}
+            onRefresh={async () => {
+              const fresh = await loadInventionDashboard(classId);
+              if (!("error" in fresh)) setData(fresh as DashboardData);
+            }}
+          />
         )}
 
         {/* Algorithm terminal — opens over current tab content */}

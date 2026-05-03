@@ -82,7 +82,7 @@ export async function loadInventionDashboard(classId: string) {
   // Get all invention sessions
   const { data: sessions } = await supabase
     .from("invention_sessions")
-    .select("student_id, circle_1_category, circle_2_archetype, circle_3_chips, circle_4_scale, circle_5_voice, completed_at, group_number")
+    .select("id, student_id, circle_1_category, circle_2_archetype, circle_3_chips, circle_4_scale, circle_5_voice, completed_at, group_number, generated_card")
     .eq("class_code", classCode);
 
   const completed = sessions?.filter((s) => s.completed_at) ?? [];
@@ -143,6 +143,22 @@ export async function loadInventionDashboard(classId: string) {
       hasCircle3: !!s.circle_3_chips?.length,
       hasCircle4: !!s.circle_4_scale,
       hasCircle5: !!s.circle_5_voice?.length,
+    })),
+    // Card data for the Cards tab
+    cardSessions: (sessions ?? []).map((s) => ({
+      sessionId: s.id,
+      studentId: s.student_id,
+      studentName: studentMap[s.student_id]?.name ?? "Unknown",
+      groupNumber: s.group_number,
+      completed: !!s.completed_at,
+      completedAt: s.completed_at,
+      allCirclesDone: !!(s.circle_1_category && s.circle_2_archetype && s.circle_3_chips?.length && s.circle_4_scale && s.circle_5_voice?.length),
+      generatedCard: s.generated_card as {
+        title: string;
+        description: string;
+        insights: { wish: string; mind: string; lens: string; scale: string; voice: string };
+        shareable_slug: string;
+      } | null,
     })),
   };
 }
