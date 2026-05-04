@@ -3,6 +3,7 @@ import { DM_Sans, JetBrains_Mono, EB_Garamond, Playfair_Display } from "next/fon
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import SplashScreen from "@/components/ui/SplashScreen";
+import SupportBubble from "@/components/ui/SupportBubble";
 
 const dmSans = DM_Sans({
   variable: "--font-body",
@@ -56,6 +57,7 @@ export default function RootLayout({
         <SplashScreen>
           {children}
         </SplashScreen>
+        <SupportBubble />
         <Analytics />
       </body>
     </html>

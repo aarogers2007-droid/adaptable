@@ -33,6 +33,14 @@ export default async function AJDashboard() {
     redirect("/dashboard");
   }
 
+  // Fetch open support escalations
+  const { data: escalations } = await supabase
+    .from("support_escalations")
+    .select("id, user_name, user_role, summary, status, created_at")
+    .eq("status", "open")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
   const sections = [
     {
       label: "Student Experience",
@@ -146,6 +154,31 @@ export default async function AJDashboard() {
             </div>
           ))}
         </div>
+
+        {/* Support escalations */}
+        {escalations && escalations.length > 0 && (
+          <div className="mt-8">
+            <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)] mb-4">
+              Open Support Issues ({escalations.length})
+            </h2>
+            <div className="space-y-3">
+              {escalations.map((esc) => (
+                <div key={esc.id} className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">{esc.user_name}</span>
+                    <span className="rounded-full bg-[var(--bg-muted)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">{esc.user_role}</span>
+                    <span className="ml-auto text-[10px] text-[var(--text-muted)]">
+                      {new Date(esc.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap" style={{ lineHeight: 1.5 }}>
+                    {esc.summary}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Flow diagram */}
         <div className="mt-12">
