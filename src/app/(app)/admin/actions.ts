@@ -1,30 +1,34 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 async function verifyAdmin() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { supabase: null, userId: null, error: "Not authenticated" };
+  if (!user) return { supabase: null, admin: null, userId: null, error: "Not authenticated" };
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, is_platform_owner")
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.role !== "org_admin") {
-    return { supabase: null, userId: null, error: "Not an admin" };
+  if (!profile || (profile.role !== "org_admin" && !(profile as Record<string, unknown>).is_platform_owner)) {
+    return { supabase: null, admin: null, userId: null, error: "Not an admin" };
   }
 
-  return { supabase, userId: user.id, error: null };
+  // Admin client bypasses RLS — needed for DELETE operations
+  const admin = createAdminClient();
+
+  return { supabase, admin, userId: user.id, error: null };
 }
 
 export async function resetAllProgress() {
-  const { supabase, userId, error } = await verifyAdmin();
-  if (error || !supabase || !userId) return { error: error ?? "Auth failed" };
+  const { admin, userId, error } = await verifyAdmin();
+  if (error || !admin || !userId) return { error: error ?? "Auth failed" };
 
-  await supabase
+  await admin
     .from("student_progress")
     .delete()
     .eq("student_id", userId);
@@ -33,11 +37,12 @@ export async function resetAllProgress() {
 }
 
 export async function resetIkigai() {
-  const { supabase, userId, error } = await verifyAdmin();
-  if (error || !supabase || !userId) return { error: error ?? "Auth failed" };
+  const { admin, userId, error } = await verifyAdmin();
+  if (error || !admin || !userId) return { error: error ?? "Auth failed" };
 
   // Clear business idea, ikigai, draft, recommendations, and all progress
-  await supabase
+  // Uses admin client (service role) to bypass RLS — DELETE policies don't exist
+  await admin
     .from("profiles")
     .update({
       business_idea: null,
@@ -47,29 +52,36 @@ export async function resetIkigai() {
     })
     .eq("id", userId);
 
-  await supabase
+  await admin
     .from("student_progress")
     .delete()
     .eq("student_id", userId);
 
-  await supabase
+  await admin
     .from("ai_conversations")
     .delete()
     .eq("student_id", userId);
 
-  await supabase
+  await admin
     .from("mentor_checkins")
     .delete()
     .eq("student_id", userId);
+
+  // Also clear daily checkins, lesson decisions, business pitches, achievements
+  await admin.from("daily_checkins").delete().eq("student_id", userId);
+  await admin.from("lesson_decisions").delete().eq("student_id", userId);
+  await admin.from("business_pitches").delete().eq("student_id", userId);
+  await admin.from("student_achievements").delete().eq("student_id", userId);
+  await admin.from("founder_log_entries").delete().eq("student_id", userId);
 
   return { success: true };
 }
 
 export async function resetSingleLesson(lessonId: string) {
-  const { supabase, userId, error } = await verifyAdmin();
-  if (error || !supabase || !userId) return { error: error ?? "Auth failed" };
+  const { admin, userId, error } = await verifyAdmin();
+  if (error || !admin || !userId) return { error: error ?? "Auth failed" };
 
-  await supabase
+  await admin
     .from("student_progress")
     .delete()
     .eq("student_id", userId)
