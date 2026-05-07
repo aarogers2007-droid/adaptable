@@ -365,7 +365,7 @@ export default function LessonConversation({
     setShowPacingNudge(false);
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
     if (composingTimerRef.current) { clearTimeout(composingTimerRef.current); composingTimerRef.current = null; }
-    setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+    setMessages((prev) => [...prev, { role: "user", content: trimmed }, { role: "assistant", content: "" }]);
     setLoading(true);
 
     try {
@@ -393,10 +393,12 @@ export default function LessonConversation({
             // ignore
           }
         }
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: errMsg },
-        ]);
+        // Replace the empty thinking bubble with the error message
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: "assistant", content: errMsg };
+          return updated;
+        });
         setLoading(false);
         return;
       }
@@ -404,8 +406,6 @@ export default function LessonConversation({
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let assistantMsg = "";
-
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       while (reader) {
         const { done, value } = await reader.read();
