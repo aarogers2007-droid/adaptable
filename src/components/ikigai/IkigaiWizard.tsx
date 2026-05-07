@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import IkigaiDiagram, { STEPS, type IkigaiStep } from "./IkigaiDiagram";
 import StepContent from "./StepContent";
+import ForceLightMode from "@/components/ui/ForceLightMode";
 import type { IkigaiDraft, BusinessIdea } from "@/lib/types";
 
 const MAX_REGENS = 5;
@@ -485,6 +486,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAd
 
   return (
     <>
+      <ForceLightMode />
       {/* NAME INPUT — shown before the diagram */}
       {!nameConfirmed && (
         <div
