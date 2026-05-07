@@ -790,14 +790,14 @@ export default function LessonConversation({
 
             {/* Suggested responses (appear after 30s idle) */}
             {showSuggestions && suggestions.length > 0 && !nudge && (
-              <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Suggested responses">
-                <span className="text-xs text-[var(--text-muted)] self-center mr-1">Stuck?</span>
+              <div className="mb-3 flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Suggested responses">
+                <span className="shrink-0 text-xs text-[var(--text-muted)] mr-1">Stuck?</span>
                 {suggestions.map((s, i) => (
                   <button
                     key={i}
                     onClick={() => applySuggestion(s)}
                     aria-label={`Use suggestion: ${s}`}
-                    className="chip-cascade rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
+                    className="chip-cascade shrink-0 whitespace-nowrap rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:border-[var(--primary)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
                     style={{ animationDelay: `${i * 200}ms` }}
                   >
                     {s}
