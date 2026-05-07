@@ -217,7 +217,7 @@ export default function InventionWizard({ studentName, existingSession, sessionI
           <button
             onClick={exitToDigram}
             className="rounded-lg bg-white/30 px-4 py-2 text-sm font-medium hover:bg-white/50 transition-colors"
-            style={{ color: "#111827" }}
+            style={{ color: "var(--text-primary)" }}
           >
             &larr; Back
           </button>
@@ -225,14 +225,14 @@ export default function InventionWizard({ studentName, existingSession, sessionI
 
         {/* Title */}
         <div className="px-6 pt-8 pb-2 text-center">
-          <p className="text-sm font-medium" style={{ color: "rgba(0,0,0,0.5)" }}>
+          <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
             Circle {activeCircle.num} of 5
           </p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold" style={{ color: "#111827" }}>
+          <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
             {activeCircle.question}
           </h2>
           {(step === 3 || step === 5) && (
-            <p className="mt-2 text-sm" style={{ color: "rgba(0,0,0,0.45)" }}>Pick up to two.</p>
+            <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>Pick up to two.</p>
           )}
         </div>
 
@@ -312,7 +312,7 @@ export default function InventionWizard({ studentName, existingSession, sessionI
                   })}
                 </div>
                 <div className="mt-8 mx-auto max-w-[400px]">
-                  <p className="text-sm mb-2 text-center" style={{ color: "rgba(0,0,0,0.5)" }}>
+                  <p className="text-sm mb-2 text-center" style={{ color: "var(--text-muted)" }}>
                     Tell us more (optional)
                   </p>
                   <input

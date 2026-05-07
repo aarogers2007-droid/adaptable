@@ -139,17 +139,17 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
               justifyContent: "center",
             }}
           >
-            <p style={{ fontSize: "13px", color: "#999", textAlign: "center" }}>Finding your type...</p>
+            <p className="text-sm text-[var(--text-muted)] text-center">Finding your type...</p>
           </div>
         )}
 
         {/* ── TIMEOUT STATE ── */}
         {phase === "timeout" && (
-          <div className="rounded-xl mx-auto p-8 text-center" style={{ maxWidth: "480px", background: "#FAFAF8", border: "1px solid #E5E5E5" }}>
-            <p style={{ fontSize: "15px", color: "#444", lineHeight: 1.6 }}>
+          <div className="rounded-xl mx-auto p-8 text-center border border-[var(--border)] bg-[var(--bg-subtle)]" style={{ maxWidth: "480px" }}>
+            <p className="text-[15px] text-[var(--text-secondary)]" style={{ lineHeight: 1.6 }}>
               Your card is still being prepared — this can take a moment when many students finish at the same time.
             </p>
-            <p className="mt-4" style={{ fontSize: "14px", color: "#666", lineHeight: 1.6 }}>
+            <p className="mt-4 text-sm text-[var(--text-muted)]" style={{ lineHeight: 1.6 }}>
               Hold tight — your card will be ready in just a moment.
             </p>
           </div>
@@ -157,8 +157,8 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
 
         {/* ── ERROR STATE ── */}
         {phase === "error" && (
-          <div className="rounded-xl mx-auto p-8 text-center" style={{ maxWidth: "480px", background: "#FAFAF8", border: "1px solid #E5E5E5" }}>
-            <p style={{ fontSize: "15px", color: "#444", lineHeight: 1.6 }}>
+          <div className="rounded-xl mx-auto p-8 text-center border border-[var(--border)] bg-[var(--bg-subtle)]" style={{ maxWidth: "480px" }}>
+            <p className="text-[15px] text-[var(--text-secondary)]" style={{ lineHeight: 1.6 }}>
               Something went wrong preparing your card.
             </p>
             {retryCount < 1 ? (
@@ -169,7 +169,7 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
                 Try again
               </button>
             ) : (
-              <p className="mt-4" style={{ fontSize: "14px", color: "#666", lineHeight: 1.6 }}>
+              <p className="mt-4 text-sm text-[var(--text-muted)]" style={{ lineHeight: 1.6 }}>
                 Please let your facilitator know. Your answers have been saved.
               </p>
             )}

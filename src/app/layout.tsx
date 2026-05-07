@@ -50,7 +50,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)] font-[family-name:var(--font-body)]">
         {/* Prevent flash of wrong theme */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var p=location.pathname;if(p==="/demo"||p==="/for-schools"||p==="/venture"||p==="/"||p==="/invention")return;var t=localStorage.getItem("theme");if(t==="dark"||(t==null&&matchMedia("(prefers-color-scheme:dark)").matches))document.documentElement.classList.add("dark")}catch(e){}}())` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var p=location.pathname;if(p==="/demo"||p==="/for-schools"||p==="/venture"||p==="/"||p==="/invention")return;var t=localStorage.getItem("theme");if(t==="dark")document.documentElement.classList.add("dark")}catch(e){}}())` }} />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[9999] focus:rounded-lg focus:bg-[var(--primary)] focus:px-4 focus:py-2 focus:text-white focus:text-sm">
           Skip to content
         </a>
