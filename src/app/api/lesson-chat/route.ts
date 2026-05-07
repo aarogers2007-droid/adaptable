@@ -7,13 +7,6 @@ import type { Profile, GradeTier } from "@/lib/types";
 import { getMentorAdaptation } from "@/lib/grade-adaptation";
 
 export async function POST(request: Request) {
-  // CSRF protection (defense-in-depth, auth is the real gate)
-  const { validateOrigin } = await import("@/lib/csrf");
-  if (!validateOrigin(request)) {
-    console.error("[lesson-chat] CSRF blocked request");
-    return Response.json({ error: "Request blocked. Please refresh the page and try again." }, { status: 403 });
-  }
-
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
