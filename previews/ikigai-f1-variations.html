@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai F1 — Line & Label Variations</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Satoshi', sans-serif; background: #F9FAFB; color: #111827; padding: 40px; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  p.subtitle { font-size: 14px; color: #4B5563; margin-bottom: 32px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1100px; }
+  .option { background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 28px; }
+  .option h2 { font-size: 16px; font-weight: 700; margin-bottom: 3px; color: #0D9488; }
+  .option p.desc { font-size: 12px; color: #9CA3AF; margin-bottom: 16px; line-height: 1.5; }
+  .ikigai-wrap { position: relative; width: 100%; aspect-ratio: 1/1; max-width: 440px; margin: 0 auto; }
+  .circles-area { position: absolute; left: 18%; top: 18%; width: 64%; height: 64%; }
+  .circle { position: absolute; border-radius: 50%; width: 58%; height: 58%; transform: translate(-50%, -50%); opacity: 0.55; }
+  .center-circle { position: absolute; border-radius: 50%; width: 20%; height: 20%; left: 50%; top: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, #4A6741 40%, #8B9E6A 100%); box-shadow: 0 0 20px rgba(74,103,65,0.3); z-index: 5; }
+  .center-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6; text-align: center; }
+  .center-label span { display: block; font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 0.15em; line-height: 1.3; }
+  .corner-label { position: absolute; font-size: 15px; font-weight: 700; color: #111827; line-height: 1.3; z-index: 10; }
+  .callout-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 8; }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>F1 — Line & Label Spacing Variations</h1>
+<p class="subtitle">All four have corrected dot positions (on the actual circle edge). The difference is how far the lines extend toward the labels.</p>
+
+<div class="grid">
+
+<!-- ═══ VARIATION 1: Corrected dots, same short lines ═══ -->
+<div class="option">
+  <h2>V1 — Corrected Dots, Short Lines</h2>
+  <p class="desc">Dots fixed to circle edges. Lines stay short. Decent breathing room but bottom-left line feels disconnected from its label.</p>
+  <div class="ikigai-wrap">
+    <svg class="callout-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <line x1="34.4" y1="24" x2="24" y2="16" stroke="#C4B320" stroke-width="0.3" opacity="0.5" />
+      <circle cx="34.4" cy="24" r="0.8" fill="#C4B320" opacity="0.7" />
+      <line x1="23.7" y1="68.6" x2="16" y2="80" stroke="#7AAD3A" stroke-width="0.3" opacity="0.5" />
+      <circle cx="23.7" cy="68.6" r="0.8" fill="#7AAD3A" opacity="0.7" />
+      <line x1="75.3" y1="37.1" x2="84" y2="22" stroke="#D4796E" stroke-width="0.3" opacity="0.5" />
+      <circle cx="75.3" cy="37.1" r="0.8" fill="#D4796E" opacity="0.7" />
+      <line x1="66.3" y1="78.1" x2="76" y2="84" stroke="#4DBAB4" stroke-width="0.3" opacity="0.5" />
+      <circle cx="66.3" cy="78.1" r="0.8" fill="#4DBAB4" opacity="0.7" />
+    </svg>
+    <div class="circles-area">
+      <div class="circle" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="circle" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="circle" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="circle" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="center-circle"></div>
+      <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="corner-label" style="top:6%; left:2%;">What you love</div>
+    <div class="corner-label" style="bottom:6%; left:2%;">What you're<br>good at</div>
+    <div class="corner-label" style="top:6%; right:2%; text-align:right;">What the world<br>needs</div>
+    <div class="corner-label" style="bottom:6%; right:2%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ VARIATION 2: Lines longer, end close to labels ═══ -->
+<div class="option">
+  <h2>V2 — Long Lines, Close to Labels</h2>
+  <p class="desc">Lines extend most of the way to the labels (3-4 unit gap). Strong visual connection. The line almost touches the text.</p>
+  <div class="ikigai-wrap">
+    <svg class="callout-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <line x1="34.4" y1="24" x2="14" y2="11" stroke="#C4B320" stroke-width="0.3" opacity="0.5" />
+      <circle cx="34.4" cy="24" r="0.8" fill="#C4B320" opacity="0.7" />
+      <line x1="23.7" y1="68.6" x2="12" y2="86" stroke="#7AAD3A" stroke-width="0.3" opacity="0.5" />
+      <circle cx="23.7" cy="68.6" r="0.8" fill="#7AAD3A" opacity="0.7" />
+      <line x1="75.3" y1="37.1" x2="86" y2="14" stroke="#D4796E" stroke-width="0.3" opacity="0.5" />
+      <circle cx="75.3" cy="37.1" r="0.8" fill="#D4796E" opacity="0.7" />
+      <line x1="66.3" y1="78.1" x2="80" y2="87" stroke="#4DBAB4" stroke-width="0.3" opacity="0.5" />
+      <circle cx="66.3" cy="78.1" r="0.8" fill="#4DBAB4" opacity="0.7" />
+    </svg>
+    <div class="circles-area">
+      <div class="circle" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="circle" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="circle" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="circle" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="center-circle"></div>
+      <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="corner-label" style="top:6%; left:2%;">What you love</div>
+    <div class="corner-label" style="bottom:6%; left:2%;">What you're<br>good at</div>
+    <div class="corner-label" style="top:6%; right:2%; text-align:right;">What the world<br>needs</div>
+    <div class="corner-label" style="bottom:6%; right:2%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ VARIATION 3: Short lines, max breathing room ═══ -->
+<div class="option">
+  <h2>V3 — Short Lines, Max Breathing Room</h2>
+  <p class="desc">Lines extend only ~40% of the way from circle to label. Subtle hint of connection. The diagram and labels feel like separate elements linked by a whisper.</p>
+  <div class="ikigai-wrap">
+    <svg class="callout-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <line x1="34.4" y1="24" x2="28" y2="19" stroke="#C4B320" stroke-width="0.3" opacity="0.5" />
+      <circle cx="34.4" cy="24" r="0.8" fill="#C4B320" opacity="0.7" />
+      <line x1="23.7" y1="68.6" x2="20" y2="74" stroke="#7AAD3A" stroke-width="0.3" opacity="0.5" />
+      <circle cx="23.7" cy="68.6" r="0.8" fill="#7AAD3A" opacity="0.7" />
+      <line x1="75.3" y1="37.1" x2="79" y2="30" stroke="#D4796E" stroke-width="0.3" opacity="0.5" />
+      <circle cx="75.3" cy="37.1" r="0.8" fill="#D4796E" opacity="0.7" />
+      <line x1="66.3" y1="78.1" x2="70" y2="80.5" stroke="#4DBAB4" stroke-width="0.3" opacity="0.5" />
+      <circle cx="66.3" cy="78.1" r="0.8" fill="#4DBAB4" opacity="0.7" />
+    </svg>
+    <div class="circles-area">
+      <div class="circle" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="circle" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="circle" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="circle" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="center-circle"></div>
+      <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="corner-label" style="top:6%; left:2%;">What you love</div>
+    <div class="corner-label" style="bottom:6%; left:2%;">What you're<br>good at</div>
+    <div class="corner-label" style="top:6%; right:2%; text-align:right;">What the world<br>needs</div>
+    <div class="corner-label" style="bottom:6%; right:2%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ VARIATION 4: Ideal — balanced labels, consistent 5-unit gap ═══ -->
+<div class="option">
+  <h2>V4 — Ideal Balance</h2>
+  <p class="desc">Everything corrected: dots on edges, consistent ~5 unit gap to labels, labels repositioned for visual symmetry (bottom labels raised to compensate for 2-line height).</p>
+  <div class="ikigai-wrap">
+    <svg class="callout-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <line x1="34.4" y1="24" x2="17" y2="12.8" stroke="#C4B320" stroke-width="0.3" opacity="0.5" />
+      <circle cx="34.4" cy="24" r="0.8" fill="#C4B320" opacity="0.7" />
+      <line x1="23.7" y1="68.6" x2="13" y2="84" stroke="#7AAD3A" stroke-width="0.3" opacity="0.5" />
+      <circle cx="23.7" cy="68.6" r="0.8" fill="#7AAD3A" opacity="0.7" />
+      <line x1="75.3" y1="37.1" x2="85" y2="15" stroke="#D4796E" stroke-width="0.3" opacity="0.5" />
+      <circle cx="75.3" cy="37.1" r="0.8" fill="#D4796E" opacity="0.7" />
+      <line x1="66.3" y1="78.1" x2="79" y2="86" stroke="#4DBAB4" stroke-width="0.3" opacity="0.5" />
+      <circle cx="66.3" cy="78.1" r="0.8" fill="#4DBAB4" opacity="0.7" />
+    </svg>
+    <div class="circles-area">
+      <div class="circle" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="circle" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="circle" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="circle" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="center-circle"></div>
+      <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="corner-label" style="top:4%; left:2%;">What you love</div>
+    <div class="corner-label" style="bottom:3%; left:2%;">What you're<br>good at</div>
+    <div class="corner-label" style="top:4%; right:2%; text-align:right;">What the world<br>needs</div>
+    <div class="corner-label" style="bottom:3%; right:2%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

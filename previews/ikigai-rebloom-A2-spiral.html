@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Rebloom — A2 Spiral Merge</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * IKIGAI REBLOOM — VARIATION A2: SPIRAL MERGE
+   * ═══════════════════════════════════════════════════════════
+   * The four circles find their dance, and the dance becomes the name.
+   *
+   * Timing (golden ratio, base 1000ms):
+   *   0.000s → scene begins
+   *   1.000s → first circle birth (c1 yellow, top)
+   *   2.618s → second (c2 green, left)
+   *   4.236s → third (c3 peach, right)
+   *   5.854s → fourth (c4 teal, bottom)
+   *   8.472s → all four fully breathing together (+~3.236s hold inside spiral warmup)
+   *   8.472s → orbit begins (slow)
+   *   10.090s → orbit accelerates, spiral tightens
+   *   14.326s → singularity flash — white-hot point
+   *   14.944s → name-reveal pulse fires (2.618s)
+   *   17.562s → name holds
+   *   20.562s → loop / replay
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Satoshi', sans-serif;
+  }
+
+  /* ─── Ambient ─── */
+  .ceremony-particles { position: absolute; inset: 0; overflow: hidden; }
+  .particle {
+    position: absolute;
+    background: rgba(180, 200, 230, 0.07);
+    border-radius: 50%;
+    animation: drift var(--p-dur, 17.944s) linear infinite;
+  }
+  .particle.near { background: rgba(160, 190, 240, 0.13); }
+  @keyframes drift {
+    from { transform: translateY(110vh) translateX(0); opacity: 0; }
+    8% { opacity: 0.8; }
+    50% { transform: translateY(50vh) translateX(var(--p-sway, 0px)); }
+    92% { opacity: 0.8; }
+    to { transform: translateY(-10vh) translateX(0); opacity: 0; }
+  }
+
+  .ceremony-ambient-glow {
+    position: absolute; width: 61.8vh; height: 61.8vh; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%);
+    animation: ceremony-glow-breathe 6.854s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes ceremony-glow-breathe {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%,-50%) scale(1.146); opacity: 1; }
+  }
+
+  /* ─── Scene container ─── */
+  .scene {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ceremony-ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+  }
+
+  /* ─── Circles: entrance (UNCHANGED) ─── */
+  .ceremony-ik-circle {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%,-50%) scale(0.236);
+  }
+  .ceremony-ik-circle.reveal {
+    animation: ceremony-circle-birth 2.618s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes ceremony-circle-birth {
+    0%   { opacity: 0;     transform: translate(-50%,-50%) scale(0.236); filter: blur(10px); }
+    50%  { opacity: 0.382;                                                filter: blur(3px); }
+    100% { opacity: 0.618; transform: translate(-50%,-50%) scale(1);      filter: blur(0); }
+  }
+
+  .ceremony-ik-circle.c1 { background: #F5E642; left: 50%;   top: 19.1%; }
+  .ceremony-ik-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%;   }
+  .ceremony-ik-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%;   }
+  .ceremony-ik-circle.c4 { background: #6DD5D0; left: 50%;   top: 80.9%; }
+
+  /* ─── SPIRAL MERGE ───
+     Each circle is wrapped in an orbiter. The orbiter rotates
+     around the center; the circle inside is offset outward by
+     the current spiral radius. A logarithmic-feeling spiral is
+     achieved by easing radius→0 on cubic-bezier(0.55,0,0.2,1)
+     while rotation accelerates (ease-in). The circles never
+     touch because each orbiter is 90° out of phase. */
+
+  .orbiter {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 0; height: 0;
+    transform: translate(-50%, -50%) rotate(0deg);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .orbiter .spoke {
+    position: absolute;
+    left: 0; top: 0;
+    width: 0; height: 0;
+    /* --radius animates from ~30.9% of wrap down to 0% */
+    transform: translate(var(--radius, 0%), 0);
+  }
+  .orbiter .trail-circle {
+    position: absolute;
+    left: 0; top: 0;
+    width: calc(min(420px, 61.8vh) * 0.50);
+    height: calc(min(420px, 61.8vh) * 0.50);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.618;
+    filter: blur(0);
+    mix-blend-mode: screen;
+  }
+
+  .orbiter.o1 .trail-circle { background: #F5E642; }
+  .orbiter.o2 .trail-circle { background: #A8DB5A; }
+  .orbiter.o3 .trail-circle { background: #F4A79D; }
+  .orbiter.o4 .trail-circle { background: #6DD5D0; }
+
+  /* Phase offsets — the four corners of the ikigai square, as angles.
+     c1 yellow top → -90°, c2 green left → 180°, c3 peach right → 0°, c4 teal bottom → 90°. */
+  .orbiter.o1 { transform: translate(-50%, -50%) rotate(-90deg); }
+  .orbiter.o2 { transform: translate(-50%, -50%) rotate(180deg); }
+  .orbiter.o3 { transform: translate(-50%, -50%) rotate(0deg);   }
+  .orbiter.o4 { transform: translate(-50%, -50%) rotate(90deg);  }
+
+  /* Initial radius matches the resting circle position: 30.9% of wrap */
+  .orbiter .spoke { --radius: 30.9%; }
+
+  /* SPIRAL ANIMATIONS
+     Runs only once, triggered by .spiraling class. */
+  .orbiter.spiraling {
+    animation: orbit-rotate 6.854s cubic-bezier(0.33,0,0.67,1) forwards;
+  }
+  .orbiter.o1.spiraling { animation-name: orbit-rotate-1; }
+  .orbiter.o2.spiraling { animation-name: orbit-rotate-2; }
+  .orbiter.o3.spiraling { animation-name: orbit-rotate-3; }
+  .orbiter.o4.spiraling { animation-name: orbit-rotate-4; }
+
+  /* Each orbiter sweeps ~1080° (three turns) while tightening.
+     Slow start, accelerating into the singularity. */
+  @keyframes orbit-rotate-1 {
+    0%   { transform: translate(-50%,-50%) rotate(-90deg); }
+    100% { transform: translate(-50%,-50%) rotate(990deg); }
+  }
+  @keyframes orbit-rotate-2 {
+    0%   { transform: translate(-50%,-50%) rotate(180deg); }
+    100% { transform: translate(-50%,-50%) rotate(1260deg); }
+  }
+  @keyframes orbit-rotate-3 {
+    0%   { transform: translate(-50%,-50%) rotate(0deg); }
+    100% { transform: translate(-50%,-50%) rotate(1080deg); }
+  }
+  @keyframes orbit-rotate-4 {
+    0%   { transform: translate(-50%,-50%) rotate(90deg); }
+    100% { transform: translate(-50%,-50%) rotate(1170deg); }
+  }
+
+  /* Radius tightens — same for all spokes, drives the logarithmic feel */
+  .orbiter.spiraling .spoke {
+    animation: spoke-tighten 6.854s cubic-bezier(0.55,0,0.2,1) forwards;
+  }
+  @keyframes spoke-tighten {
+    0%   { transform: translate(30.9%, 0); }
+    38.2%{ transform: translate(23.6%, 0); }
+    61.8%{ transform: translate(11.8%, 0); }
+    82%  { transform: translate(4.2%, 0);  }
+    100% { transform: translate(0%, 0);    }
+  }
+
+  /* The circle trail itself — blurs as it accelerates, shrinks slightly,
+     fades to white-hot at the end. */
+  .orbiter.spiraling .trail-circle {
+    animation: trail-smear 6.854s cubic-bezier(0.55,0,0.2,1) forwards;
+  }
+  @keyframes trail-smear {
+    0%   { opacity: 0.618; filter: blur(0px);   transform: translate(-50%,-50%) scale(1); }
+    23.6%{ opacity: 0.7;   filter: blur(6px);   transform: translate(-50%,-50%) scale(0.95); }
+    50%  { opacity: 0.75;  filter: blur(16px);  transform: translate(-50%,-50%) scale(0.85); }
+    78%  { opacity: 0.85;  filter: blur(28px);  transform: translate(-50%,-50%) scale(0.68); }
+    92%  { opacity: 1;     filter: blur(40px) brightness(1.6); transform: translate(-50%,-50%) scale(0.42); }
+    100% { opacity: 1;     filter: blur(56px) brightness(2.4); transform: translate(-50%,-50%) scale(0.18); }
+  }
+
+  /* While spiraling, hide the original static circles (they've handed
+     off to the orbiter trails which sit at the same starting position). */
+  .ceremony-ik-circle.handoff {
+    animation: circle-handoff 0.382s ease-out forwards;
+  }
+  @keyframes circle-handoff {
+    to { opacity: 0; }
+  }
+
+  /* ─── Singularity flash ─── */
+  .singularity {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%,-50%) scale(0);
+    opacity: 0;
+    box-shadow:
+      0 0 0 rgba(255,255,255,0),
+      0 0 0 rgba(255,255,255,0);
+    z-index: 6;
+    pointer-events: none;
+  }
+  .singularity.fire {
+    animation: singularity-fire 1.618s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes singularity-fire {
+    0% {
+      opacity: 0;
+      transform: translate(-50%,-50%) scale(0);
+      box-shadow:
+        0 0 0px  rgba(255,255,255,0.0),
+        0 0 0px  rgba(139,158,106,0.0);
+    }
+    23.6% {
+      opacity: 1;
+      transform: translate(-50%,-50%) scale(1);
+      box-shadow:
+        0 0 28px  rgba(255,255,255,0.9),
+        0 0 72px  rgba(255,255,255,0.7),
+        0 0 140px rgba(139,158,106,0.5);
+    }
+    38.2% {
+      opacity: 1;
+      transform: translate(-50%,-50%) scale(1.618);
+      box-shadow:
+        0 0 60px  rgba(255,255,255,1),
+        0 0 140px rgba(255,255,255,0.85),
+        0 0 240px rgba(139,158,106,0.7);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%,-50%) scale(2.618);
+      box-shadow:
+        0 0 40px  rgba(255,255,255,0.0),
+        0 0 100px rgba(139,158,106,0.0);
+    }
+  }
+
+  /* ─── Name reveal pulse (UNCHANGED from spec) ─── */
+  .ceremony-biz-wrap {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ceremony-biz-wrap.birthing {
+    animation:
+      ceremony-name-fade 2.618s ease-out forwards,
+      ceremony-name-glow 2.618s ease-out forwards;
+  }
+  @keyframes ceremony-name-fade {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes ceremony-name-glow {
+    0%   { filter: drop-shadow(0 0 60px rgba(255,255,255,0.9)) drop-shadow(0 0 120px rgba(74,103,65,0.8)); }
+    100% { filter: drop-shadow(0 0 28px rgba(74,103,65,0.5))   drop-shadow(0 0 56px  rgba(74,103,65,0.2)); }
+  }
+  .ceremony-biz-name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+
+  /* ─── Chrome: label + replay ─── */
+  .label {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.28);
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .replay {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.32);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 11px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 100;
+    transition:
+      color 0.618s cubic-bezier(0.16,1,0.3,1),
+      border-color 0.618s cubic-bezier(0.16,1,0.3,1),
+      box-shadow 0.618s cubic-bezier(0.16,1,0.3,1);
+  }
+  .replay:hover {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.38);
+    box-shadow: 0 0 28px rgba(139,158,106,0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+    .particle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="label">Variation A2 — Spiral Merge</div>
+
+<div class="scene">
+  <div class="ceremony-particles" id="particles"></div>
+  <div class="ceremony-ambient-glow"></div>
+
+  <div class="ceremony-ik-wrap" id="wrap">
+    <!-- Static circles — the entrance (unchanged) -->
+    <div class="ceremony-ik-circle c1" id="circ1"></div>
+    <div class="ceremony-ik-circle c2" id="circ2"></div>
+    <div class="ceremony-ik-circle c3" id="circ3"></div>
+    <div class="ceremony-ik-circle c4" id="circ4"></div>
+
+    <!-- Orbiters — the spiral trails that take over -->
+    <div class="orbiter o1" id="orb1"><div class="spoke"><div class="trail-circle"></div></div></div>
+    <div class="orbiter o2" id="orb2"><div class="spoke"><div class="trail-circle"></div></div></div>
+    <div class="orbiter o3" id="orb3"><div class="spoke"><div class="trail-circle"></div></div></div>
+    <div class="orbiter o4" id="orb4"><div class="spoke"><div class="trail-circle"></div></div></div>
+
+    <!-- Singularity point -->
+    <div class="singularity" id="singularity"></div>
+
+    <!-- Name reveal -->
+    <div class="ceremony-biz-wrap" id="biz-wrap">
+      <span class="ceremony-biz-name">Cristal&#8217;s Art Studio</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay" onclick="runScene()">Replay</button>
+
+<script>
+  const PHI = 1.618034;
+  const BASE = 1000;
+
+  // Generate ambient particles (21 — Fibonacci)
+  const particlesEl = document.getElementById('particles');
+  for (let i = 0; i < 21; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle' + (i % 3 === 0 ? ' near' : '');
+    const size = 2 + Math.random() * 3;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.setProperty('--p-sway', ((Math.random() - 0.5) * 60) + 'px');
+    p.style.animationDelay = (Math.random() * Math.pow(PHI, 4)) + 's';
+    p.style.animationDuration = (Math.pow(PHI, 5) + Math.random() * Math.pow(PHI, 4)) + 's';
+    particlesEl.appendChild(p);
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function resetAll() {
+    ['circ1','circ2','circ3','circ4'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('reveal','handoff');
+      // Force reflow to restart animations
+      void el.offsetWidth;
+    });
+    ['orb1','orb2','orb3','orb4'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('spiraling');
+      void el.offsetWidth;
+    });
+    const sing = document.getElementById('singularity');
+    sing.classList.remove('fire');
+    void sing.offsetWidth;
+
+    const biz = document.getElementById('biz-wrap');
+    biz.classList.remove('birthing');
+    biz.style.opacity = '0';
+    void biz.offsetWidth;
+  }
+
+  async function runScene() {
+    resetAll();
+
+    // ─── ACT I: ENTRANCE ───
+    // Four circles born one by one, 1.618s stagger.
+    await sleep(BASE); // breath before beginning
+
+    const circles = ['circ1','circ2','circ3','circ4'];
+    for (let i = 0; i < 4; i++) {
+      document.getElementById(circles[i]).classList.add('reveal');
+      if (i < 3) await sleep(PHI * BASE); // 1.618s stagger
+    }
+
+    // Wait for the last circle to finish its birth (2.618s animation)
+    await sleep(2.618 * BASE);
+
+    // Breathe together — ~3.236s
+    await sleep(PHI * PHI * BASE);
+
+    // ─── ACT II: SPIRAL MERGE ───
+    // Hand off the static circles to the orbiters at the same positions,
+    // then start the spiral.
+    circles.forEach(id => document.getElementById(id).classList.add('handoff'));
+
+    // Tiny beat so the handoff fade starts before the orbiters begin moving
+    await sleep(236);
+
+    ['orb1','orb2','orb3','orb4'].forEach(id => {
+      document.getElementById(id).classList.add('spiraling');
+    });
+
+    // Spiral runs 6.854s. Fire the singularity near the end so the
+    // white-hot point catches the trails collapsing.
+    await sleep(6.854 * BASE - 382);
+
+    document.getElementById('singularity').classList.add('fire');
+
+    // Let the singularity reach its peak (~382ms into its 1.618s life)
+    await sleep(618);
+
+    // ─── ACT III: NAME REVEAL PULSE (unchanged) ───
+    const biz = document.getElementById('biz-wrap');
+    biz.classList.add('birthing');
+
+    // Hold — 2.618s pulse + 3s hold
+    await sleep(2.618 * BASE);
+    await sleep(3 * BASE);
+  }
+
+  runScene();
+</script>
+
+</body>
+</html>

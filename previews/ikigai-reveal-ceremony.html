@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Reveal</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Satoshi', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ═══════════════════════════════════════════
+     THE STAGE — full viewport, layered
+     ═══════════════════════════════════════════ */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+
+  /* Ambient particle field — cold, spacey, PS2 energy */
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    animation: particles-in 3s ease-out 1s forwards;
+  }
+
+  @keyframes particles-in {
+    to { opacity: 1; }
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    animation: drift 20s linear infinite;
+  }
+
+  @keyframes drift {
+    from { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    to { transform: translateY(-20vh) translateX(40px); opacity: 0; }
+  }
+
+  /* Ambient deep blue glow — the PS2 hum made visible */
+  .ambient-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(30, 58, 95, 0.15) 0%, transparent 70%);
+    opacity: 0;
+    animation: ambient-breathe 8s ease-in-out 2s infinite, ambient-in 4s ease-out 1.5s forwards;
+  }
+
+  @keyframes ambient-in {
+    to { opacity: 1; }
+  }
+
+  @keyframes ambient-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  }
+
+  /* ═══════════════════════════════════════════
+     THE FOUR CIRCLES — warm against cold
+     ═══════════════════════════════════════════ */
+  .ikigai-container {
+    position: relative;
+    width: min(420px, 80vw);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+  }
+
+  .ik-circle {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    transform: scale(0.3);
+    filter: blur(8px);
+  }
+
+  /* Each circle fades in from blur to sharp, cold to warm */
+  .ik-circle.c1 {
+    background: #F5E642;
+    left: 50%; top: 19.1%;
+    transform-origin: center;
+    animation: circle-emerge 2.5s cubic-bezier(0.16, 1, 0.3, 1) 3s forwards;
+  }
+  .ik-circle.c2 {
+    background: #A8DB5A;
+    left: 19.1%; top: 50%;
+    animation: circle-emerge 2.5s cubic-bezier(0.16, 1, 0.3, 1) 4.5s forwards;
+  }
+  .ik-circle.c3 {
+    background: #F4A79D;
+    left: 80.9%; top: 50%;
+    animation: circle-emerge 2.5s cubic-bezier(0.16, 1, 0.3, 1) 6s forwards;
+  }
+  .ik-circle.c4 {
+    background: #6DD5D0;
+    left: 50%; top: 80.9%;
+    animation: circle-emerge 2.5s cubic-bezier(0.16, 1, 0.3, 1) 7.5s forwards;
+  }
+
+  @keyframes circle-emerge {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); filter: blur(8px); }
+    60% { opacity: 0.45; filter: blur(2px); }
+    100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
+  }
+
+  /* Student's answer labels — appear after each circle */
+  .answer-label {
+    position: absolute;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    opacity: 0;
+    letter-spacing: 0.03em;
+    z-index: 3;
+  }
+
+  .answer-label.a1 {
+    left: 50%; top: 6%;
+    transform: translateX(-50%);
+    animation: label-fade 1.5s ease-out 4.5s forwards;
+  }
+  .answer-label.a2 {
+    left: 3%; top: 50%;
+    transform: translateY(-50%);
+    animation: label-fade 1.5s ease-out 6s forwards;
+  }
+  .answer-label.a3 {
+    right: 3%; top: 50%;
+    transform: translateY(-50%);
+    text-align: right;
+    animation: label-fade 1.5s ease-out 7.5s forwards;
+  }
+  .answer-label.a4 {
+    left: 50%; bottom: 3%;
+    transform: translateX(-50%);
+    animation: label-fade 1.5s ease-out 9s forwards;
+  }
+
+  @keyframes label-fade {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to { opacity: 0.7; transform: translateX(-50%) translateY(0); }
+  }
+
+  .answer-label.a2 {
+    animation-name: label-fade-left;
+  }
+  @keyframes label-fade-left {
+    from { opacity: 0; transform: translateY(-50%) translateX(-4px); }
+    to { opacity: 0.7; transform: translateY(-50%) translateX(0); }
+  }
+  .answer-label.a3 {
+    animation-name: label-fade-right;
+  }
+  @keyframes label-fade-right {
+    from { opacity: 0; transform: translateY(-50%) translateX(4px); }
+    to { opacity: 0.7; transform: translateY(-50%) translateX(0); }
+  }
+
+  /* ═══════════════════════════════════════════
+     CONVERGENCE — circles drift inward
+     ═══════════════════════════════════════════ */
+
+  /* After all 4 appear, the whole container subtly contracts */
+  .ikigai-container {
+    animation: converge 3s ease-in-out 10s forwards;
+  }
+
+  @keyframes converge {
+    to { transform: scale(0.92); }
+  }
+
+  /* ═══════════════════════════════════════════
+     THE CENTER — warm glow emerges from convergence
+     ═══════════════════════════════════════════ */
+  .center-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20%;
+    height: 20%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 30%, #8B9E6A 70%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74, 103, 65, 0.4), 0 0 80px rgba(74, 103, 65, 0.2);
+    opacity: 0;
+    z-index: 4;
+    animation: center-emerge 2.5s ease-out 11s forwards;
+  }
+
+  @keyframes center-emerge {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    60% { opacity: 0.8; }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* ═══════════════════════════════════════════
+     THE BUSINESS NAME — letter by letter, slow
+     ═══════════════════════════════════════════ */
+  .business-name {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    animation: name-reveal 1s ease-out 13.5s forwards;
+  }
+
+  @keyframes name-reveal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .business-name .title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.3);
+    /* Letter-by-letter via clip-path + animation */
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    animation: typewriter 2.5s steps(18) 13.5s forwards;
+  }
+
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  .business-name .origin {
+    display: block;
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.08em;
+    opacity: 0;
+    animation: origin-fade 2s ease-out 16.5s forwards;
+  }
+
+  @keyframes origin-fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 0.4; transform: translateY(0); }
+  }
+
+  /* ═══════════════════════════════════════════
+     THE PULL — "I'm in" appears with gravity
+     ═══════════════════════════════════════════ */
+  .cta-container {
+    position: absolute;
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(-50%);
+    z-index: 10;
+    opacity: 0;
+    animation: cta-rise 1.5s ease-out 19s forwards;
+  }
+
+  @keyframes cta-rise {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .cta-container button {
+    font-family: 'Satoshi', sans-serif;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 14px 48px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .cta-container button:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 30px rgba(74, 103, 65, 0.2);
+  }
+
+  /* ═══════════════════════════════════════════
+     REDUCED MOTION
+     ═══════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- Ambient cold atmosphere -->
+  <div class="particles">
+    <div class="particle" style="left:12%; animation-delay:0s; animation-duration:18s;"></div>
+    <div class="particle" style="left:28%; animation-delay:2s; animation-duration:22s;"></div>
+    <div class="particle" style="left:45%; animation-delay:5s; animation-duration:16s;"></div>
+    <div class="particle" style="left:62%; animation-delay:1s; animation-duration:24s;"></div>
+    <div class="particle" style="left:78%; animation-delay:4s; animation-duration:19s;"></div>
+    <div class="particle" style="left:88%; animation-delay:7s; animation-duration:21s;"></div>
+    <div class="particle" style="left:35%; animation-delay:3s; animation-duration:17s;"></div>
+    <div class="particle" style="left:55%; animation-delay:6s; animation-duration:23s;"></div>
+    <div class="particle" style="left:20%; animation-delay:8s; animation-duration:20s;"></div>
+    <div class="particle" style="left:70%; animation-delay:2.5s; animation-duration:18s;"></div>
+    <div class="particle" style="left:8%; animation-delay:9s; animation-duration:25s;"></div>
+    <div class="particle" style="left:92%; animation-delay:3.5s; animation-duration:15s;"></div>
+    <div class="particle" style="left:42%; animation-delay:7.5s; animation-duration:22s;"></div>
+    <div class="particle" style="left:58%; animation-delay:0.5s; animation-duration:19s;"></div>
+    <div class="particle" style="left:82%; animation-delay:5.5s; animation-duration:21s;"></div>
+  </div>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Ikigai diagram -->
+  <div class="ikigai-container">
+
+    <!-- Student's answers (appear after each circle) -->
+    <div class="answer-label a1">Music, Animals,<br>Helping People</div>
+    <div class="answer-label a2">Drawing, Public<br>Speaking, Math</div>
+    <div class="answer-label a3">Mental Health,<br>Community, Art</div>
+    <div class="answer-label a4">Teaching, Tutoring,<br>Creative Services</div>
+
+    <!-- Four Ikigai circles — warm against the cold -->
+    <div class="ik-circle c1"></div>
+    <div class="ik-circle c2"></div>
+    <div class="ik-circle c3"></div>
+    <div class="ik-circle c4"></div>
+
+    <!-- Center glow -->
+    <div class="center-glow"></div>
+
+    <!-- Business name — letter by letter -->
+    <div class="business-name">
+      <span class="title">Harmony Art Studio</span>
+      <span class="origin">This came from who you are.</span>
+    </div>
+  </div>
+
+  <!-- The pull -->
+  <div class="cta-container">
+    <button>I'M IN</button>
+  </div>
+
+</div>
+
+</body>
+</html>

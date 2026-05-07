@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grouping Algorithm — Full Matrix Visualization</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #0a0a0f; color: #e0e0e0; overflow-x: hidden; }
+
+  /* Background grid */
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 60px 32px; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 60px; }
+  .header h1 {
+    font-size: 48px; font-weight: 700; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #C084FC, #60A5FA, #2DD4BF);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header p { font-size: 16px; color: #666; margin-top: 12px; }
+  .header .version {
+    display: inline-block; margin-top: 16px; padding: 4px 12px;
+    border: 1px solid #333; border-radius: 999px; font-size: 11px;
+    font-family: 'JetBrains Mono', monospace; color: #888;
+  }
+
+  /* Pipeline */
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin-bottom: 64px; }
+  .step {
+    flex: 1; padding: 28px 20px; position: relative;
+    border: 1px solid #1a1a2e; background: #0d0d15;
+  }
+  .step:first-child { border-radius: 12px 0 0 12px; }
+  .step:last-child { border-radius: 0 12px 12px 0; }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    color: #444; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .step-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .step-desc { font-size: 12px; color: #666; line-height: 1.5; }
+  .step-circle { font-size: 11px; color: #888; margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
+  .step .arrow {
+    position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px; background: #0a0a0f; border: 1px solid #1a1a2e;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    z-index: 2; font-size: 14px; color: #444;
+  }
+  .step:last-child .arrow { display: none; }
+
+  .step-1 { border-color: #C084FC33; }
+  .step-1 .step-title { color: #C084FC; }
+  .step-2 { border-color: #60A5FA33; }
+  .step-2 .step-title { color: #60A5FA; }
+  .step-3 { border-color: #2DD4BF33; }
+  .step-3 .step-title { color: #2DD4BF; }
+  .step-4 { border-color: #FBBF2433; }
+  .step-4 .step-title { color: #FBBF24; }
+  .step-5 { border-color: #F8717133; }
+  .step-5 .step-title { color: #F87171; }
+
+  /* Section headers */
+  .section { margin-bottom: 48px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .section-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .section-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; }
+  .section-line { flex: 1; height: 1px; background: #1a1a2e; }
+
+  /* Cards grid */
+  .options-grid { display: grid; gap: 12px; }
+  .grid-8 { grid-template-columns: repeat(4, 1fr); }
+  .grid-5 { grid-template-columns: repeat(5, 1fr); }
+  .grid-10 { grid-template-columns: repeat(5, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-7 { grid-template-columns: repeat(4, 1fr); }
+
+  .option {
+    border: 1px solid #1a1a2e; border-radius: 10px; padding: 16px;
+    background: #0d0d15; transition: all 0.2s;
+  }
+  .option:hover { border-color: #333; transform: translateY(-2px); }
+  .option .opt-id {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: #555; margin-bottom: 6px;
+  }
+  .option .opt-label { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .option .opt-desc { font-size: 11px; color: #555; line-height: 1.4; }
+
+  /* Color coding per circle */
+  .c1 .opt-label { color: #C084FC; }
+  .c1 { border-color: #C084FC22; }
+  .c2 .opt-label { color: #60A5FA; }
+  .c2 { border-color: #60A5FA22; }
+  .c3 .opt-label { color: #2DD4BF; }
+  .c3 { border-color: #2DD4BF22; }
+  .c4 .opt-label { color: #FBBF24; }
+  .c4 { border-color: #FBBF2422; }
+  .c5 .opt-label { color: #F87171; }
+  .c5 { border-color: #F8717122; }
+
+  /* Cross-group swaps */
+  .swap-section {
+    border: 1px solid #1a1a2e; border-radius: 12px; padding: 24px;
+    background: #0d0d15; margin-top: 48px;
+  }
+  .swap-title { font-size: 16px; font-weight: 700; color: #F87171; margin-bottom: 16px; }
+  .swap-diagram {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+    padding: 24px; background: #08080d; border-radius: 8px;
+  }
+  .swap-group {
+    border: 1px dashed #333; border-radius: 8px; padding: 16px; min-width: 160px; text-align: center;
+  }
+  .swap-group-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #666; margin-bottom: 8px; }
+  .swap-student {
+    display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px;
+    margin: 3px; font-family: 'JetBrains Mono', monospace;
+  }
+  .swap-arrow { font-size: 24px; color: #F87171; }
+  .has-visual { background: #C084FC22; color: #C084FC; border: 1px solid #C084FC44; }
+  .has-verbal { background: #2DD4BF22; color: #2DD4BF; border: 1px solid #2DD4BF44; }
+  .has-both { background: #60A5FA22; color: #60A5FA; border: 1px solid #60A5FA44; }
+  .has-neither { background: #33333344; color: #888; border: 1px solid #444; }
+
+  /* Criteria checklist */
+  .criteria {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-top: 48px;
+  }
+  .criterion {
+    border: 1px solid #1a1a2e; border-radius: 10px; padding: 16px; background: #0d0d15;
+  }
+  .criterion .check { font-size: 14px; margin-bottom: 6px; }
+  .criterion .crit-label { font-size: 13px; font-weight: 600; color: #ccc; margin-bottom: 4px; }
+  .criterion .crit-rule { font-size: 11px; color: #555; line-height: 1.5; }
+
+  /* Composition log example */
+  .comp-log {
+    border: 1px solid #1a1a2e; border-radius: 12px; padding: 24px;
+    background: #0d0d15; margin-top: 48px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.8; overflow-x: auto;
+  }
+  .comp-log .key { color: #60A5FA; }
+  .comp-log .str { color: #2DD4BF; }
+  .comp-log .num { color: #FBBF24; }
+  .comp-log .bool-true { color: #10B981; }
+  .comp-log .bool-false { color: #EF4444; }
+  .comp-log .bracket { color: #666; }
+  .comp-log .comment { color: #444; font-style: italic; }
+
+  /* Merge rule */
+  .merge-rule {
+    margin-top: 32px; padding: 20px; border-radius: 10px;
+    border: 1px solid #FBBF2433; background: #FBBF240a;
+  }
+  .merge-rule .rule-label { font-size: 12px; font-weight: 700; color: #FBBF24; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .merge-rule .rule-text { font-size: 13px; color: #999; line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .pipeline { flex-direction: column; }
+    .step { border-radius: 8px !important; }
+    .step .arrow { display: none; }
+    .grid-8, .grid-5, .grid-10, .grid-4, .grid-7 { grid-template-columns: repeat(2, 1fr); }
+    .criteria { grid-template-columns: 1fr; }
+    .swap-diagram { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Grouping Algorithm</h1>
+    <p>Five-step optimization for balanced invention teams</p>
+    <span class="version">src/lib/invention-grouping.ts</span>
+  </div>
+
+  <!-- ═══ THE PIPELINE ═══ -->
+  <div class="pipeline">
+    <div class="step step-1">
+      <p class="step-num">Step 1 — Primary</p>
+      <p class="step-title">Category Pool</p>
+      <p class="step-desc">Students who chose the same invention category are pooled together. Groups form within pools.</p>
+      <p class="step-circle">Circle 1 · The Wish</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="step step-2">
+      <p class="step-num">Step 2 — Secondary</p>
+      <p class="step-title">Archetype Mix</p>
+      <p class="step-desc">Each group must have a Builder, Empath, and Systems Thinker. Fill remaining slots with diversity priority.</p>
+      <p class="step-circle">Circle 2 · The Mind</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="step step-3">
+      <p class="step-num">Step 3 — Tertiary</p>
+      <p class="step-title">Chip Diversity</p>
+      <p class="step-desc">Maximize the ratio of unique knowledge chips to total chips within each group.</p>
+      <p class="step-circle">Circle 3 · The Lens</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="step step-4">
+      <p class="step-num">Step 4 — Balance</p>
+      <p class="step-title">Scale Balance</p>
+      <p class="step-desc">No more than 3 students with the same ambition scale in one group.</p>
+      <p class="step-circle">Circle 4 · The Scale</p>
+      <div class="arrow">→</div>
+    </div>
+    <div class="step step-5">
+      <p class="step-num">Step 5 — Coverage</p>
+      <p class="step-title">Voice Coverage</p>
+      <p class="step-desc">Every group needs at least one visual communicator and one verbal communicator.</p>
+      <p class="step-circle">Circle 5 · The Voice</p>
+    </div>
+  </div>
+
+  <!-- ═══ CIRCLE 1: CATEGORIES ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background: #C084FC;"></div>
+      <span class="section-label" style="color: #C084FC;">Circle 1 — The Wish</span>
+      <span style="font-size: 11px; color: #555;">8 categories · Students pooled by selection</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="options-grid grid-8">
+      <div class="option c1"><p class="opt-id">physical</p><p class="opt-label">Physical Product</p><p class="opt-desc">Something you can hold, wear, or use in the real world</p></div>
+      <div class="option c1"><p class="opt-id">digital</p><p class="opt-label">Digital Tool</p><p class="opt-desc">Software, a platform, something that lives on a screen</p></div>
+      <div class="option c1"><p class="opt-id">medical</p><p class="opt-label">Medical/Health</p><p class="opt-desc">Helps people feel better, stay healthier, or live with a condition</p></div>
+      <div class="option c1"><p class="opt-id">learning</p><p class="opt-label">Learning Tool</p><p class="opt-desc">Helps people understand or practice something</p></div>
+      <div class="option c1"><p class="opt-id">environmental</p><p class="opt-label">Environmental</p><p class="opt-desc">Helps the planet, animals, or nature</p></div>
+      <div class="option c1"><p class="opt-id">social</p><p class="opt-label">Social/Community</p><p class="opt-desc">Connects people or fixes a social problem</p></div>
+      <div class="option c1"><p class="opt-id">transport</p><p class="opt-label">Transportation</p><p class="opt-desc">Moves people, goods, or information differently</p></div>
+      <div class="option c1"><p class="opt-id">wildcard</p><p class="opt-label">Something New</p><p class="opt-desc">Doesn't fit any of these categories</p></div>
+    </div>
+  </div>
+
+  <!-- ═══ CIRCLE 2: ARCHETYPES ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background: #60A5FA;"></div>
+      <span class="section-label" style="color: #60A5FA;">Circle 2 — The Mind</span>
+      <span style="font-size: 11px; color: #555;">5 archetypes · 3 required per group (★)</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="options-grid grid-5">
+      <div class="option c2" style="border-color: #60A5FA44;">
+        <p class="opt-id">builder ★</p>
+        <p class="opt-label">Builder</p>
+        <p class="opt-desc">Immediately thinks about how to make the thing. Wants to know what it looks like and how it works.</p>
+      </div>
+      <div class="option c2" style="border-color: #60A5FA44;">
+        <p class="opt-id">empath ★</p>
+        <p class="opt-label">Empath</p>
+        <p class="opt-desc">Thinks about the people affected first. Wants to understand how they feel before thinking about solutions.</p>
+      </div>
+      <div class="option c2" style="border-color: #60A5FA44;">
+        <p class="opt-id">systems_thinker ★</p>
+        <p class="opt-label">Systems Thinker</p>
+        <p class="opt-desc">Asks why the problem exists in the first place. Wants to understand what broke before fixing it.</p>
+      </div>
+      <div class="option c2">
+        <p class="opt-id">connector</p>
+        <p class="opt-label">Connector</p>
+        <p class="opt-desc">Looks for what already exists that could be combined or repurposed. Finds solutions hiding in other fields.</p>
+      </div>
+      <div class="option c2">
+        <p class="opt-id">storyteller</p>
+        <p class="opt-label">Storyteller</p>
+        <p class="opt-desc">Thinks about how to make people care. Finds the words or images that make the idea feel real.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CIRCLE 3: KNOWLEDGE CHIPS ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background: #2DD4BF;"></div>
+      <span class="section-label" style="color: #2DD4BF;">Circle 3 — The Lens</span>
+      <span style="font-size: 11px; color: #555;">10 chips + free text · diversity = unique / total</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="options-grid grid-10">
+      <div class="option c3"><p class="opt-label">Animals & nature</p></div>
+      <div class="option c3"><p class="opt-label">Culture / language</p></div>
+      <div class="option c3"><p class="opt-label">Medical condition</p></div>
+      <div class="option c3"><p class="opt-label">Tech & coding</p></div>
+      <div class="option c3"><p class="opt-label">Farming / food</p></div>
+      <div class="option c3"><p class="opt-label">Mental health</p></div>
+      <div class="option c3"><p class="opt-label">Sport / physical</p></div>
+      <div class="option c3"><p class="opt-label">Creative field</p></div>
+      <div class="option c3"><p class="opt-label">Religion / spiritual</p></div>
+      <div class="option c3"><p class="opt-label">Unseen world</p></div>
+    </div>
+    <div class="merge-rule" style="border-color: #2DD4BF33; background: #2DD4BF0a; margin-top: 16px;">
+      <p class="rule-label" style="color: #2DD4BF;">Diversity Score</p>
+      <p class="rule-text">chip_diversity = unique_chips / total_chips across the group. A group of 5 students where each picked different chips scores 1.0. A group where everyone picked the same 3 chips scores 0.33.</p>
+    </div>
+  </div>
+
+  <!-- ═══ CIRCLE 4: SCALE ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background: #FBBF24;"></div>
+      <span class="section-label" style="color: #FBBF24;">Circle 4 — The Scale</span>
+      <span style="font-size: 11px; color: #555;">4 options · max 3 of same per group</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="options-grid grid-4">
+      <div class="option c4">
+        <p class="opt-id">one_person</p>
+        <p class="opt-label">A — One Person</p>
+        <p class="opt-desc">One person's life is completely transformed. They will never be the same.</p>
+      </div>
+      <div class="option c4">
+        <p class="opt-id">community</p>
+        <p class="opt-label">B — Community</p>
+        <p class="opt-desc">A small community of people finally has something they have always needed.</p>
+      </div>
+      <div class="option c4">
+        <p class="opt-id">generation</p>
+        <p class="opt-label">C — Generation</p>
+        <p class="opt-desc">A whole generation of kids grows up with something we never had.</p>
+      </div>
+      <div class="option c4">
+        <p class="opt-id">world</p>
+        <p class="opt-label">D — World</p>
+        <p class="opt-desc">Something that changes the world.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CIRCLE 5: VOICE ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-dot" style="background: #F87171;"></div>
+      <span class="section-label" style="color: #F87171;">Circle 5 — The Voice</span>
+      <span style="font-size: 11px; color: #555;">7 chips · must have ≥1 visual + ≥1 verbal</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="options-grid grid-7">
+      <div class="option c5" style="border-color: #C084FC44;">
+        <p class="opt-id" style="color: #C084FC;">VISUAL</p>
+        <p class="opt-label">Draw it</p>
+      </div>
+      <div class="option c5" style="border-color: #C084FC44;">
+        <p class="opt-id" style="color: #C084FC;">VISUAL</p>
+        <p class="opt-label">Build a prototype</p>
+      </div>
+      <div class="option c5" style="border-color: #C084FC44;">
+        <p class="opt-id" style="color: #C084FC;">VISUAL</p>
+        <p class="opt-label">Build a slide or poster</p>
+      </div>
+      <div class="option c5" style="border-color: #2DD4BF44;">
+        <p class="opt-id" style="color: #2DD4BF;">VERBAL</p>
+        <p class="opt-label">Explain it out loud</p>
+      </div>
+      <div class="option c5" style="border-color: #2DD4BF44;">
+        <p class="opt-id" style="color: #2DD4BF;">VERBAL</p>
+        <p class="opt-label">Write it out</p>
+      </div>
+      <div class="option c5">
+        <p class="opt-id">EITHER</p>
+        <p class="opt-label">Make a video</p>
+      </div>
+      <div class="option c5">
+        <p class="opt-id">EITHER</p>
+        <p class="opt-label">Act it out</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CROSS-GROUP SWAPS ═══ -->
+  <div class="swap-section">
+    <p class="swap-title">Cross-Group Voice Swaps</p>
+    <p style="font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.6;">After initial group formation, the algorithm scans for groups missing visual or verbal coverage. If Group A needs a visual communicator and Group B has a spare, the algorithm swaps two students between groups — but only if the swap doesn't break Group B's coverage.</p>
+    <div class="swap-diagram">
+      <div class="swap-group">
+        <p class="swap-group-label">GROUP A — needs visual</p>
+        <span class="swap-student has-verbal">S1 verbal</span>
+        <span class="swap-student has-verbal">S2 verbal</span>
+        <span class="swap-student has-neither">S3</span>
+        <span class="swap-student has-verbal">S4 verbal</span>
+        <span class="swap-student has-neither" style="border-color: #EF4444; color: #EF4444;">S5 ← out</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+        <span class="swap-arrow">⇄</span>
+        <span style="font-size: 10px; color: #444; font-family: 'JetBrains Mono', monospace;">swap</span>
+      </div>
+      <div class="swap-group">
+        <p class="swap-group-label">GROUP B — has spare visual</p>
+        <span class="swap-student has-visual">S6 visual</span>
+        <span class="swap-student has-visual" style="border-color: #10B981; color: #10B981;">S7 visual ← out</span>
+        <span class="swap-student has-verbal">S8 verbal</span>
+        <span class="swap-student has-both">S9 both</span>
+        <span class="swap-student has-neither">S10</span>
+      </div>
+    </div>
+    <p style="font-size: 11px; color: #444; margin-top: 16px; text-align: center; font-family: 'JetBrains Mono', monospace;">
+      Result: S5 goes to Group B, S7 (visual) goes to Group A → both groups now have coverage
+    </p>
+  </div>
+
+  <!-- ═══ CRITERIA CHECKLIST ═══ -->
+  <div style="margin-top: 48px;">
+    <div class="section-header">
+      <div class="section-dot" style="background: #10B981;"></div>
+      <span class="section-label" style="color: #10B981;">Pass / Fail Criteria</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="criteria">
+      <div class="criterion">
+        <p class="check">✓</p>
+        <p class="crit-label">Archetype Coverage</p>
+        <p class="crit-rule">Group has at least one Builder, one Empath, and one Systems Thinker</p>
+      </div>
+      <div class="criterion">
+        <p class="check">✓</p>
+        <p class="crit-label">Scale Balance</p>
+        <p class="crit-rule">No more than 3 students selected the same scale option (A/B/C/D)</p>
+      </div>
+      <div class="criterion">
+        <p class="check">✓</p>
+        <p class="crit-label">Visual Communicator</p>
+        <p class="crit-rule">At least one student chose Draw it, Build a prototype, or Build a slide</p>
+      </div>
+      <div class="criterion">
+        <p class="check">✓</p>
+        <p class="crit-label">Verbal Communicator</p>
+        <p class="crit-rule">At least one student chose Explain out loud or Write it out</p>
+      </div>
+      <div class="criterion">
+        <p class="check">✓</p>
+        <p class="crit-label">Minimum Group Size</p>
+        <p class="crit-rule">Groups smaller than 3 are merged into the last group in their category pool</p>
+      </div>
+      <div class="criterion">
+        <p class="check">✓</p>
+        <p class="crit-label">all_criteria_met</p>
+        <p class="crit-rule">True only when archetype coverage + scale balance + visual + verbal all pass</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COMPOSITION LOG ═══ -->
+  <div style="margin-top: 48px;">
+    <div class="section-header">
+      <div class="section-dot" style="background: #60A5FA;"></div>
+      <span class="section-label" style="color: #60A5FA;">Output — composition_log per group</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="comp-log">
+      <span class="bracket">{</span><br>
+      &nbsp;&nbsp;<span class="key">"category"</span>: <span class="str">"physical"</span>,<br>
+      &nbsp;&nbsp;<span class="key">"archetypes"</span>: [<span class="str">"builder"</span>, <span class="str">"empath"</span>, <span class="str">"systems_thinker"</span>, <span class="str">"connector"</span>, <span class="str">"storyteller"</span>],<br>
+      &nbsp;&nbsp;<span class="key">"missing_archetypes"</span>: [],&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// empty = all 3 targets present</span><br>
+      &nbsp;&nbsp;<span class="key">"chip_diversity"</span>: <span class="num">0.87</span>,&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// 13 unique out of 15 total chips</span><br>
+      &nbsp;&nbsp;<span class="key">"scale_distribution"</span>: <span class="bracket">{</span> <span class="str">"one_person"</span>: <span class="num">1</span>, <span class="str">"community"</span>: <span class="num">2</span>, <span class="str">"world"</span>: <span class="num">2</span> <span class="bracket">}</span>,<br>
+      &nbsp;&nbsp;<span class="key">"has_visual"</span>: <span class="bool-true">true</span>,<br>
+      &nbsp;&nbsp;<span class="key">"has_verbal"</span>: <span class="bool-true">true</span>,<br>
+      &nbsp;&nbsp;<span class="key">"all_criteria_met"</span>: <span class="bool-true">true</span>,<br>
+      &nbsp;&nbsp;<span class="key">"compromises"</span>: []&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// empty = perfect group</span><br>
+      <span class="bracket">}</span>
+    </div>
+
+    <div class="comp-log" style="margin-top: 16px; border-color: #EF444433;">
+      <span class="bracket">{</span><br>
+      &nbsp;&nbsp;<span class="key">"category"</span>: <span class="str">"digital"</span>,<br>
+      &nbsp;&nbsp;<span class="key">"archetypes"</span>: [<span class="str">"builder"</span>, <span class="str">"builder"</span>, <span class="str">"empath"</span>, <span class="str">"storyteller"</span>],<br>
+      &nbsp;&nbsp;<span class="key">"missing_archetypes"</span>: [<span class="str">"systems_thinker"</span>],<br>
+      &nbsp;&nbsp;<span class="key">"chip_diversity"</span>: <span class="num">0.58</span>,<br>
+      &nbsp;&nbsp;<span class="key">"scale_distribution"</span>: <span class="bracket">{</span> <span class="str">"world"</span>: <span class="num">4</span> <span class="bracket">}</span>,&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// ⚠ imbalance</span><br>
+      &nbsp;&nbsp;<span class="key">"has_visual"</span>: <span class="bool-true">true</span>,<br>
+      &nbsp;&nbsp;<span class="key">"has_verbal"</span>: <span class="bool-false">false</span>,&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// ⚠ no verbal</span><br>
+      &nbsp;&nbsp;<span class="key">"all_criteria_met"</span>: <span class="bool-false">false</span>,<br>
+      &nbsp;&nbsp;<span class="key">"compromises"</span>: [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"Missing archetypes: systems_thinker"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"Scale imbalance: >3 students selected same scale option"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"No verbal communicator (explain out loud/write)"</span><br>
+      &nbsp;&nbsp;]<br>
+      <span class="bracket">}</span>
+    </div>
+  </div>
+
+  <!-- ═══ MERGE RULE ═══ -->
+  <div class="merge-rule" style="margin-top: 32px;">
+    <p class="rule-label">Merge Rule — Minimum Group Size</p>
+    <p class="rule-text">If fewer than 3 students remain in a category pool after groups are formed, they are merged into the last group in that pool rather than forming a tiny group. Composition metrics are recomputed after merge. This prevents groups of 1-2 which can't function as teams.</p>
+  </div>
+
+  <p style="text-align: center; font-size: 11px; color: #333; margin-top: 60px; font-family: 'JetBrains Mono', monospace;">
+    Adaptable Invention Mode · Five-Step Grouping Algorithm · v0.23.0
+  </p>
+
+</div>
+</body>
+</html>

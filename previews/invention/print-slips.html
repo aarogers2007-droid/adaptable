@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Preview: Print Student Slips</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #000; background: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .slip {
+    border: 2px dashed #999;
+    padding: 20px 16px;
+    text-align: center;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    page-break-inside: avoid;
+  }
+  .slip-name { font-size: 24px; font-weight: 700; line-height: 1.2; }
+  .slip-group { font-size: 72px; font-weight: 800; line-height: 1.1; margin-top: 8px; }
+  .slip-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+  .slip-event { font-size: 10px; color: #999; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="slip"><div class="slip-name">Zara Ali</div><div class="slip-group">2</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Jordan Blake</div><div class="slip-group">6</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Ethan Brooks</div><div class="slip-group">2</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Mia Chang</div><div class="slip-group">3</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Aisha Diallo</div><div class="slip-group">6</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Naomi Foster</div><div class="slip-group">8</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Noah Gutierrez</div><div class="slip-group">4</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Fatima Hassan</div><div class="slip-group">4</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Sofia Hernandez</div><div class="slip-group">2</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Destiny Howard</div><div class="slip-group">7</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Lily Johansson</div><div class="slip-group">8</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Tyler Johnson</div><div class="slip-group">2</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">David Kim</div><div class="slip-group">1</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Ryan Kowalski</div><div class="slip-group">6</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Rani Krishnan</div><div class="slip-group">5</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+  <div class="slip"><div class="slip-name">Jasmine Lee</div><div class="slip-group">4</div><div class="slip-label">Group</div><div class="slip-event">VentureLab Invention Mode &middot; May 13, 2026</div></div>
+</div>
+
+</body>
+</html>

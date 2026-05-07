@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adaptable — Animation Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ── Adaptable design tokens (mirrors src/app/globals.css :root) ── */
+  :root {
+    --primary: #0D9488;
+    --primary-light: #14B8A6;
+    --primary-dark: #0F766E;
+    --accent: #F59E0B;
+    --accent-light: #FBBF24;
+    --ikigai-love: #F5E642;
+    --ikigai-skills: #A8DB5A;
+    --ikigai-needs: #F4A79D;
+    --ikigai-money: #6DD5D0;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-muted: #9CA3AF;
+    --bg: #FFFFFF;
+    --bg-subtle: #F9FAFB;
+    --bg-muted: #F3F4F6;
+    --border: #E5E7EB;
+    --border-strong: #D1D5DB;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Inter", -apple-system, sans-serif;
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    padding: 48px 32px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  header h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
+  header p { margin: 8px 0 0; color: var(--text-secondary); font-size: 14px; max-width: 720px; }
+  header .meta { margin-top: 16px; display: flex; gap: 16px; font-size: 13px; color: var(--text-muted); }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card .label {
+    padding: 14px 18px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card .label h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .card .label p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .stage {
+    position: relative;
+    flex: 1;
+    min-height: 280px;
+    background: var(--bg-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .stage.dark {
+    background: #0a0a0d;
+  }
+  .replay-btn {
+    margin: 0;
+    padding: 10px 16px;
+    background: var(--bg);
+    border: none;
+    border-top: 1px solid var(--border);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 120ms;
+  }
+  .replay-btn:hover { background: var(--bg-muted); }
+  .replay-btn:active { background: var(--border); }
+
+  .toc {
+    position: sticky;
+    top: 16px;
+    margin-bottom: 24px;
+    padding: 12px 18px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .toc strong { color: var(--text-primary); }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     IKIGAI WIZARD REVEAL — multi-layer breathing glow + spark embers
+     (mirrors .ikigai-reveal-* in globals.css)
+     ═══════════════════════════════════════════════════════════════════ */
+  .ikigai-reveal-card {
+    position: relative;
+    width: 320px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: visible !important;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  }
+  .ikigai-reveal-glow {
+    position: absolute; inset: 0; border-radius: 12px;
+    pointer-events: none; z-index: 0; opacity: 0;
+  }
+  .ikigai-reveal-glow-inner {
+    box-shadow: 0 0 30px rgba(245,230,66,0.25), 0 0 40px rgba(168,219,90,0.2),
+      0 0 50px rgba(244,167,157,0.2), 0 0 60px rgba(109,213,208,0.25);
+    animation: ikigai-glow-burst-inner 0.8s ease-out forwards, ikigai-glow-breathe-inner 4s ease-in-out 0.8s infinite;
+  }
+  .ikigai-reveal-glow-mid {
+    inset: -8px; border-radius: 18px;
+    box-shadow: 0 0 60px rgba(245,230,66,0.18), 0 0 90px rgba(168,219,90,0.15),
+      0 0 90px rgba(244,167,157,0.15), 0 0 120px rgba(109,213,208,0.18);
+    animation: ikigai-glow-burst-mid 1.2s ease-out forwards, ikigai-glow-breathe-mid 5.5s ease-in-out 1.2s infinite;
+  }
+  .ikigai-reveal-glow-outer {
+    inset: -20px; border-radius: 28px;
+    box-shadow: 0 0 100px rgba(245,230,66,0.1), 0 0 160px rgba(168,219,90,0.08),
+      0 0 160px rgba(244,167,157,0.08), 0 0 200px rgba(109,213,208,0.1);
+    animation: ikigai-glow-burst-outer 1.6s ease-out forwards, ikigai-glow-breathe-outer 7s ease-in-out 1.6s infinite;
+  }
+  @keyframes ikigai-glow-burst-inner { 0% { opacity:0; transform:scale(0.9); } 30% { opacity:1; transform:scale(1.05); } 100% { opacity:0.85; transform:scale(1); } }
+  @keyframes ikigai-glow-burst-mid { 0% { opacity:0; transform:scale(0.85); } 25% { opacity:1; transform:scale(1.08); } 100% { opacity:0.7; transform:scale(1); } }
+  @keyframes ikigai-glow-burst-outer { 0% { opacity:0; transform:scale(0.8); } 20% { opacity:0.8; transform:scale(1.1); } 100% { opacity:0.5; transform:scale(1); } }
+  @keyframes ikigai-glow-breathe-inner { 0%,100% { opacity:0.85; transform:scale(1); } 50% { opacity:1; transform:scale(1.01); } }
+  @keyframes ikigai-glow-breathe-mid { 0%,100% { opacity:0.7; transform:scale(1); } 50% { opacity:0.85; transform:scale(1.015); } }
+  @keyframes ikigai-glow-breathe-outer { 0%,100% { opacity:0.5; transform:scale(1); } 50% { opacity:0.65; transform:scale(1.02); } }
+  .ikigai-reveal-bar-glow {
+    position: absolute; top: -2px; left: 10%; right: 10%; height: 10px;
+    border-radius: 6px; background: linear-gradient(to right, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+    filter: blur(8px); opacity: 0; pointer-events: none; z-index: 3;
+    animation: ikigai-bar-glow-in 0.6s ease-out 0.2s forwards, ikigai-bar-glow-breathe 4s ease-in-out 0.8s infinite;
+  }
+  @keyframes ikigai-bar-glow-in { 0% { opacity:0; } 50% { opacity:1; } 100% { opacity:0.7; } }
+  @keyframes ikigai-bar-glow-breathe { 0%,100% { opacity:0.7; } 50% { opacity:0.9; } }
+  .ikigai-reveal-particles {
+    position: absolute; inset: -30px; pointer-events: none; overflow: visible; z-index: 20;
+  }
+  .ikigai-reveal-particle {
+    position: absolute; border-radius: 50%; opacity: 0;
+    animation: ikigai-particle-rise ease-in-out infinite;
+  }
+  @keyframes ikigai-particle-rise {
+    0% { opacity: 0; transform: translateY(0) scale(0.3); }
+    15% { opacity: 0.8; transform: translateY(-6px) scale(1); }
+    50% { opacity: 0.5; transform: translateY(-28px) scale(0.7); }
+    100% { opacity: 0; transform: translateY(-55px) scale(0.15); }
+  }
+  .ikigai-card-bar {
+    display: flex; height: 6px; position: relative; z-index: 2;
+    border-radius: 12px 12px 0 0; overflow: hidden;
+  }
+  .ikigai-card-bar > div { flex: 1; }
+  .ikigai-card-content { padding: 20px; position: relative; z-index: 2; }
+  .ikigai-card-content .eyebrow { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .ikigai-card-content h2 { margin: 8px 0 0; font-size: 24px; font-weight: 700; line-height: 1.1; }
+  .ikigai-card-content .niche { margin: 8px 0 0; font-size: 13px; color: var(--text-secondary); }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     GRAVITATIONAL COLLAPSE — circles compress into singularity
+     (mirrors .ceremony-* in globals.css)
+     ═══════════════════════════════════════════════════════════════════ */
+  .ceremony-stage {
+    position: relative;
+    width: 280px;
+    height: 280px;
+  }
+  .ceremony-circle {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0;
+    mix-blend-mode: screen;
+    filter: blur(2px);
+  }
+  .ceremony-circle.c1 { background: #F5E642; left: 50%; top: 19.1%; transform: translate(-50%, -50%) scale(0); }
+  .ceremony-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%; transform: translate(-50%, -50%) scale(0); }
+  .ceremony-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%; transform: translate(-50%, -50%) scale(0); }
+  .ceremony-circle.c4 { background: #6DD5D0; left: 50%; top: 80.9%; transform: translate(-50%, -50%) scale(0); }
+  .ceremony-circle.reveal { animation: ceremony-circle-birth 2.618s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes ceremony-circle-birth {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  }
+  .ceremony-circle.contracting {
+    animation: ceremony-contract 2.618s cubic-bezier(0.55,0,0.2,1) forwards !important;
+  }
+  @keyframes ceremony-contract {
+    0% { left: var(--start-l); top: var(--start-t); transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
+    100% { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+  }
+  .ceremony-c1.contracting { --start-l: 50%; --start-t: 19.1%; }
+  .ceremony-c2.contracting { --start-l: 19.1%; --start-t: 50%; }
+  .ceremony-c3.contracting { --start-l: 80.9%; --start-t: 50%; }
+  .ceremony-c4.contracting { --start-l: 50%; --start-t: 80.9%; }
+  .ceremony-shockwave {
+    position: absolute; left: 50%; top: 50%;
+    width: 20px; height: 20px;
+    border: 2px solid rgba(245,230,66,0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ceremony-shockwave.expand {
+    animation: ceremony-shockwave-expand 1.6s ease-out forwards;
+  }
+  @keyframes ceremony-shockwave-expand {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(15); opacity: 0; }
+  }
+  .ceremony-biz {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    opacity: 0;
+    text-shadow: 0 0 30px rgba(245,230,66,0.8), 0 0 60px rgba(109,213,208,0.5);
+  }
+  .ceremony-biz.visible { animation: ceremony-biz-fade 1.5s ease-out forwards; }
+  @keyframes ceremony-biz-fade { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     BUSINESS CARD 3D TILT
+     ═══════════════════════════════════════════════════════════════════ */
+  .card3d-stage { perspective: 1000px; padding: 20px; }
+  .card3d {
+    width: 280px; height: 170px;
+    background: linear-gradient(145deg, #1a1a1e 0%, #2a2a30 50%, #1a1a1e 100%);
+    border-radius: 16px;
+    border: 2px solid rgba(13,148,136,0.3);
+    padding: 20px;
+    position: relative;
+    transition: transform 0.05s ease-out;
+    transform-style: preserve-3d;
+    cursor: grab;
+  }
+  .card3d:active { cursor: grabbing; }
+  .card3d::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: 16px;
+    background: radial-gradient(circle at var(--lx, 50%) var(--ly, 50%), rgba(255,255,255,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .card3d .name { color: #fff; font-size: 18px; font-weight: 700; }
+  .card3d .role { color: #9999aa; font-size: 11px; margin-top: 4px; }
+  .card3d .bar { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, #F5E642, #A8DB5A, #F4A79D, #6DD5D0); border-radius: 0 0 14px 14px; }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     CHECKPOINT CELEBRATION
+     ═══════════════════════════════════════════════════════════════════ */
+  .checkpoint-celebration {
+    background: linear-gradient(90deg, rgba(13,148,136,0.06), rgba(13,148,136,0.12), rgba(13,148,136,0.06));
+    background-size: 200% 100%;
+    border: 1px solid rgba(13,148,136,0.3);
+    padding: 16px 24px;
+    border-radius: 12px;
+    color: var(--primary);
+    font-weight: 600;
+    text-align: center;
+    animation: checkpoint-celebrate 1.6s ease-out;
+  }
+  @keyframes checkpoint-celebrate {
+    0% { transform: scale(0.96); opacity: 0; background-position: -200% 0; }
+    20% { transform: scale(1.02); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; background-position: 200% 0; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     PROGRESS BAR SHIMMER
+     ═══════════════════════════════════════════════════════════════════ */
+  .progress-track {
+    width: 280px; height: 8px;
+    background: var(--bg-muted);
+    border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 60%;
+    background: linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%);
+    background-size: 200% 100%;
+    border-radius: 999px;
+    animation: progress-shimmer 2.5s linear infinite;
+  }
+  @keyframes progress-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     STREAK BADGE
+     ═══════════════════════════════════════════════════════════════════ */
+  .streak-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 999px;
+    background: rgba(245,158,11,0.1);
+    color: var(--accent);
+    font-weight: 700;
+    animation: streak-breathe 3s ease-in-out infinite;
+  }
+  .streak-badge-hot {
+    background: linear-gradient(90deg, rgba(245,158,11,0.15), rgba(220,38,38,0.15));
+    box-shadow: 0 0 20px rgba(245,158,11,0.3);
+    animation: streak-breathe-hot 1.5s ease-in-out infinite;
+  }
+  @keyframes streak-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+  @keyframes streak-breathe-hot {
+    0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+    50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(245,158,11,0.5), 0 0 50px rgba(220,38,38,0.2); }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     STAGGER ENTER
+     ═══════════════════════════════════════════════════════════════════ */
+  .stagger-row { display: flex; flex-direction: column; gap: 8px; width: 280px; }
+  .stagger-item {
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fade-up 500ms cubic-bezier(0.2,0.8,0.2,1) forwards;
+  }
+  @keyframes fade-up { to { opacity: 1; transform: translateY(0); } }
+  .stagger-item:nth-child(1) { animation-delay: 0ms; }
+  .stagger-item:nth-child(2) { animation-delay: 100ms; }
+  .stagger-item:nth-child(3) { animation-delay: 200ms; }
+  .stagger-item:nth-child(4) { animation-delay: 300ms; }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     CHIP CASCADE
+     ═══════════════════════════════════════════════════════════════════ */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; max-width: 280px; }
+  .chip {
+    padding: 6px 14px; border-radius: 999px;
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    animation: chip-cascade-in 400ms cubic-bezier(0.2,0.8,0.2,1) forwards;
+  }
+  @keyframes chip-cascade-in { to { opacity: 1; transform: translateY(0) scale(1); } }
+  .chip:nth-child(1) { animation-delay: 0ms; }
+  .chip:nth-child(2) { animation-delay: 80ms; }
+  .chip:nth-child(3) { animation-delay: 160ms; }
+  .chip:nth-child(4) { animation-delay: 240ms; }
+  .chip:nth-child(5) { animation-delay: 320ms; }
+  .chip:nth-child(6) { animation-delay: 400ms; }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     MESSAGE LAND BOUNCE
+     ═══════════════════════════════════════════════════════════════════ */
+  .msg-bubble {
+    max-width: 280px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    line-height: 1.4;
+    animation: msg-land-bounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes msg-land-bounce {
+    0% { transform: scale(0.96); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     SLIDE-DOWN DRAWER
+     ═══════════════════════════════════════════════════════════════════ */
+  .drawer {
+    width: 280px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: slide-down 200ms ease-out both;
+  }
+  @keyframes slide-down { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .drawer-item { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13px; }
+  .drawer-item:first-child { border-top: none; }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     CONFETTI
+     ═══════════════════════════════════════════════════════════════════ */
+  .confetti-stage { width: 100%; height: 280px; position: relative; overflow: hidden; }
+  .confetti-piece {
+    position: absolute;
+    width: 8px; height: 14px;
+    top: -20px;
+    opacity: 0;
+    animation: confetti-fall 3s linear forwards;
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(320px) rotate(720deg); opacity: 0; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     FOUNDER LETTER (typewriter fade)
+     ═══════════════════════════════════════════════════════════════════ */
+  .letter-stage {
+    background: #0a0a0d;
+    color: rgba(255,255,255,0.7);
+    font-family: "Times New Roman", serif;
+    padding: 32px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .letter-content { max-width: 280px; }
+  .letter-content p { margin: 0 0 1em; opacity: 0; transform: translateY(8px); transition: opacity 1.2s, transform 1.2s; }
+  .letter-content p.visible { opacity: 1; transform: translateY(0); }
+  .letter-sig { font-style: italic; font-size: 12px; color: rgba(255,255,255,0.5); }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     DIPLOMA
+     ═══════════════════════════════════════════════════════════════════ */
+  .diploma {
+    width: 320px;
+    background: linear-gradient(145deg, #f5f0e1, #ebe4d2);
+    border: 8px double #8a6914;
+    padding: 24px;
+    text-align: center;
+    font-family: "Times New Roman", serif;
+    color: #1a1a1e;
+    opacity: 0;
+    transform: scale(0.95);
+    animation: diploma-in 1.2s cubic-bezier(0.2,0.8,0.2,1) forwards;
+  }
+  @keyframes diploma-in { to { opacity: 1; transform: scale(1); } }
+  .diploma .program { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8a6914; }
+  .diploma .title { font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 8px; }
+  .diploma .name { font-size: 22px; font-weight: 700; margin: 12px 0 8px; }
+  .diploma .body { font-size: 11px; line-height: 1.4; }
+  .diploma .date { font-size: 10px; margin-top: 14px; color: #555; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Adaptable — Animation Gallery</h1>
+  <p>Every animation in the platform, side by side, replayable. Click <strong>Replay</strong> on any card to re-trigger that animation in isolation. The animations here use the same CSS keyframes as production (mirrored from <code>src/app/globals.css</code>).</p>
+  <div class="meta">
+    <span>13 animations</span>
+    <span>•</span>
+    <span>Self-contained, no build step</span>
+    <span>•</span>
+    <span>Mirrors production CSS</span>
+  </div>
+</header>
+
+<main>
+
+  <div class="toc">
+    <strong>Reveal animations:</strong>
+    <a href="#ikigai-reveal">Ikigai Wizard Reveal</a> ·
+    <a href="#grav-collapse">Gravitational Collapse</a> ·
+    <a href="#founder-letter">Founder's Letter</a> ·
+    <a href="#diploma">Diploma</a> ·
+    <a href="#confetti">Confetti</a>
+  </div>
+
+  <div class="grid">
+
+    <!-- 1. IKIGAI WIZARD REVEAL -->
+    <div class="card" id="ikigai-reveal">
+      <div class="label">
+        <h3>1. Ikigai Wizard Reveal</h3>
+        <p>End-of-wizard moment. Multi-layer breathing glow shells, gradient bar, spark embers from all edges. Real component in <code>IkigaiWizard.tsx</code>.</p>
+      </div>
+      <div class="stage" id="stage-ikigai-reveal"></div>
+      <button class="replay-btn" onclick="renderIkigaiReveal()">▶ Replay</button>
+    </div>
+
+    <!-- 2. GRAVITATIONAL COLLAPSE -->
+    <div class="card" id="grav-collapse">
+      <div class="label">
+        <h3>2. Gravitational Collapse → Business Name</h3>
+        <p>End-of-program moment. Four Ikigai circles compress into a singularity, shockwave, business name emerges. From <code>CompletionCeremony.tsx</code>.</p>
+      </div>
+      <div class="stage dark" id="stage-grav"></div>
+      <button class="replay-btn" onclick="renderGravCollapse()">▶ Replay</button>
+    </div>
+
+    <!-- 3. FOUNDER LETTER -->
+    <div class="card" id="founder-letter">
+      <div class="label">
+        <h3>3. Founder's Letter</h3>
+        <p>"Dear {name}, With this launchpad..." — fades in over the dark ceremony scene. AJ Rogers, age 19.</p>
+      </div>
+      <div class="stage dark" id="stage-letter" style="padding: 0;"></div>
+      <button class="replay-btn" onclick="renderLetter()">▶ Replay</button>
+    </div>
+
+    <!-- 4. DIPLOMA -->
+    <div class="card" id="diploma">
+      <div class="label">
+        <h3>4. Diploma</h3>
+        <p>Adaptable Venture Program — Certificate of Completion. Final scene of the graduation ceremony.</p>
+      </div>
+      <div class="stage dark" id="stage-diploma"></div>
+      <button class="replay-btn" onclick="renderDiploma()">▶ Replay</button>
+    </div>
+
+    <!-- 5. BUSINESS CARD 3D -->
+    <div class="card">
+      <div class="label">
+        <h3>5. Business Card 3D Tilt</h3>
+        <p>Pointer-driven tilt with light cast. Move your cursor over the card. From <code>Card3D.tsx</code>.</p>
+      </div>
+      <div class="stage card3d-stage">
+        <div class="card3d" id="card3d">
+          <div class="name">Studio Bloom</div>
+          <div class="role">Elsa Martinez · Founder</div>
+          <div class="bar"></div>
+        </div>
+      </div>
+      <button class="replay-btn" onclick="document.getElementById('card3d').style.transform=''">↺ Reset tilt</button>
+    </div>
+
+    <!-- 6. CHECKPOINT CELEBRATION -->
+    <div class="card" id="confetti">
+      <div class="label">
+        <h3>6. Checkpoint Celebration</h3>
+        <p>Fires when a student hits a lesson checkpoint. Gradient sweep + scale-in pop.</p>
+      </div>
+      <div class="stage" id="stage-checkpoint"></div>
+      <button class="replay-btn" onclick="renderCheckpoint()">▶ Replay</button>
+    </div>
+
+    <!-- 7. CONFETTI -->
+    <div class="card">
+      <div class="label">
+        <h3>7. Completion Confetti</h3>
+        <p>Full-screen confetti on program completion. From <code>CompletionConfetti.tsx</code>.</p>
+      </div>
+      <div class="stage confetti-stage" id="stage-confetti"></div>
+      <button class="replay-btn" onclick="renderConfetti()">▶ Replay</button>
+    </div>
+
+    <!-- 8. PROGRESS SHIMMER -->
+    <div class="card">
+      <div class="label">
+        <h3>8. Progress Bar Shimmer</h3>
+        <p>The Ikigai gradient bar shimmers across the lesson progress indicator. Always-on loop.</p>
+      </div>
+      <div class="stage">
+        <div class="progress-track"><div class="progress-fill"></div></div>
+      </div>
+      <button class="replay-btn" onclick="renderProgress()">▶ Replay</button>
+    </div>
+
+    <!-- 9. STREAK BADGE -->
+    <div class="card">
+      <div class="label">
+        <h3>9. Streak Badge (cool + hot)</h3>
+        <p>Daily check-in streak. Cool variant breathes gently. Hot variant (7+ day streaks) pulses with red-orange glow.</p>
+      </div>
+      <div class="stage" style="flex-direction: column; gap: 16px;">
+        <div class="streak-badge"><span>🔥</span><span>3 day streak</span></div>
+        <div class="streak-badge streak-badge-hot"><span>🔥</span><span>14 day streak</span></div>
+      </div>
+      <button class="replay-btn" onclick="renderStreak()">▶ Replay</button>
+    </div>
+
+    <!-- 10. STAGGER ENTER -->
+    <div class="card">
+      <div class="label">
+        <h3>10. Stagger Enter (page-load)</h3>
+        <p>Cards fade up in sequence as the dashboard loads. 100ms delay per item.</p>
+      </div>
+      <div class="stage" id="stage-stagger"></div>
+      <button class="replay-btn" onclick="renderStagger()">▶ Replay</button>
+    </div>
+
+    <!-- 11. CHIP CASCADE -->
+    <div class="card">
+      <div class="label">
+        <h3>11. Chip Cascade (suggestions)</h3>
+        <p>"Stuck?" suggestion chips appear in cascade. Used in lesson conversations and Ikigai wizard.</p>
+      </div>
+      <div class="stage" id="stage-chips"></div>
+      <button class="replay-btn" onclick="renderChips()">▶ Replay</button>
+    </div>
+
+    <!-- 12. MESSAGE LAND -->
+    <div class="card">
+      <div class="label">
+        <h3>12. Message Land Bounce</h3>
+        <p>A new chat message lands with a small bounce. Spring physics. Used in lesson and AI guide chat.</p>
+      </div>
+      <div class="stage" id="stage-msg"></div>
+      <button class="replay-btn" onclick="renderMsg()">▶ Replay</button>
+    </div>
+
+    <!-- 13. NAV DRAWER -->
+    <div class="card">
+      <div class="label">
+        <h3>13. Mobile Nav Drawer</h3>
+        <p>Slide-down with fade. Mobile nav menu opens. From <code>AppNav.tsx</code>.</p>
+      </div>
+      <div class="stage" id="stage-drawer"></div>
+      <button class="replay-btn" onclick="renderDrawer()">▶ Replay</button>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ── Helper: re-trigger an animation by removing and re-adding the element ──
+  function reset(stageId, html) {
+    const stage = document.getElementById(stageId);
+    stage.innerHTML = "";
+    // Force reflow before injecting new content so animations restart cleanly
+    void stage.offsetWidth;
+    stage.innerHTML = html;
+  }
+
+  // ── 1. Ikigai Wizard Reveal ──
+  function renderIkigaiReveal() {
+    const particles = [];
+    for (let i = 0; i < 32; i++) {
+      const colors = ["#F5E642", "#A8DB5A", "#F4A79D", "#6DD5D0"];
+      const color = colors[i % 4];
+      const size = 4 + Math.random() * 5;
+      const edge = i % 4;
+      let left, top;
+      if (edge === 0) { left = (-3 + Math.random() * 6) + "%"; top = (5 + Math.random() * 90) + "%"; }
+      else if (edge === 1) { left = (97 + Math.random() * 6) + "%"; top = (5 + Math.random() * 90) + "%"; }
+      else if (edge === 2) { left = (10 + Math.random() * 80) + "%"; top = (-3 + Math.random() * 6) + "%"; }
+      else { left = (10 + Math.random() * 80) + "%"; top = (97 + Math.random() * 6) + "%"; }
+      particles.push(`<div class="ikigai-reveal-particle" style="left:${left};top:${top};width:${size}px;height:${size}px;background-color:${color};box-shadow:0 0 ${size*2}px ${color}66, 0 0 ${size*4}px ${color}33;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*2.6}s"></div>`);
+    }
+    const html = `
+      <div class="ikigai-reveal-card">
+        <div class="ikigai-reveal-glow ikigai-reveal-glow-outer"></div>
+        <div class="ikigai-reveal-glow ikigai-reveal-glow-mid"></div>
+        <div class="ikigai-reveal-glow ikigai-reveal-glow-inner"></div>
+        <div class="ikigai-reveal-bar-glow"></div>
+        <div class="ikigai-reveal-particles">${particles.join("")}</div>
+        <div class="ikigai-card-bar">
+          <div style="background:#F5E642"></div>
+          <div style="background:#A8DB5A"></div>
+          <div style="background:#F4A79D"></div>
+          <div style="background:#6DD5D0"></div>
+        </div>
+        <div class="ikigai-card-content">
+          <div class="eyebrow">Elsa's venture</div>
+          <h2>Studio Bloom</h2>
+          <div class="niche">An art education studio for creative self-expression.</div>
+        </div>
+      </div>`;
+    reset("stage-ikigai-reveal", html);
+  }
+
+  // ── 2. Gravitational Collapse ──
+  function renderGravCollapse() {
+    const stage = document.getElementById("stage-grav");
+    stage.innerHTML = `
+      <div class="ceremony-stage">
+        <div class="ceremony-circle ceremony-c1 c1"></div>
+        <div class="ceremony-circle ceremony-c2 c2"></div>
+        <div class="ceremony-circle ceremony-c3 c3"></div>
+        <div class="ceremony-circle ceremony-c4 c4"></div>
+        <div class="ceremony-shockwave"></div>
+        <div class="ceremony-biz">Studio Bloom</div>
+      </div>`;
+    const circles = stage.querySelectorAll(".ceremony-circle");
+    const shockwave = stage.querySelector(".ceremony-shockwave");
+    const biz = stage.querySelector(".ceremony-biz");
+    // Phase 1: birth (staggered)
+    circles.forEach((c, i) => {
+      setTimeout(() => c.classList.add("reveal"), i * 400);
+    });
+    // Phase 2: contract
+    setTimeout(() => circles.forEach((c) => c.classList.add("contracting")), 3500);
+    // Phase 3: shockwave
+    setTimeout(() => shockwave.classList.add("expand"), 5500);
+    // Phase 4: business name
+    setTimeout(() => biz.classList.add("visible"), 5900);
+  }
+
+  // ── 3. Founder Letter ──
+  function renderLetter() {
+    const stage = document.getElementById("stage-letter");
+    stage.innerHTML = `
+      <div class="letter-stage">
+        <div class="letter-content">
+          <p id="lp1">Dear Elsa,</p>
+          <p id="lp2">With this launchpad, I only hope you realize all that you are capable of. I started this platform with nothing but a vision, and an unstoppable will. You are capable of more than you know.</p>
+          <p class="letter-sig" id="lp3">— AJ Rogers, age 19<br><span style="font-size:10px;color:rgba(255,255,255,0.4)">Founder of Adaptable</span></p>
+        </div>
+      </div>`;
+    setTimeout(() => stage.querySelector("#lp1").classList.add("visible"), 200);
+    setTimeout(() => stage.querySelector("#lp2").classList.add("visible"), 1400);
+    setTimeout(() => stage.querySelector("#lp3").classList.add("visible"), 4000);
+  }
+
+  // ── 4. Diploma ──
+  function renderDiploma() {
+    const html = `
+      <div class="diploma">
+        <div class="program">Adaptable Venture Program</div>
+        <div class="title">Certificate of Completion</div>
+        <div class="name">Elsa Martinez</div>
+        <div class="body">has completed the Adaptable Venture Program and designed <strong>Studio Bloom</strong>, an art education studio for creative self-expression.</div>
+        <div class="date">April 8, 2026</div>
+      </div>`;
+    reset("stage-diploma", html);
+  }
+
+  // ── 5. Card 3D (live, no replay needed) ──
+  (function () {
+    const card = document.getElementById("card3d");
+    const stage = card.parentElement;
+    stage.addEventListener("pointermove", (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      const rx = -(y - 0.5) * 30;
+      const ry = (x - 0.5) * 30;
+      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      card.style.setProperty("--lx", x * 100 + "%");
+      card.style.setProperty("--ly", y * 100 + "%");
+    });
+    stage.addEventListener("pointerleave", () => {
+      card.style.transform = "";
+    });
+  })();
+
+  // ── 6. Checkpoint celebration ──
+  function renderCheckpoint() {
+    const html = `<div class="checkpoint-celebration">✓ Checkpoint reached <span style="font-size:11px;display:block;margin-top:4px;opacity:0.7">2 of 4 complete</span></div>`;
+    reset("stage-checkpoint", html);
+  }
+
+  // ── 7. Confetti ──
+  function renderConfetti() {
+    const colors = ["#F5E642", "#A8DB5A", "#F4A79D", "#6DD5D0", "#F59E0B"];
+    const pieces = [];
+    for (let i = 0; i < 60; i++) {
+      const c = colors[i % 5];
+      const left = Math.random() * 100;
+      const delay = Math.random() * 1.5;
+      const dur = 2 + Math.random() * 1.5;
+      pieces.push(`<div class="confetti-piece" style="left:${left}%;background:${c};animation-delay:${delay}s;animation-duration:${dur}s"></div>`);
+    }
+    reset("stage-confetti", pieces.join(""));
+  }
+
+  // ── 8. Progress shimmer (always on, but allow restart) ──
+  function renderProgress() {
+    document.querySelector(".progress-fill").style.animation = "none";
+    void document.querySelector(".progress-fill").offsetWidth;
+    document.querySelector(".progress-fill").style.animation = "";
+  }
+
+  // ── 9. Streak ──
+  function renderStreak() {
+    document.querySelectorAll(".streak-badge").forEach((b) => {
+      b.style.animation = "none";
+      void b.offsetWidth;
+      b.style.animation = "";
+    });
+  }
+
+  // ── 10. Stagger ──
+  function renderStagger() {
+    const html = `
+      <div class="stagger-row">
+        <div class="stagger-item">📊 Your progress: 14 of 22 lessons</div>
+        <div class="stagger-item">💡 Last decision: "I want to help teens..."</div>
+        <div class="stagger-item">🔥 3 day streak</div>
+        <div class="stagger-item">🏆 New achievement unlocked</div>
+      </div>`;
+    reset("stage-stagger", html);
+  }
+
+  // ── 11. Chips ──
+  function renderChips() {
+    const labels = ["Instagram art accounts", "School art clubs", "Local community centers", "Etsy sellers", "TikTok creators", "Library bulletins"];
+    const html = `<div class="chip-row">${labels.map(l => `<div class="chip">${l}</div>`).join("")}</div>`;
+    reset("stage-chips", html);
+  }
+
+  // ── 12. Message land ──
+  function renderMsg() {
+    const html = `<div class="msg-bubble">I think it would be teens who love art but can't afford expensive classes or don't have art programs at school</div>`;
+    reset("stage-msg", html);
+  }
+
+  // ── 13. Drawer ──
+  function renderDrawer() {
+    const html = `
+      <div class="drawer">
+        <div class="drawer-item">🏠 My Business</div>
+        <div class="drawer-item">📖 Lessons</div>
+        <div class="drawer-item">💬 AI Guide</div>
+        <div class="drawer-item">📊 Leaderboard</div>
+        <div class="drawer-item">💳 Card</div>
+      </div>`;
+    reset("stage-drawer", html);
+  }
+
+  // ── Initial render ──
+  renderIkigaiReveal();
+  renderGravCollapse();
+  renderLetter();
+  renderDiploma();
+  renderCheckpoint();
+  renderConfetti();
+  renderStagger();
+  renderChips();
+  renderMsg();
+  renderDrawer();
+
+  // Re-render Ikigai every 12s so it stays alive on the gallery page
+  setInterval(renderIkigaiReveal, 12000);
+  // Re-trigger gravitational collapse every 10s
+  setInterval(renderGravCollapse, 10000);
+</script>
+
+</body>
+</html>

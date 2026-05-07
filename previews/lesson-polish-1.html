@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson Polish Ideas — Round 1</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #111827; color: #fff; }
+
+  /* ─── Section layout ─── */
+  .section {
+    min-height: 70vh;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 64px;
+  }
+  .section-header {
+    text-align: center;
+    max-width: 560px;
+    margin-bottom: 40px;
+  }
+  .section-number {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #0D9488;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .section-desc {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #9CA3AF;
+  }
+
+  /* ─── Shared chat mockup ─── */
+  .phone-frame {
+    width: 400px;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .chat-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+  }
+  .goal-box {
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+  }
+  .goal-box .label { font-size: 11px; font-weight: 600; color: #0d9488; }
+  .goal-box .text { font-size: 13px; color: #4b5563; }
+  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .module-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
+  .lesson-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .progress-bar { flex: 1; height: 8px; border-radius: 99px; background: #f3f4f6; overflow: hidden; position: relative; }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%);
+    transition: width 0.8s ease-out;
+  }
+  .progress-text { font-size: 11px; color: #9ca3af; }
+
+  .messages {
+    padding: 20px;
+    min-height: 260px;
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13,148,136,0.03) 0%, transparent 70%), #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .messages-inner { max-width: 360px; margin: 0 auto; }
+
+  .msg { margin-bottom: 20px; }
+  .msg-right { text-align: right; }
+  .msg-right .bubble { display: inline-block; background: #0d9488; color: #fff; border-radius: 16px; padding: 10px 16px; max-width: 80%; text-align: left; }
+  .msg-left .bubble {
+    display: inline-block; background: #f3f4f6; color: #111827;
+    border-radius: 16px; padding: 16px 20px; max-width: 85%; text-align: left;
+    box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .msg-left .bubble.has-text::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 2px; border-radius: 1px;
+    background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  }
+  .bubble p { font-size: 15px; line-height: 1.6; margin: 0; }
+  .guide-label { font-size: 9px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; margin-left: 4px; }
+
+  .input-area {
+    padding: 12px 20px; border-top: 1px solid #e5e7eb;
+    background: rgba(249,250,251,0.8);
+  }
+  .input-row { display: flex; gap: 10px; max-width: 360px; margin: 0 auto; }
+  .input-row input {
+    flex: 1; border: 1px solid #d1d5db; border-radius: 12px;
+    padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit;
+    background: #fff;
+  }
+  .input-row button {
+    background: #0d9488; color: #fff; border: none; border-radius: 12px;
+    padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Replay button */
+  .replay-btn {
+    margin-top: 20px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #9CA3AF;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+  .replay-btn:hover {
+    border-color: rgba(255,255,255,0.3);
+    color: #fff;
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 1: LESSON ENTRANCE
+     ═══════════════════════════════════════════ */
+  .entrance-container {
+    width: 400px;
+    height: 420px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+    position: relative;
+    background: #fff;
+  }
+
+  .entrance-overlay {
+    position: absolute;
+    inset: 0;
+    background: #0a0f1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    animation: entrance-fade-out 0.8s ease-in 3.2s forwards;
+  }
+  @keyframes entrance-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; pointer-events: none; }
+  }
+
+  .entrance-module {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #6DD5D0;
+    opacity: 0;
+    animation: entrance-text-in 0.7s ease-out 0.4s forwards;
+  }
+  .entrance-lesson-title {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 12px;
+    opacity: 0;
+    animation: entrance-text-in 0.8s ease-out 1.0s forwards;
+  }
+  .entrance-line {
+    width: 40px;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+    margin-top: 20px;
+    opacity: 0;
+    animation: entrance-text-in 0.6s ease-out 1.6s forwards;
+  }
+  @keyframes entrance-text-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* The chat behind the overlay */
+  .entrance-chat {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .entrance-chat .messages-inner .msg {
+    opacity: 0;
+    animation: entrance-msg-in 0.5s ease-out forwards;
+  }
+  .entrance-chat .messages-inner .msg:nth-child(1) { animation-delay: 3.6s; }
+  .entrance-chat .messages-inner .msg:nth-child(2) { animation-delay: 3.9s; }
+
+  /* ═══════════════════════════════════════════
+     IDEA 2: AI MESSAGE ENTRANCE ANIMATION
+     ═══════════════════════════════════════════ */
+  @keyframes msg-rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes entrance-msg-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .rise-msg {
+    opacity: 0;
+    animation: msg-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 3: COMPLETION MOMENT
+     ═══════════════════════════════════════════ */
+  .completion-container {
+    width: 400px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+    position: relative;
+    background: #fff;
+  }
+
+  .completion-dim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    z-index: 5;
+    pointer-events: none;
+    animation: dim-in 0.6s ease-out 2.0s forwards;
+  }
+  @keyframes dim-in {
+    to { background: rgba(0,0,0,0.35); }
+  }
+
+  .completion-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    z-index: 10;
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 40px;
+    text-align: center;
+    opacity: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: card-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) 2.3s forwards;
+  }
+  @keyframes card-rise {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1) translateY(0); }
+  }
+
+  .completion-check {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #A8DB5A, #0D9488);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .completion-check svg {
+    width: 28px; height: 28px;
+    stroke: #fff; stroke-width: 3; fill: none;
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: check-draw 0.4s ease-out 2.7s forwards;
+  }
+  @keyframes check-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .completion-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #0D9488;
+    margin-bottom: 4px;
+    opacity: 0;
+    animation: fade-up-sm 0.4s ease-out 2.8s forwards;
+  }
+  .completion-title {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fade-up-sm 0.4s ease-out 2.9s forwards;
+  }
+  @keyframes fade-up-sm {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .completion-next-btn {
+    background: #0D9488;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    opacity: 0;
+    animation: fade-up-sm 0.4s ease-out 3.1s forwards;
+    transition: background 150ms;
+  }
+  .completion-next-btn:hover { background: #14B8A6; }
+
+  .completion-confetti {
+    position: absolute;
+    inset: 0;
+    z-index: 11;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .confetti-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    opacity: 0;
+    animation: confetti-fall 1.8s ease-out 2.5s forwards;
+  }
+  @keyframes confetti-fall {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translateY(120px) rotate(360deg) scale(0.3); }
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 4: STUDENT MESSAGE CONFIRMATION
+     ═══════════════════════════════════════════ */
+  @keyframes msg-land {
+    0% { transform: scale(1); opacity: 0.7; }
+    40% { transform: scale(1.03); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .land-msg {
+    opacity: 0;
+    animation: msg-land 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Subtle ripple on send */
+  .send-ripple {
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 70%);
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .send-ripple.active {
+    animation: ripple-out 0.6s ease-out forwards;
+  }
+  @keyframes ripple-out {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  /* Thinking dots */
+  .thinking-dots { display: flex; align-items: center; gap: 5px; padding: 8px 0; }
+  .tdot {
+    width: 7px; height: 7px; border-radius: 50%;
+    animation: tdot-pulse 1.2s ease-in-out infinite;
+  }
+  .tdot:nth-child(1) { background: #F5E642; animation-delay: 0ms; }
+  .tdot:nth-child(2) { background: #A8DB5A; animation-delay: 150ms; }
+  .tdot:nth-child(3) { background: #F4A79D; animation-delay: 300ms; }
+  @keyframes tdot-pulse {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     IDEA 1: LESSON ENTRANCE — "Chapter Opening"
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="section-1">
+  <div class="section-header">
+    <div class="section-number">Idea 1</div>
+    <div class="section-title">Lesson Entrance</div>
+    <div class="section-desc">When a student first enters a lesson, show a brief chapter opening: dark background, module number fades in, lesson title rises below it, a gradient line appears, then it all fades to reveal the chat. Like opening a book to a new chapter. ~3 seconds.</div>
+  </div>
+
+  <div class="entrance-container" id="entrance-1">
+    <!-- Dark overlay with chapter text -->
+    <div class="entrance-overlay" id="entrance-overlay-1">
+      <div class="entrance-module">Module 1</div>
+      <div class="entrance-lesson-title">Define Your Target Customer</div>
+      <div class="entrance-line"></div>
+    </div>
+
+    <!-- The chat waiting underneath -->
+    <div class="entrance-chat">
+      <div class="chat-header">
+        <div class="goal-box">
+          <div class="label">Goal</div>
+          <div class="text">Define your target customer and understand their needs.</div>
+        </div>
+        <div class="progress-row">
+          <div>
+            <div class="module-label">Module 1</div>
+            <div class="lesson-title">Define Your Target Customer</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+          <span class="progress-text">0/5</span>
+        </div>
+      </div>
+      <div class="messages">
+        <div class="messages-inner">
+          <div class="msg msg-left">
+            <div class="guide-label">Guide</div>
+            <div class="bubble">
+              <p>Welcome! Let's figure out exactly who your ideal customer is. Not just "everyone" -- but the specific person who'd be most excited about what you're building.</p>
+            </div>
+          </div>
+          <div class="msg msg-left">
+            <div class="guide-label">Guide</div>
+            <div class="bubble">
+              <p>Who comes to mind first?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="input-area">
+        <div class="input-row">
+          <input type="text" placeholder="What are you thinking?" />
+          <button>Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="replay-btn" onclick="replayEntrance()">Replay animation</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     IDEA 2: AI MESSAGE ENTRANCE ANIMATION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="section-2">
+  <div class="section-header">
+    <div class="section-number">Idea 2</div>
+    <div class="section-title">AI Message Entrance</div>
+    <div class="section-desc">Instead of messages just appearing, each AI message rises gently from below with a smooth opacity fade. Staggered timing between messages creates a natural, breathing rhythm. Subtle but makes the conversation feel alive.</div>
+  </div>
+
+  <div class="phone-frame" id="frame-2">
+    <div class="chat-header">
+      <div class="progress-row">
+        <div>
+          <div class="module-label">Module 1</div>
+          <div class="lesson-title">Define Your Target Customer</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+        <span class="progress-text">2/5</span>
+      </div>
+    </div>
+    <div class="messages" id="rise-messages" style="min-height:320px;">
+      <div class="messages-inner" id="rise-inner">
+        <!-- Messages will be injected by JS -->
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <input type="text" placeholder="What are you thinking?" />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="replay-btn" onclick="replayRise()">Replay animation</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     IDEA 3: COMPLETION MOMENT
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="section-3">
+  <div class="section-header">
+    <div class="section-number">Idea 3</div>
+    <div class="section-title">Completion Moment</div>
+    <div class="section-desc">When a lesson completes, the message area dims, and a centered completion card rises with a drawn checkmark, the lesson title, and a "Next Lesson" button. More weight and ceremony than a notification strip. The moment feels earned.</div>
+  </div>
+
+  <div class="completion-container" id="completion-frame" style="height: 440px;">
+    <!-- Dim overlay -->
+    <div class="completion-dim" id="completion-dim"></div>
+
+    <!-- Confetti dots -->
+    <div class="completion-confetti" id="completion-confetti"></div>
+
+    <!-- Completion card -->
+    <div class="completion-card" id="completion-card">
+      <div class="completion-check">
+        <svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg>
+      </div>
+      <div class="completion-label">Lesson Complete</div>
+      <div class="completion-title">Define Your Target Customer</div>
+      <button class="completion-next-btn">Next Lesson</button>
+    </div>
+
+    <!-- Chat behind -->
+    <div style="display:flex;flex-direction:column;height:100%;">
+      <div class="chat-header">
+        <div class="progress-row">
+          <div>
+            <div class="module-label">Module 1</div>
+            <div class="lesson-title">Define Your Target Customer</div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          <span class="progress-text">5/5</span>
+        </div>
+      </div>
+      <div class="messages" style="flex:1;">
+        <div class="messages-inner">
+          <div class="msg msg-right">
+            <div class="bubble has-text"><p>I think my target customer is a 15-17 year old girl who does digital art and wants to sell custom stickers online</p></div>
+          </div>
+          <div class="msg msg-left">
+            <div class="guide-label">Guide</div>
+            <div class="bubble">
+              <p>That's incredibly specific -- and that's exactly what makes it powerful. You can picture her, you know what she wants, and you know where to find her. Great work on this lesson!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="input-area">
+        <div class="input-row">
+          <input type="text" placeholder="What are you thinking?" disabled />
+          <button>Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="replay-btn" onclick="replayCompletion()">Replay animation</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     IDEA 4: STUDENT MESSAGE CONFIRMATION
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section" id="section-4">
+  <div class="section-header">
+    <div class="section-number">Idea 4</div>
+    <div class="section-title">Student Message Confirmation</div>
+    <div class="section-desc">When a student sends a message, their bubble lands with a brief scale-up (1.03x) and settles back, like their words have weight. A subtle teal ripple radiates from the send area. Then the AI thinking dots appear. The whole send-receive loop feels tactile and responsive. Try typing and pressing Send.</div>
+  </div>
+
+  <div class="phone-frame" id="frame-4">
+    <div class="chat-header">
+      <div class="progress-row">
+        <div>
+          <div class="module-label">Module 2</div>
+          <div class="lesson-title">Research Your Market</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+        <span class="progress-text">1/5</span>
+      </div>
+    </div>
+    <div class="messages" style="min-height:300px;position:relative;" id="send-messages">
+      <div class="messages-inner" id="send-inner">
+        <div class="msg msg-left">
+          <div class="guide-label">Guide</div>
+          <div class="bubble">
+            <p>Now that you know your target customer, let's find out how big the opportunity really is. How many people like your ideal customer exist? Where do they hang out online?</p>
+          </div>
+        </div>
+      </div>
+      <div class="send-ripple" id="send-ripple"></div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <input type="text" id="send-input" placeholder="Type something and press Send..." value="I think there are millions of teen artists on TikTok and Instagram" />
+        <button id="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="replay-btn" onclick="replaySend()">Reset</button>
+</div>
+
+
+<div style="height:80px;"></div>
+
+<script>
+// ─── IDEA 1: Replay entrance ───
+function replayEntrance() {
+  const container = document.getElementById('entrance-1');
+  const overlay = document.getElementById('entrance-overlay-1');
+  // Clone and replace to restart animations
+  const clone = container.cloneNode(true);
+  container.parentNode.replaceChild(clone, container);
+  clone.id = 'entrance-1';
+}
+
+// ─── IDEA 2: AI Message Rise ───
+const riseMessages = [
+  { type: 'ai', label: 'Guide', text: "Good start! But \"teenagers who are into art\" is still pretty broad. Let's narrow it down." },
+  { type: 'ai', label: 'Guide', text: "Are we talking about 13-year-olds or 19-year-olds? City kids or suburban? Kids who draw for fun or kids applying to art school?" },
+  { type: 'ai', label: 'Guide', text: "The more specific you get, the easier it becomes to build something they actually want. Try describing one single person." },
+];
+
+function replayRise() {
+  const inner = document.getElementById('rise-inner');
+  inner.innerHTML = '';
+  riseMessages.forEach((m, i) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = `msg msg-left rise-msg`;
+      div.style.animationDelay = '0ms';
+      div.innerHTML = `
+        <div class="guide-label">${m.label}</div>
+        <div class="bubble has-text"><p>${m.text}</p></div>
+      `;
+      inner.appendChild(div);
+    }, i * 800);
+  });
+}
+// Auto-play on load
+setTimeout(replayRise, 500);
+
+// ─── IDEA 3: Completion confetti ───
+function spawnConfetti() {
+  const container = document.getElementById('completion-confetti');
+  container.innerHTML = '';
+  const colors = ['#F5E642', '#A8DB5A', '#F4A79D', '#6DD5D0', '#0D9488', '#FBBF24'];
+  for (let i = 0; i < 24; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'confetti-dot';
+    dot.style.left = (20 + Math.random() * 60) + '%';
+    dot.style.top = (30 + Math.random() * 20) + '%';
+    dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+    dot.style.animationDelay = (2.3 + Math.random() * 0.5) + 's';
+    dot.style.animationDuration = (1.2 + Math.random() * 1.0) + 's';
+    dot.style.width = (4 + Math.random() * 5) + 'px';
+    dot.style.height = dot.style.width;
+    container.appendChild(dot);
+  }
+}
+spawnConfetti();
+
+function replayCompletion() {
+  const frame = document.getElementById('completion-frame');
+  const clone = frame.cloneNode(true);
+  frame.parentNode.replaceChild(clone, frame);
+  clone.id = 'completion-frame';
+  // Re-attach confetti
+  setTimeout(() => {
+    const container = clone.querySelector('.completion-confetti');
+    container.id = 'completion-confetti';
+    const colors = ['#F5E642', '#A8DB5A', '#F4A79D', '#6DD5D0', '#0D9488', '#FBBF24'];
+    for (let i = 0; i < 24; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'confetti-dot';
+      dot.style.left = (20 + Math.random() * 60) + '%';
+      dot.style.top = (30 + Math.random() * 20) + '%';
+      dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+      dot.style.animationDelay = (2.3 + Math.random() * 0.5) + 's';
+      dot.style.animationDuration = (1.2 + Math.random() * 1.0) + 's';
+      dot.style.width = (4 + Math.random() * 5) + 'px';
+      dot.style.height = dot.style.width;
+      container.appendChild(dot);
+    }
+  }, 50);
+}
+
+// ─── IDEA 4: Student Message Send ───
+let sendLocked = false;
+function sendMessage() {
+  if (sendLocked) return;
+  const input = document.getElementById('send-input');
+  const text = input.value.trim();
+  if (!text) return;
+  sendLocked = true;
+
+  const inner = document.getElementById('send-inner');
+
+  // Ripple effect
+  const ripple = document.getElementById('send-ripple');
+  ripple.classList.remove('active');
+  void ripple.offsetWidth; // force reflow
+  ripple.classList.add('active');
+
+  // Add student message with landing animation
+  const studentMsg = document.createElement('div');
+  studentMsg.className = 'msg msg-right land-msg';
+  studentMsg.innerHTML = `<div class="bubble has-text"><p>${text}</p></div>`;
+  inner.appendChild(studentMsg);
+
+  input.value = '';
+
+  // After a beat, show thinking dots
+  setTimeout(() => {
+    const thinkMsg = document.createElement('div');
+    thinkMsg.className = 'msg msg-left rise-msg';
+    thinkMsg.innerHTML = `
+      <div class="guide-label">Guide</div>
+      <div class="bubble">
+        <div class="thinking-dots">
+          <span class="tdot"></span>
+          <span class="tdot"></span>
+          <span class="tdot"></span>
+        </div>
+      </div>
+    `;
+    inner.appendChild(thinkMsg);
+
+    // After another beat, replace with response
+    setTimeout(() => {
+      thinkMsg.remove();
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'msg msg-left rise-msg';
+      aiMsg.innerHTML = `
+        <div class="guide-label">Guide</div>
+        <div class="bubble">
+          <p>Great instinct! TikTok and Instagram are exactly where teen artists congregate. Now let's put some numbers on it -- can you estimate how many people might actually pay for custom stickers?</p>
+        </div>
+      `;
+      inner.appendChild(aiMsg);
+      sendLocked = false;
+      input.value = 'Maybe 1 in 100 would actually buy?';
+    }, 2200);
+  }, 600);
+}
+
+// Auto-play the send demo after a delay
+setTimeout(() => {
+  sendMessage();
+}, 1500);
+</script>
+
+</body>
+</html>

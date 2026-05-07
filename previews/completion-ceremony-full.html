@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptable</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * ADAPTABLE COMPLETION CEREMONY
+   * ═══════════════════════════════════════════════════════════
+   *
+   * Golden Ratio (φ = 1.618034) governs all timing and proportion:
+   *
+   * BASE UNIT: 1000ms
+   * φ intervals: 1000, 1618, 2618, 4236, 6854ms
+   * 1/φ intervals: 618, 382, 236ms
+   *
+   * Section durations:
+   *   Founder's Letter: ~18s  (staggered fade-in, reading, staggered fade-out)
+   *   Program Complete:  φ³ ≈ 4.2s  (the tolling bell)
+   *   Ikigai Reveal:    18s  (the heart — longest by φ)
+   *   Diploma:          holds until user clicks
+   *   Mentor Farewell:  holds until user clicks
+   *
+   * Typography scale (φ-based):
+   *   72px → 44px → 28px → 17px → 11px → 7px
+   *   Each step = 72 / φⁿ (rounded to nearest integer)
+   *
+   * Spacing:
+   *   Golden section of viewport height for vertical centering
+   *   Content occupies 61.8% of available space
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ═══════════════════════════════════════════
+     SCENE MANAGEMENT
+     ═══════════════════════════════════════════ */
+  .scene {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.618s ease-in-out;
+  }
+  .scene.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .scene.exiting {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ═══════════════════════════════════════════
+     SCENE 1: FOUNDER'S LETTER
+     EB Garamond. Dark. A human speaking.
+     Fades in and out like the ikigai definition —
+     paragraphs arrive one by one, linger, dissolve together.
+     ═══════════════════════════════════════════ */
+  .letter-scene {
+    background: #000;
+  }
+  .letter-content {
+    width: min(480px, 61.8%);
+    font-family: 'EB Garamond', 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.618;
+    color: rgba(255, 255, 255, 0.75);
+    text-align: left;
+  }
+  .letter-content p {
+    margin-bottom: 1.618em;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 1.618s ease-out, transform 1.618s ease-out;
+  }
+  .letter-content p.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .letter-content p.fade-out {
+    opacity: 0;
+    transform: translateY(0);
+    transition: opacity 2.618s ease-in;
+  }
+  .letter-content .signature {
+    margin-top: 2.618em;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .letter-content .signature .name {
+    font-style: normal;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    display: block;
+    margin-top: 0.382em;
+  }
+  .letter-content .signature .title-line {
+    font-style: normal;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    display: block;
+    margin-top: 0.236em;
+  }
+
+  /* ═══════════════════════════════════════════
+     SCENE 2: PROGRAM COMPLETE
+     Two words. Nothing else. The tolling bell.
+     ═══════════════════════════════════════════ */
+  .complete-scene {
+    background: #000;
+  }
+  .complete-text {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════════════
+     SCENE 3: IKIGAI REVEAL
+     Cold space. Warm circles. Convergence.
+     ═══════════════════════════════════════════ */
+  .reveal-scene {
+    background: #000;
+  }
+
+  /* Ambient particles — cold, drifting upward
+     Size and opacity vary per-particle via inline styles for depth.
+     21 is correct (Fibonacci) — enough to feel inhabited, not enough for snow. */
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    background: rgba(180, 200, 230, 0.07);
+    border-radius: 50%;
+    animation: drift var(--p-dur, 17.944s) linear infinite;
+  }
+  /* Near particles — slightly larger, slightly brighter, subtle blue tint */
+  .particle.near {
+    background: rgba(160, 190, 240, 0.13);
+  }
+  @keyframes drift {
+    from { transform: translateY(110vh) translateX(0); opacity: 0; }
+    8% { opacity: var(--p-peak, 0.8); }
+    50% { transform: translateY(50vh) translateX(var(--p-sway, 0px)); }
+    92% { opacity: var(--p-peak, 0.8); }
+    to { transform: translateY(-10vh) translateX(0); opacity: 0; }
+  }
+
+  /* Deep blue ambient glow — the hum */
+  .ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(25, 50, 82, 0.090) 0%, transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+  }
+  @keyframes glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+  /* Ikigai container — 61.8% of viewport height */
+  .ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+  }
+
+  /* Circles — warm emerging from cold */
+  .ik-c {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%, -50%) scale(0.236);
+  }
+  .ik-c.reveal { animation: circle-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+  @keyframes circle-birth {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.236); filter: blur(10px); }
+    50% { opacity: 0.382; filter: blur(3px); }
+    100% { opacity: 0.618; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+  }
+
+  .ik-c.c1 { background: #F5E642; left: 50%; top: 19.1%; }
+  .ik-c.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
+  .ik-c.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
+  .ik-c.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
+
+  /* Answer labels beside circles */
+  .ik-answer {
+    position: absolute;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.056em;
+    color: rgba(255, 255, 255, 0);
+    text-align: center;
+    z-index: 3;
+    transition: color 1.618s ease-out;
+    line-height: 1.382;
+  }
+  .ik-answer.visible { color: rgba(255, 255, 255, 0.6); }
+
+  .ik-answer.a1 { left: 50%; top: 2.36%; transform: translateX(-50%); }
+  .ik-answer.a2 { left: 0; top: 50%; transform: translateY(-50%); }
+  .ik-answer.a3 { right: 0; top: 50%; transform: translateY(-50%); text-align: right; }
+  .ik-answer.a4 { left: 50%; bottom: 0; transform: translateX(-50%); }
+
+  /* Center glow — the convergence point */
+  .ik-center {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 19.1%;
+    height: 19.1%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2);
+    opacity: 0;
+    z-index: 4;
+    transform-origin: center;
+    transition: opacity 2.618s ease-out, transform 2.618s ease-out;
+  }
+  .ik-center.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* Business name — types in */
+  .biz-name-wrap {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1.618s ease-out;
+  }
+  .biz-name-wrap.visible { opacity: 1; }
+
+  .biz-name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25);
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    border-right: 2px solid rgba(255,255,255,0.4);
+    width: 0;
+    animation: none;
+  }
+  .biz-name.typing {
+    animation: type-name 2.618s steps(18) forwards, blink-cursor 0.618s step-end 5 forwards;
+  }
+  @keyframes type-name {
+    from { width: 0; }
+    to { width: 18ch; }
+  }
+  @keyframes blink-cursor {
+    50% { border-color: transparent; }
+  }
+
+  .biz-origin {
+    display: block;
+    margin-top: 11px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0);
+    letter-spacing: 0.146em;
+    transition: color 2.618s ease-out;
+  }
+  .biz-origin.visible { color: rgba(255, 255, 255, 0.35); }
+
+  /* "I'm in" — the pull */
+  .im-in-wrap {
+    position: absolute;
+    left: 50%;
+    bottom: 9.02%;
+    transform: translateX(-50%);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 1.618s ease-out, transform 1.618s ease-out;
+  }
+  .im-in-wrap.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .im-in {
+    font-family: 'Satoshi', sans-serif;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+    padding: 17px 44px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.146em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.382s ease;
+  }
+  .im-in:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 30px rgba(74, 103, 65, 0.15);
+  }
+
+  /* ═══════════════════════════════════════════
+     SCENE 4: DIPLOMA
+     Parchment. Serif. Otherworldly.
+     No Adaptable colors. Harvard/Yale weight.
+     Enters with subtle scale — materializes, doesn't just appear.
+     ═══════════════════════════════════════════ */
+  .diploma-scene {
+    background: #0a0a08;
+  }
+  .diploma {
+    background: #f5f0e8;
+    width: min(520px, 80.9vw);
+    /* Golden rectangle: width / height = φ */
+    aspect-ratio: 1.618 / 1;
+    border: 2px solid #c4b18a;
+    outline: 1px solid #d4c9a8;
+    outline-offset: 8.472px;
+    padding: 8%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 1px rgba(196,177,138,0.3), inset 0 0 80px rgba(196,177,138,0.08);
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 1.618s ease-out, transform 1.618s ease-out;
+  }
+  .diploma-scene.active .diploma {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .diploma::before {
+    content: '';
+    position: absolute;
+    inset: 5.236px;
+    border: 1px solid #d4c9a8;
+    pointer-events: none;
+  }
+  .diploma .institution {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.382em;
+    text-transform: uppercase;
+    color: #8a7d65;
+    margin-bottom: 1.618em;
+  }
+  .diploma .cert-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    letter-spacing: 0.146em;
+    text-transform: uppercase;
+    color: #5c5240;
+    margin-bottom: 0.618em;
+  }
+  .diploma .student-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1712;
+    margin-bottom: 0.618em;
+    line-height: 1.146;
+  }
+  .diploma .cert-body {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+    color: #6b6050;
+    line-height: 1.618;
+    max-width: 340px;
+    margin-bottom: 1.618em;
+  }
+  .diploma .cert-date {
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+    color: #9a8e78;
+    letter-spacing: 0.090em;
+  }
+  .diploma .cert-id {
+    position: absolute;
+    bottom: 11px;
+    right: 17px;
+    font-family: 'EB Garamond', serif;
+    font-size: 7px;
+    color: #c4b9a0;
+    letter-spacing: 0.056em;
+  }
+
+  .diploma-continue {
+    margin-top: 28px;
+    font-family: 'Satoshi', sans-serif;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.146em;
+    cursor: pointer;
+    padding: 11px 28px;
+    transition: color 0.382s ease;
+  }
+  .diploma-scene.active .diploma-continue {
+    color: rgba(255,255,255,0.3);
+    transition: color 1.618s ease-out 1.618s;
+  }
+  .diploma-continue:hover { color: rgba(255,255,255,0.6) !important; }
+
+  /* ═══════════════════════════════════════════
+     SCENE 5: MENTOR FAREWELL
+     Personal. Typed. The last voice.
+     Just the mentor's name — no subtitle, no title.
+     The student knows who this is.
+     ═══════════════════════════════════════════ */
+  .farewell-scene {
+    background: #000;
+  }
+  .farewell-content {
+    width: min(500px, 61.8%);
+    text-align: left;
+  }
+  .farewell-mentor {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.146em;
+    color: rgba(255, 255, 255, 0.22);
+    margin-bottom: 1.618em;
+  }
+  .farewell-text {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.618;
+    color: rgba(255, 255, 255, 0.65);
+    min-height: 200px;
+  }
+  .farewell-text .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: rgba(255,255,255,0.4);
+    margin-left: 2px;
+    animation: farewell-blink 0.618s step-end infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes farewell-blink {
+    50% { opacity: 0; }
+  }
+  .farewell-cta {
+    margin-top: 2.618em;
+    opacity: 0;
+    transition: opacity 1.618s ease-out;
+  }
+  .farewell-cta.visible { opacity: 1; }
+  .farewell-cta button {
+    font-family: 'Satoshi', sans-serif;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.4);
+    padding: 11px 28px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.146em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.382s ease;
+  }
+  .farewell-cta button:hover {
+    border-color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ═══════════════════════════════════════════
+     REDUCED MOTION
+     ═══════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+    .particle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCENE 1: FOUNDER'S LETTER
+     ═══════════════════════════════════════════════════════ -->
+<div class="scene letter-scene active" id="scene-letter">
+  <div class="letter-content" id="letter-content">
+    <p>Dear Maria,</p>
+    <p>With this launchpad, I only hope you realize all that you are capable of. I started this platform with nothing but a vision, and an unstoppable will. You are capable of more than you know.</p>
+    <p class="signature">
+      <span class="name">— AJ Rogers, age 19</span>
+      <span class="title-line">Founder of Adaptable</span>
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCENE 2: PROGRAM COMPLETE
+     ═══════════════════════════════════════════════════════ -->
+<div class="scene complete-scene" id="scene-complete">
+  <span class="complete-text">Program Complete.</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCENE 3: IKIGAI REVEAL
+     ═══════════════════════════════════════════════════════ -->
+<div class="scene reveal-scene" id="scene-reveal">
+  <div class="particles" id="particles"></div>
+  <div class="ambient-glow"></div>
+
+  <div class="ik-wrap">
+    <div class="ik-answer a1" id="ans1">Music, Animals,<br>Helping People</div>
+    <div class="ik-answer a2" id="ans2">Drawing, Public<br>Speaking, Math</div>
+    <div class="ik-answer a3" id="ans3">Mental Health,<br>Community, Art</div>
+    <div class="ik-answer a4" id="ans4">Teaching, Tutoring,<br>Creative Services</div>
+
+    <div class="ik-c c1" id="circ1"></div>
+    <div class="ik-c c2" id="circ2"></div>
+    <div class="ik-c c3" id="circ3"></div>
+    <div class="ik-c c4" id="circ4"></div>
+
+    <div class="ik-center" id="ik-center"></div>
+
+    <div class="biz-name-wrap" id="biz-wrap">
+      <span class="biz-name" id="biz-name">Harmony Art Studio</span>
+      <span class="biz-origin" id="biz-origin">This came from who you are.</span>
+    </div>
+  </div>
+
+  <div class="im-in-wrap" id="im-in-wrap">
+    <button class="im-in" onclick="goToDiploma()">I'M IN</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCENE 4: DIPLOMA
+     ═══════════════════════════════════════════════════════ -->
+<div class="scene diploma-scene" id="scene-diploma">
+  <div class="diploma">
+    <div class="institution">Adaptable Venture Program</div>
+    <div class="cert-title">Certificate of Completion</div>
+    <div class="student-name">Maria Santos</div>
+    <div class="cert-body">
+      has completed the Adaptable Venture Program and designed
+      <strong>Harmony Art Studio</strong>, a creative wellness venture
+      connecting art therapy with community mental health.
+    </div>
+    <div class="cert-date">April 6, 2026</div>
+    <div class="cert-id">AVP-2026-4A7F</div>
+  </div>
+  <button class="diploma-continue" onclick="goToFarewell()">Continue</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCENE 5: MENTOR FAREWELL
+     ═══════════════════════════════════════════════════════ -->
+<div class="scene farewell-scene" id="scene-farewell">
+  <div class="farewell-content">
+    <div class="farewell-mentor">Nova</div>
+    <div class="farewell-text" id="farewell-text"><span class="cursor"></span></div>
+    <div class="farewell-cta" id="farewell-cta">
+      <button onclick="goToDashboard()">Begin</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /*
+   * CEREMONY ORCHESTRATOR
+   * All timing based on φ = 1.618
+   * Base unit = 1000ms
+   */
+  const PHI = 1.618034;
+  const BASE = 1000;
+
+  // Generate particles
+  const particlesEl = document.getElementById('particles');
+  for (let i = 0; i < 21; i++) {  // 21 = Fibonacci number
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.animationDelay = (Math.random() * Math.pow(PHI, 4)) + 's';  // 0–6.854s
+    p.style.animationDuration = (Math.pow(PHI, 5) + Math.random() * Math.pow(PHI, 4)) + 's';  // 11.09–17.94s
+    particlesEl.appendChild(p);
+  }
+
+  function transition(fromId, toId, duration) {
+    return new Promise(resolve => {
+      const from = document.getElementById(fromId);
+      const to = document.getElementById(toId);
+      from.classList.add('exiting');
+      from.classList.remove('active');
+      setTimeout(() => {
+        to.classList.add('active');
+        resolve();
+      }, duration);
+    });
+  }
+
+  // ─── SCENE FLOW ───
+
+  async function startCeremony() {
+    const paragraphs = document.querySelectorAll('#letter-content p');
+
+    // Scene 1: Founder's letter — JS-controlled fade-in/fade-out
+    // Like the ikigai definition page: paragraphs emerge from darkness, linger, dissolve.
+
+    // Fade in paragraphs one by one
+    await sleep(1.618 * BASE);
+    paragraphs[0].classList.add('fade-in');  // "Dear Maria,"
+    await sleep(2.618 * BASE);
+    paragraphs[1].classList.add('fade-in');  // Main body
+    await sleep(4.236 * BASE);
+    paragraphs[2].classList.add('fade-in');  // Signature
+
+    // Let the full letter breathe — reading time
+    await sleep(4.236 * BASE);
+
+    // Fade out all paragraphs together — the letter dissolves into darkness
+    paragraphs.forEach(p => {
+      p.classList.remove('fade-in');
+      p.classList.add('fade-out');
+    });
+
+    // Hold the darkness after the letter dissolves — a breath between thoughts
+    await sleep(3.236 * BASE);
+
+    // Scene 2: Program Complete
+    // Letter scene is already visually empty; short transition since we're black-to-black
+    await transition('scene-letter', 'scene-complete', 618);
+    await sleep(PHI * PHI * PHI * BASE); // Hold "Program Complete" for φ³ ≈ 4.236s — the tolling bell
+
+    // Scene 3: Ikigai Reveal
+    await transition('scene-complete', 'scene-reveal', PHI * BASE);
+    await sleep(BASE); // Brief pause before circles begin
+
+    // Circles emerge one by one with golden-ratio spacing
+    const circles = ['circ1', 'circ2', 'circ3', 'circ4'];
+    const answers = ['ans1', 'ans2', 'ans3', 'ans4'];
+
+    for (let i = 0; i < 4; i++) {
+      document.getElementById(circles[i]).classList.add('reveal');
+      await sleep(PHI * BASE); // Wait for circle to mostly appear
+      document.getElementById(answers[i]).classList.add('visible');
+      await sleep(BASE); // Pause between circles
+    }
+
+    // Convergence pause — let all four breathe together
+    await sleep(PHI * PHI * BASE); // 2.618s — the four circles need to exist before converging
+
+    // Center emerges
+    document.getElementById('ik-center').classList.add('visible');
+    await sleep(PHI * PHI * BASE); // 2.618s
+
+    // Business name types in
+    const bizWrap = document.getElementById('biz-wrap');
+    const bizName = document.getElementById('biz-name');
+    bizWrap.classList.add('visible');
+    bizName.classList.add('typing');
+    await sleep(Math.pow(PHI, 3) * BASE); // φ³ ≈ 4.236s — wait for typing to finish
+
+    // "This came from who you are."
+    document.getElementById('biz-origin').classList.add('visible');
+    await sleep(PHI * PHI * BASE);
+
+    // "I'M IN" rises
+    document.getElementById('im-in-wrap').classList.add('visible');
+  }
+
+  function goToDiploma() {
+    transition('scene-reveal', 'scene-diploma', PHI * BASE);
+  }
+
+  function goToFarewell() {
+    transition('scene-diploma', 'scene-farewell', PHI * BASE).then(() => {
+      typeFarewell();
+    });
+  }
+
+  function goToDashboard() {
+    alert('\u2192 Student returns to their dashboard.\n\nThe ceremony is complete.\nThe mentor is still there.\nThe ceiling is gone.');
+  }
+
+  // ─── MENTOR FAREWELL TYPEWRITER ───
+
+  const FAREWELL_TEXT = "Maria. I remember when you first told me you wanted to combine art with mental health. You said it quietly, like you weren\u2019t sure you were allowed to want that. You were.\n\nYou didn\u2019t take the easy path. When the pricing felt scary, you pushed through it. When the customer interviews challenged what you assumed, you actually listened. That takes more courage than most adults ever show.\n\nHarmony Art Studio is real. You built it from who you are \u2014 not from a template, not from what someone told you to care about. From you.\n\nI\u2019ll be here. For this venture, the next one, or just to talk.";
+
+  async function typeFarewell() {
+    const el = document.getElementById('farewell-text');
+    const chars = FAREWELL_TEXT.split('');
+    let html = '';
+
+    for (let i = 0; i < chars.length; i++) {
+      const char = chars[i];
+      if (char === '\n') {
+        html += '<br>';
+      } else {
+        html += char;
+      }
+      el.innerHTML = html + '<span class="cursor"></span>';
+
+      // Variable speed — 50ms base feels like someone composing, not printing
+      if (char === '.' || char === '?') {
+        await sleep(450); // Full stop — let it land
+      } else if (char === ',') {
+        await sleep(180); // Breath pause
+      } else if (char === '\n') {
+        await sleep(700); // Paragraph break — a real exhale
+      } else if (char === '\u2014') {
+        await sleep(280); // Em dash — the thought pivots
+      } else {
+        await sleep(50); // Unhurried, deliberate — someone choosing words
+      }
+    }
+
+    // Remove cursor, show CTA after a long beat
+    el.innerHTML = html;
+    await sleep(PHI * PHI * BASE); // 2.618s — let the last line sit
+    document.getElementById('farewell-cta').classList.add('visible');
+  }
+
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  // ─── BEGIN ───
+  startCeremony();
+</script>
+
+</body>
+</html>

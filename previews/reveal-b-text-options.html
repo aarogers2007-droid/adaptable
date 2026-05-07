@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Name Text Reveal — Smoothness Options</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; color: #fff; font-family: 'Satoshi', sans-serif; }
+
+  .option {
+    width: 100%; height: 50vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .label {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: rgba(255,255,255,0.2); z-index: 50;
+    text-align: center; line-height: 1.5;
+  }
+  .label span { display: block; font-weight: 400; font-size: 9px; color: rgba(255,255,255,0.12); letter-spacing: 0.15em; }
+
+  /* Center glow — present in all */
+  .glow {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 80px; height: 80px; border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74,103,65,0.5), 0 0 80px rgba(74,103,65,0.2);
+    opacity: 0.382; z-index: 1;
+  }
+
+  .name {
+    position: relative; z-index: 10;
+    font-size: 28px; font-weight: 800; color: #fff;
+    text-shadow: 0 0 28px rgba(74,103,65,0.6), 0 0 56px rgba(74,103,65,0.25);
+    white-space: nowrap; text-align: center;
+  }
+
+  .sub {
+    position: absolute; left: 50%; top: calc(50% + 28px); transform: translateX(-50%);
+    font-size: 11px; font-weight: 500; letter-spacing: 0.146em;
+    color: rgba(255,255,255,0); z-index: 10; white-space: nowrap;
+  }
+
+  /* ═══ T1: Pure opacity + scale. No blur at all. ═══ */
+  #t1 .name {
+    opacity: 0; transform: scale(0);
+    animation: t1-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+  }
+  @keyframes t1-birth {
+    0%    { opacity: 0; transform: scale(0); }
+    30%   { opacity: 1; transform: scale(0.8); }
+    61.8% { transform: scale(1.03); }
+    100%  { opacity: 1; transform: scale(1); }
+  }
+  #t1 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* ═══ T2: Opacity only. No scale, no blur. Fade from nothing. ═══ */
+  #t2 .name {
+    opacity: 0;
+    animation: t2-birth 2.618s ease-out 2s forwards;
+  }
+  @keyframes t2-birth {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  #t2 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* ═══ T3: Scale from tiny + letter-spacing tightens. No blur. ═══ */
+  #t3 .name {
+    opacity: 0; transform: scale(0); letter-spacing: 0.5em;
+    animation: t3-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+  }
+  @keyframes t3-birth {
+    0%    { opacity: 0; transform: scale(0); letter-spacing: 0.5em; }
+    38.2% { opacity: 1; transform: scale(0.7); letter-spacing: 0.15em; }
+    61.8% { transform: scale(1.02); letter-spacing: 0.01em; }
+    100%  { opacity: 1; transform: scale(1); letter-spacing: 0em; }
+  }
+  #t3 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* ═══ T4: Scale up from 0 with text-shadow intensifying. Smooth glow build. ═══ */
+  #t4 .name {
+    opacity: 0; transform: scale(0);
+    text-shadow: none;
+    animation: t4-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+  }
+  @keyframes t4-birth {
+    0%    { opacity: 0; transform: scale(0); text-shadow: 0 0 0 rgba(74,103,65,0); }
+    30%   { opacity: 0.8; transform: scale(0.7); text-shadow: 0 0 40px rgba(74,103,65,0.8), 0 0 80px rgba(74,103,65,0.4); }
+    61.8% { opacity: 1; transform: scale(1.03); text-shadow: 0 0 30px rgba(74,103,65,0.6), 0 0 60px rgba(74,103,65,0.3); }
+    100%  { opacity: 1; transform: scale(1); text-shadow: 0 0 28px rgba(74,103,65,0.5), 0 0 56px rgba(74,103,65,0.2); }
+  }
+  #t4 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* ═══ T5: Very slow scale (0 to 1) over φ³ = 4.236s. Ultra smooth. No overshoot. ═══ */
+  #t5 .name {
+    opacity: 0; transform: scale(0);
+    animation: t5-birth 4.236s cubic-bezier(0.22, 1, 0.36, 1) 2s forwards;
+  }
+  @keyframes t5-birth {
+    0%    { opacity: 0; transform: scale(0); }
+    20%   { opacity: 0.6; transform: scale(0.4); }
+    50%   { opacity: 0.9; transform: scale(0.8); }
+    100%  { opacity: 1; transform: scale(1); }
+  }
+  #t5 .sub { animation: sub-in 2.618s ease-out 6.5s forwards; }
+
+  /* ═══ T6: Scale + opacity + slight Y-rise. Name ascends into existence. ═══ */
+  #t6 .name {
+    opacity: 0; transform: scale(0.5) translateY(12px);
+    animation: t6-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+  }
+  @keyframes t6-birth {
+    0%    { opacity: 0; transform: scale(0.5) translateY(12px); }
+    38.2% { opacity: 1; transform: scale(0.9) translateY(3px); }
+    61.8% { transform: scale(1.02) translateY(-1px); }
+    100%  { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  #t6 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* ═══ T7: Instant appear + text-shadow explosion that fades. The "flash of being." ═══ */
+  #t7 .name {
+    opacity: 0;
+    animation: t7-birth 0.1s ease-out 2s forwards, t7-glow 2.618s ease-out 2s forwards;
+  }
+  @keyframes t7-birth {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes t7-glow {
+    0%   { text-shadow: 0 0 60px rgba(255,255,255,0.9), 0 0 120px rgba(74,103,65,0.8); }
+    100% { text-shadow: 0 0 28px rgba(74,103,65,0.5), 0 0 56px rgba(74,103,65,0.2); }
+  }
+  #t7 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* ═══ T8: Current (with blur). For comparison. ═══ */
+  #t8 .name {
+    opacity: 0; transform: scale(0); filter: blur(8px);
+    animation: t8-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+  }
+  @keyframes t8-birth {
+    0%    { opacity: 0; transform: scale(0); filter: blur(8px); }
+    23.6% { opacity: 1; transform: scale(0.618); filter: blur(3px); }
+    61.8% { transform: scale(1.056); filter: blur(0); }
+    100%  { opacity: 1; transform: scale(1); filter: blur(0); }
+  }
+  #t8 .sub { animation: sub-in 2.618s ease-out 5s forwards; }
+
+  /* Shared sub animation */
+  @keyframes sub-in {
+    from { color: rgba(255,255,255,0); }
+    to   { color: rgba(255,255,255,0.35); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="option" id="t1">
+  <div class="label">T1 — Pure Scale + Opacity<span>No blur. Clean scale 0→1. Tiny overshoot (1.03x).</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t2">
+  <div class="label">T2 — Pure Fade<span>No scale, no blur. Just opacity 0→1. The name was always there.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t3">
+  <div class="label">T3 — Scale + Letter-Spacing<span>Compressed letters expand outward as the name grows. No blur.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t4">
+  <div class="label">T4 — Scale + Glow Build<span>Text-shadow intensifies during scale, then settles. No blur. The name radiates as it arrives.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t5">
+  <div class="label">T5 — Ultra-Slow Scale<span>φ³ = 4.236s duration. No overshoot. No blur. Just... arriving. Unhurried.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t6">
+  <div class="label">T6 — Scale + Rise<span>Name ascends slightly as it grows. Like it's surfacing. No blur.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t7">
+  <div class="label">T7 — Instant + Glow Fade<span>Name appears instantly. A burst of white glow dissipates around it. The flash of being.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+<div class="option" id="t8">
+  <div class="label">T8 — Current (with blur)<span>For comparison. Scale + blur. This is what you have now.</span></div>
+  <div class="glow"></div>
+  <div class="name">Harmony Art Studio</div>
+  <div class="sub">This came from who you are.</div>
+</div>
+
+</body>
+</html>

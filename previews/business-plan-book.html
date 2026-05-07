@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elsa's Art Studio — Business Plan</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,600,500,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#0D9488;
+  --accent:#F59E0B;
+  --manila:#D4B896;
+  --manila-dark:#C4A67A;
+  --manila-light:#E8D5B8;
+  --paper:#FFFEF9;
+  --paper-warm:#F8F3EA;
+  --paper-line:#ECE7DD;
+  --text-primary:#1C1917;
+  --text-secondary:#57534E;
+  --text-muted:#A8A29E;
+  --text-folder:#6B5B3E;
+  --border:#E7E5E4;
+  --font-display:'Satoshi',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --love:#F5E642;
+  --good-at:#A8DB5A;
+  --needs:#F4A79D;
+  --paid:#6DD5D0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:var(--font-body);
+  background:#3D3529;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  -webkit-font-smoothing:antialiased;
+  padding:30px 16px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ARCHITECTURE
+
+   Phase 1 (closed): .frame is 440x600, centered. Shows cover.
+   Phase 2 (slide):  .frame slides right to 880x600 position.
+   Phase 3 (open):   Cover flips. Pages visible.
+   Phase 4 (browse): Pages flip inside static frame.
+
+   .frame      — the manila folder. Static once open.
+   .spine      — the center line. All leaves hinge here.
+   .leaf       — a page with front (right) and back (left).
+   .leaf.cover — the manila cover, on top of everything.
+
+   ALL content is pre-rendered. Nothing toggles display/visibility.
+   The cover's high z-index hides pages when closed.
+   The .frame overflow:hidden clips the left half when closed.
+   ═══════════════════════════════════════════════════════ */
+
+/* Wrapper — centered by flexbox, controls the slide position */
+.wrapper {
+  position:relative;
+  width:440px;
+  height:600px;
+  transition:width 0.5s ease;
+}
+.wrapper.slid {
+  width:880px;
+}
+
+/* Frame — the actual visible folder, clips content, pinned right */
+.frame {
+  position:absolute;
+  right:0; top:0;
+  width:440px;
+  height:100%;
+  overflow:hidden;
+  border-radius:6px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.2);
+  /* No transition — snaps instantly */
+}
+.frame.expanded {
+  width:880px;
+}
+
+/* Manila folder background — always full 880px, pinned right */
+.manila {
+  position:absolute;
+  top:0; right:0;
+  width:880px;
+  height:100%;
+  display:flex;
+}
+.manila-left {
+  flex:1;
+  background:linear-gradient(170deg, var(--manila-light), var(--manila));
+  position:relative;
+}
+.manila-left::after {
+  content:'';
+  position:absolute;
+  right:0; top:0; bottom:0; width:16px;
+  background:linear-gradient(to right, transparent, rgba(0,0,0,0.06));
+}
+.manila-right {
+  flex:1;
+  background:linear-gradient(160deg, var(--manila), var(--manila-dark));
+  position:relative;
+}
+.manila-right::after {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0; width:16px;
+  background:linear-gradient(to left, transparent, rgba(0,0,0,0.05));
+}
+/* Subtle texture */
+.manila-left::before, .manila-right::before {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.007) 3px, rgba(0,0,0,0.007) 4px);
+  pointer-events:none;
+}
+
+/* 3D scene — at the spine (center of 880px manila) */
+/* Perspective container — sits over the manila, full 880px width.
+   This has real dimensions so perspective works correctly.
+   The spine is just a positioning anchor inside it. */
+.persp {
+  position:absolute;
+  top:0; right:0;
+  width:880px;
+  height:100%;
+  perspective:2200px;
+  pointer-events:none;
+}
+
+.spine {
+  position:absolute;
+  top:10px; bottom:10px;
+  left:440px; /* center of 880px */
+  width:0;
+  overflow:visible;
+  transform-style:preserve-3d;
+  z-index:2;
+  pointer-events:auto;
+}
+
+/* Leaves */
+.leaf {
+  position:absolute;
+  top:0; bottom:0;
+  left:0;
+  width:428px; /* 440 - 12px inset on each side */
+  transform-origin:left center;
+  transform-style:preserve-3d;
+  transition:transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor:pointer;
+}
+.leaf.flipped {
+  transform:rotateY(-180deg);
+}
+
+.leaf-front, .leaf-back {
+  position:absolute; inset:0;
+  backface-visibility:hidden;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:var(--paper-line) transparent;
+}
+.leaf-front {
+  background:var(--paper);
+  border-radius:0 4px 4px 0;
+}
+.leaf-front::before {
+  content:'';
+  position:absolute; inset:0; border-radius:inherit;
+  background:repeating-linear-gradient(to bottom, transparent 0, transparent 26px, var(--paper-line) 26px, var(--paper-line) 27px);
+  opacity:0.12; pointer-events:none;
+}
+.leaf-back {
+  transform:rotateY(180deg);
+  background:var(--paper-warm);
+  border-radius:4px 0 0 4px;
+}
+.leaf-back::before {
+  content:'';
+  position:absolute; inset:0; border-radius:inherit;
+  background:repeating-linear-gradient(to bottom, transparent 0, transparent 26px, var(--paper-line) 26px, var(--paper-line) 27px);
+  opacity:0.12; pointer-events:none;
+}
+
+/* Cover — fake 3D with scaleX collapse toward spine */
+.leaf.cover {
+  z-index:6;
+  transform-origin:left center;
+  transition:transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.leaf.cover.flipped {
+  transform:scaleX(0);
+}
+.leaf.cover .leaf-front {
+  background:linear-gradient(160deg, var(--manila-light) 0%, var(--manila) 40%, var(--manila-dark) 100%);
+  border-radius:0 4px 4px 0;
+  box-shadow:2px 0 8px rgba(0,0,0,0.12);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:36px 28px; overflow:hidden;
+}
+.leaf.cover .leaf-front::before {
+  background:repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.01) 3px, rgba(0,0,0,0.01) 4px);
+  opacity:1;
+}
+.leaf.cover .leaf-back {
+  background:transparent;
+}
+.leaf.cover .leaf-back::before {
+  display:none;
+}
+
+/* Static page 1 — sits flat in the frame, outside the 3D context.
+   Revealed when the cover lifts out of the way. */
+.page1-static {
+  position:absolute;
+  top:10px; bottom:10px;
+  right:440px; /* left side of the manila — 880px total, left half ends at 440px from right */
+  width:428px;
+  background:var(--paper-warm);
+  border-radius:4px 0 0 4px;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:var(--paper-line) transparent;
+  z-index:1;
+  display:none; /* hidden when closed */
+}
+.page1-static::before {
+  content:'';
+  position:absolute; inset:0; border-radius:inherit;
+  background:repeating-linear-gradient(to bottom, transparent 0, transparent 26px, var(--paper-line) 26px, var(--paper-line) 27px);
+  opacity:0.12; pointer-events:none;
+}
+
+/* ═══ Cover text ═══ */
+.cv-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.14em;color:var(--text-folder);opacity:0.55}
+.cv-name{margin-top:22px;font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text-folder);text-align:center;line-height:1.15}
+.cv-biz{margin-top:5px;font-size:13px;color:var(--text-folder);opacity:0.65}
+.cv-date{margin-top:3px;font-size:11px;color:var(--text-folder);opacity:0.4}
+.cv-hint{margin-top:36px;font-size:11px;color:var(--text-folder);opacity:0.3}
+.ik-wrap{margin-top:40px;position:relative;width:130px;height:130px}
+.ik-c{position:absolute;width:80px;height:80px;border-radius:50%;opacity:0.3}
+.ik-c.love{background:var(--love);top:0;left:50%;transform:translateX(-50%)}
+.ik-c.good{background:var(--good-at);top:25px;left:0}
+.ik-c.needs{background:var(--needs);top:25px;right:0}
+.ik-c.paid{background:var(--paid);bottom:0;left:50%;transform:translateX(-50%)}
+
+/* ═══ Page content ═══ */
+.pg{padding:22px 20px 16px}
+.pn{position:absolute;bottom:8px;font-size:9px;color:var(--text-muted)}
+.pn-r{right:20px}.pn-l{left:20px}
+.sl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:3px}
+.st{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:11px;line-height:1.2}
+.f{margin-bottom:10px}.f:last-child{margin-bottom:0}
+.fl{font-size:9px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px}
+.fv{font-size:11.5px;color:var(--text-primary);line-height:1.55}
+.d{padding:6px 0;border-bottom:1px solid var(--paper-line)}.d:last-child{border-bottom:none}
+.dl{font-size:9px;color:var(--text-muted);font-weight:500;margin-bottom:1px}
+.dt{font-size:11px;color:var(--text-primary);line-height:1.5}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px}
+.ic{border-radius:7px;padding:8px 9px}
+.icl{font-size:8px;font-weight:600;text-transform:uppercase;opacity:0.6;margin-bottom:2px}
+.ict{font-size:10px;line-height:1.4;color:#1C1917}
+.ic1{background:var(--love)}.ic2{background:var(--good-at)}.ic3{background:var(--needs)}.ic4{background:var(--paid)}
+.pb{border:1px solid rgba(245,158,11,0.2);background:rgba(245,158,11,0.04);border-radius:8px;padding:12px;margin-top:6px}
+.pt{font-family:var(--font-display);font-size:12px;font-weight:500;color:var(--text-primary);line-height:1.6;font-style:italic}
+.pa{margin-top:5px;font-size:10px;font-weight:500;color:var(--text-muted)}
+.pill{display:inline-block;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:600;background:rgba(13,148,136,0.08);color:var(--primary)}
+.br{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.b{padding:2px 6px;border-radius:999px;font-size:9px;font-weight:500;border:1px solid var(--border);background:white;color:var(--text-secondary)}
+.bg{background:#FEF3C7;border-color:#FDE68A;color:#92400E}
+.bs{background:#F1F5F9;border-color:#CBD5E1;color:#475569}
+.lb{padding:10px;background:var(--paper-warm);border:1px dashed var(--border);border-radius:6px;font-size:10.5px;font-style:italic;color:var(--text-secondary);line-height:1.5}
+.tt{font-family:var(--font-display);font-size:10.5px;font-weight:600;color:var(--text-primary);margin-bottom:3px;display:flex;justify-content:space-between}
+.tt .wk{font-size:8px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.06em}
+.tp{font-size:9px;font-weight:600;color:var(--text-muted)}
+.tb{margin-bottom:8px}
+.tk{display:flex;align-items:flex-start;gap:5px;padding:3px 0;border-bottom:1px solid var(--paper-line);cursor:pointer}
+.tk:last-child{border-bottom:none}
+.tk input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:12px;height:12px;min-width:12px;border:2px solid #D6D3D1;border-radius:3px;margin-top:1px;cursor:pointer;transition:all 0.2s;position:relative;background:white}
+.tk input:checked{background:var(--primary);border-color:var(--primary)}
+.tk input:checked::after{content:'\2713';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:8px;font-weight:700}
+.tkx{font-size:10px;color:var(--text-primary);line-height:1.35}
+.tk input:checked~.tkx{text-decoration:line-through;opacity:0.4}
+.tlb{height:3px;background:var(--paper-line);border-radius:999px;margin-top:5px;overflow:hidden}
+.tlf{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:999px;transition:width 0.5s ease}
+.tlt{text-align:center;font-size:9px;color:var(--text-muted);margin-top:2px}
+
+/* ═══ Nav ═══ */
+.nav{margin-top:18px;display:flex;align-items:center;gap:12px}
+.nb{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:8px;padding:9px 18px;font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s}
+.nb:hover{background:rgba(255,255,255,0.15);color:white}
+.nb:disabled{opacity:0.2;cursor:default}
+.ni{font-size:12px;color:rgba(255,255,255,0.4);min-width:90px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="wrapper" id="wrapper">
+<div class="frame" id="frame">
+  <!-- Manila backing — always 880px, pinned right -->
+  <div class="manila">
+    <div class="manila-left"></div>
+    <div class="manila-right"></div>
+  </div>
+
+  <!-- Static page 1 (Ikigai) — flat, outside 3D context, revealed when cover lifts -->
+  <div class="page1-static" id="page1static"><div class="pg"><div class="sl">Your Ikigai</div><div class="st">The Foundation</div><div class="ig"><div class="ic ic1"><div class="icl">Love</div><div class="ict">Drawing, painting, pet portraits, watercolors</div></div><div class="ic ic2"><div class="icl">Good At</div><div class="ict">Likeness, color mixing, photo references</div></div><div class="ic ic3"><div class="icl">Need</div><div class="ict">Affordable pet portraits, personal gifts</div></div><div class="ic ic4"><div class="icl">Paid</div><div class="ict">Per-portrait, $15-35 by size</div></div></div><div class="f"><div class="fl">What We Do</div><div class="fv">Custom watercolor pet portraits &mdash; hand-painted from photos</div></div><div class="f"><div class="fl">Golden Circle</div><div class="fv"><strong>WHY:</strong> Freeze a moment with their best friend. <strong>HOW:</strong> Painted from favorite photo. <strong>WHAT:</strong> Custom portraits.</div></div><span class="pn pn-l">1</span></div></div>
+
+  <!-- Perspective is on .manila so 3D works across full width -->
+  <div class="persp"><div class="spine">
+
+    <!-- L5 (bottom): front=p10, back=empty -->
+    <div class="leaf" id="L5" style="z-index:1">
+      <div class="leaf-front"><div class="pg"><div class="sl">Your Next 30 Days</div><div class="st">Weeks 3 &amp; 4</div><div class="tb"><div class="tt"><span><span class="wk">Wk 3</span> Build the System</span><span class="tp" id="p3">0/4</span></div><label class="tk" data-w="3"><input type="checkbox" onchange="up()"><span class="tkx">Display sample in school hallway + QR</span></label><label class="tk" data-w="3"><input type="checkbox" onchange="up()"><span class="tkx">Post customer reaction story</span></label><label class="tk" data-w="3"><input type="checkbox" onchange="up()"><span class="tkx">Sunday 7pm: first financial review</span></label><label class="tk" data-w="3"><input type="checkbox" onchange="up()"><span class="tkx">Deliver portrait #3</span></label></div><div class="tb"><div class="tt"><span><span class="wk">Wk 4</span> What's Next</span><span class="tp" id="p4">0/4</span></div><label class="tk" data-w="4"><input type="checkbox" onchange="up()"><span class="tkx">Review all feedback &mdash; what pattern?</span></label><label class="tk" data-w="4"><input type="checkbox" onchange="up()"><span class="tkx">Decide: raise your price?</span></label><label class="tk" data-w="4"><input type="checkbox" onchange="up()"><span class="tkx">Financial review #2: total P&amp;L</span></label><label class="tk" data-w="4"><input type="checkbox" onchange="up()"><span class="tkx">Set next 30-day goal</span></label></div><div class="tlb"><div class="tlf" id="bf"></div></div><div class="tlt"><span id="bc">0</span>/16</div><div style="margin-top:8px"><div class="sl">Founder's Log</div><div class="lb">"I used to think art was just a hobby. Now I know it's a skill people will pay for."<br><span style="font-style:normal;font-size:9px;color:var(--text-muted)">22 reflections &middot; private</span></div></div><span class="pn pn-r">10</span></div></div>
+      <div class="leaf-back"></div>
+    </div>
+
+    <!-- L4: front=p8 (launch), back=p9 (timeline wk1-2) -->
+    <div class="leaf" id="L4" style="z-index:2">
+      <div class="leaf-front"><div class="pg"><div class="sl">Module 6</div><div class="st">Launch &amp; First Sale</div><div class="d"><div class="dl">MVP</div><div class="dt">One 5&times;7 pencil sketch of Biscuit. Not watercolor, not framed. Delivering Thursday.</div></div><div class="d"><div class="dl">First Customer</div><div class="dt">Confirm within 1 hour. Likeness off &rarr; show WIP. Doesn't like it &rarr; free redo. Surprise: sunglasses sketch on back.</div></div><div class="d"><div class="dl">Feedback</div><div class="dt">"Walk me through showing it to your mom" + "One thing you'd change?" If "too slow" &rarr; $5 rush.</div></div><div class="d"><div class="dl">After the Sale</div><div class="dt">Post on Instagram. DM three who liked it. "The hardest part was the first DM."</div></div><span class="pn pn-r">8</span></div></div>
+      <div class="leaf-back"><div class="pg"><div class="sl">Your Next 30 Days</div><div class="st">Weeks 1 &amp; 2</div><div class="tb"><div class="tt"><span><span class="wk">Wk 1</span> Ship to One</span><span class="tp" id="p1">0/4</span></div><label class="tk" data-w="1"><input type="checkbox" onchange="up()"><span class="tkx">Paint &amp; deliver MVP sketch to Sarah</span></label><label class="tk" data-w="1"><input type="checkbox" onchange="up()"><span class="tkx">Send confirmation, include surprise sketch</span></label><label class="tk" data-w="1"><input type="checkbox" onchange="up()"><span class="tkx">Ask the 2 feedback questions</span></label><label class="tk" data-w="1"><input type="checkbox" onchange="up()"><span class="tkx">Post finished portrait on Instagram</span></label></div><div class="tb"><div class="tt"><span><span class="wk">Wk 2</span> Get #2 &amp; #3</span><span class="tp" id="p2">0/4</span></div><label class="tk" data-w="2"><input type="checkbox" onchange="up()"><span class="tkx">DM Diego, Mrs. Chen, art teacher</span></label><label class="tk" data-w="2"><input type="checkbox" onchange="up()"><span class="tkx">Set up Google Sheet, log Sarah as row #1</span></label><label class="tk" data-w="2"><input type="checkbox" onchange="up()"><span class="tkx">Post first process timelapse</span></label><label class="tk" data-w="2"><input type="checkbox" onchange="up()"><span class="tkx">Deliver portrait #2</span></label></div><span class="pn pn-l">9</span></div></div>
+    </div>
+
+    <!-- L3: front=p6 (marketing), back=p7 (numbers) -->
+    <div class="leaf" id="L3" style="z-index:3">
+      <div class="leaf-front"><div class="pg"><div class="sl">Module 4</div><div class="st">Marketing &amp; Sales</div><div class="d"><div class="dl">Zero-Budget</div><div class="dt">Instagram process videos, school art hallway + QR, word of mouth. First action: DM 5 classmates.</div></div><div class="d"><div class="dl">Social Media</div><div class="dt">1-1-1 rule: one timelapse, one reaction, one behind-the-scenes. 3x/week.</div></div><div class="d"><div class="dl">Word of Mouth</div><div class="dt">Surprise bonus sketch on back. "I painted Sarah's dog &mdash; want me to do yours?"</div></div><div class="pb"><div class="pt">"Everyone has pet photos but nothing on their wall. Custom watercolors from your favorite photo &mdash; $25, less than a week."</div><div class="pa">&mdash; Elsa, Founder</div></div><span class="pn pn-r">6</span></div></div>
+      <div class="leaf-back"><div class="pg"><div class="sl">Module 5</div><div class="st">The Numbers</div><div class="f"><div class="fl">Cost Per Portrait (8&times;10)</div><div class="fv">Paper $2 &middot; Paints $1 &middot; Frame $4 &middot; Time ~2hr<br><strong>Cost: $7</strong> &rarr; $25 price = <strong>$18 profit</strong></div></div><div class="f"><div class="fl">Pricing</div><div class="fv">Etsy: $60+. Framing: $15. At $25 I'm the only option between "free photo" and "$60+ art."</div></div><div class="f"><div class="fl">Tracking</div><div class="fv">Google Sheet &middot; Sundays 7pm &middot; Am I making more than I spend?</div></div><div style="margin-top:8px"><div class="sl">Achievements</div><div class="br"><span class="b bg">Venture Founded</span><span class="b bg">Named &amp; Claimed</span><span class="b bg">Price Is Right</span><span class="b bs">7-Day Streak</span><span class="b bs">Deep Thinker</span><span class="b bg">Full Sweep</span></div></div><span class="pn pn-l">7</span></div></div>
+    </div>
+
+    <!-- L2: front=p4 (customer), back=p5 (brand) -->
+    <div class="leaf" id="L2" style="z-index:4">
+      <div class="leaf-front"><div class="pg"><div class="sl">Module 2</div><div class="st">Customer</div><div class="f"><div class="fl">Target Customer</div><div class="fv">Girls at school with pets &mdash; Christmas, Mother's Day, pet birthdays.</div></div><div class="f"><div class="fl">Customer Profile</div><div class="fv"><strong>Sarah, 15.</strong> Golden retriever Biscuit. Mom's birthday next month. Can't afford $200 Etsy. Would pay $25.</div></div><div class="f"><div class="fl">Revenue Model</div><div class="fv">$15 sketch &middot; $25 watercolor &middot; $35 large. Venmo/cash. 3-5 days.</div></div><div class="f"><div class="fl">Interviews</div><div class="fv"><span class="pill">4 done</span><br>People want PERSONALITY. "Make him look goofy." Emotion &gt; accuracy.</div></div><span class="pn pn-r">4</span></div></div>
+      <div class="leaf-back"><div class="pg"><div class="sl">Module 3</div><div class="st">Brand</div><div class="f"><div class="fl">Brand Voice</div><div class="fv"><strong>Words:</strong> warm, personal, handmade, joyful, real<br><strong>Not:</strong> corporate, mass-produced, sterile</div></div><div class="f"><div class="fl">Business Name</div><div class="fv">Elsa's Art Studio &mdash; tested with 5 friends. Personal name because customers buy from ME.</div></div><div class="f"><div class="fl">Visual Identity</div><div class="fv"><strong>Color:</strong> Warm cream &middot; <strong>Font:</strong> Hand-written &middot; <strong>Feel:</strong> "Made by someone who cares about your pet."</div></div><span class="pn pn-l">5</span></div></div>
+    </div>
+
+    <!-- L1: front=p2 (vision), back=p3 (competition) -->
+    <div class="leaf" id="L1" style="z-index:5">
+      <div class="leaf-front"><div class="pg"><div class="sl">Module 1</div><div class="st">Vision</div><div class="f"><div class="fl">What We Do</div><div class="fv">Custom watercolor pet portraits for classmates and families &mdash; hand-painted from photos</div></div><div class="f"><div class="fl">Why This Matters</div><div class="fv">I've drawn animals since I was 8. People say my portraits "look alive." Every portrait is a gift to someone who loves their pet.</div></div><div class="f"><div class="fl">Golden Circle</div><div class="fv"><strong>WHY:</strong> Freeze a moment with their best friend. <strong>HOW:</strong> Painted from favorite photo. <strong>WHAT:</strong> Custom portraits.</div></div><span class="pn pn-r">2</span></div></div>
+      <div class="leaf-back"><div class="pg"><div class="sl">Module 1</div><div class="st">Competition &amp; Differentiation</div><div class="f"><div class="fl">Competitors</div><div class="fv">Etsy portrait artists ($60-200, 2-4 week wait) and phone filter apps (free but generic).</div></div><div class="f"><div class="fl">My Edge</div><div class="fv">Local, fast (3-5 days), affordable ($15-35), and I know the pets personally.</div></div><div class="f"><div class="fl">Real Competition</div><div class="fv">Not pro artists. The "print a photo at Walgreens" default.</div></div><span class="pn pn-l">3</span></div></div>
+    </div>
+
+    <!-- L0: COVER — front=manila, back=p1 (ikigai) -->
+    <div class="leaf cover" id="L0" style="z-index:10">
+      <div class="leaf-front">
+        <div class="cv-label">Business Plan</div>
+        <div class="cv-name">Elsa Martinez</div>
+        <div class="cv-biz">Elsa's Art Studio</div>
+        <div class="cv-date">April 2026</div>
+        <div class="ik-wrap"><div class="ik-c love"></div><div class="ik-c good"></div><div class="ik-c needs"></div><div class="ik-c paid"></div></div>
+        <div class="cv-hint">click to open</div>
+      </div>
+      <div class="leaf-back"></div>
+    </div>
+
+  </div><!-- /spine -->
+  </div><!-- /persp -->
+</div><!-- /frame -->
+</div><!-- /wrapper -->
+
+<div class="nav">
+  <button class="nb" id="prevBtn" onclick="prev()" disabled>&larr; Back</button>
+  <div class="ni" id="info">Cover</div>
+  <button class="nb" id="nextBtn" onclick="next()">Open &rarr;</button>
+</div>
+
+<script>
+var SLIDE = 500;   // frame slide duration (matches CSS)
+var COVER = 600;   // cover clip-path wipe duration (matches CSS)
+var FLIP = 700;    // page flip duration (matches CSS)
+var fl = 0;        // 0=closed, 1=open(p1-2), 2=p3-4, 3=p5-6, 4=p7-8, 5=p9-10
+var busy = false;
+
+function next() {
+  if (fl >= 5 || busy) return;
+  busy = true;
+
+  if (fl === 0) {
+    // OPEN: 2 steps
+    // Step 1: Slide the closed folder to the right
+    document.getElementById('wrapper').classList.add('slid');
+
+    setTimeout(function() {
+      // Step 2: Expand frame, show static page 1, flip cover.
+      // The cover has no back-face content — it just lifts away,
+      // revealing the static page 1 underneath.
+      document.getElementById('page1static').style.display = 'block';
+      document.getElementById('frame').classList.add('expanded');
+      document.getElementById('L0').classList.add('flipped');
+
+      setTimeout(function() {
+        // Cover has landed. Drop cover z-index.
+        document.getElementById('L0').style.zIndex = 0;
+        fl = 1;
+        updateNav();
+        busy = false;
+      }, COVER);
+    }, SLIDE + 30);
+
+    updateNav();
+    return;
+  }
+
+  // Regular page flip
+  if (fl === 1) document.getElementById('page1static').style.display = 'none';
+  document.getElementById('L' + fl).classList.add('flipped');
+  // Drop z-index at midpoint
+  var leaf = document.getElementById('L' + fl);
+  setTimeout(function() { leaf.style.zIndex = fl; }, Math.round(FLIP / 2));
+  fl++;
+  updateNav();
+  setTimeout(function() { busy = false; }, FLIP + 30);
+}
+
+function prev() {
+  if (fl <= 0 || busy) return;
+  busy = true;
+
+  if (fl === 1) {
+    // CLOSE: reverse of open
+    // Step 1: Restore cover z-index + flip back + collapse frame + hide static page 1
+    document.getElementById('L0').style.zIndex = 6;
+    document.getElementById('page1static').style.display = 'none';
+    document.getElementById('L0').classList.remove('flipped');
+    document.getElementById('frame').classList.remove('expanded');
+
+    setTimeout(function() {
+      // Step 2: Slide the closed folder back to center
+      document.getElementById('wrapper').classList.remove('slid');
+      setTimeout(function() {
+        fl = 0;
+        updateNav();
+        busy = false;
+      }, SLIDE + 30);
+    }, COVER + 30);
+
+    updateNav();
+    return;
+  }
+
+  // Regular page unflip
+  fl--;
+  if (fl === 1) document.getElementById('page1static').style.display = 'block';
+  var leaf = document.getElementById('L' + fl);
+  leaf.style.zIndex = 5 - fl + 1; // restore original z-index
+  leaf.classList.remove('flipped');
+  updateNav();
+  setTimeout(function() { busy = false; }, FLIP + 30);
+}
+
+function updateNav() {
+  document.getElementById('prevBtn').disabled = fl === 0 && !busy;
+  document.getElementById('nextBtn').disabled = fl >= 5;
+  if (fl === 0) {
+    document.getElementById('info').textContent = 'Cover';
+    document.getElementById('nextBtn').textContent = 'Open \u2192';
+    document.getElementById('prevBtn').textContent = '\u2190 Back';
+    document.getElementById('prevBtn').disabled = true;
+  } else {
+    document.getElementById('info').textContent = (fl*2-1) + '\u2013' + (fl*2) + ' of 10';
+    document.getElementById('nextBtn').textContent = fl >= 5 ? '\u2014' : 'Next \u2192';
+    document.getElementById('prevBtn').textContent = fl === 1 ? '\u2190 Close' : '\u2190 Back';
+    document.getElementById('prevBtn').disabled = false;
+  }
+}
+
+// Click on leaves to flip
+var leaves = document.querySelectorAll('.leaf');
+for (var k = 0; k < leaves.length; k++) {
+  (function(el) {
+    el.addEventListener('click', function(e) {
+      if (e.target.closest('input') || e.target.closest('label')) return;
+      var i = parseInt(el.id.replace('L', ''));
+      if (i === fl) next();
+      else if (i === fl - 1) prev();
+    });
+  })(leaves[k]);
+}
+
+function up() {
+  var t=0,c=0;
+  for(var w=1;w<=4;w++){
+    var ts=document.querySelectorAll('.tk[data-w="'+w+'"] input');
+    var wc=0;ts.forEach(function(x){if(x.checked)wc++});
+    var el=document.getElementById('p'+w);
+    if(el){el.textContent=wc+'/'+ts.length;el.style.color=wc===ts.length?'var(--primary)':''}
+    t+=ts.length;c+=wc;
+  }
+  var bc=document.getElementById('bc'),bf=document.getElementById('bf');
+  if(bc)bc.textContent=c;if(bf)bf.style.width=(c/t)*100+'%';
+}
+</script>
+</body>
+</html>

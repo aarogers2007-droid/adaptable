@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grouping Algorithm — Visual</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif; background: #08080d; color: #e0e0e0;
+    overflow-x: hidden; perspective: 1200px;
+  }
+  canvas#bg { position: fixed; inset: 0; z-index: 0; }
+  .scene { position: relative; z-index: 1; padding: 60px 20px 100px; }
+
+  /* Title */
+  .title-area { text-align: center; margin-bottom: 80px; }
+  .title-area h1 {
+    font-size: 52px; font-weight: 700;
+    background: linear-gradient(135deg, #C084FC, #60A5FA, #2DD4BF, #FBBF24, #F87171);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+    background-size: 200% 200%;
+  }
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .title-area p { color: #444; font-size: 14px; margin-top: 8px; }
+
+  /* ═══ FUNNEL — the 5-step pipeline as a 3D funnel ═══ */
+  .funnel {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    max-width: 1100px; margin: 0 auto 80px;
+    transform: rotateX(8deg);
+    transform-style: preserve-3d;
+  }
+  .funnel-step {
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+    padding: 20px 0; position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.4s;
+  }
+  .funnel-step:hover { transform: translateZ(20px) scale(1.02); }
+
+  .funnel-bar {
+    height: 56px; border-radius: 28px; display: flex; align-items: center;
+    justify-content: center; gap: 12px; padding: 0 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+    transform: translateZ(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  .funnel-bar::before {
+    content: ''; position: absolute; inset: 0; border-radius: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+  }
+  .funnel-bar .step-icon { font-size: 22px; }
+  .funnel-bar .step-name { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; }
+
+  .f1 .funnel-bar { width: 900px; background: linear-gradient(135deg, #7c3aed, #9333ea); }
+  .f2 .funnel-bar { width: 780px; background: linear-gradient(135deg, #2563eb, #3b82f6); }
+  .f3 .funnel-bar { width: 660px; background: linear-gradient(135deg, #0d9488, #14b8a6); }
+  .f4 .funnel-bar { width: 540px; background: linear-gradient(135deg, #d97706, #f59e0b); }
+  .f5 .funnel-bar { width: 420px; background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+  /* Connector arrows between funnel steps */
+  .funnel-connector {
+    width: 2px; height: 20px; background: linear-gradient(180deg, #333, #1a1a1a);
+    position: relative;
+  }
+  .funnel-connector::after {
+    content: '▼'; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+    font-size: 8px; color: #333;
+  }
+
+  /* ═══ INPUT CIRCLES — orbiting around each step ═══ */
+  .orbit-section {
+    max-width: 1100px; margin: 0 auto 80px; position: relative;
+  }
+  .orbit-label {
+    text-align: center; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.15em; margin-bottom: 24px;
+  }
+
+  /* Circle containers */
+  .orbit-ring {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+    perspective: 800px;
+  }
+
+  .orb {
+    width: 110px; height: 110px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; text-align: center;
+    font-size: 11px; font-weight: 600; line-height: 1.3; padding: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.1);
+    transition: all 0.3s; cursor: default;
+    transform: translateZ(0);
+    animation: float 3s ease-in-out infinite;
+  }
+  .orb:nth-child(2) { animation-delay: 0.3s; }
+  .orb:nth-child(3) { animation-delay: 0.6s; }
+  .orb:nth-child(4) { animation-delay: 0.9s; }
+  .orb:nth-child(5) { animation-delay: 1.2s; }
+  .orb:nth-child(6) { animation-delay: 1.5s; }
+  .orb:nth-child(7) { animation-delay: 1.8s; }
+  .orb:nth-child(8) { animation-delay: 2.1s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateZ(0); }
+    50% { transform: translateY(-8px) translateZ(10px); }
+  }
+
+  .orb:hover { transform: translateY(-12px) translateZ(30px) scale(1.12); box-shadow: 0 16px 40px rgba(0,0,0,0.6); }
+
+  .orb-c1 { background: linear-gradient(135deg, #581c87, #7c3aed); color: #e9d5ff; }
+  .orb-c2 { background: linear-gradient(135deg, #1e3a5f, #3b82f6); color: #bfdbfe; }
+  .orb-c2.target { border: 2px solid #60a5fa; box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 20px #3b82f633; }
+  .orb-c3 { background: linear-gradient(135deg, #134e4a, #14b8a6); color: #99f6e4; }
+  .orb-c4 { background: linear-gradient(135deg, #78350f, #f59e0b); color: #fef3c7; }
+  .orb-c5-v { background: linear-gradient(135deg, #581c87, #a855f7); color: #e9d5ff; }
+  .orb-c5-b { background: linear-gradient(135deg, #134e4a, #2dd4bf); color: #99f6e4; }
+  .orb-c5-n { background: linear-gradient(135deg, #1a1a2e, #444); color: #aaa; }
+
+  /* ═══ THE SORT MACHINE — 3D box visualization ═══ */
+  .machine {
+    max-width: 1000px; margin: 0 auto 80px;
+    perspective: 1000px;
+  }
+  .machine-box {
+    background: #0d0d18; border: 1px solid #1a1a2e; border-radius: 16px;
+    padding: 40px; transform: rotateX(3deg) rotateY(-2deg);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+    transform-style: preserve-3d;
+  }
+
+  /* Student dots flowing through the machine */
+  .flow-row {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 20px 0; flex-wrap: wrap;
+  }
+  .dot {
+    width: 32px; height: 32px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: 9px; font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  .dot:nth-child(odd) { animation-delay: 0.5s; }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .flow-arrow {
+    font-size: 28px; color: #333; margin: 0 12px;
+    animation: arrow-pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes arrow-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  /* Group output boxes */
+  .groups-output {
+    display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+    margin-top: 40px;
+  }
+  .group-box {
+    width: 180px; border-radius: 12px; padding: 16px;
+    transform: translateZ(15px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    transition: transform 0.3s;
+  }
+  .group-box:hover { transform: translateZ(30px) scale(1.05); }
+  .group-box .g-num { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .group-box .g-dots { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+  .group-box .g-dot { width: 20px; height: 20px; border-radius: 50%; }
+  .group-box .g-checks { font-size: 10px; line-height: 1.8; }
+  .group-box .g-check { display: flex; align-items: center; gap: 4px; }
+
+  /* ═══ SWAP VISUALIZATION ═══ */
+  .swap-vis {
+    max-width: 800px; margin: 0 auto 80px; text-align: center;
+  }
+  .swap-boxes {
+    display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 24px;
+  }
+  .swap-box {
+    width: 200px; border-radius: 12px; padding: 20px; position: relative;
+    transform-style: preserve-3d;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .swap-box.before { background: #1a0a0a; border: 1px solid #ef444433; }
+  .swap-box.after { background: #0a1a0a; border: 1px solid #10b98133; }
+
+  .swap-dots { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+  .sd { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
+  .sd-vis { background: #a855f7; color: white; }
+  .sd-ver { background: #2dd4bf; color: white; }
+  .sd-non { background: #333; color: #888; }
+  .sd-swap { animation: swap-glow 1s ease-in-out infinite alternate; }
+  @keyframes swap-glow { from { box-shadow: 0 0 0 rgba(239,68,68,0); } to { box-shadow: 0 0 16px rgba(239,68,68,0.5); } }
+
+  .swap-arrow-big {
+    font-size: 40px; color: #ef4444;
+    animation: swap-bounce 1s ease-in-out infinite alternate;
+  }
+  @keyframes swap-bounce { from { transform: scale(1); } to { transform: scale(1.2); } }
+
+  /* ═══ CRITERIA RING ═══ */
+  .criteria-ring {
+    max-width: 700px; margin: 0 auto 60px;
+    display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
+  }
+  .crit-orb {
+    width: 100px; height: 100px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; text-align: center;
+    font-size: 10px; font-weight: 600; line-height: 1.3; padding: 10px;
+    background: #0d1a0d; border: 2px solid #10b98144;
+    box-shadow: 0 0 20px #10b98122;
+    animation: float 4s ease-in-out infinite;
+    color: #10b981;
+  }
+  .crit-orb:nth-child(2) { animation-delay: 0.7s; }
+  .crit-orb:nth-child(3) { animation-delay: 1.4s; }
+  .crit-orb:nth-child(4) { animation-delay: 2.1s; }
+  .crit-orb:nth-child(5) { animation-delay: 2.8s; }
+  .crit-orb:nth-child(6) { animation-delay: 3.5s; }
+
+  .section-title {
+    text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.2em; color: #444; margin-bottom: 20px;
+  }
+
+  /* Colors for group boxes */
+  .gb-1 { background: linear-gradient(135deg, #1e3a5f, #3b82f622); border: 2px solid #3b82f6; }
+  .gb-1 .g-num { color: #3b82f6; }
+  .gb-2 { background: linear-gradient(135deg, #064e3b, #10b98122); border: 2px solid #10b981; }
+  .gb-2 .g-num { color: #10b981; }
+  .gb-3 { background: linear-gradient(135deg, #78350f, #f59e0b22); border: 2px solid #f59e0b; }
+  .gb-3 .g-num { color: #f59e0b; }
+  .gb-4 { background: linear-gradient(135deg, #450a0a, #ef444422); border: 2px solid #ef4444; }
+  .gb-4 .g-num { color: #ef4444; }
+  .gb-5 { background: linear-gradient(135deg, #2e1065, #8b5cf622); border: 2px solid #8b5cf6; }
+  .gb-5 .g-num { color: #8b5cf6; }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="scene">
+
+  <div class="title-area">
+    <h1>The Sort</h1>
+    <p>165 students → balanced teams in 5 steps</p>
+  </div>
+
+  <!-- ═══ FUNNEL ═══ -->
+  <div class="funnel">
+    <div class="funnel-step f1">
+      <div class="funnel-bar">
+        <span class="step-icon">🟣</span>
+        <span class="step-name">Pool by Category</span>
+        <span style="font-size: 11px; opacity: 0.6;">8 types</span>
+      </div>
+    </div>
+    <div class="funnel-connector"></div>
+    <div class="funnel-step f2">
+      <div class="funnel-bar">
+        <span class="step-icon">🔵</span>
+        <span class="step-name">Mix Archetypes</span>
+        <span style="font-size: 11px; opacity: 0.6;">3 required</span>
+      </div>
+    </div>
+    <div class="funnel-connector"></div>
+    <div class="funnel-step f3">
+      <div class="funnel-bar">
+        <span class="step-icon">🟢</span>
+        <span class="step-name">Diversify Knowledge</span>
+        <span style="font-size: 11px; opacity: 0.6;">10 chips</span>
+      </div>
+    </div>
+    <div class="funnel-connector"></div>
+    <div class="funnel-step f4">
+      <div class="funnel-bar">
+        <span class="step-icon">🟡</span>
+        <span class="step-name">Balance Scale</span>
+        <span style="font-size: 11px; opacity: 0.6;">max 3 same</span>
+      </div>
+    </div>
+    <div class="funnel-connector"></div>
+    <div class="funnel-step f5">
+      <div class="funnel-bar">
+        <span class="step-icon">🔴</span>
+        <span class="step-name">Cover Voice</span>
+        <span style="font-size: 11px; opacity: 0.6;">visual + verbal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ INPUT SPHERES ═══ -->
+
+  <p class="section-title" style="color: #C084FC;">Circle 1 — The Wish</p>
+  <div class="orbit-section">
+    <div class="orbit-ring">
+      <div class="orb orb-c1">Physical</div>
+      <div class="orb orb-c1">Digital</div>
+      <div class="orb orb-c1">Medical</div>
+      <div class="orb orb-c1">Learning</div>
+      <div class="orb orb-c1">Environ&shy;mental</div>
+      <div class="orb orb-c1">Social</div>
+      <div class="orb orb-c1">Transport</div>
+      <div class="orb orb-c1">Wildcard</div>
+    </div>
+  </div>
+
+  <p class="section-title" style="color: #60A5FA;">Circle 2 — The Mind</p>
+  <div class="orbit-section">
+    <div class="orbit-ring">
+      <div class="orb orb-c2 target" style="width: 130px; height: 130px; font-size: 13px;">Builder ★</div>
+      <div class="orb orb-c2 target" style="width: 130px; height: 130px; font-size: 13px;">Empath ★</div>
+      <div class="orb orb-c2 target" style="width: 130px; height: 130px; font-size: 13px;">Systems Thinker ★</div>
+      <div class="orb orb-c2">Connector</div>
+      <div class="orb orb-c2">Storyteller</div>
+    </div>
+  </div>
+
+  <p class="section-title" style="color: #2DD4BF;">Circle 3 — The Lens</p>
+  <div class="orbit-section">
+    <div class="orbit-ring">
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Animals</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Culture</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Medical</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Tech</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Food</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Mental Health</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Sport</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Creative</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Spiritual</div>
+      <div class="orb orb-c3" style="width: 95px; height: 95px; font-size: 10px;">Unseen World</div>
+    </div>
+  </div>
+
+  <p class="section-title" style="color: #FBBF24;">Circle 4 — The Scale</p>
+  <div class="orbit-section">
+    <div class="orbit-ring">
+      <div class="orb orb-c4" style="width: 130px; height: 130px;">A<br><span style="font-size: 9px; font-weight: 400;">One person</span></div>
+      <div class="orb orb-c4" style="width: 130px; height: 130px;">B<br><span style="font-size: 9px; font-weight: 400;">Community</span></div>
+      <div class="orb orb-c4" style="width: 130px; height: 130px;">C<br><span style="font-size: 9px; font-weight: 400;">Generation</span></div>
+      <div class="orb orb-c4" style="width: 130px; height: 130px;">D<br><span style="font-size: 9px; font-weight: 400;">World</span></div>
+    </div>
+  </div>
+
+  <p class="section-title" style="color: #F87171;">Circle 5 — The Voice</p>
+  <div class="orbit-section">
+    <div class="orbit-ring">
+      <div class="orb orb-c5-v">Draw it</div>
+      <div class="orb orb-c5-v">Prototype</div>
+      <div class="orb orb-c5-v">Slide / Poster</div>
+      <div class="orb orb-c5-b">Explain aloud</div>
+      <div class="orb orb-c5-b">Write it</div>
+      <div class="orb orb-c5-n">Video</div>
+      <div class="orb orb-c5-n">Act it out</div>
+    </div>
+  </div>
+
+  <!-- ═══ THE MACHINE — students in, groups out ═══ -->
+  <p class="section-title" style="color: #888; margin-top: 60px;">The Machine</p>
+  <div class="machine">
+    <div class="machine-box">
+
+      <p style="text-align: center; font-size: 11px; color: #555; margin-bottom: 16px;">165 students enter</p>
+      <div class="flow-row">
+        <div class="dot" style="background: #7c3aed;">B</div>
+        <div class="dot" style="background: #3b82f6;">E</div>
+        <div class="dot" style="background: #7c3aed;">S</div>
+        <div class="dot" style="background: #14b8a6;">C</div>
+        <div class="dot" style="background: #f59e0b;">B</div>
+        <div class="dot" style="background: #3b82f6;">T</div>
+        <div class="dot" style="background: #ef4444;">E</div>
+        <div class="dot" style="background: #7c3aed;">B</div>
+        <div class="dot" style="background: #14b8a6;">S</div>
+        <div class="dot" style="background: #f59e0b;">C</div>
+        <div class="dot" style="background: #3b82f6;">B</div>
+        <div class="dot" style="background: #ef4444;">T</div>
+        <div class="dot" style="background: #7c3aed;">E</div>
+        <div class="dot" style="background: #14b8a6;">B</div>
+        <div class="dot" style="background: #3b82f6;">S</div>
+        <span style="font-size: 20px; color: #333;">···</span>
+      </div>
+
+      <div style="text-align: center; margin: 24px 0;">
+        <span class="flow-arrow">↓</span>
+        <span class="flow-arrow">↓</span>
+        <span class="flow-arrow">↓</span>
+        <span class="flow-arrow">↓</span>
+        <span class="flow-arrow">↓</span>
+      </div>
+
+      <p style="text-align: center; font-size: 11px; color: #555; margin-bottom: 20px;">~33 balanced groups come out</p>
+
+      <div class="groups-output">
+        <div class="group-box gb-1">
+          <p class="g-num">1</p>
+          <div class="g-dots">
+            <div class="g-dot" style="background: #3b82f6;"></div>
+            <div class="g-dot" style="background: #10b981;"></div>
+            <div class="g-dot" style="background: #f59e0b;"></div>
+            <div class="g-dot" style="background: #8b5cf6;"></div>
+            <div class="g-dot" style="background: #ef4444;"></div>
+          </div>
+          <div class="g-checks">
+            <div class="g-check">✅ 3 archetypes</div>
+            <div class="g-check">✅ scale balanced</div>
+            <div class="g-check">✅ visual + verbal</div>
+          </div>
+        </div>
+        <div class="group-box gb-2">
+          <p class="g-num">2</p>
+          <div class="g-dots">
+            <div class="g-dot" style="background: #10b981;"></div>
+            <div class="g-dot" style="background: #f59e0b;"></div>
+            <div class="g-dot" style="background: #3b82f6;"></div>
+            <div class="g-dot" style="background: #ef4444;"></div>
+            <div class="g-dot" style="background: #ec4899;"></div>
+          </div>
+          <div class="g-checks">
+            <div class="g-check">✅ 3 archetypes</div>
+            <div class="g-check">✅ scale balanced</div>
+            <div class="g-check">✅ visual + verbal</div>
+          </div>
+        </div>
+        <div class="group-box gb-3">
+          <p class="g-num">3</p>
+          <div class="g-dots">
+            <div class="g-dot" style="background: #f59e0b;"></div>
+            <div class="g-dot" style="background: #8b5cf6;"></div>
+            <div class="g-dot" style="background: #3b82f6;"></div>
+            <div class="g-dot" style="background: #10b981;"></div>
+          </div>
+          <div class="g-checks">
+            <div class="g-check">✅ 3 archetypes</div>
+            <div class="g-check">⚠️ missing verbal</div>
+            <div class="g-check" style="color: #f59e0b;">→ swap fixes it</div>
+          </div>
+        </div>
+        <div class="group-box gb-4">
+          <p class="g-num">4</p>
+          <div class="g-dots">
+            <div class="g-dot" style="background: #ef4444;"></div>
+            <div class="g-dot" style="background: #3b82f6;"></div>
+            <div class="g-dot" style="background: #10b981;"></div>
+            <div class="g-dot" style="background: #f59e0b;"></div>
+            <div class="g-dot" style="background: #8b5cf6;"></div>
+          </div>
+          <div class="g-checks">
+            <div class="g-check">✅ 3 archetypes</div>
+            <div class="g-check">✅ scale balanced</div>
+            <div class="g-check">✅ visual + verbal</div>
+          </div>
+        </div>
+        <div class="group-box gb-5">
+          <p class="g-num">5</p>
+          <div class="g-dots">
+            <div class="g-dot" style="background: #8b5cf6;"></div>
+            <div class="g-dot" style="background: #ec4899;"></div>
+            <div class="g-dot" style="background: #3b82f6;"></div>
+            <div class="g-dot" style="background: #14b8a6;"></div>
+            <div class="g-dot" style="background: #f59e0b;"></div>
+          </div>
+          <div class="g-checks">
+            <div class="g-check">✅ 3 archetypes</div>
+            <div class="g-check">✅ scale balanced</div>
+            <div class="g-check">✅ visual + verbal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SWAP VISUALIZATION ═══ -->
+  <p class="section-title" style="color: #F87171; margin-top: 60px;">Cross-Group Swap</p>
+  <div class="swap-vis">
+    <div class="swap-boxes">
+      <div class="swap-box before">
+        <p style="font-size: 11px; color: #ef4444; margin-bottom: 8px;">Group A — no visual ⚠️</p>
+        <div class="swap-dots">
+          <div class="sd sd-ver">V</div>
+          <div class="sd sd-ver">V</div>
+          <div class="sd sd-non">·</div>
+          <div class="sd sd-ver">V</div>
+          <div class="sd sd-non sd-swap" style="border: 2px solid #ef4444;">?</div>
+        </div>
+      </div>
+      <div class="swap-arrow-big">⇄</div>
+      <div class="swap-box after">
+        <p style="font-size: 11px; color: #10b981; margin-bottom: 8px;">Group B — spare visual ✓</p>
+        <div class="swap-dots">
+          <div class="sd sd-vis">P</div>
+          <div class="sd sd-vis sd-swap" style="border: 2px solid #10b981;">P</div>
+          <div class="sd sd-ver">V</div>
+          <div class="sd sd-vis">P</div>
+          <div class="sd sd-non">·</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size: 11px; color: #444; margin-top: 16px;">Student swapped without breaking either group's coverage</p>
+  </div>
+
+  <!-- ═══ CRITERIA RING ═══ -->
+  <p class="section-title" style="color: #10b981; margin-top: 60px;">Pass Criteria</p>
+  <div class="criteria-ring">
+    <div class="crit-orb">≥1 Builder</div>
+    <div class="crit-orb">≥1 Empath</div>
+    <div class="crit-orb">≥1 Systems Thinker</div>
+    <div class="crit-orb">≤3 same scale</div>
+    <div class="crit-orb">≥1 visual</div>
+    <div class="crit-orb">≥1 verbal</div>
+  </div>
+
+</div>
+
+<!-- Particle background -->
+<script>
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let w, h, particles = [];
+
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = document.documentElement.scrollHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const colors = ['#C084FC', '#60A5FA', '#2DD4BF', '#FBBF24', '#F87171'];
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: Math.random() * 2 + 0.5,
+    dx: (Math.random() - 0.5) * 0.3,
+    dy: (Math.random() - 0.5) * 0.15,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    alpha: Math.random() * 0.3 + 0.05,
+  });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, w, h);
+  for (const p of particles) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+    p.x += p.dx;
+    p.y += p.dy;
+    if (p.x < 0 || p.x > w) p.dx *= -1;
+    if (p.y < 0 || p.y > h) p.dy *= -1;
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+
+</body>
+</html>

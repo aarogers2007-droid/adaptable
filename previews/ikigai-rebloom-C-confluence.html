@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptable — Ikigai Rebloom · Concept C · Confluence</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * IKIGAI REBLOOM — CONCEPT C — CONFLUENCE OF LIGHT
+   * ═══════════════════════════════════════════════════════════
+   *
+   * "Four streams of who you are flow into one place,
+   *  and from that confluence something new is born."
+   *
+   * Golden Ratio (φ = 1.618034) governs all timing:
+   *   BASE: 1000ms
+   *   φ intervals:   618, 1000, 1618, 2618, 4236, 6854ms
+   *   1/φ intervals: 382, 236, 146ms
+   *
+   * Arc:
+   *   0.000s  void, breath
+   *   1.000s  first ribbon begins its descent (yellow, from above)
+   *   1.618s  second ribbon (green, from the left)
+   *   2.236s  third ribbon (peach, from the right)
+   *   2.854s  fourth ribbon (teal, from below)
+   *   ~7.0s   the four rivers meet — sage bloom at center
+   *   ~9.0s   the pool brightens
+   *  ~11.6s   brightness threshold — name reveal pulse fires
+   *  ~14.2s   settle
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Satoshi', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══════════════════════════════════════════
+     STAGE
+     ═══════════════════════════════════════════ */
+  .stage {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Concept label — top left, barely there */
+  .concept-label {
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.382em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.22);
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* Replay — bottom right, whisper-quiet */
+  .replay-btn {
+    position: absolute;
+    bottom: 28px;
+    right: 32px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.28);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding: 10px 22px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition:
+      color 0.618s cubic-bezier(0.33, 0, 0.67, 1),
+      border-color 0.618s cubic-bezier(0.33, 0, 0.67, 1),
+      background 0.618s cubic-bezier(0.33, 0, 0.67, 1),
+      letter-spacing 0.618s cubic-bezier(0.33, 0, 0.67, 1);
+    z-index: 100;
+  }
+  .replay-btn:hover {
+    color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.02);
+    letter-spacing: 0.316em;
+  }
+
+  /* Ambient deep hum — a barely-there sage glow that breathes */
+  .ambient-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 61.8vh;
+    height: 61.8vh;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle,
+      rgba(139, 158, 106, 0.045) 0%,
+      rgba(25, 50, 82, 0.035) 38.2%,
+      transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
+    50%      { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+  /* Drifting particles — the air is alive */
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(200, 215, 235, 0.10);
+    border-radius: 50%;
+    animation: drift var(--p-dur, 17.944s) linear infinite;
+  }
+  @keyframes drift {
+    from { transform: translateY(110vh); opacity: 0; }
+    8%   { opacity: 0.8; }
+    92%  { opacity: 0.8; }
+    to   { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  /* ═══════════════════════════════════════════
+     THE RIBBONS (SVG)
+     Four rivers flowing inward from the edges.
+     Each path is drawn via stroke-dasharray from
+     full length → 0 (pouring into the center).
+     ═══════════════════════════════════════════ */
+  .flow {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .ribbon {
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* Path total length is set via JS (getTotalLength)
+       and we animate --len from L → 0 */
+    stroke-dasharray: var(--len, 2000);
+    stroke-dashoffset: var(--len, 2000);
+    opacity: 0;
+    filter: blur(0.4px) drop-shadow(0 0 6px var(--glow, rgba(255,255,255,0.4)));
+  }
+
+  /* A soft wider halo underneath each ribbon — the aurora bleed */
+  .ribbon-halo {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: var(--len, 2000);
+    stroke-dashoffset: var(--len, 2000);
+    opacity: 0;
+    filter: blur(8px);
+  }
+
+  /* YELLOW — passion — from the top */
+  .r-passion      { stroke: #F5E642; --glow: rgba(245, 230, 66, 0.55); }
+  .r-passion-halo { stroke: rgba(245, 230, 66, 0.35); }
+
+  /* GREEN — skill — from the left */
+  .r-skill        { stroke: #A8DB5A; --glow: rgba(168, 219, 90, 0.55); }
+  .r-skill-halo   { stroke: rgba(168, 219, 90, 0.35); }
+
+  /* PEACH — needs — from the right */
+  .r-needs        { stroke: #F4A79D; --glow: rgba(244, 167, 157, 0.55); }
+  .r-needs-halo   { stroke: rgba(244, 167, 157, 0.35); }
+
+  /* TEAL — monetization — from the bottom */
+  .r-mon          { stroke: #6DD5D0; --glow: rgba(109, 213, 208, 0.55); }
+  .r-mon-halo     { stroke: rgba(109, 213, 208, 0.35); }
+
+  /* The flow animation: fade in, draw, fade nothing — the river stays lit
+     after it arrives because its light is now part of the pool. */
+  @keyframes ribbon-flow {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: var(--len, 2000);
+    }
+    8% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+      stroke-dashoffset: 0;
+    }
+    100% {
+      opacity: 0.85;
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes ribbon-halo-flow {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: var(--len, 2000);
+    }
+    8% {
+      opacity: 0.55;
+    }
+    85% {
+      opacity: 0.55;
+      stroke-dashoffset: 0;
+    }
+    100% {
+      opacity: 0.4;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Individual ribbon delays — staggered by golden-ratio fractions.
+     Each ribbon takes 4.236s to draw — the patient procession. */
+  .ribbon.run, .ribbon-halo.run {
+    animation-duration: 4.236s;
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+    animation-fill-mode: forwards;
+  }
+  .ribbon.run      { animation-name: ribbon-flow; }
+  .ribbon-halo.run { animation-name: ribbon-halo-flow; }
+
+  .d-passion { animation-delay: 1.000s; }
+  .d-skill   { animation-delay: 1.618s; }
+  .d-needs   { animation-delay: 2.236s; }
+  .d-mon     { animation-delay: 2.854s; }
+
+  /* After the rivers arrive (~5.24s – ~7.09s depending on stagger),
+     the ribbons subtly soften and hold — a steady pour into the pool. */
+  .ribbon.hold      { opacity: 0.75; transition: opacity 2.618s cubic-bezier(0.33,0,0.67,1); }
+  .ribbon-halo.hold { opacity: 0.35; transition: opacity 2.618s cubic-bezier(0.33,0,0.67,1); }
+
+  /* ═══════════════════════════════════════════
+     THE CONFLUENCE POOL
+     A sage bloom at the center that grows as the
+     rivers arrive, then brightens into white.
+     ═══════════════════════════════════════════ */
+  .pool {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 36vh;
+    height: 36vh;
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(139, 158, 106, 0.85) 0%,
+      rgba(139, 158, 106, 0.45) 24%,
+      rgba(139, 158, 106, 0.15) 48%,
+      transparent 70%);
+    filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: screen;
+  }
+  .pool.bloom {
+    animation: pool-bloom 4.236s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes pool-bloom {
+    0%   { transform: translate(-50%, -50%) scale(0);    opacity: 0; filter: blur(6px); }
+    38%  {                                               opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.95; filter: blur(2px); }
+  }
+
+  /* Brightening — the pool climbs toward white */
+  .pool.brighten {
+    animation: pool-brighten 2.618s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes pool-brighten {
+    0% {
+      background: radial-gradient(circle,
+        rgba(139, 158, 106, 0.85) 0%,
+        rgba(139, 158, 106, 0.45) 24%,
+        rgba(139, 158, 106, 0.15) 48%,
+        transparent 70%);
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      background: radial-gradient(circle,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(220, 232, 195, 0.6) 20%,
+        rgba(139, 158, 106, 0.35) 46%,
+        transparent 72%);
+      transform: translate(-50%, -50%) scale(1.146);
+    }
+  }
+
+  /* The flash — a breath before the name arrives */
+  .flash {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80vh;
+    height: 80vh;
+    transform: translate(-50%, -50%) scale(0.4);
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(220, 232, 195, 0.25) 20%,
+      transparent 50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 4;
+    mix-blend-mode: screen;
+  }
+  .flash.fire {
+    animation: flash-burst 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes flash-burst {
+    0%   { opacity: 0;    transform: translate(-50%, -50%) scale(0.4); }
+    24%  { opacity: 0.95; transform: translate(-50%, -50%) scale(0.85); }
+    100% { opacity: 0;    transform: translate(-50%, -50%) scale(1.382); }
+  }
+
+  /* ═══════════════════════════════════════════
+     THE NAME REVEAL — the part AJ loves
+     White text, font-size 44px, soft white + sage
+     drop-shadow that starts strong and softens.
+     ═══════════════════════════════════════════ */
+  .biz-name-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .biz-name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: 0.006em;
+    color: #fff;
+    white-space: nowrap;
+    /* Starting shadows — strong, luminous */
+    text-shadow:
+      0 0 60px rgba(255, 255, 255, 0.85),
+      0 0 120px rgba(139, 158, 106, 0.75);
+  }
+  .biz-origin {
+    display: block;
+    margin-top: 18px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0);
+  }
+
+  .biz-name-wrap.pulse {
+    animation: name-pulse 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes name-pulse {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.96);
+    }
+    38% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.024);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* After the pulse lands, shadows soften — the glow settles */
+  .biz-name-wrap.settled .biz-name {
+    text-shadow:
+      0 0 28px rgba(255, 255, 255, 0.55),
+      0 0 56px rgba(139, 158, 106, 0.45);
+    transition: text-shadow 2.618s cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  .biz-name-wrap.settled .biz-origin {
+    color: rgba(255, 255, 255, 0.38);
+    transition: color 2.618s cubic-bezier(0.33, 0, 0.67, 1);
+  }
+
+  /* ═══════════════════════════════════════════
+     REDUCED MOTION
+     ═══════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+    .particle { display: none; }
+    .biz-name-wrap { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <div class="concept-label">Concept C &nbsp;·&nbsp; Confluence</div>
+
+  <div class="ambient-glow"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SVG FLOW LAYER
+       Four organic cubic-bezier paths, one from each edge,
+       curving gently inward to the center of the viewport.
+       Coordinates are in a 1000x1000 viewBox, preserveAspectRatio
+       "xMidYMid slice" so the center always lands at screen center.
+       ═══════════════════════════════════════════════════ -->
+  <svg class="flow" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <!-- Halos are rendered first (underneath) -->
+    </defs>
+
+    <!-- PASSION — yellow — from top.
+         Starts at (500,-40), gentle sumi-e drift into (500,500).
+         Control points hand-tuned for an organic S-curve that leans
+         right-then-left — not a straight fall. -->
+    <path class="ribbon-halo r-passion-halo d-passion"
+          d="M 500 -40
+             C 560 140, 430 280, 520 420
+             S 500 500, 500 500" />
+    <path class="ribbon r-passion d-passion"
+          d="M 500 -40
+             C 560 140, 430 280, 520 420
+             S 500 500, 500 500" />
+
+    <!-- SKILL — green — from left.
+         Starts at (-40,500), curves upward then settles low into center. -->
+    <path class="ribbon-halo r-skill-halo d-skill"
+          d="M -40 500
+             C 150 440, 290 580, 420 480
+             S 500 500, 500 500" />
+    <path class="ribbon r-skill d-skill"
+          d="M -40 500
+             C 150 440, 290 580, 420 480
+             S 500 500, 500 500" />
+
+    <!-- NEEDS — peach — from right.
+         Starts at (1040,500), curves downward then rises into center. -->
+    <path class="ribbon-halo r-needs-halo d-needs"
+          d="M 1040 500
+             C 850 560, 710 420, 580 520
+             S 500 500, 500 500" />
+    <path class="ribbon r-needs d-needs"
+          d="M 1040 500
+             C 850 560, 710 420, 580 520
+             S 500 500, 500 500" />
+
+    <!-- MONETIZATION — teal — from bottom.
+         Starts at (500,1040), drifts left then right into center. -->
+    <path class="ribbon-halo r-mon-halo d-mon"
+          d="M 500 1040
+             C 440 860, 570 720, 480 580
+             S 500 500, 500 500" />
+    <path class="ribbon r-mon d-mon"
+          d="M 500 1040
+             C 440 860, 570 720, 480 580
+             S 500 500, 500 500" />
+  </svg>
+
+  <!-- The confluence pool -->
+  <div class="pool" id="pool"></div>
+  <div class="flash" id="flash"></div>
+
+  <!-- The name reveal -->
+  <div class="biz-name-wrap" id="biz-wrap">
+    <span class="biz-name">Cristal&rsquo;s Art Studio</span>
+    <span class="biz-origin">This came from who you are</span>
+  </div>
+
+  <button class="replay-btn" id="replay" type="button">Replay</button>
+</div>
+
+<script>
+  /*
+   * CONFLUENCE ORCHESTRATOR
+   * ─────────────────────────────────────────
+   * Every timing is a multiple or fraction of φ.
+   *
+   * Sequence:
+   *   t =  0.000  void (breath)
+   *   t =  1.000  yellow ribbon begins its draw (4.236s)
+   *   t =  1.618  green ribbon begins
+   *   t =  2.236  peach ribbon begins
+   *   t =  2.854  teal ribbon begins
+   *   t =  ~7.09  last ribbon completes its draw
+   *   t =  ~6.5   pool begins to bloom (so the arrival
+   *               of each ribbon appears to feed it)
+   *   t = ~10.7   pool begins to brighten toward white
+   *   t = ~11.6   flash fires + name pulses in
+   *   t = ~14.2   settle (softened glow, subtitle fades in)
+   */
+  const PHI = 1.618034;
+  const BASE = 1000;
+  const s = (n) => n * BASE; // seconds → ms
+
+  // ─── Particles: 21 drifting specks (Fibonacci) ───
+  const particlesEl = document.getElementById('particles');
+  function seedParticles() {
+    particlesEl.innerHTML = '';
+    for (let i = 0; i < 21; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.setProperty('--p-dur', (11.09 + Math.random() * 6.854) + 's');
+      p.style.animationDelay = (Math.random() * 6.854) + 's';
+      particlesEl.appendChild(p);
+    }
+  }
+  seedParticles();
+
+  // ─── Measure each SVG path and set --len for stroke-dasharray ───
+  function measureRibbons() {
+    const ribbons = document.querySelectorAll('.ribbon, .ribbon-halo');
+    ribbons.forEach(r => {
+      const len = r.getTotalLength();
+      // Slight overshoot so caps don't reveal the seam
+      r.style.setProperty('--len', (len + 2));
+    });
+  }
+
+  // ─── Reset state for replay ───
+  function resetStage() {
+    // Remove animation classes
+    document.querySelectorAll('.ribbon, .ribbon-halo').forEach(r => {
+      r.classList.remove('run', 'hold');
+      // Force reflow to restart animations cleanly
+      void r.offsetWidth;
+    });
+    const pool = document.getElementById('pool');
+    const flash = document.getElementById('flash');
+    const wrap = document.getElementById('biz-wrap');
+
+    pool.classList.remove('bloom', 'brighten');
+    flash.classList.remove('fire');
+    wrap.classList.remove('pulse', 'settled');
+
+    void pool.offsetWidth;
+    void flash.offsetWidth;
+    void wrap.offsetWidth;
+  }
+
+  // ─── The main sequence ───
+  async function runConfluence() {
+    resetStage();
+    measureRibbons();
+
+    // Breath
+    await sleep(s(0.382));
+
+    // Arm the ribbons — CSS delays handle the staggered starts.
+    document.querySelectorAll('.ribbon, .ribbon-halo').forEach(r => r.classList.add('run'));
+
+    // Pool begins to bloom at t ≈ 6.5s into the sequence —
+    // so that as the last ribbons complete their draw, the
+    // sage light is already gathering at the center.
+    // The ribbons started being armed at t=0 here, so we
+    // wait for the in-sequence absolute time.
+    await sleep(s(6.5));
+    const pool = document.getElementById('pool');
+    pool.classList.add('bloom');
+
+    // Soften the ribbons into a steady hold — their light is now part of the pool
+    await sleep(s(1.618));
+    document.querySelectorAll('.ribbon, .ribbon-halo').forEach(r => r.classList.add('hold'));
+
+    // A breath. The pool holds sage. The rivers glow steady.
+    await sleep(s(1.000));
+
+    // The pool brightens — climbing toward white
+    pool.classList.add('brighten');
+    await sleep(s(1.618));
+
+    // The flash — a soft burst outward
+    const flash = document.getElementById('flash');
+    flash.classList.add('fire');
+
+    // Name pulses in, slightly overlapped with the flash peak
+    await sleep(s(0.382));
+    const wrap = document.getElementById('biz-wrap');
+    wrap.classList.add('pulse');
+
+    // After the pulse lands, soften the shadows and bring in the subtitle
+    await sleep(s(2.618));
+    wrap.classList.add('settled');
+  }
+
+  // ─── Replay ───
+  document.getElementById('replay').addEventListener('click', () => {
+    runConfluence();
+  });
+
+  // ─── Utilities ───
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  // Re-measure on resize (viewBox scales but recalculation keeps
+  // stroke-dasharray precise across aspect ratios)
+  window.addEventListener('resize', () => {
+    // Only re-measure; don't interrupt a running sequence
+    measureRibbons();
+  });
+
+  // Wait a tick so fonts and layout settle, then begin.
+  window.addEventListener('load', () => {
+    requestAnimationFrame(() => {
+      measureRibbons();
+      runConfluence();
+    });
+  });
+</script>
+
+</body>
+</html>

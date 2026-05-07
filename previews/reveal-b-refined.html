@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gravitational Collapse — Refined</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  /*
+   * GRAVITATIONAL COLLAPSE — Refined with Golden Ratio
+   *
+   * φ = 1.618034
+   *
+   * TIMING MAP (all derived from φ):
+   *   Circles hold visible:     φ² = 2.618s
+   *   Circle contraction:       φ² = 2.618s duration
+   *   Stagger between circles:  1/φ² = 0.382s
+   *   Center absorb:            φ = 1.618s
+   *   Shockwave expand:         φ = 1.618s
+   *   Name birth:               φ² = 2.618s
+   *   Name overshoot settle:    reaches 1.0 at 61.8% of duration
+   *   Origin line fade:         φ² = 2.618s
+   *   Circle return:            φ² = 2.618s
+   *   Return stagger:           1/φ³ = 0.236s
+   *
+   * EASING:
+   *   Contraction: cubic-bezier(0.55, 0, 0.2, 1) — accelerating inward, gravity
+   *   Birth:       cubic-bezier(0.16, 1, 0.3, 1) — explosive outward, deceleration
+   *   Return:      cubic-bezier(0.33, 0, 0.67, 1) — gentle, drifting back
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Satoshi', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ambient-glow {
+    position: absolute;
+    width: 61.8vh; height: 61.8vh;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+  }
+  @keyframes glow-breathe {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%,-50%) scale(1.146); opacity: 1; }
+  }
+
+  /* Particles */
+  .particles { position: absolute; inset: 0; overflow: hidden; }
+  .particle {
+    position: absolute;
+    width: 1.618px; height: 1.618px;
+    background: rgba(180,200,230,0.07);
+    border-radius: 50%;
+    animation: drift var(--dur, 17.944s) linear infinite;
+    animation-delay: var(--del, 0s);
+  }
+  @keyframes drift {
+    from { transform: translateY(110vh); opacity: 0; }
+    8% { opacity: 0.7; }
+    92% { opacity: 0.7; }
+    to { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  .ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1/1;
+    z-index: 2;
+  }
+
+  /* Circles — start visible */
+  .ik-c {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%; height: 50%;
+    transform: translate(-50%,-50%);
+    opacity: 0.618;
+    transition: none;
+  }
+  .ik-c.c1 { background: #F5E642; left: 50%; top: 19.1%; }
+  .ik-c.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
+  .ik-c.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
+  .ik-c.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
+
+  /* Center glow */
+  .ik-center {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    width: 19.1%; height: 19.1%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74,103,65,0.5), 0 0 80px rgba(74,103,65,0.2);
+    z-index: 4;
+    transition: all 1.618s cubic-bezier(0.33,0,0.67,1);
+  }
+  .ik-center.absorb {
+    transform: translate(-50%,-50%) scale(1.618);
+    box-shadow: 0 0 80px rgba(74,103,65,0.9), 0 0 160px rgba(139,158,106,0.5);
+  }
+  .ik-center.collapse {
+    transform: translate(-50%,-50%) scale(0.382);
+    box-shadow: 0 0 20px rgba(74,103,65,0.3);
+    opacity: 0;
+  }
+
+  /* Circle contraction — CSS classes triggered by JS for precise timing */
+  .ik-c.contracting {
+    animation: contract 2.618s cubic-bezier(0.55, 0, 0.2, 1) forwards;
+  }
+  @keyframes contract {
+    0% { width: 50%; height: 50%; opacity: 0.618; }
+    38.2% { opacity: 0.8; }
+    61.8% { opacity: 0.9; width: 25%; height: 25%; }
+    100% { left: 50%; top: 50%; width: 4%; height: 4%; opacity: 0; }
+  }
+  /* Override individual starting positions in the animation */
+  .ik-c.c1.contracting { animation-name: contract-c1; }
+  .ik-c.c2.contracting { animation-name: contract-c2; }
+  .ik-c.c3.contracting { animation-name: contract-c3; }
+  .ik-c.c4.contracting { animation-name: contract-c4; }
+
+  @keyframes contract-c1 {
+    0% { left: 50%; top: 19.1%; width: 50%; height: 50%; opacity: 0.618; }
+    38.2% { opacity: 0.85; }
+    100% { left: 50%; top: 50%; width: 3%; height: 3%; opacity: 0; }
+  }
+  @keyframes contract-c2 {
+    0% { left: 19.1%; top: 50%; width: 50%; height: 50%; opacity: 0.618; }
+    38.2% { opacity: 0.85; }
+    100% { left: 50%; top: 50%; width: 3%; height: 3%; opacity: 0; }
+  }
+  @keyframes contract-c3 {
+    0% { left: 80.9%; top: 50%; width: 50%; height: 50%; opacity: 0.618; }
+    38.2% { opacity: 0.85; }
+    100% { left: 50%; top: 50%; width: 3%; height: 3%; opacity: 0; }
+  }
+  @keyframes contract-c4 {
+    0% { left: 50%; top: 80.9%; width: 50%; height: 50%; opacity: 0.618; }
+    38.2% { opacity: 0.85; }
+    100% { left: 50%; top: 50%; width: 3%; height: 3%; opacity: 0; }
+  }
+
+  /* Circle return — ghost echoes */
+  .ik-c.returning { opacity: 0; }
+  .ik-c.c1.returning { animation: return-c1 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  .ik-c.c2.returning { animation: return-c2 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  .ik-c.c3.returning { animation: return-c3 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  .ik-c.c4.returning { animation: return-c4 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+
+  @keyframes return-c1 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:50%; top:19.1%; width:50%; height:50%; opacity:0.236; } }
+  @keyframes return-c2 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:19.1%; top:50%; width:50%; height:50%; opacity:0.236; } }
+  @keyframes return-c3 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:80.9%; top:50%; width:50%; height:50%; opacity:0.236; } }
+  @keyframes return-c4 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:50%; top:80.9%; width:50%; height:50%; opacity:0.236; } }
+
+  /* Shockwave */
+  .shockwave {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    width: 0; height: 0;
+    border-radius: 50%;
+    border: 1.618px solid rgba(139,158,106,0.7);
+    z-index: 15; opacity: 0; pointer-events: none;
+  }
+  .shockwave.expanding {
+    animation: shockwave-expand 1.618s cubic-bezier(0, 0.618, 0.382, 1) forwards;
+  }
+  @keyframes shockwave-expand {
+    0% { width: 0; height: 0; opacity: 0.8; border-width: 1.618px; }
+    61.8% { opacity: 0.3; }
+    100% { width: 130%; height: 130%; opacity: 0; border-width: 0.382px; }
+  }
+  .shockwave.s2.expanding {
+    animation: shockwave-expand 2.618s cubic-bezier(0, 0.618, 0.382, 1) forwards;
+    border-width: 0.618px;
+  }
+
+  /* Business name — born from convergence */
+  .biz-wrap {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 30; text-align: center;
+    opacity: 0; pointer-events: none;
+  }
+  .biz-wrap.birthing {
+    animation: name-fade 2.618s ease-out forwards, name-glow 2.618s ease-out forwards;
+  }
+  @keyframes name-fade {
+    0%   { opacity: 0; transform: translate(-50%,-50%); }
+    100% { opacity: 1; transform: translate(-50%,-50%); }
+  }
+  @keyframes name-glow {
+    0%   { filter: drop-shadow(0 0 60px rgba(255,255,255,0.9)) drop-shadow(0 0 120px rgba(74,103,65,0.8)); }
+    100% { filter: drop-shadow(0 0 28px rgba(74,103,65,0.5)) drop-shadow(0 0 56px rgba(74,103,65,0.2)); }
+  }
+
+  .biz-name {
+    font-size: 28px; font-weight: 800; color: #fff;
+    text-shadow: 0 0 28px rgba(74,103,65,0.6), 0 0 56px rgba(74,103,65,0.25);
+    white-space: nowrap;
+  }
+  .biz-origin {
+    display: block; margin-top: 11px;
+    font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0); letter-spacing: 0.146em;
+    transition: color 2.618s ease-out;
+  }
+  .biz-origin.visible { color: rgba(255,255,255,0.35); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.2s !important;
+    }
+    .particle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+<div class="ambient-glow"></div>
+
+<div class="ik-wrap">
+  <div class="ik-c c1" id="c1"></div>
+  <div class="ik-c c2" id="c2"></div>
+  <div class="ik-c c3" id="c3"></div>
+  <div class="ik-c c4" id="c4"></div>
+  <div class="ik-center" id="center"></div>
+  <div class="shockwave" id="shock1"></div>
+  <div class="shockwave s2" id="shock2"></div>
+  <div class="biz-wrap" id="biz">
+    <span class="biz-name">Harmony Art Studio</span>
+    <span class="biz-origin" id="origin">This came from who you are.</span>
+  </div>
+</div>
+
+<script>
+  const PHI = 1.618034;
+  const BASE = 1000;
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Generate particles
+  const p = document.getElementById('particles');
+  for (let i = 0; i < 21; i++) {
+    const d = document.createElement('div');
+    d.className = 'particle';
+    d.style.left = (Math.random() * 100) + '%';
+    d.style.setProperty('--dur', (11 + Math.random() * 7) + 's');
+    d.style.setProperty('--del', (Math.random() * 8) + 's');
+    p.appendChild(d);
+  }
+
+  async function run() {
+    const c1 = document.getElementById('c1');
+    const c2 = document.getElementById('c2');
+    const c3 = document.getElementById('c3');
+    const c4 = document.getElementById('c4');
+    const center = document.getElementById('center');
+    const shock1 = document.getElementById('shock1');
+    const shock2 = document.getElementById('shock2');
+    const biz = document.getElementById('biz');
+    const origin = document.getElementById('origin');
+
+    // Hold — let the circles breathe
+    await sleep(PHI * PHI * BASE); // 2.618s
+
+    // Contraction begins — staggered by 1/φ² = 0.382s
+    c1.classList.add('contracting');
+    await sleep(0.382 * BASE);
+    c2.classList.add('contracting');
+    await sleep(0.382 * BASE);
+    c3.classList.add('contracting');
+    await sleep(0.382 * BASE);
+    c4.classList.add('contracting');
+
+    // Wait for contraction to near completion (2.618s - stagger already elapsed)
+    await sleep(1.472 * BASE);
+
+    // Center absorbs — grows brighter as circles arrive
+    center.classList.add('absorb');
+    await sleep(PHI * BASE); // 1.618s
+
+    // Center collapses to a point
+    center.classList.add('collapse');
+    center.classList.remove('absorb');
+
+    // Shockwaves
+    await sleep(0.382 * BASE);
+    shock1.classList.add('expanding');
+    await sleep(0.236 * BASE);
+    shock2.classList.add('expanding');
+
+    // Name births from the convergence point
+    await sleep(0.382 * BASE);
+    biz.classList.add('birthing');
+
+    // Wait for name to settle
+    await sleep(PHI * PHI * BASE); // 2.618s
+
+    // "This came from who you are."
+    origin.classList.add('visible');
+
+    // Circles return as ghosts
+    await sleep(PHI * BASE);
+    c1.className = 'ik-c c1 returning';
+    await sleep(0.236 * BASE);
+    c2.className = 'ik-c c2 returning';
+    await sleep(0.236 * BASE);
+    c3.className = 'ik-c c3 returning';
+    await sleep(0.236 * BASE);
+    c4.className = 'ik-c c4 returning';
+  }
+
+  run();
+</script>
+</body>
+</html>

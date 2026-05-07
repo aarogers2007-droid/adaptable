@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai F1 — Square Variations</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Satoshi', sans-serif; background: #F9FAFB; color: #111827; padding: 32px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  p.sub { font-size: 13px; color: #9CA3AF; margin-bottom: 28px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; max-width: 1100px; }
+  .card { background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px; }
+  .card h2 { font-size: 15px; font-weight: 700; color: #0D9488; margin-bottom: 2px; }
+  .card p.d { font-size: 11px; color: #9CA3AF; margin-bottom: 14px; line-height: 1.4; }
+
+  .w {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+  .ca {
+    position: absolute;
+    left: 18%;
+    top: 18%;
+    width: 64%;
+    height: 64%;
+  }
+  .ci { position: absolute; border-radius: 50%; width: 58%; height: 58%; transform: translate(-50%,-50%); opacity: 0.55; }
+  .cc { position: absolute; border-radius: 50%; width: 20%; height: 20%; left: 50%; top: 50%; transform: translate(-50%,-50%); background: radial-gradient(circle, #4A6741 40%, #8B9E6A 100%); box-shadow: 0 0 20px rgba(74,103,65,0.3); z-index: 5; }
+  .cl { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 6; text-align: center; }
+  .cl span { display: block; font-size: 9.5px; font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 0.15em; line-height: 1.3; }
+  .lb { position: absolute; font-size: 17px; font-weight: 700; color: #111827; line-height: 1.25; z-index: 10; }
+  .sv { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 8; }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>F1 Square — Moving Top/Bottom Labels Inward</h1>
+<p class="sub">"What you love" moved down, "What you can be paid for" moved up. 6 variations of how far.</p>
+
+<div class="grid">
+
+<!-- ═══ V1: Subtle shift — top 10%, bottom 10% ═══ -->
+<div class="card">
+  <h2>V1 — Subtle Shift</h2>
+  <p class="d">Top label: 10% (was 6%). Bottom label: 10% (was 6%). Small move, starts to feel more square.</p>
+  <div class="w">
+    <svg class="sv" viewBox="0 0 100 100"><line x1="35" y1="23.5" x2="22" y2="14" stroke="#C4B320" stroke-width="0.5" opacity="0.6"/><circle cx="35" cy="23.5" r="1" fill="#C4B320" opacity="0.7"/><line x1="21" y1="66.5" x2="13" y2="78" stroke="#7AAD3A" stroke-width="0.5" opacity="0.6"/><circle cx="21" cy="66.5" r="1" fill="#7AAD3A" opacity="0.7"/><line x1="75" y1="37" x2="85" y2="24" stroke="#D4796E" stroke-width="0.5" opacity="0.6"/><circle cx="75" cy="37" r="1" fill="#D4796E" opacity="0.7"/><line x1="66" y1="78" x2="79" y2="87" stroke="#4DBAB4" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="78" r="1" fill="#4DBAB4" opacity="0.7"/></svg>
+    <div class="ca">
+      <div class="ci" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="ci" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="ci" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="ci" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="cc"></div>
+      <div class="cl"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="lb" style="top:10%; left:6%;">What you love</div>
+    <div class="lb" style="bottom:14%; left:6%;">What you're<br>good at</div>
+    <div class="lb" style="top:16%; right:6%; text-align:right;">What the world<br>needs</div>
+    <div class="lb" style="bottom:10%; right:6%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ V2: Medium shift — top 12%, bottom 12% ═══ -->
+<div class="card">
+  <h2>V2 — Medium Shift</h2>
+  <p class="d">Top label: 12%. Bottom-right label: 12%. Getting squarer. Labels and arrows start to feel connected.</p>
+  <div class="w">
+    <svg class="sv" viewBox="0 0 100 100"><line x1="35" y1="23.5" x2="22" y2="16" stroke="#C4B320" stroke-width="0.5" opacity="0.6"/><circle cx="35" cy="23.5" r="1" fill="#C4B320" opacity="0.7"/><line x1="21" y1="66.5" x2="13" y2="78" stroke="#7AAD3A" stroke-width="0.5" opacity="0.6"/><circle cx="21" cy="66.5" r="1" fill="#7AAD3A" opacity="0.7"/><line x1="75" y1="37" x2="85" y2="24" stroke="#D4796E" stroke-width="0.5" opacity="0.6"/><circle cx="75" cy="37" r="1" fill="#D4796E" opacity="0.7"/><line x1="66" y1="78" x2="79" y2="85" stroke="#4DBAB4" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="78" r="1" fill="#4DBAB4" opacity="0.7"/></svg>
+    <div class="ca">
+      <div class="ci" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="ci" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="ci" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="ci" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="cc"></div>
+      <div class="cl"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="lb" style="top:12%; left:6%;">What you love</div>
+    <div class="lb" style="bottom:14%; left:6%;">What you're<br>good at</div>
+    <div class="lb" style="top:16%; right:6%; text-align:right;">What the world<br>needs</div>
+    <div class="lb" style="bottom:12%; right:6%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ V3: Strong shift — top 14%, bottom 14% ═══ -->
+<div class="card">
+  <h2>V3 — Strong Shift</h2>
+  <p class="d">Top label: 14%. Bottom-right: 14%. All four labels now feel like they live at the same "ring" distance from center. Very square.</p>
+  <div class="w">
+    <svg class="sv" viewBox="0 0 100 100"><line x1="35" y1="23.5" x2="22" y2="18" stroke="#C4B320" stroke-width="0.5" opacity="0.6"/><circle cx="35" cy="23.5" r="1" fill="#C4B320" opacity="0.7"/><line x1="21" y1="66.5" x2="13" y2="78" stroke="#7AAD3A" stroke-width="0.5" opacity="0.6"/><circle cx="21" cy="66.5" r="1" fill="#7AAD3A" opacity="0.7"/><line x1="75" y1="37" x2="85" y2="24" stroke="#D4796E" stroke-width="0.5" opacity="0.6"/><circle cx="75" cy="37" r="1" fill="#D4796E" opacity="0.7"/><line x1="66" y1="78" x2="77" y2="83" stroke="#4DBAB4" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="78" r="1" fill="#4DBAB4" opacity="0.7"/></svg>
+    <div class="ca">
+      <div class="ci" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="ci" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="ci" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="ci" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="cc"></div>
+      <div class="cl"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="lb" style="top:14%; left:6%;">What you love</div>
+    <div class="lb" style="bottom:14%; left:6%;">What you're<br>good at</div>
+    <div class="lb" style="top:16%; right:6%; text-align:right;">What the world<br>needs</div>
+    <div class="lb" style="bottom:14%; right:6%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ V4: Maximum square — all labels at same inset ═══ -->
+<div class="card">
+  <h2>V4 — Maximum Square</h2>
+  <p class="d">All four labels at exactly 14-16% inset. Perfectly square label arrangement. The labels form their own invisible box around the circles.</p>
+  <div class="w">
+    <svg class="sv" viewBox="0 0 100 100"><line x1="35" y1="23.5" x2="22" y2="18" stroke="#C4B320" stroke-width="0.5" opacity="0.6"/><circle cx="35" cy="23.5" r="1" fill="#C4B320" opacity="0.7"/><line x1="21" y1="66.5" x2="14" y2="76" stroke="#7AAD3A" stroke-width="0.5" opacity="0.6"/><circle cx="21" cy="66.5" r="1" fill="#7AAD3A" opacity="0.7"/><line x1="75" y1="37" x2="83" y2="26" stroke="#D4796E" stroke-width="0.5" opacity="0.6"/><circle cx="75" cy="37" r="1" fill="#D4796E" opacity="0.7"/><line x1="66" y1="78" x2="77" y2="83" stroke="#4DBAB4" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="78" r="1" fill="#4DBAB4" opacity="0.7"/></svg>
+    <div class="ca">
+      <div class="ci" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="ci" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="ci" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="ci" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="cc"></div>
+      <div class="cl"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="lb" style="top:15%; left:6%;">What you love</div>
+    <div class="lb" style="bottom:15%; left:6%;">What you're<br>good at</div>
+    <div class="lb" style="top:15%; right:6%; text-align:right;">What the world<br>needs</div>
+    <div class="lb" style="bottom:15%; right:6%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ V5: Same as V3 but arrows adjusted to meet labels ═══ -->
+<div class="card">
+  <h2>V5 — V3 + Arrows Reach Labels</h2>
+  <p class="d">Same label positions as V3, but arrow endpoints extended closer to each label. The connection is clear and direct.</p>
+  <div class="w">
+    <svg class="sv" viewBox="0 0 100 100"><line x1="35" y1="23.5" x2="18" y2="16" stroke="#C4B320" stroke-width="0.5" opacity="0.6"/><circle cx="35" cy="23.5" r="1" fill="#C4B320" opacity="0.7"/><line x1="21" y1="66.5" x2="12" y2="80" stroke="#7AAD3A" stroke-width="0.5" opacity="0.6"/><circle cx="21" cy="66.5" r="1" fill="#7AAD3A" opacity="0.7"/><line x1="75" y1="37" x2="86" y2="20" stroke="#D4796E" stroke-width="0.5" opacity="0.6"/><circle cx="75" cy="37" r="1" fill="#D4796E" opacity="0.7"/><line x1="66" y1="78" x2="80" y2="86" stroke="#4DBAB4" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="78" r="1" fill="#4DBAB4" opacity="0.7"/></svg>
+    <div class="ca">
+      <div class="ci" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="ci" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="ci" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="ci" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="cc"></div>
+      <div class="cl"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="lb" style="top:14%; left:6%;">What you love</div>
+    <div class="lb" style="bottom:14%; left:6%;">What you're<br>good at</div>
+    <div class="lb" style="top:16%; right:6%; text-align:right;">What the world<br>needs</div>
+    <div class="lb" style="bottom:14%; right:6%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+<!-- ═══ V6: Tightest square — labels at 16%, arrows short ═══ -->
+<div class="card">
+  <h2>V6 — Tightest Square</h2>
+  <p class="d">All labels at 16% inset. Closest to the circles. Arrows are short stubs. Everything feels like one tight, cohesive unit.</p>
+  <div class="w">
+    <svg class="sv" viewBox="0 0 100 100"><line x1="35" y1="23.5" x2="26" y2="20" stroke="#C4B320" stroke-width="0.5" opacity="0.6"/><circle cx="35" cy="23.5" r="1" fill="#C4B320" opacity="0.7"/><line x1="21" y1="66.5" x2="15" y2="74" stroke="#7AAD3A" stroke-width="0.5" opacity="0.6"/><circle cx="21" cy="66.5" r="1" fill="#7AAD3A" opacity="0.7"/><line x1="75" y1="37" x2="81" y2="28" stroke="#D4796E" stroke-width="0.5" opacity="0.6"/><circle cx="75" cy="37" r="1" fill="#D4796E" opacity="0.7"/><line x1="66" y1="78" x2="74" y2="82" stroke="#4DBAB4" stroke-width="0.5" opacity="0.6"/><circle cx="66" cy="78" r="1" fill="#4DBAB4" opacity="0.7"/></svg>
+    <div class="ca">
+      <div class="ci" style="background:#F5E642; left:50%; top:25%;"></div>
+      <div class="ci" style="background:#A8DB5A; left:25%; top:55%;"></div>
+      <div class="ci" style="background:#F4A79D; left:75%; top:55%;"></div>
+      <div class="ci" style="background:#6DD5D0; left:50%; top:80%;"></div>
+      <div class="cc"></div>
+      <div class="cl"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <div class="lb" style="top:16%; left:6%;">What you love</div>
+    <div class="lb" style="bottom:16%; left:6%;">What you're<br>good at</div>
+    <div class="lb" style="top:16%; right:6%; text-align:right;">What the world<br>needs</div>
+    <div class="lb" style="bottom:16%; right:6%; text-align:right;">What you can<br>be paid for</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

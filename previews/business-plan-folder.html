@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elsa's Art Studio — Business Plan</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,600,500,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0D9488;
+    --primary-light: #14B8A6;
+    --primary-dark: #0F766E;
+    --accent: #F59E0B;
+    --accent-light: #FBBF24;
+
+    --manila: #D4B896;
+    --manila-dark: #C4A67A;
+    --manila-shadow: #B8956A;
+    --manila-light: #E8D5B8;
+    --manila-tab: #CAAD88;
+    --paper: #FFFEF9;
+    --paper-line: #E8E4DA;
+
+    --text-primary: #1C1917;
+    --text-secondary: #57534E;
+    --text-muted: #A8A29E;
+    --text-folder: #6B5B3E;
+    --border: #E7E5E4;
+
+    --font-display: 'Satoshi', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    --love: #F5E642;
+    --good-at: #A8DB5A;
+    --needs: #F4A79D;
+    --paid: #6DD5D0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: #E8E0D4;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══ THE FOLDER ═══ */
+
+  .folder-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* Tab */
+  .folder-tab {
+    position: relative;
+    width: 200px;
+    height: 32px;
+    margin-left: 40px;
+    background: var(--manila-tab);
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-folder);
+    letter-spacing: 0.03em;
+    z-index: 2;
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+  }
+
+  /* Folder body */
+  .folder {
+    position: relative;
+    background: var(--manila);
+    border-radius: 4px 12px 12px 12px;
+    min-height: 700px;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.06),
+      0 8px 24px rgba(0,0,0,0.1),
+      inset 0 1px 0 var(--manila-light);
+    overflow: hidden;
+  }
+
+  /* Subtle folder texture */
+  .folder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.008) 3px,
+        rgba(0,0,0,0.008) 4px
+      );
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Crease line on left */
+  .folder::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--manila-shadow) 10%,
+      var(--manila-shadow) 90%,
+      transparent 100%
+    );
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* ═══ COVER PAGE ═══ */
+
+  .cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .cover.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+  }
+
+  .cover-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-folder);
+    opacity: 0.6;
+  }
+  .cover-name {
+    margin-top: 24px;
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-folder);
+    text-align: center;
+    line-height: 1.15;
+  }
+  .cover-business {
+    margin-top: 8px;
+    font-size: 16px;
+    color: var(--text-folder);
+    opacity: 0.7;
+  }
+  .cover-date {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-folder);
+    opacity: 0.45;
+  }
+
+  /* Ikigai circles — pure CSS */
+  .ikigai-cover {
+    margin-top: 60px;
+    position: relative;
+    width: 180px;
+    height: 180px;
+  }
+  .ikigai-circle {
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    opacity: 0.35;
+  }
+  .ikigai-circle.love     { background: var(--love);    top: 0;    left: 50%; transform: translateX(-50%); }
+  .ikigai-circle.good-at  { background: var(--good-at); top: 35px; left: 0; }
+  .ikigai-circle.needs    { background: var(--needs);   top: 35px; right: 0; }
+  .ikigai-circle.paid     { background: var(--paid);    bottom: 0; left: 50%; transform: translateX(-50%); }
+
+  .cover-open-hint {
+    margin-top: 48px;
+    font-size: 12px;
+    color: var(--text-folder);
+    opacity: 0.4;
+    letter-spacing: 0.04em;
+  }
+
+  /* ═══ PAGES ═══ */
+
+  .pages {
+    position: relative;
+    min-height: 700px;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.2s;
+  }
+  .pages.visible { opacity: 1; }
+
+  .page {
+    display: none;
+    padding: 40px 36px 80px;
+    background: var(--paper);
+    min-height: 660px;
+    position: relative;
+    border-radius: 2px;
+    margin: 20px;
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      1px 0 0 var(--paper-line),
+      2px 0 0 #F5F0E8,
+      3px 0 0 var(--paper-line),
+      4px 0 0 #F0EBE2;
+    animation: pageIn 0.35s ease;
+  }
+  .page.active { display: block; }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Paper ruled lines (subtle) */
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 27px,
+      var(--paper-line) 27px,
+      var(--paper-line) 28px
+    );
+    opacity: 0.3;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Red margin line */
+  .page::after {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #E8B4B4;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  /* Page content sits above the lines */
+  .page > * { position: relative; z-index: 1; }
+
+  .page-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    line-height: 1.25;
+  }
+
+  /* Page navigation */
+  .page-nav {
+    position: absolute;
+    bottom: 20px;
+    left: 36px;
+    right: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 5;
+  }
+  .page-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .page-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .page-btn.hidden { visibility: hidden; }
+  .page-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .page-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .page-dot.active {
+    background: var(--primary);
+    transform: scale(1.3);
+  }
+
+  /* ═══ CONTENT STYLES ═══ */
+
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+  .field-value {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .decision {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--paper-line);
+  }
+  .decision:last-child { border-bottom: none; }
+  .decision-lesson {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .decision-text {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.55;
+  }
+
+  /* Ikigai grid on page */
+  .ikigai-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .ikigai-cell {
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .ikigai-cell-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.65;
+    margin-bottom: 4px;
+  }
+  .ikigai-cell-content {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #1C1917;
+  }
+  .ikigai-love { background: var(--love); }
+  .ikigai-good { background: var(--good-at); }
+  .ikigai-needs { background: var(--needs); }
+  .ikigai-paid { background: var(--paid); }
+
+  /* Pitch */
+  .pitch-card {
+    border: 1px solid rgba(245,158,11,0.2);
+    background: rgba(245,158,11,0.04);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 8px;
+  }
+  .pitch-text {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.65;
+    font-style: italic;
+  }
+  .pitch-attribution {
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* Badges */
+  .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-secondary);
+  }
+  .badge.gold { background: #FEF3C7; border-color: #FDE68A; color: #92400E; }
+  .badge.silver { background: #F1F5F9; border-color: #CBD5E1; color: #475569; }
+  .badge.bronze { background: #FFF7ED; border-color: #FED7AA; color: #9A3412; }
+
+  /* Pill */
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(13,148,136,0.08);
+    color: var(--primary);
+  }
+
+  /* Timeline tasks */
+  .timeline-week { margin-bottom: 16px; }
+  .timeline-week-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .timeline-week-title .wk {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .timeline-progress-sm {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--paper-line);
+    cursor: pointer;
+  }
+  .task:last-child { border-bottom: none; }
+  .task input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    border: 2px solid #D6D3D1;
+    border-radius: 4px;
+    margin-top: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: white;
+  }
+  .task input[type="checkbox"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: '\\2713';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .task-text {
+    font-size: 12px;
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+  .task input[type="checkbox"]:checked ~ .task-text {
+    text-decoration: line-through;
+    opacity: 0.4;
+  }
+  .overall-bar {
+    margin-top: 12px;
+    height: 5px;
+    background: var(--paper-line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .overall-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 999px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  .overall-bar-text {
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* Founder's log */
+  .log-entry {
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 16px;
+    background: var(--paper);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="folder-wrapper">
+  <div class="folder-tab">Elsa's Art Studio</div>
+  <div class="folder">
+
+    <!-- ═══ COVER ═══ -->
+    <div class="cover" id="cover" onclick="openFolder()">
+      <div class="cover-label">Business Plan</div>
+      <div class="cover-name">Elsa Martinez</div>
+      <div class="cover-business">Elsa's Art Studio</div>
+      <div class="cover-date">Created April 2026</div>
+      <div class="ikigai-cover">
+        <div class="ikigai-circle love"></div>
+        <div class="ikigai-circle good-at"></div>
+        <div class="ikigai-circle needs"></div>
+        <div class="ikigai-circle paid"></div>
+      </div>
+      <div class="cover-open-hint">click to open</div>
+    </div>
+
+    <!-- ═══ PAGES ═══ -->
+    <div class="pages" id="pages">
+
+      <!-- Page 1: Vision & Ikigai -->
+      <div class="page active" data-page="0">
+        <div class="page-label">Page 1 of 8</div>
+        <div class="page-title">Vision</div>
+        <div class="ikigai-grid">
+          <div class="ikigai-cell ikigai-love"><div class="ikigai-cell-label">What I Love</div><div class="ikigai-cell-content">Drawing, painting, pet portraits, watercolors</div></div>
+          <div class="ikigai-cell ikigai-good"><div class="ikigai-cell-label">What I'm Good At</div><div class="ikigai-cell-content">Capturing likeness, color mixing, photo references</div></div>
+          <div class="ikigai-cell ikigai-needs"><div class="ikigai-cell-label">What People Need</div><div class="ikigai-cell-content">Affordable custom pet portraits, personal gifts</div></div>
+          <div class="ikigai-cell ikigai-paid"><div class="ikigai-cell-label">How I Get Paid</div><div class="ikigai-cell-content">Per-portrait pricing, $15-35 by size</div></div>
+        </div>
+        <div class="field">
+          <div class="field-label">What We Do</div>
+          <div class="field-value">Custom watercolor pet portraits for classmates and their families &mdash; hand-painted from photos, delivered framed or unframed</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Why This Matters to Me</div>
+          <div class="field-value">I've been drawing animals since I was 8 and people always say my portraits "look alive." Every portrait I paint is a gift someone gives to a person who loves their pet.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">The Golden Circle</div>
+          <div class="field-value"><strong>WHY:</strong> Every pet owner wants to freeze a moment with their best friend. <strong>HOW:</strong> Hand-painted from the owner's favorite photo. <strong>WHAT:</strong> Custom watercolor pet portraits.</div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn hidden">&larr; Back</button>
+          <div class="page-dots" id="dots"></div>
+          <button class="page-btn" onclick="goPage(1)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 2: Customer -->
+      <div class="page" data-page="1">
+        <div class="page-label">Page 2 of 8</div>
+        <div class="page-title">Customer</div>
+        <div class="field">
+          <div class="field-label">Target Customer</div>
+          <div class="field-value">Girls at school whose families have pets &mdash; especially around Christmas, Mother's Day, and pet birthdays. The buyer is usually a parent paying for a gift, or a student buying for their own room.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Customer Profile</div>
+          <div class="field-value"><strong>Sarah, 15.</strong> Has a golden retriever named Biscuit that she posts on Instagram constantly. Her mom's birthday is next month and she wants something personal but can't afford a $200 Etsy commission.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Revenue Model</div>
+          <div class="field-value">$15 for a 5&times;7 pencil sketch, $25 for an 8&times;10 watercolor, $35 for 11&times;14 with background detail. Payment via Venmo or cash. Takes 3-5 days per portrait.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Interview Insights</div>
+          <div class="field-value"><span class="pill">4 interviews completed</span><br style="margin-bottom: 6px">People don't just want a picture of their pet &mdash; they want the PERSONALITY captured. "Make him look goofy, that's how he really is."</div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(0)">&larr; Back</button>
+          <div class="page-dots" id="dots1"></div>
+          <button class="page-btn" onclick="goPage(2)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 3: Competition -->
+      <div class="page" data-page="2">
+        <div class="page-label">Page 3 of 8</div>
+        <div class="page-title">Competition &amp; Differentiation</div>
+        <div class="decision">
+          <div class="decision-lesson">Research Your Competition</div>
+          <div class="decision-text">My main competitors are Etsy portrait artists ($60-200, 2-4 week wait) and phone filter apps (free but generic). My edge: I'm local, fast (3-5 days), cheap ($15-35), and I know the pets personally.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-lesson">Define Your Target Customer</div>
+          <div class="decision-text">I'm not competing with professional artists. I'm competing with the "I'll just print a photo at Walgreens" default. My customer wants something more personal than a photo but can't justify $100+.</div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(1)">&larr; Back</button>
+          <div class="page-dots" id="dots2"></div>
+          <button class="page-btn" onclick="goPage(3)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 4: Brand -->
+      <div class="page" data-page="3">
+        <div class="page-label">Page 4 of 8</div>
+        <div class="page-title">Brand</div>
+        <div class="field">
+          <div class="field-label">Brand Voice</div>
+          <div class="field-value"><strong>Gut-feeling words:</strong> warm, personal, handmade, joyful, real<br><strong>Not:</strong> corporate, mass-produced, sterile, generic, "luxury"</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Business Name</div>
+          <div class="field-value">Elsa's Art Studio &mdash; tested with 5 friends. Chose the personal name because customers are buying from ME, not a brand.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Visual Identity</div>
+          <div class="field-value"><strong>Color:</strong> Warm cream (#FFF8F0)<br><strong>Font:</strong> Hand-written category<br><strong>First impression:</strong> "Made by a real person who cares about your pet."</div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(2)">&larr; Back</button>
+          <div class="page-dots" id="dots3"></div>
+          <button class="page-btn" onclick="goPage(4)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 5: Marketing -->
+      <div class="page" data-page="4">
+        <div class="page-label">Page 5 of 8</div>
+        <div class="page-title">Marketing &amp; Sales</div>
+        <div class="decision">
+          <div class="decision-lesson">Zero-Budget Marketing</div>
+          <div class="decision-text">Three channels: Instagram process videos, school art hallway with QR code, word of mouth. First action: DM 5 classmates with pet Instagrams this week.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-lesson">Social Media</div>
+          <div class="decision-text">1-1-1 rule: one process timelapse, one customer reaction, one behind-the-scenes. Post 3x/week.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-lesson">Word of Mouth</div>
+          <div class="decision-text">Remarkable moment: tiny bonus sketch on the back. Referral script: "I painted Sarah's dog &mdash; want me to do yours?" 5 people to tell this week.</div>
+        </div>
+        <div style="margin-top: 16px;">
+          <div class="pitch-card">
+            <div class="pitch-text">"You know how everyone has a million photos of their pet but nothing on their wall? I paint custom watercolors from your favorite photo &mdash; $25, less than a week."</div>
+            <div class="pitch-attribution">&mdash; Elsa Martinez, Founder</div>
+          </div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(3)">&larr; Back</button>
+          <div class="page-dots" id="dots4"></div>
+          <button class="page-btn" onclick="goPage(5)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 6: Numbers -->
+      <div class="page" data-page="5">
+        <div class="page-label">Page 6 of 8</div>
+        <div class="page-title">The Numbers</div>
+        <div class="field">
+          <div class="field-label">Cost Per Portrait (8&times;10 watercolor)</div>
+          <div class="field-value">Paper: $2 &middot; Paints: $1 &middot; Frame: $4 &middot; Time: ~2 hours<br><strong>Total cost: $7</strong> &rarr; At $25 price = <strong>$18 profit</strong></div>
+        </div>
+        <div class="field">
+          <div class="field-label">Pricing Rationale</div>
+          <div class="field-value">Etsy portraits start at $60. Framing alone costs $15. At $25, I'm the only option between "free phone photo" and "$60+ art."</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Tracking System</div>
+          <div class="field-value">Google Sheet: Date | In | Out | What For<br>Weekly review: Sundays 7pm<br>Two questions: Am I making more than I spend? Biggest cost I could cut?</div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(4)">&larr; Back</button>
+          <div class="page-dots" id="dots5"></div>
+          <button class="page-btn" onclick="goPage(6)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 7: Launch -->
+      <div class="page" data-page="6">
+        <div class="page-label">Page 7 of 8</div>
+        <div class="page-title">Launch &amp; First Sale</div>
+        <div class="decision">
+          <div class="decision-lesson">MVP</div>
+          <div class="decision-text">One 5&times;7 pencil sketch of Biscuit. Not watercolor, not framed. Perfectionism traps I'm ignoring: "I need a website," "I should practice more breeds." Delivering Thursday.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-lesson">First Customer Protocol</div>
+          <div class="decision-text">Confirmation DM within 1 hour. Risk plan: likeness off &rarr; show WIP; doesn't like it &rarr; free redo. Remarkable moment: bonus sunglasses sketch on the back.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-lesson">Feedback</div>
+          <div class="decision-text">Two questions: "Walk me through showing it to your mom" + "One thing you'd change?" Pre-committed: if "too slow" &rarr; offer $5 rush option.</div>
+        </div>
+        <div class="decision">
+          <div class="decision-lesson">After the Sale</div>
+          <div class="decision-text">Post the portrait on Instagram. DM three people who liked it. Next targets: Diego (cat), Mrs. Chen (puppy), art teacher (2 rescues). Wisdom: "The hardest part was the first DM."</div>
+        </div>
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(5)">&larr; Back</button>
+          <div class="page-dots" id="dots6"></div>
+          <button class="page-btn" onclick="goPage(7)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Page 8: 4-Week Timeline -->
+      <div class="page" data-page="7">
+        <div class="page-label">Page 8 of 8</div>
+        <div class="page-title">4-Week Launch Plan</div>
+
+        <div class="timeline-week">
+          <div class="timeline-week-title"><span><span class="wk">Week 1 &mdash;</span> Ship to One Person</span><span class="timeline-progress-sm" id="tw1">0/4</span></div>
+          <label class="task" data-tw="1"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Paint &amp; deliver the MVP sketch of Biscuit to Sarah</span></label>
+          <label class="task" data-tw="1"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Send confirmation DM, deliver, include surprise sketch</span></label>
+          <label class="task" data-tw="1"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Ask Sarah the 2 feedback questions</span></label>
+          <label class="task" data-tw="1"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Post the finished portrait on Instagram</span></label>
+        </div>
+
+        <div class="timeline-week">
+          <div class="timeline-week-title"><span><span class="wk">Week 2 &mdash;</span> Get #2 and #3</span><span class="timeline-progress-sm" id="tw2">0/4</span></div>
+          <label class="task" data-tw="2"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">DM Diego, Mrs. Chen, and art teacher with referral script</span></label>
+          <label class="task" data-tw="2"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Set up Google Sheet tracker, log Sarah as row #1</span></label>
+          <label class="task" data-tw="2"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Post first process timelapse on Instagram</span></label>
+          <label class="task" data-tw="2"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Deliver portrait #2, apply feedback from Sarah</span></label>
+        </div>
+
+        <div class="timeline-week">
+          <div class="timeline-week-title"><span><span class="wk">Week 3 &mdash;</span> Build the System</span><span class="timeline-progress-sm" id="tw3">0/4</span></div>
+          <label class="task" data-tw="3"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Display sample portrait in school art hallway + QR code</span></label>
+          <label class="task" data-tw="3"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Post customer reaction story (1-1-1 rule)</span></label>
+          <label class="task" data-tw="3"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Sunday 7pm: first weekly financial review</span></label>
+          <label class="task" data-tw="3"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Deliver portrait #3 &mdash; you now have 3 customers</span></label>
+        </div>
+
+        <div class="timeline-week">
+          <div class="timeline-week-title"><span><span class="wk">Week 4 &mdash;</span> Decide What's Next</span><span class="timeline-progress-sm" id="tw4">0/4</span></div>
+          <label class="task" data-tw="4"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Review all 3 customers' feedback &mdash; what pattern do you see?</span></label>
+          <label class="task" data-tw="4"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Decide: should you raise your price? You have data now.</span></label>
+          <label class="task" data-tw="4"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Financial review #2: total revenue, costs, profit</span></label>
+          <label class="task" data-tw="4"><input type="checkbox" onchange="updateTimeline()"><span class="task-text">Set your next 30-day goal. Write it down.</span></label>
+        </div>
+
+        <div class="overall-bar"><div class="overall-bar-fill" id="tl-fill"></div></div>
+        <div class="overall-bar-text"><span id="tl-count">0</span>/16 tasks</div>
+
+        <div class="page-nav">
+          <button class="page-btn" onclick="goPage(6)">&larr; Back</button>
+          <div class="page-dots" id="dots7"></div>
+          <button class="page-btn" onclick="closeFolder()">Close folder</button>
+        </div>
+      </div>
+
+    </div><!-- /pages -->
+  </div><!-- /folder -->
+</div>
+
+<script>
+const TOTAL_PAGES = 8;
+let currentPage = 0;
+
+function openFolder() {
+  document.getElementById('cover').classList.add('hidden');
+  document.getElementById('pages').classList.add('visible');
+  goPage(0);
+}
+
+function closeFolder() {
+  document.getElementById('pages').classList.remove('visible');
+  document.getElementById('cover').classList.remove('hidden');
+}
+
+function goPage(n) {
+  currentPage = n;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.querySelector(`.page[data-page="${n}"]`);
+  if (target) target.classList.add('active');
+  renderDots();
+}
+
+function renderDots() {
+  document.querySelectorAll('.page-dots').forEach(container => {
+    container.innerHTML = '';
+    for (let i = 0; i < TOTAL_PAGES; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'page-dot' + (i === currentPage ? ' active' : '');
+      dot.onclick = () => goPage(i);
+      container.appendChild(dot);
+    }
+  });
+}
+
+function updateTimeline() {
+  let total = 0, checked = 0;
+  for (let w = 1; w <= 4; w++) {
+    const tasks = document.querySelectorAll(`.task[data-tw="${w}"] input`);
+    let wc = 0;
+    tasks.forEach(t => { if (t.checked) wc++; });
+    document.getElementById(`tw${w}`).textContent = `${wc}/${tasks.length}`;
+    if (wc === tasks.length) document.getElementById(`tw${w}`).style.color = 'var(--primary)';
+    else document.getElementById(`tw${w}`).style.color = 'var(--text-muted)';
+    total += tasks.length;
+    checked += wc;
+  }
+  document.getElementById('tl-count').textContent = checked;
+  document.getElementById('tl-fill').style.width = `${(checked/total)*100}%`;
+}
+
+renderDots();
+</script>
+</body>
+</html>

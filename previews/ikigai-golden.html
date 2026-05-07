@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai — Golden Ratio Construction</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Satoshi', sans-serif;
+    background: #F9FAFB;
+    color: #111827;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px;
+  }
+  .meta {
+    max-width: 560px;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .meta h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .meta p { font-size: 12px; color: #9CA3AF; line-height: 1.5; }
+  .card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 32px;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════
+   * IKIGAI DIAGRAM — GOLDEN RATIO CONSTRUCTION
+   * ═══════════════════════════════════════════════════════════════════
+   *
+   * All coordinates in a 100 x 100 unit space.
+   *
+   * φ = 1.618034
+   * 1/φ = 0.618034
+   * 1/φ² = 0.381966
+   *
+   * ── CLUSTER ──
+   *   Cluster diameter = 100/φ = 61.803
+   *   Inset from edge  = (100 − 61.803)/2 = 19.099
+   *   Center           = (50, 50)
+   *   Cluster radius   = 30.901
+   *
+   * ── MAIN CIRCLES ──
+   *   Center offset    = cluster_radius / φ = 30.901 / 1.618 = 19.099
+   *     Top    (Love):     (50.000, 30.901)
+   *     Left   (Good At):  (30.901, 50.000)
+   *     Right  (Needs):    (69.099, 50.000)
+   *     Bottom (Paid For): (50.000, 69.099)
+   *
+   *   Circle radius R  = 20.000 (chosen so circles span the cluster)
+   *     Adjacent distance = √(19.099² + 19.099²) = 27.012
+   *     Adjacent overlap  = 2×20 − 27.012 = 12.988 (32.5%)
+   *     Opposite distance = 2 × 19.099 = 38.198
+   *     Opposite overlap  = 2×20 − 38.198 = 1.802 (4.5%)
+   *
+   * ── CENTER CIRCLE ──
+   *   Radius = R / φ² = 20 / 2.618 = 7.640
+   *
+   * ── LABELS (square corners, equidistant from center) ──
+   *   Each label's visual center is at distance D from (50, 50):
+   *     D = √((50−14)² + (50−16.5)²) = √(1296 + 1122.25) = 49.18
+   *   All four corners are symmetric → exactly equidistant.
+   *
+   *   Single-line labels receive 1px upward optical compensation
+   *   to match the visual weight of 2-line labels.
+   *
+   * ── CALLOUT DOTS (on circle edge) ──
+   *   dot = circleCenter + R × normalize(labelCenter − circleCenter)
+   *   Computed per-label below.
+   *
+   * ── CALLOUT LINE ENDPOINTS ──
+   *   Each line ends at a consistent ~3-unit gap from the label's
+   *   nearest edge, walking back along the direction vector.
+   *   The LINE LENGTHS (dot to endpoint) are:
+   *     TL: 18.8 units  (diagonal)
+   *     BL: 16.2 units  (side)
+   *     TR: 16.2 units  (side)
+   *     BR: 18.8 units  (diagonal)
+   *   Endpoints placed so visible gap from line tip to nearest
+   *   label text-box edge is a consistent 3 units.
+   * ═══════════════════════════════════════════════════════════════════
+   */
+
+  .w {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+
+  /* SVG layer — circles, lines, dots */
+  .sv {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Center circle — HTML overlay for the gradient + glow */
+  .center-circle {
+    position: absolute;
+    border-radius: 50%;
+    /* Diameter = 2 × 7.64 = 15.28% */
+    width: 15.28%;
+    height: 15.28%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, #4A6741 40%, #8B9E6A 100%);
+    box-shadow: 0 0 20px rgba(74, 103, 65, 0.3);
+    z-index: 5;
+  }
+
+  /* Center label */
+  .center-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    text-align: center;
+    pointer-events: none;
+  }
+  .center-label span {
+    display: block;
+    font-size: 9.5px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.15em;
+    line-height: 1.3;
+  }
+
+  /* Corner labels — HTML divs for reliable Satoshi rendering */
+  .lb {
+    position: absolute;
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.25;
+    z-index: 10;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="meta">
+  <h1>Ikigai — Golden Ratio Construction</h1>
+  <p>
+    Every proportion derived from φ = 1.618034.
+    Circle cluster = 100/φ = 61.8% of container.
+    Circle offset = cluster radius / φ = 19.1.
+    Center circle = main radius / φ² = 7.64.
+    Labels equidistant from center at 49.18 units.
+    Dots computed on circle edges via normalized direction vectors.
+  </p>
+</div>
+
+<div class="card">
+  <div class="w">
+
+    <!--
+      ════════════════════════════════════════════
+      SVG LAYER: Circles, callout lines, callout dots
+      ════════════════════════════════════════════
+    -->
+    <svg class="sv" viewBox="0 0 100 100">
+
+      <!-- ── FOUR MAIN CIRCLES ── -->
+      <!-- Each: R=20, opacity 0.55, centers at golden-ratio offsets -->
+
+      <!-- Love (top) — Yellow — (50, 30.901) -->
+      <circle cx="50" cy="30.901" r="20" fill="#F5E642" opacity="0.55"/>
+
+      <!-- Good At (left) — Green — (30.901, 50) -->
+      <circle cx="30.901" cy="50" r="20" fill="#A8DB5A" opacity="0.55"/>
+
+      <!-- Needs (right) — Salmon — (69.099, 50) -->
+      <circle cx="69.099" cy="50" r="20" fill="#F4A79D" opacity="0.55"/>
+
+      <!-- Paid For (bottom) — Teal — (50, 69.099) -->
+      <circle cx="50" cy="69.099" r="20" fill="#6DD5D0" opacity="0.55"/>
+
+      <!--
+        ════════════════════════════════════════════
+        CALLOUT LINES + DOTS
+        ════════════════════════════════════════════
+
+        For each label, the dot sits on the associated circle's edge
+        at the point nearest the label. The math:
+
+        ── TOP-LEFT: "What you love" ← Yellow (50, 30.901) ──
+          Label anchor: top-left corner, ~(5, 14.5)
+          Label visual center ≈ (14, 15.5) [single line, 17px ≈ 3.5% height, ~18% width]
+          dir = (14−50, 15.5−30.901) = (−36, −15.401)
+          |dir| = √(1296 + 237.19) = √1533.19 = 39.156
+          norm = (−0.9195, −0.3933)
+          dot = (50 + 20×−0.9195, 30.901 + 20×−0.3933)
+              = (31.610, 23.035)
+          line end ≈ (18, 17.2)  [~3 units from label right edge]
+
+        ── BOTTOM-LEFT: "What you're good at" ← Green (30.901, 50) ──
+          Label anchor: bottom-left, ~(5, 80)
+          Label visual center ≈ (13, 82.5) [2 lines, center between y=80 and y=85]
+          dir = (13−30.901, 82.5−50) = (−17.901, 32.5)
+          |dir| = √(320.45 + 1056.25) = √1376.70 = 37.105
+          norm = (−0.4824, 0.8760)
+          dot = (30.901 + 20×−0.4824, 50 + 20×0.8760)
+              = (21.253, 67.520)
+          line end ≈ (15.5, 78)  [~3 units above label top edge]
+
+        ── TOP-RIGHT: "What the world needs" ← Salmon (69.099, 50) ──
+          Label anchor: top-right, ~(95, 14.5)
+          Label visual center ≈ (87, 17) [2 lines, center between y=14.5 and y=19.5]
+          dir = (87−69.099, 17−50) = (17.901, −33)
+          |dir| = √(320.45 + 1089) = √1409.45 = 37.543
+          norm = (0.4768, −0.8791)
+          dot = (69.099 + 20×0.4768, 50 + 20×−0.8791)
+              = (78.635, 32.418)
+          line end ≈ (84.5, 21.2)  [~3 units below label bottom edge]
+
+        ── BOTTOM-RIGHT: "What you can be paid for" ← Teal (50, 69.099) ──
+          Label anchor: bottom-right, ~(95, 80)
+          Label visual center ≈ (86, 82.5) [2 lines]
+          dir = (86−50, 82.5−69.099) = (36, 13.401)
+          |dir| = √(1296 + 179.59) = √1475.59 = 38.414
+          norm = (0.9371, 0.3489)
+          dot = (50 + 20×0.9371, 69.099 + 20×0.3489)
+              = (68.742, 76.077)
+          line end ≈ (82, 81)  [~3 units from label left edge]
+      -->
+
+      <!-- Top-left callout — yellow/gold
+           Recomputed for label at top:16.5%.
+           Label visual center ≈ (14, 17.5)
+           dir = (14−50, 17.5−30.901) = (−36, −13.401)
+           |dir| = √(1296 + 179.59) = 38.414
+           norm = (−0.9371, −0.3489)
+           dot = (31.258, 23.923)
+           line end ≈ (29, 23) — 3 units from text box corner -->
+      <line x1="31.26" y1="23.92" x2="26" y2="22"
+            stroke="#C4B320" stroke-width="0.5" opacity="0.55"/>
+      <circle cx="31.26" cy="23.92" r="1.05" fill="#C4B320" opacity="0.7"/>
+
+      <!-- Bottom-left callout — green -->
+      <line x1="21.25" y1="67.52" x2="17.7" y2="73.9"
+            stroke="#7AAD3A" stroke-width="0.5" opacity="0.55"/>
+      <circle cx="21.25" cy="67.52" r="1.05" fill="#7AAD3A" opacity="0.7"/>
+
+      <!-- Top-right callout — salmon/rose -->
+      <line x1="78.64" y1="32.42" x2="82.1" y2="26.1"
+            stroke="#D4796E" stroke-width="0.5" opacity="0.55"/>
+      <circle cx="78.64" cy="32.42" r="1.05" fill="#D4796E" opacity="0.7"/>
+
+      <!-- Bottom-right callout — teal -->
+      <line x1="68.74" y1="76.08" x2="72" y2="77.3"
+            stroke="#4DBAB4" stroke-width="0.5" opacity="0.55"/>
+      <circle cx="68.74" cy="76.08" r="1.05" fill="#4DBAB4" opacity="0.7"/>
+
+    </svg>
+
+    <!--
+      ════════════════════════════════════════════
+      HTML LAYER: Center circle, center label, corner labels
+      ════════════════════════════════════════════
+      Using HTML divs guarantees Satoshi font rendering.
+    -->
+
+    <!-- Center circle (gradient + glow) -->
+    <div class="center-circle"></div>
+
+    <!-- Center label -->
+    <div class="center-label">
+      <span>YOUR</span>
+      <span>BUSINESS</span>
+    </div>
+
+    <!--
+      ════════════════════════════════════════════
+      CORNER LABELS — Square Arrangement
+      ════════════════════════════════════════════
+
+      Positions computed so each label's visual center
+      is equidistant from the diagram center (50, 50).
+
+      Visual center distance = √(36² + 33.5²) ≈ 49.18 for all four.
+
+      The labels form an invisible rectangle whose aspect ratio
+      is 72:67 ≈ 1.075:1 — nearly square with slight horizontal
+      stretch that compensates for text being wider than tall.
+    -->
+
+    <!--
+      Label positioning rationale:
+
+      2-line labels anchored at top:14.5% have their visual center at:
+        14.5% + (17px × 1.25 line-height × 2 lines) / 2 ≈ 14.5% + ~4.4% ≈ 18.9%
+
+      Single-line "What you love" anchored at top:16.5% has visual center at:
+        16.5% + (17px × 1.25) / 2 ≈ 16.5% + ~2.2% ≈ 18.7%
+
+      This makes all four labels' visual centers land at the same
+      ~18.7-18.9% inset from their respective edges — equidistant from center.
+
+      Horizontal: 5% inset from edges. Labels extend ~18-24% inward.
+      Label visual centers are all ~49 units from (50, 50).
+    -->
+
+    <!-- Top-left: "What you love" (single line)
+         Shifted down 2% vs 2-line labels to compensate for less text mass.
+         Visual center aligns with the 2-line labels' visual centers. -->
+    <div class="lb" style="top: 16.5%; left: 5%;">What you love</div>
+
+    <!-- Bottom-left: "What you're good at" (2 lines) -->
+    <div class="lb" style="bottom: 14.5%; left: 5%;">What you're<br>good at</div>
+
+    <!-- Top-right: "What the world needs" (2 lines, right-aligned) -->
+    <div class="lb" style="top: 14.5%; right: 5%; text-align: right;">What the world<br>needs</div>
+
+    <!-- Bottom-right: "What you can be paid for" (2 lines, right-aligned) -->
+    <div class="lb" style="bottom: 14.5%; right: 5%; text-align: right;">What you can<br>be paid for</div>
+
+  </div>
+</div>
+
+</body>
+</html>

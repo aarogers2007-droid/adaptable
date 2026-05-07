@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptable — Ikigai Rebloom · Concept A · Constellation</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * ADAPTABLE — IKIGAI REBLOOM · CONCEPT A · CONSTELLATION
+   * ═══════════════════════════════════════════════════════════
+   *
+   * "Your future was already written in the stars of who you are."
+   *
+   * Four ikigai stars emerge from a deep starfield. Thin lines
+   * of light draw between them, forming a four-pointed asterism.
+   * The constellation breathes. Then it collapses inward — the
+   * stars and their lines pull toward a single point as if a
+   * black hole is forming. Light rushes in. The business name
+   * is born in a sage-glow pulse.
+   *
+   * Golden Ratio (φ = 1.618034) governs all timing:
+   *   base 1000ms
+   *   φ intervals:   1000, 1618, 2618, 4236, 6854ms
+   *   1/φ intervals: 618, 382, 236ms
+   *
+   * Easings (sacred):
+   *   birth:    cubic-bezier(0.16, 1, 0.3, 1)
+   *   collapse: cubic-bezier(0.55, 0, 0.2, 1)
+   *   steady:   cubic-bezier(0.33, 0, 0.67, 1)
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Satoshi', sans-serif;
+  }
+
+  /* ───────────────────────────────────────────────
+     CONCEPT LABEL — top-left, tiny, tracking wide
+     ─────────────────────────────────────────────── */
+  .concept-label {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 100;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.32);
+  }
+
+  /* ───────────────────────────────────────────────
+     REPLAY BUTTON — bottom-right, barely there
+     ─────────────────────────────────────────────── */
+  .replay {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100;
+    font-family: 'Satoshi', sans-serif;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.32);
+    padding: 11px 24px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.618s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .replay:hover {
+    border-color: rgba(255, 255, 255, 0.32);
+    color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 40px rgba(139, 158, 106, 0.18);
+  }
+
+  /* ───────────────────────────────────────────────
+     STAGE
+     ─────────────────────────────────────────────── */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+
+  /* Deep starfield — faint drifting points of light.
+     These are the "background stars" — the universe. */
+  .starfield {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .bg-star {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: rgba(200, 215, 240, 0.55);
+    border-radius: 50%;
+    opacity: 0;
+    animation: bg-twinkle var(--tw-dur, 6.854s) ease-in-out infinite;
+    animation-delay: var(--tw-delay, 0s);
+  }
+  .bg-star.bright {
+    width: 2px;
+    height: 2px;
+    background: rgba(220, 230, 255, 0.75);
+    box-shadow: 0 0 3px rgba(200, 215, 240, 0.5);
+  }
+  @keyframes bg-twinkle {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.618; }
+  }
+
+  /* Body collapses the starfield inward during the black-hole rush */
+  body.collapsing .starfield {
+    animation: starfield-pull 2.618s cubic-bezier(0.55, 0, 0.2, 1) forwards;
+  }
+  @keyframes starfield-pull {
+    0%   { transform: scale(1); opacity: 1; }
+    60%  { transform: scale(0.618); opacity: 0.618; }
+    100% { transform: scale(0.236); opacity: 0; }
+  }
+
+  /* Ambient deep-space glow behind the constellation */
+  .ambient {
+    position: absolute;
+    width: 76.4vh;
+    height: 76.4vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: radial-gradient(circle,
+      rgba(25, 50, 82, 0.12) 0%,
+      rgba(25, 50, 82, 0.04) 38.2%,
+      transparent 68%);
+    opacity: 0;
+    transition: opacity 2.618s cubic-bezier(0.33, 0, 0.67, 1),
+                transform 4.236s cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  body.run .ambient {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  body.collapsing .ambient {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.236);
+    transition: opacity 1.618s cubic-bezier(0.55, 0, 0.2, 1),
+                transform 2.618s cubic-bezier(0.55, 0, 0.2, 1);
+  }
+
+  /* ───────────────────────────────────────────────
+     CONSTELLATION WRAPPER
+     SVG draws the connecting lines; stars are
+     positioned absolutely on top for max glow.
+     ─────────────────────────────────────────────── */
+  .constellation {
+    position: relative;
+    width: min(520px, 68vh);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+    transition: transform 2.618s cubic-bezier(0.55, 0, 0.2, 1),
+                filter 2.618s cubic-bezier(0.55, 0, 0.2, 1);
+  }
+  body.breathing .constellation {
+    animation: const-breathe 4.236s cubic-bezier(0.33, 0, 0.67, 1) infinite;
+  }
+  @keyframes const-breathe {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50%      { transform: scale(1.034); filter: brightness(1.118); }
+  }
+  body.collapsing .constellation {
+    animation: none;
+    transform: scale(0.08);
+    filter: brightness(2.2) blur(2px);
+  }
+
+  .lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .line {
+    fill: none;
+    stroke: #8B9E6A;
+    stroke-width: 1;
+    stroke-linecap: round;
+    opacity: 0;
+    filter: drop-shadow(0 0 3px rgba(139, 158, 106, 0.7))
+            drop-shadow(0 0 8px rgba(139, 158, 106, 0.35));
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    transition: opacity 1.618s cubic-bezier(0.16, 1, 0.3, 1),
+                stroke-dashoffset 2.618s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .line.drawn {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+  }
+  body.collapsing .line {
+    opacity: 0;
+    transition: opacity 1.618s cubic-bezier(0.55, 0, 0.2, 1);
+  }
+
+  /* ───────────────────────────────────────────────
+     STARS — the four ikigai points
+     ─────────────────────────────────────────────── */
+  .star {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: opacity 2.618s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 2.618s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .star::before {
+    /* Inner bright core */
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.9;
+  }
+  .star::after {
+    /* Outer halo — colored */
+    content: '';
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--star-color) 0%, transparent 61.8%);
+    opacity: 0.618;
+  }
+  .star.lit {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .star.breathe {
+    animation: star-twinkle 4.236s cubic-bezier(0.33, 0, 0.67, 1) infinite;
+  }
+  @keyframes star-twinkle {
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(1.382); }
+  }
+
+  /* Positions — forming a four-pointed asterism (diamond) */
+  .star.s-passion      { left: 50%;   top: 14.6%; --star-color: #F5E642; background: #F5E642; box-shadow: 0 0 20px #F5E642, 0 0 40px rgba(245, 230, 66, 0.5), 0 0 80px rgba(245, 230, 66, 0.25); }
+  .star.s-skill        { left: 14.6%; top: 50%;   --star-color: #A8DB5A; background: #A8DB5A; box-shadow: 0 0 20px #A8DB5A, 0 0 40px rgba(168, 219, 90, 0.5), 0 0 80px rgba(168, 219, 90, 0.25); }
+  .star.s-needs        { left: 85.4%; top: 50%;   --star-color: #F4A79D; background: #F4A79D; box-shadow: 0 0 20px #F4A79D, 0 0 40px rgba(244, 167, 157, 0.5), 0 0 80px rgba(244, 167, 157, 0.25); }
+  .star.s-monetization { left: 50%;   top: 85.4%; --star-color: #6DD5D0; background: #6DD5D0; box-shadow: 0 0 20px #6DD5D0, 0 0 40px rgba(109, 213, 208, 0.5), 0 0 80px rgba(109, 213, 208, 0.25); }
+
+  body.collapsing .star {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) scale(0.236);
+    opacity: 0;
+    transition: all 2.618s cubic-bezier(0.55, 0, 0.2, 1);
+  }
+
+  /* ───────────────────────────────────────────────
+     BLACK-HOLE / SINGULARITY FLASH
+     ─────────────────────────────────────────────── */
+  .singularity {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #fff;
+    box-shadow: 0 0 0 rgba(255,255,255,0);
+    opacity: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+  body.singularity-fire .singularity {
+    animation: singularity-burst 1.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes singularity-burst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5);
+           box-shadow: 0 0 0 rgba(255,255,255,0), 0 0 0 rgba(139, 158, 106, 0); }
+    38%  { opacity: 1; transform: translate(-50%, -50%) scale(1);
+           box-shadow: 0 0 60px rgba(255,255,255,0.9), 0 0 160px rgba(139, 158, 106, 0.8); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(6);
+           box-shadow: 0 0 120px rgba(255,255,255,0), 0 0 320px rgba(139, 158, 106, 0); }
+  }
+
+  /* ───────────────────────────────────────────────
+     BUSINESS NAME REVEAL — the sacred pulse
+     Matches completion-ceremony-full.html aesthetic:
+     white #fff, soft white + sage drop-shadow,
+     starts strong, softens, fades in over 2.618s.
+     ─────────────────────────────────────────────── */
+  .name-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  body.name-reveal .name-wrap {
+    animation: name-appear 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes name-appear {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  .biz-name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.012em;
+    color: #fff;
+    line-height: 1.146;
+    text-shadow:
+      0 0 60px rgba(255, 255, 255, 0.75),
+      0 0 120px rgba(139, 158, 106, 0.85);
+  }
+  body.name-reveal .biz-name {
+    animation: name-glow-settle 4.236s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes name-glow-settle {
+    0% {
+      text-shadow:
+        0 0 60px rgba(255, 255, 255, 0.9),
+        0 0 120px rgba(139, 158, 106, 0.95);
+    }
+    100% {
+      text-shadow:
+        0 0 28px rgba(255, 255, 255, 0.55),
+        0 0 56px rgba(139, 158, 106, 0.55);
+    }
+  }
+
+  .biz-origin {
+    display: block;
+    margin-top: 17px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0);
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    transition: color 2.618s cubic-bezier(0.33, 0, 0.67, 1) 1.618s;
+  }
+  body.name-reveal .biz-origin {
+    color: rgba(255, 255, 255, 0.38);
+  }
+
+  /* ───────────────────────────────────────────────
+     REDUCED MOTION
+     ─────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+    .bg-star { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .biz-name { font-size: 32px; }
+    .constellation { width: min(88vw, 60vh); }
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-label">Concept A — Constellation</div>
+
+<div class="stage">
+  <div class="starfield" id="starfield"></div>
+  <div class="ambient"></div>
+
+  <div class="constellation" id="constellation">
+    <svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <!-- Diamond asterism: top → right → bottom → left → top,
+           plus the two diagonals that cross at center -->
+      <line class="line" id="line-1" x1="50" y1="14.6" x2="85.4" y2="50" />
+      <line class="line" id="line-2" x1="85.4" y1="50"  x2="50"   y2="85.4" />
+      <line class="line" id="line-3" x1="50"   y1="85.4" x2="14.6" y2="50" />
+      <line class="line" id="line-4" x1="14.6" y1="50"   x2="50"   y2="14.6" />
+    </svg>
+
+    <div class="star s-passion"      id="star-1"></div>
+    <div class="star s-skill"        id="star-2"></div>
+    <div class="star s-needs"        id="star-3"></div>
+    <div class="star s-monetization" id="star-4"></div>
+
+    <div class="singularity"></div>
+
+    <div class="name-wrap">
+      <span class="biz-name">Cristal's Art Studio</span>
+      <span class="biz-origin">This came from who you are.</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay" id="replay" type="button">Replay</button>
+
+<script>
+  /*
+   * CONSTELLATION ORCHESTRATOR
+   * Pure class-toggling on <body>. Resetting = remove classes.
+   * All timing based on φ = 1.618034.
+   */
+  const PHI = 1.618034;
+  const BASE = 1000;
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // ─── Generate deep starfield (background stars) ───
+  const starfield = document.getElementById('starfield');
+  const STAR_COUNT = 89; // Fibonacci
+  for (let i = 0; i < STAR_COUNT; i++) {
+    const s = document.createElement('div');
+    s.className = 'bg-star' + (Math.random() < 0.236 ? ' bright' : '');
+    s.style.left = (Math.random() * 100) + '%';
+    s.style.top  = (Math.random() * 100) + '%';
+    s.style.setProperty('--tw-dur',   (4 + Math.random() * 6.854) + 's');
+    s.style.setProperty('--tw-delay', (Math.random() * 4.236) + 's');
+    starfield.appendChild(s);
+  }
+
+  let running = false;
+
+  async function runSequence() {
+    if (running) return;
+    running = true;
+
+    // Reset
+    document.body.classList.remove('run', 'breathing', 'collapsing',
+                                   'singularity-fire', 'name-reveal');
+    document.querySelectorAll('.star').forEach(el => {
+      el.classList.remove('lit', 'breathe');
+    });
+    document.querySelectorAll('.line').forEach(el => {
+      el.classList.remove('drawn');
+    });
+
+    // Force reflow so animations restart cleanly
+    void document.body.offsetWidth;
+
+    // ═══ PHASE 1: AMBIENCE WAKES (0 → 1.618s) ═══
+    document.body.classList.add('run');
+    await sleep(1.618 * BASE);
+
+    // ═══ PHASE 2: FOUR STARS BORN ONE BY ONE (1.618 → ~6.090s)
+    // Order: passion → skill → needs → monetization
+    // Spacing: 1.0s between births (tight enough to feel connected,
+    // loose enough that each one is "seen") ═══
+    const starIds = ['star-1', 'star-2', 'star-3', 'star-4'];
+    for (let i = 0; i < starIds.length; i++) {
+      document.getElementById(starIds[i]).classList.add('lit');
+      await sleep(BASE);
+    }
+
+    // Let all four breathe together before the lines draw
+    await sleep(0.618 * BASE);
+    document.querySelectorAll('.star').forEach(el => el.classList.add('breathe'));
+
+    // ═══ PHASE 3: LINES DRAW BETWEEN STARS (~7.0 → ~9.6s)
+    // Thin sage light traces the asterism. Each segment begins as the
+    // previous nears completion — overlapping weaves. ═══
+    const lineIds = ['line-1', 'line-2', 'line-3', 'line-4'];
+    for (let i = 0; i < lineIds.length; i++) {
+      document.getElementById(lineIds[i]).classList.add('drawn');
+      await sleep(0.618 * BASE);
+    }
+
+    // ═══ PHASE 4: THE CONSTELLATION BREATHES (~9.6 → ~12.2s) ═══
+    document.body.classList.add('breathing');
+    await sleep(2.618 * BASE);
+
+    // ═══ PHASE 5: COLLAPSE — black hole forms (~12.2 → ~14.8s) ═══
+    document.body.classList.remove('breathing');
+    document.body.classList.add('collapsing');
+    await sleep(2.618 * BASE);
+
+    // ═══ PHASE 6: SINGULARITY FLASH (~14.8 → ~15.4s) ═══
+    document.body.classList.add('singularity-fire');
+    await sleep(0.618 * BASE);
+
+    // ═══ PHASE 7: NAME REVEAL — the sacred pulse ═══
+    document.body.classList.add('name-reveal');
+
+    running = false;
+  }
+
+  document.getElementById('replay').addEventListener('click', runSequence);
+
+  // Begin after a beat — let the starfield settle
+  setTimeout(runSequence, 618);
+</script>
+</body>
+</html>

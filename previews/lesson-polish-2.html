@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson Polish Ideas — Set 2</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+  }
+
+  /* ═══ SECTION LAYOUT ═══ */
+  .section {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 32px;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+    overflow: hidden;
+  }
+  .section:nth-child(even) {
+    background: #fff;
+  }
+  .section:nth-child(odd) {
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13,148,136,0.03) 0%, transparent 70%), #fff;
+  }
+  .section-number {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #0d9488;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .section-desc {
+    font-size: 15px;
+    color: #6b7280;
+    max-width: 520px;
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  /* ═══ SHARED CHAT COMPONENTS ═══ */
+  .phone-frame {
+    width: 380px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+  }
+  .chat-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .goal-box {
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+  }
+  .goal-box .label { font-size: 11px; font-weight: 600; color: #0d9488; }
+  .goal-box .text { font-size: 13px; color: #4b5563; }
+  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .module-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
+  .lesson-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .progress-bar { flex: 1; height: 8px; border-radius: 99px; background: #f3f4f6; overflow: hidden; }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%);
+    transition: width 0.5s;
+  }
+  .progress-text { font-size: 11px; color: #9ca3af; }
+
+  .chat-messages { padding: 20px; }
+  .msg { margin-bottom: 16px; }
+  .msg-right { text-align: right; }
+  .msg-right .bubble {
+    display: inline-block; background: #0d9488; color: #fff;
+    border-radius: 16px; padding: 10px 16px; max-width: 80%; text-align: left;
+  }
+  .msg-left .bubble {
+    display: inline-block; background: #f3f4f6; color: #111827;
+    border-radius: 16px; padding: 16px 20px; max-width: 85%; text-align: left;
+    box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .msg-left .bubble.has-text::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 2px; border-radius: 1px;
+    background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  }
+  .bubble p { font-size: 15px; line-height: 1.6; margin-bottom: 0; }
+  .guide-label {
+    font-size: 9px; font-weight: 600; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 4px; margin-left: 4px;
+  }
+
+  .chat-input-area {
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    background: rgba(249,250,251,0.8);
+  }
+  .input-row {
+    display: flex; gap: 10px;
+  }
+  .input-row input {
+    flex: 1; border: 1px solid #d1d5db; border-radius: 12px;
+    padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .input-row input:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 2px rgba(13,148,136,0.15);
+  }
+  .input-row button {
+    background: #0d9488; color: #fff; border: none; border-radius: 12px;
+    padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Side-by-side for comparison demos */
+  .demo-pair {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .demo-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: #9ca3af; text-align: center;
+    margin-bottom: 12px;
+  }
+  .demo-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 1: TYPING INDICATOR ENHANCEMENT
+     ═══════════════════════════════════════════ */
+
+  .breathing-bubble {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 16px;
+    padding: 16px 24px;
+    max-width: 85%;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .breathing-bubble::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 2px; border-radius: 1px;
+    background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  }
+  /* Breathing border glow */
+  .breathing-bubble::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: conic-gradient(
+      from 0deg,
+      rgba(245,230,66,0.25),
+      rgba(168,219,90,0.25),
+      rgba(244,167,157,0.25),
+      rgba(109,213,208,0.25),
+      rgba(245,230,66,0.25)
+    );
+    z-index: -1;
+    animation: breathe-glow 3s ease-in-out infinite;
+    filter: blur(3px);
+  }
+  @keyframes breathe-glow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.01); }
+  }
+
+  .thinking-dots { display: flex; align-items: center; gap: 6px; padding: 4px 0; }
+  .tdot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: tdot-pulse 1.2s ease-in-out infinite;
+  }
+  .tdot:nth-child(1) { background: #F5E642; animation-delay: 0ms; }
+  .tdot:nth-child(2) { background: #A8DB5A; animation-delay: 150ms; }
+  .tdot:nth-child(3) { background: #F4A79D; animation-delay: 300ms; }
+  @keyframes tdot-pulse {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Plain dots for comparison */
+  .plain-dots-bubble {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 16px;
+    padding: 16px 24px;
+    max-width: 85%;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .plain-dots-bubble::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 2px; border-radius: 1px;
+    background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 2: SUGGESTION CHIPS ANIMATION
+     ═══════════════════════════════════════════ */
+
+  .stuck-label {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+  }
+  .chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 99px;
+    font-size: 13px;
+    color: #4b5563;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 150ms, background 150ms;
+  }
+  .chip:hover {
+    border-color: #0d9488;
+    background: rgba(13,148,136,0.04);
+    color: #0d9488;
+  }
+
+  /* Cascading entrance */
+  .chip-cascade {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+    animation: chip-enter 350ms ease-out forwards;
+  }
+  @keyframes chip-enter {
+    from { opacity: 0; transform: translateY(8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Static chips (no animation) */
+  .chip-static {
+    opacity: 1;
+  }
+
+  .chips-demo-frame {
+    width: 360px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 3: INPUT FOCUS GLOW
+     ═══════════════════════════════════════════ */
+
+  .input-demo-frame {
+    width: 380px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+  }
+  .input-demo-body {
+    padding: 20px;
+    background: rgba(249,250,251,0.8);
+  }
+
+  /* Unfocused state */
+  .glow-input-unfocused {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    background: #fff;
+    color: #9ca3af;
+  }
+
+  /* Focused state with Ikigai gradient glow */
+  .glow-input-wrapper {
+    position: relative;
+    border-radius: 14px;
+  }
+  .glow-input-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 14px;
+    background: conic-gradient(
+      from 90deg,
+      #F5E642,
+      #A8DB5A,
+      #6DD5D0,
+      #F4A79D,
+      #F5E642
+    );
+    opacity: 0.35;
+    filter: blur(4px);
+    animation: glow-rotate 4s linear infinite;
+    z-index: 0;
+  }
+  @keyframes glow-rotate {
+    to { filter: blur(4px) hue-rotate(0deg); }
+  }
+  .glow-input-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: #fff;
+    z-index: 1;
+  }
+  .glow-input-focused {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    border: 1px solid rgba(13,148,136,0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    background: transparent;
+    color: #111827;
+  }
+
+  /* ═══════════════════════════════════════════
+     IDEA 4: AI AVATAR MICRO-ANIMATION
+     ═══════════════════════════════════════════ */
+
+  .avatar-demo-frame {
+    width: 380px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    padding: 20px;
+  }
+
+  /* Ikigai micro-avatar */
+  .ikigai-avatar {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 4px;
+    margin-left: 4px;
+  }
+  .ikigai-dots {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    animation: avatar-breathe 3s ease-in-out infinite;
+  }
+  .ikigai-dots .dot {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    opacity: 0.85;
+  }
+  .ikigai-dots .dot-love    { background: #F5E642; top: 0; left: 3.5px; }
+  .ikigai-dots .dot-good    { background: #A8DB5A; top: 4px; left: 0; }
+  .ikigai-dots .dot-needs   { background: #F4A79D; top: 4px; right: 0; }
+  .ikigai-dots .dot-paid    { background: #6DD5D0; bottom: 0; left: 3.5px; }
+  @keyframes avatar-breathe {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+  .avatar-name {
+    font-size: 9px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Plain text label for comparison */
+  .plain-guide-label {
+    font-size: 9px; font-weight: 600; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 4px; margin-left: 4px;
+  }
+
+  /* Zoomed avatar for showcase */
+  .avatar-showcase {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .avatar-zoom {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    animation: avatar-breathe 3s ease-in-out infinite;
+  }
+  .avatar-zoom .dot {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    opacity: 0.75;
+    mix-blend-mode: multiply;
+  }
+  .avatar-zoom .dot-love    { background: #F5E642; top: 0; left: 16px; }
+  .avatar-zoom .dot-good    { background: #A8DB5A; top: 16px; left: 0; }
+  .avatar-zoom .dot-needs   { background: #F4A79D; top: 16px; right: 0; }
+  .avatar-zoom .dot-paid    { background: #6DD5D0; bottom: 0; left: 16px; }
+  .avatar-zoom-label {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+  }
+  .avatar-zoom-sub {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     IDEA 1: TYPING INDICATOR ENHANCEMENT
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-number">Idea 1</div>
+  <div class="section-title">Typing Indicator Enhancement</div>
+  <div class="section-desc">
+    When the AI is thinking, the message bubble gets a soft breathing border glow in Ikigai colors.
+    The dots pulse inside a glowing container -- turning a loading state into a moment of anticipation.
+  </div>
+
+  <div class="demo-pair">
+    <div class="demo-col">
+      <div class="demo-label">Current -- dots only</div>
+      <div style="padding: 24px;">
+        <div class="guide-label">Guide</div>
+        <div class="plain-dots-bubble">
+          <div class="thinking-dots">
+            <span class="tdot"></span>
+            <span class="tdot"></span>
+            <span class="tdot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-col">
+      <div class="demo-label">Enhanced -- breathing glow</div>
+      <div style="padding: 24px;">
+        <div class="guide-label">Guide</div>
+        <div class="breathing-bubble">
+          <div class="thinking-dots">
+            <span class="tdot"></span>
+            <span class="tdot"></span>
+            <span class="tdot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     IDEA 2: SUGGESTION CHIPS ANIMATION
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-number">Idea 2</div>
+  <div class="section-title">Suggestion Chips Cascade</div>
+  <div class="section-desc">
+    When "Stuck?" suggestions appear after 30 seconds idle, they cascade in one by one from left to right
+    instead of appearing all at once. Each chip enters with a slight delay, creating a gentle ripple effect.
+  </div>
+
+  <div class="demo-pair">
+    <div class="demo-col">
+      <div class="demo-label">Current -- all at once</div>
+      <div class="chips-demo-frame">
+        <div class="stuck-label">Stuck? Try one of these:</div>
+        <div class="chips-container">
+          <div class="chip chip-static">What problem am I solving?</div>
+          <div class="chip chip-static">Who needs this most?</div>
+          <div class="chip chip-static">What makes mine different?</div>
+          <div class="chip chip-static">How big is the market?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-col">
+      <div class="demo-label">Enhanced -- staggered cascade</div>
+      <div class="chips-demo-frame" id="cascade-demo">
+        <div class="stuck-label" style="opacity:0; animation: chip-enter 350ms ease-out forwards; animation-delay: 0ms;">Stuck? Try one of these:</div>
+        <div class="chips-container">
+          <div class="chip chip-cascade" style="animation-delay: 200ms;">What problem am I solving?</div>
+          <div class="chip chip-cascade" style="animation-delay: 400ms;">Who needs this most?</div>
+          <div class="chip chip-cascade" style="animation-delay: 600ms;">What makes mine different?</div>
+          <div class="chip chip-cascade" style="animation-delay: 800ms;">How big is the market?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Replay button -->
+  <button onclick="replayCascade()" style="
+    margin-top: 24px;
+    padding: 8px 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #4b5563;
+    cursor: pointer;
+  ">Replay animation</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     IDEA 3: INPUT FOCUS GLOW
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-number">Idea 3</div>
+  <div class="section-title">Input Focus Glow</div>
+  <div class="section-desc">
+    When the student focuses the input field, a subtle Ikigai-gradient glow appears around it.
+    Not distracting, but makes the act of typing feel intentional and special.
+  </div>
+
+  <div class="demo-pair">
+    <div class="demo-col">
+      <div class="demo-label">Unfocused -- resting state</div>
+      <div class="input-demo-frame">
+        <div class="input-demo-body">
+          <input class="glow-input-unfocused" type="text" value="Type your response..." readonly />
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-col">
+      <div class="demo-label">Focused -- Ikigai glow</div>
+      <div class="input-demo-frame">
+        <div class="input-demo-body">
+          <div class="glow-input-wrapper">
+            <input class="glow-input-focused" type="text" value="I think the market for..." readonly />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     IDEA 4: AI AVATAR MICRO-ANIMATION
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-number">Idea 4</div>
+  <div class="section-title">AI Avatar Micro-Animation</div>
+  <div class="section-desc">
+    Instead of just a "Guide" text label, the AI gets a tiny 4-circle Ikigai icon that subtly breathes.
+    Gives the mentor a visual identity rooted in the product's core symbol.
+  </div>
+
+  <!-- Zoomed showcase of the avatar -->
+  <div class="avatar-showcase">
+    <div class="avatar-zoom">
+      <div class="dot dot-love"></div>
+      <div class="dot dot-good"></div>
+      <div class="dot dot-needs"></div>
+      <div class="dot dot-paid"></div>
+    </div>
+    <div>
+      <div class="avatar-zoom-label">The Ikigai Avatar at 4x</div>
+      <div class="avatar-zoom-sub">Four overlapping circles, gently breathing</div>
+    </div>
+  </div>
+
+  <div class="demo-pair">
+    <div class="demo-col">
+      <div class="demo-label">Current -- text label</div>
+      <div class="avatar-demo-frame">
+        <div class="msg msg-left" style="margin-bottom:0">
+          <div class="plain-guide-label">Guide</div>
+          <div class="bubble">
+            <p>Let's think about who would pay for your product. Not just who likes it -- who would actually open their wallet?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-col">
+      <div class="demo-label">Enhanced -- Ikigai avatar</div>
+      <div class="avatar-demo-frame">
+        <div class="msg msg-left" style="margin-bottom:0">
+          <div class="ikigai-avatar">
+            <div class="ikigai-dots">
+              <div class="dot dot-love"></div>
+              <div class="dot dot-good"></div>
+              <div class="dot dot-needs"></div>
+              <div class="dot dot-paid"></div>
+            </div>
+            <span class="avatar-name">Guide</span>
+          </div>
+          <div class="bubble">
+            <p>Let's think about who would pay for your product. Not just who likes it -- who would actually open their wallet?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Replay the cascade animation
+  function replayCascade() {
+    const demo = document.getElementById('cascade-demo');
+    const clone = demo.cloneNode(true);
+    demo.parentNode.replaceChild(clone, demo);
+    clone.id = 'cascade-demo';
+  }
+</script>
+
+</body>
+</html>

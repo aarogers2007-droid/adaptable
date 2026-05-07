@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Rebloom — Vigil</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * IKIGAI REBLOOM — VIGIL
+   * ─────────────────────────────────────────────────────────────
+   * The four parts of who you are do not disappear.
+   * They remain, lit, witnessing the name being born between them.
+   *
+   * The name is not a quiz result. It is a christening.
+   * That is why it is set in serif.
+   *
+   * Each circle breathes on its own period. Four hearts, not one
+   * machine. The central ember does not collapse — it ignites, slow
+   * as a star forming, gathering light without consuming the parents.
+   *
+   * Timing follows respiratory rhythm: ~6 breaths per minute
+   * (10s cycles), the pace of meditation, the pace of trust.
+   * Golden ratio governs spatial relationships and beat durations.
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #000;
+    color: #fff;
+    font-family: 'Satoshi', sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  /* ═══ STAGE ═══ */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #050505 0%, #000 70%);
+  }
+
+  /* ═══ AMBIENT DUST (background life) ═══
+     12 motes drift slowly. translate3d forces GPU compositing. */
+  .dust {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    animation: dust-fade-in 4.236s ease-out 0.5s forwards;
+  }
+  @keyframes dust-fade-in {
+    to { opacity: 1; }
+  }
+  .dust-mote {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    will-change: transform, opacity;
+    animation: dust-drift 26s linear infinite;
+  }
+  @keyframes dust-drift {
+    0%   { transform: translate3d(0, 0, 0);       opacity: 0;   }
+    20%  {                                         opacity: 0.5; }
+    80%  {                                         opacity: 0.5; }
+    100% { transform: translate3d(-50px, -36px, 0); opacity: 0;   }
+  }
+
+  /* Soft outer vignette so the eye is held to center */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+  }
+
+  /* ═══ THE WRAP ═══ */
+  .wrap {
+    position: relative;
+    width: min(520px, 70vh);
+    aspect-ratio: 1/1;
+    z-index: 2;
+  }
+
+  /* ═══ CIRCLES (the four parents) ═══
+     GPU rule: only `transform` and `opacity` get animated. The colored
+     halo is a STATIC pre-baked radial-gradient on a ::before pseudo-
+     element — its opacity pulses for the breathing effect, but the
+     gradient itself is rasterized once and reused. No box-shadow.
+     No filter:blur. No background animation. Pure GPU compositing. */
+  .circle {
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.6);
+    will-change: transform, opacity;
+  }
+  /* The static halo — pre-sized (260% of core), gradient baked in,
+     animates only opacity (10ms paint per frame, no rasterization). */
+  .circle::before {
+    content: '';
+    position: absolute;
+    inset: -80%;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      var(--halo-core) 0%,
+      var(--halo-mid)  28%,
+      var(--halo-edge) 55%,
+      transparent      78%);
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity;
+  }
+
+  /* Born — gentle and slow. ONLY transform + opacity. */
+  .circle.born {
+    animation: circle-birth 3.236s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .circle.born::before {
+    animation:
+      halo-fade-in 3.236s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+      halo-breathe var(--breath, 9s) ease-in-out 3.236s infinite;
+  }
+  @keyframes circle-birth {
+    0%   { opacity: 0;     transform: translate3d(-50%,-50%,0) scale(0.6); }
+    60%  { opacity: 0.55;                                                  }
+    100% { opacity: 0.62;  transform: translate3d(-50%,-50%,0) scale(1);   }
+  }
+  @keyframes halo-fade-in {
+    0%   { opacity: 0; }
+    100% { opacity: 0.85; }
+  }
+  /* Each parent breathes on its OWN period — never in sync. Only
+     opacity is touched. The browser composites a cached layer. */
+  @keyframes halo-breathe {
+    0%, 100% { opacity: 0.78; }
+    50%      { opacity: 1.0;  }
+  }
+
+  /* ═══ THE FOUR — POSITIONS, COLORS, HALO STOPS ═══
+     Halo gradient is baked per-circle via CSS variables. */
+  .c1 { /* yellow — passion — top */
+    background: radial-gradient(circle, #FFF6B0 0%, #F5E642 50%, #C9B928 100%);
+    left: 50%; top: 28%;
+    --breath: 9.236s;
+    --halo-core: rgba(245, 230, 66, 0.32);
+    --halo-mid:  rgba(245, 230, 66, 0.14);
+    --halo-edge: rgba(245, 230, 66, 0.05);
+  }
+  .c2 { /* green — skill — left */
+    background: radial-gradient(circle, #DEFFA0 0%, #A8DB5A 50%, #6FA82E 100%);
+    left: 28%; top: 50%;
+    --breath: 11.618s;
+    --halo-core: rgba(168, 219, 90, 0.36);
+    --halo-mid:  rgba(168, 219, 90, 0.16);
+    --halo-edge: rgba(168, 219, 90, 0.06);
+  }
+  .c3 { /* peach — needs — right */
+    background: radial-gradient(circle, #FFD8CE 0%, #F4A79D 50%, #C16C61 100%);
+    left: 72%; top: 50%;
+    --breath: 10.382s;
+    --halo-core: rgba(244, 167, 157, 0.42);
+    --halo-mid:  rgba(244, 167, 157, 0.20);
+    --halo-edge: rgba(244, 167, 157, 0.07);
+  }
+  .c4 { /* teal — monetization — bottom */
+    background: radial-gradient(circle, #B8FAF6 0%, #6DD5D0 50%, #2F8F8A 100%);
+    left: 50%; top: 72%;
+    --breath: 12.854s;
+    --halo-core: rgba(109, 213, 208, 0.40);
+    --halo-mid:  rgba(109, 213, 208, 0.18);
+    --halo-edge: rgba(109, 213, 208, 0.07);
+  }
+
+  /* ═══ THE EMBER (the center, the new life) ═══
+     Pre-sized at full size. NO scale animation (was choking the
+     compositor). NO box-shadow. Just opacity. The radial gradient
+     is fully transparent at 0–14% so the eye never lands on a focal
+     point — the flash is a diffuse field, not a star. */
+  .ember {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 660px;
+    height: 660px;
+    margin-left: -330px;
+    margin-top: -330px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(255, 246, 229, 0)    0%,
+      rgba(255, 246, 229, 0)    14%,
+      rgba(255, 246, 229, 0.16) 28%,
+      rgba(245, 224, 184, 0.11) 46%,
+      rgba(201, 169, 104, 0.04) 68%,
+      transparent               92%);
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+    pointer-events: none;
+    z-index: 5;
+    will-change: opacity;
+  }
+  .ember.lit {
+    animation: ember-ignite 6.472s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes ember-ignite {
+    0%   { opacity: 0;    }
+    35%  { opacity: 0.45; }
+    100% { opacity: 0.92; }
+  }
+  .ember.settled {
+    animation: ember-settle 3.236s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes ember-settle {
+    from { opacity: 0.92; }
+    to   { opacity: 0.55; }
+  }
+
+  /* ═══ THE NAME (a christening, in serif) ═══ */
+  .name-wrap {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* Name fade — opacity + translate only. The glow is a STATIC
+     text-shadow baked into .name (no filter, no drop-shadow). */
+  .name-wrap.born {
+    animation: name-emerge 4.236s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes name-emerge {
+    0%   { opacity: 0; transform: translate3d(-50%, -50%, 0); }
+    60%  { opacity: 1;                                         }
+    100% { opacity: 1; transform: translate3d(-50%, -50%, 0); }
+  }
+  .name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    color: #FFF8EC;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    white-space: nowrap;
+    text-shadow:
+      0 0 22px rgba(255, 246, 229, 0.42),
+      0 0 56px rgba(245, 224, 184, 0.28),
+      0 0 96px rgba(201, 169, 104, 0.14);
+  }
+  .name-marker {
+    display: block;
+    margin-top: 1.382em;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.382em;
+    text-transform: uppercase;
+    color: rgba(255, 248, 236, 0);
+    transition: color 2.618s ease-out 1s;
+  }
+  .name-wrap.born .name-marker {
+    color: rgba(255, 248, 236, 0.42);
+  }
+
+  /* ═══ APPLAUSE WAVE ═══
+     Pre-sized circle, fixed dimensions. Animates ONLY transform:scale
+     and opacity. No width/height animation (layout-thrashing).
+     No border-color animation (paint-thrashing). */
+  .applause {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 100px;
+    height: 100px;
+    margin-left: -50px;
+    margin-top: -50px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 246, 229, 0.7);
+    opacity: 0;
+    transform: scale(0);
+    z-index: 6;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+  .applause.ripple {
+    animation: applause-ripple 3.618s cubic-bezier(0, 0.618, 0.382, 1) forwards;
+  }
+  @keyframes applause-ripple {
+    0%   { transform: scale(0);   opacity: 0.7; }
+    61.8%{                        opacity: 0.3; }
+    100% { transform: scale(8);   opacity: 0;   }
+  }
+
+  /* When applause hits, the parent halos brighten one final time.
+     Targets the ::before halo only — opacity-only animation. */
+  .circle.applauding::before {
+    animation:
+      halo-breathe var(--breath, 9s) ease-in-out infinite,
+      halo-applaud 2.618s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes halo-applaud {
+    0%   { opacity: 0.85; }
+    50%  { opacity: 1;    }
+    100% { opacity: 0.9;  }
+  }
+
+  /* ═══ REPLAY + LABEL ═══ */
+  .label {
+    position: fixed;
+    top: 24px; left: 32px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.382em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.32);
+    z-index: 100;
+    pointer-events: none;
+  }
+  .label-sub {
+    display: block;
+    margin-top: 6px;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.22);
+    font-family: 'EB Garamond', serif;
+    font-size: 11px;
+  }
+  .replay {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.55);
+    padding: 12px 30px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.382em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.618s cubic-bezier(0.16,1,0.3,1);
+    z-index: 100;
+  }
+  .replay:hover {
+    border-color: rgba(255,255,255,0.45);
+    color: #fff;
+    background: rgba(255,255,255,0.04);
+    transform: translateY(-1px);
+  }
+</style>
+</head>
+<body>
+<div class="label">
+  Ikigai Rebloom — Vigil
+  <span class="label-sub">the parents do not disappear</span>
+</div>
+
+<div class="stage">
+  <div class="dust" id="dust"></div>
+  <div class="vignette"></div>
+
+  <div class="wrap" id="wrap">
+    <div class="circle c1" id="c1"></div>
+    <div class="circle c2" id="c2"></div>
+    <div class="circle c3" id="c3"></div>
+    <div class="circle c4" id="c4"></div>
+
+    <div class="ember" id="ember"></div>
+    <div class="applause" id="applause"></div>
+
+    <div class="name-wrap" id="name">
+      <span class="name">Cristal&rsquo;s Art Studio</span>
+      <span class="name-marker">a venture is born</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay" id="replay">Replay</button>
+
+<script>
+  // ═══ DUST FIELD ═══
+  // 12 motes (was 30 → 16 → 12). All transform-only animations.
+  const dust = document.getElementById('dust');
+  for (let i = 0; i < 12; i++) {
+    const mote = document.createElement('div');
+    mote.className = 'dust-mote';
+    mote.style.left  = Math.random() * 100 + '%';
+    mote.style.top   = Math.random() * 100 + '%';
+    mote.style.animationDelay    = (Math.random() * -26) + 's';
+    mote.style.animationDuration = (24 + Math.random() * 14) + 's';
+    dust.appendChild(mote);
+  }
+
+  // ═══ ELEMENTS ═══
+  const circles = [
+    document.getElementById('c1'),
+    document.getElementById('c2'),
+    document.getElementById('c3'),
+    document.getElementById('c4'),
+  ];
+  const ember    = document.getElementById('ember');
+  const applause = document.getElementById('applause');
+  const name     = document.getElementById('name');
+  const wrap     = document.getElementById('wrap');
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // ═══ RESET ═══
+  // Crucial: never destroy/recreate DOM. Just remove classes and force
+  // a clean reflow. Eliminates the choppiness from previous version.
+  function reset() {
+    circles.forEach(c => {
+      c.classList.remove('born', 'applauding');
+    });
+    ember.classList.remove('lit', 'settled');
+    name.classList.remove('born');
+    applause.classList.remove('ripple');
+    void wrap.offsetWidth; // force reflow
+  }
+
+  // ═══ THE SEQUENCE ═══
+  // Total: ~22s. Respiratory rhythm. The dead spots are short, the
+  // held moments breathe. Each beat is intentional.
+  async function play() {
+    reset();
+
+    // Beat 0 — silence in the void (dust fades in via CSS)
+    await sleep(1200);
+
+    // Beat 1 — the four parents arrive, gentle and slow.
+    // Stagger 1.4s apart. Each takes 3.236s to fully bloom.
+    // (Longer than production: gentleness over speed.)
+    for (let i = 0; i < 4; i++) {
+      circles[i].classList.add('born');
+      await sleep(1400);
+    }
+
+    // Beat 2 — let the four breathe together.
+    // Trust the silence, but not for longer than the eye needs to read
+    // the composition. Kuleshov/ensemble-read ceiling is ~1.6s; past
+    // that, holding becomes waiting. Each circle still breathes on its
+    // OWN period, so the drift-into-phase will keep going under Beat 3.
+    await sleep(1618); // TIGHTENED: was 3200ms → 1618ms (φ seconds — one golden unit, matches the compositional read time for a 4-element symmetric shot)
+
+    // Beat 3 — the ember ignites.
+    // No collapse. No sacrifice. The light gathers from nothing,
+    // in the center, between the parents. They remain.
+    ember.classList.add('lit');
+
+    // Wait through ignition. CSS ember-ignite is 6.472s and hits 0.45
+    // opacity at its 35% keyframe (~2.26s in) — that's the moment the
+    // warmth first visibly fills the space the parents hold. Land the
+    // held-breath one φ-tick after that, not two.
+    await sleep(2618); // TIGHTENED: was 4200ms → 2618ms (φ² seconds — ember passes its 35% keyframe, warmth is felt, curiosity peaks before it decays)
+
+    // Beat 4 — held breath.
+    // The ember is near-peak. The student senses something is about
+    // to happen. Murch's "inhale before the cut" lives in 0.5–1.0s;
+    // 618ms is the golden pause inside that window.
+    await sleep(618); // TIGHTENED: was 900ms → 618ms (φ⁻¹ seconds — the classic golden pause, felt as an inhale not a stall)
+
+    // Beat 5 — the name is born.
+    // Serif. Italic. Warm white. Drop-shadow burst from 80+160px
+    // softening to 32+70px. The font does the heavy lifting.
+    name.classList.add('born');
+    ember.classList.add('settled');
+
+    // Wait for the name to fully form
+    await sleep(1800);
+
+    // Beat 6 — applause.
+    // ONE shockwave (not two). Ripples outward through the parents.
+    // As it passes them, they brighten in response. Witness, not loss.
+    applause.classList.add('ripple');
+    circles.forEach(c => c.classList.add('applauding'));
+
+    // Beat 7 — the final tableau.
+    // Hold. Let the student breathe with the scene.
+    // (Real ceremony will have a Continue button here.)
+    await sleep(5000);
+  }
+
+  document.getElementById('replay').addEventListener('click', play);
+  // Auto-play on load
+  play();
+</script>
+</body>
+</html>

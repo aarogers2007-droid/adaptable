@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptable — Ikigai Rebloom (Concept B — Botanical)</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * ADAPTABLE — IKIGAI REBLOOM (CONCEPT B: BOTANICAL)
+   * ═══════════════════════════════════════════════════════════
+   *
+   * A single seed at the center of the void.
+   * Four stems unfurl — passion, skill, needs, monetization.
+   * Each culminates in a small four-petaled blossom.
+   * They breathe together for a beat.
+   * Petals fold, stems retract, light returns to the seed.
+   * The seed pulses brighter — and bursts into the name reveal.
+   *
+   * φ = 1.618034. Base unit = 1000ms.
+   * Setup arc runs ~12.7s before the name reveal fires.
+   *
+   *   0.000s  —  seed fades in and begins its resting pulse
+   *   1.618s  —  first stem (passion, top) begins to unfurl
+   *   2.618s  —  skill (left)
+   *   3.618s  —  needs (right)
+   *   4.618s  —  monetization (bottom)
+   *   ~6.854s —  all buds open into blossoms
+   *   8.472s  —  shared breath (all four together)
+   *  10.090s  —  petals fold, stems retract, light returns
+   *  12.708s  —  seed ignites into name reveal
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Satoshi', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══════════════════════════════════════════
+     STAGE
+     ═══════════════════════════════════════════ */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+
+  /* Ambient deep-sage glow — the hum under everything */
+  .ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(74, 103, 65, 0.09) 0%, transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.618; }
+    50%      { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+  /* ═══════════════════════════════════════════
+     BOTANICAL STAGE
+     ═══════════════════════════════════════════ */
+  .botanical {
+    position: relative;
+    width: min(520px, 76vh);
+    height: min(520px, 76vh);
+    z-index: 2;
+  }
+  .botanical svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Stems — drawn via stroke-dasharray. Each has a CSS variable for length. */
+  .stem {
+    fill: none;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-dasharray: var(--len);
+    stroke-dashoffset: var(--len);
+    opacity: 0;
+  }
+
+  /* Blossoms — each group scales/rotates around its own origin */
+  .blossom {
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .blossom .petal {
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .blossom .core {
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  /* Seed — the still center */
+  .seed-group {
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .seed-core {
+    opacity: 0;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .seed-halo {
+    opacity: 0;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  /* ═══════════════════════════════════════════
+     ANIMATION STATES
+     Classes are toggled on .botanical to fire sequences.
+     ═══════════════════════════════════════════ */
+
+  /* ── Seed arrives ── */
+  .botanical.seed-in .seed-core {
+    animation:
+      seed-fade-in 1.618s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+      seed-pulse 2.618s ease-in-out 1.618s infinite;
+  }
+  .botanical.seed-in .seed-halo {
+    animation: seed-halo-in 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes seed-fade-in {
+    0%   { opacity: 0; transform: scale(0.382); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes seed-halo-in {
+    0%   { opacity: 0; transform: scale(0.618); }
+    100% { opacity: 0.618; transform: scale(1); }
+  }
+  @keyframes seed-pulse {
+    0%, 100% { transform: scale(1);     filter: drop-shadow(0 0 6px rgba(139,158,106,0.6)); }
+    50%      { transform: scale(1.118); filter: drop-shadow(0 0 14px rgba(139,158,106,0.9)); }
+  }
+
+  /* ── Stems unfurl ──
+     Each stem draws itself via stroke-dashoffset over 2.618s,
+     with a staggered delay from a base --t var. */
+  .botanical.stems .stem {
+    animation: stem-unfurl 2.618s cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0s) forwards;
+  }
+  @keyframes stem-unfurl {
+    0%   { opacity: 0;    stroke-dashoffset: var(--len); }
+    8%   { opacity: 0.85; }
+    100% { opacity: 0.85; stroke-dashoffset: 0; }
+  }
+
+  /* ── Blossoms open ──
+     After each stem finishes, its blossom scales up and petals unfurl. */
+  .botanical.bloom .blossom {
+    animation: blossom-open 1.618s cubic-bezier(0.16, 1, 0.3, 1) var(--bloom-delay, 0s) forwards;
+  }
+  .botanical.bloom .blossom .petal {
+    animation: petal-unfurl 1.618s cubic-bezier(0.16, 1, 0.3, 1) var(--bloom-delay, 0s) forwards;
+  }
+  .botanical.bloom .blossom .core {
+    animation: core-in 1.000s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--bloom-delay, 0s) + 0.618s) forwards;
+  }
+  @keyframes blossom-open {
+    0%   { opacity: 0; transform: scale(0) rotate(-18deg); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  @keyframes petal-unfurl {
+    0%   { transform: scale(0.236); }
+    100% { transform: scale(1); }
+  }
+  @keyframes core-in {
+    0%   { opacity: 0; transform: scale(0); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Shared breath — all four blossoms inhale/exhale together ── */
+  .botanical.breathe .blossom {
+    animation: blossom-breathe 2.618s ease-in-out forwards;
+  }
+  @keyframes blossom-breathe {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.090); filter: drop-shadow(0 0 10px currentColor); }
+    100% { transform: scale(1); }
+  }
+
+  /* ── Retract — petals fold, stems draw back toward seed ── */
+  .botanical.retract .blossom {
+    animation: blossom-fold 2.000s cubic-bezier(0.55, 0, 0.2, 1) forwards;
+  }
+  .botanical.retract .stem {
+    animation: stem-retract 2.000s cubic-bezier(0.55, 0, 0.2, 1) 0.382s forwards;
+  }
+  @keyframes blossom-fold {
+    0%   { opacity: 1; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: scale(0) rotate(22deg); }
+  }
+  @keyframes stem-retract {
+    0%   { opacity: 0.85; stroke-dashoffset: 0; }
+    100% { opacity: 0;    stroke-dashoffset: var(--len); }
+  }
+
+  /* ── Ignition — seed absorbs all the light and swells ── */
+  .botanical.ignite .seed-core {
+    animation: seed-ignite 1.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .botanical.ignite .seed-halo {
+    animation: seed-halo-ignite 1.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes seed-ignite {
+    0%   { opacity: 1; transform: scale(1);    filter: drop-shadow(0 0 10px rgba(139,158,106,0.8)); }
+    60%  { opacity: 1; transform: scale(1.618); filter: drop-shadow(0 0 40px rgba(245,230,66,0.7)) drop-shadow(0 0 80px rgba(139,158,106,0.8)); }
+    100% { opacity: 0; transform: scale(2.618); filter: drop-shadow(0 0 80px rgba(255,255,255,0.9)); }
+  }
+  @keyframes seed-halo-ignite {
+    0%   { opacity: 0.618; transform: scale(1); }
+    100% { opacity: 0;     transform: scale(3); }
+  }
+
+  /* ═══════════════════════════════════════════
+     NAME REVEAL
+     Matches the existing ceremony's quality bar.
+     ═══════════════════════════════════════════ */
+  .name-reveal {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .name-reveal.visible {
+    animation: name-reveal-in 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+               name-pulse 4.236s ease-in-out 2.618s infinite;
+  }
+  .name-reveal .biz-name {
+    display: block;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-shadow:
+      0 0 60px rgba(255, 255, 255, 0.55),
+      0 0 120px rgba(139, 158, 106, 0.70);
+  }
+  .name-reveal .origin {
+    display: block;
+    margin-top: 1.618em;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0);
+    transition: color 2.618s ease-out 1.618s;
+  }
+  .name-reveal.visible .origin {
+    color: rgba(255, 255, 255, 0.38);
+  }
+  @keyframes name-reveal-in {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.618); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  @keyframes name-pulse {
+    0%, 100% {
+      text-shadow:
+        0 0 60px rgba(255, 255, 255, 0.55),
+        0 0 120px rgba(139, 158, 106, 0.70);
+    }
+    50% {
+      text-shadow:
+        0 0 28px rgba(255, 255, 255, 0.35),
+        0 0 56px rgba(139, 158, 106, 0.45);
+    }
+  }
+  .name-reveal .biz-name {
+    animation: biz-name-pulse 4.236s ease-in-out 2.618s infinite;
+  }
+  @keyframes biz-name-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.012); }
+  }
+
+  /* ═══════════════════════════════════════════
+     CHROME: label + replay
+     ═══════════════════════════════════════════ */
+  .concept-label {
+    position: fixed;
+    top: 24px;
+    left: 28px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.28);
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  .replay {
+    position: fixed;
+    bottom: 22px;
+    right: 26px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.30);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    padding: 10px 18px;
+    cursor: pointer;
+    z-index: 50;
+    transition:
+      color 0.618s cubic-bezier(0.33, 0, 0.67, 1),
+      border-color 0.618s cubic-bezier(0.33, 0, 0.67, 1),
+      box-shadow 0.618s cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  .replay:hover {
+    color: rgba(255, 255, 255, 0.72);
+    border-color: rgba(255, 255, 255, 0.32);
+    box-shadow: 0 0 24px rgba(139, 158, 106, 0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-label">Concept B — Botanical Rebloom</div>
+
+<div class="stage">
+  <div class="ambient-glow"></div>
+
+  <div class="botanical" id="botanical">
+    <!--
+      SVG coordinate system: 0..400 both axes. Seed at (200,200).
+      Stems grow outward to blossoms at the cardinal points.
+      Stem length approx 120 units; each path is ~130 units so
+      stroke-dasharray values are set via CSS custom property --len.
+    -->
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Soft radial for the seed -->
+        <radialGradient id="seedGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"  stop-color="#C7D6A4" stop-opacity="1"/>
+          <stop offset="45%" stop-color="#8B9E6A" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#4A6741" stop-opacity="0.9"/>
+        </radialGradient>
+        <radialGradient id="seedHaloGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="#8B9E6A" stop-opacity="0.55"/>
+          <stop offset="60%"  stop-color="#4A6741" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#4A6741" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- ═══ STEMS ═══
+           Gentle curves outward. Each is ~130 units long.
+           Top    (passion)      : (200,200) → (200, 70)
+           Left   (skill)        : (200,200) → ( 70,200)
+           Right  (needs)        : (200,200) → (330,200)
+           Bottom (monetization) : (200,200) → (200,330)
+      -->
+      <path class="stem s-top"    style="--len: 140; --delay: 0.000s"
+            d="M 200 200 C 204 160, 196 120, 200 70"  stroke="#F5E642"/>
+      <path class="stem s-left"   style="--len: 140; --delay: 1.000s"
+            d="M 200 200 C 160 196, 120 204, 70 200"  stroke="#A8DB5A"/>
+      <path class="stem s-right"  style="--len: 140; --delay: 2.000s"
+            d="M 200 200 C 240 204, 280 196, 330 200" stroke="#F4A79D"/>
+      <path class="stem s-bottom" style="--len: 140; --delay: 3.000s"
+            d="M 200 200 C 196 240, 204 280, 200 330" stroke="#6DD5D0"/>
+
+      <!-- ═══ BLOSSOMS ═══
+           Four-petaled. Each petal is a teardrop-ish shape built from a path.
+           The core is a small circle. Drawn at the origin and translated.
+           Color is inherited via currentColor so drop-shadows pick it up.
+      -->
+      <!-- TOP — passion (yellow) -->
+      <g class="blossom b-top" style="--bloom-delay: 2.618s; color: #F5E642" transform="translate(200 70)">
+        <path class="petal" d="M 0 -18 C  7 -18,  9 -6, 0 0 C -9 -6, -7 -18, 0 -18 Z" fill="#F5E642" fill-opacity="0.92"/>
+        <path class="petal" d="M 18 0  C 18  7,  6  9, 0 0 C  6 -9, 18 -7, 18 0 Z" fill="#F5E642" fill-opacity="0.92"/>
+        <path class="petal" d="M 0 18  C -7 18, -9  6, 0 0 C  9  6,  7 18, 0 18 Z" fill="#F5E642" fill-opacity="0.92"/>
+        <path class="petal" d="M -18 0 C -18 -7, -6 -9, 0 0 C -6  9,-18  7,-18 0 Z" fill="#F5E642" fill-opacity="0.92"/>
+        <circle class="core" r="3" fill="#8B9E6A"/>
+      </g>
+
+      <!-- LEFT — skill (green) -->
+      <g class="blossom b-left" style="--bloom-delay: 3.618s; color: #A8DB5A" transform="translate(70 200) rotate(-45)">
+        <path class="petal" d="M 0 -18 C  7 -18,  9 -6, 0 0 C -9 -6, -7 -18, 0 -18 Z" fill="#A8DB5A" fill-opacity="0.92"/>
+        <path class="petal" d="M 18 0  C 18  7,  6  9, 0 0 C  6 -9, 18 -7, 18 0 Z" fill="#A8DB5A" fill-opacity="0.92"/>
+        <path class="petal" d="M 0 18  C -7 18, -9  6, 0 0 C  9  6,  7 18, 0 18 Z" fill="#A8DB5A" fill-opacity="0.92"/>
+        <path class="petal" d="M -18 0 C -18 -7, -6 -9, 0 0 C -6  9,-18  7,-18 0 Z" fill="#A8DB5A" fill-opacity="0.92"/>
+        <circle class="core" r="3" fill="#8B9E6A"/>
+      </g>
+
+      <!-- RIGHT — needs (peach) -->
+      <g class="blossom b-right" style="--bloom-delay: 4.618s; color: #F4A79D" transform="translate(330 200) rotate(45)">
+        <path class="petal" d="M 0 -18 C  7 -18,  9 -6, 0 0 C -9 -6, -7 -18, 0 -18 Z" fill="#F4A79D" fill-opacity="0.92"/>
+        <path class="petal" d="M 18 0  C 18  7,  6  9, 0 0 C  6 -9, 18 -7, 18 0 Z" fill="#F4A79D" fill-opacity="0.92"/>
+        <path class="petal" d="M 0 18  C -7 18, -9  6, 0 0 C  9  6,  7 18, 0 18 Z" fill="#F4A79D" fill-opacity="0.92"/>
+        <path class="petal" d="M -18 0 C -18 -7, -6 -9, 0 0 C -6  9,-18  7,-18 0 Z" fill="#F4A79D" fill-opacity="0.92"/>
+        <circle class="core" r="3" fill="#8B9E6A"/>
+      </g>
+
+      <!-- BOTTOM — monetization (teal) -->
+      <g class="blossom b-bottom" style="--bloom-delay: 5.618s; color: #6DD5D0" transform="translate(200 330)">
+        <path class="petal" d="M 0 -18 C  7 -18,  9 -6, 0 0 C -9 -6, -7 -18, 0 -18 Z" fill="#6DD5D0" fill-opacity="0.92"/>
+        <path class="petal" d="M 18 0  C 18  7,  6  9, 0 0 C  6 -9, 18 -7, 18 0 Z" fill="#6DD5D0" fill-opacity="0.92"/>
+        <path class="petal" d="M 0 18  C -7 18, -9  6, 0 0 C  9  6,  7 18, 0 18 Z" fill="#6DD5D0" fill-opacity="0.92"/>
+        <path class="petal" d="M -18 0 C -18 -7, -6 -9, 0 0 C -6  9,-18  7,-18 0 Z" fill="#6DD5D0" fill-opacity="0.92"/>
+        <circle class="core" r="3" fill="#8B9E6A"/>
+      </g>
+
+      <!-- ═══ SEED — the still center ═══ -->
+      <g class="seed-group" transform="translate(200 200)">
+        <circle class="seed-halo" r="22" fill="url(#seedHaloGrad)"/>
+        <circle class="seed-core" r="7"  fill="url(#seedGrad)"/>
+      </g>
+    </svg>
+
+    <!-- Name reveal rests on top of the SVG, centered on the seed -->
+    <div class="name-reveal" id="nameReveal">
+      <span class="biz-name">Cristal&rsquo;s Art Studio</span>
+      <span class="origin">This came from who you are</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay" id="replayBtn" type="button">Replay</button>
+
+<script>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * ORCHESTRATION
+   * Setup arc (seed → stems → bloom → breathe → retract → ignite)
+   * runs ~12.7s, then the name reveal fires.
+   * ═══════════════════════════════════════════════════════════
+   */
+  const PHI  = 1.618034;
+  const BASE = 1000;
+  const stage = document.getElementById('botanical');
+  const name  = document.getElementById('nameReveal');
+  const btn   = document.getElementById('replayBtn');
+
+  let timers = [];
+  function after(ms, fn) {
+    const id = setTimeout(fn, ms);
+    timers.push(id);
+    return id;
+  }
+  function clearAll() {
+    timers.forEach(clearTimeout);
+    timers = [];
+  }
+
+  function reset() {
+    clearAll();
+    // Force reflow to restart animations
+    stage.classList.remove('seed-in', 'stems', 'bloom', 'breathe', 'retract', 'ignite');
+    name.classList.remove('visible');
+    // Trigger reflow so class removal takes effect before re-adding
+    void stage.offsetWidth;
+  }
+
+  function run() {
+    reset();
+
+    // 0.000s — Seed fades in and begins a resting pulse
+    after(0, () => stage.classList.add('seed-in'));
+
+    // 1.618s — Stems begin unfurling (staggered by 1.0s each via --delay)
+    //   s-top    starts at 1.618s
+    //   s-left   starts at 2.618s
+    //   s-right  starts at 3.618s
+    //   s-bottom starts at 4.618s
+    //   each takes 2.618s to draw → last one finishes ~7.236s
+    after(PHI * BASE, () => stage.classList.add('stems'));
+
+    // Blossoms open staggered (via --bloom-delay: 2.618 / 3.618 / 4.618 / 5.618s)
+    // Each bloom animation is 1.618s → last bloom finishes ~7.236s
+    after(PHI * BASE, () => stage.classList.add('bloom'));
+
+    // 8.472s — Shared breath (φ² after the last bloom settles)
+    //   All four blossoms inhale and exhale together for 2.618s
+    after(8.472 * BASE, () => stage.classList.add('breathe'));
+
+    // 10.090s — Retract: petals fold, stems draw back
+    //   blossom-fold 2.000s; stem-retract 2.000s delayed 0.382s
+    after(10.090 * BASE, () => {
+      stage.classList.remove('bloom', 'breathe');
+      stage.classList.add('retract');
+    });
+
+    // 12.090s — Ignite the seed (it swells and bursts)
+    after(12.090 * BASE, () => stage.classList.add('ignite'));
+
+    // 12.708s — Name reveal fires mid-burst (the crossfade moment)
+    after(12.708 * BASE, () => name.classList.add('visible'));
+  }
+
+  btn.addEventListener('click', run);
+  run();
+</script>
+
+</body>
+</html>

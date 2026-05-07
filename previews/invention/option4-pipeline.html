@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENTURE — Grouping Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0A0A; color: #9A9A9A; font-family: 'Space Mono', monospace; min-height: 100vh; padding: 32px 24px; overflow-x: hidden; }
+
+.header { display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto 20px; }
+.title { font-size: 15px; color: #F0EDE8; font-weight: 700; }
+.subtitle { font-size: 11px; color: #5A5A5A; margin-top: 4px; }
+.controls { display: flex; gap: 8px; }
+.btn { font-family: 'Space Mono', monospace; font-size: 12px; padding: 8px 20px; border-radius: 6px; cursor: pointer; border: 1px solid #3A3A3A; background: #1A1A1A; color: #C084FC; transition: all 0.15s; }
+.btn:hover:not(:disabled) { background: #2A2A2A; border-color: #C084FC; }
+.btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+/* Progress steps */
+.progress { display: flex; gap: 4px; max-width: 1100px; margin: 0 auto 20px; }
+.prog-step { flex: 1; height: 4px; border-radius: 2px; background: #1A1A1A; transition: background 0.4s; }
+.prog-step.done { background: #C084FC; }
+.prog-step.active { background: #C084FC; animation: pulse-prog 1s ease infinite; }
+@keyframes pulse-prog { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* The stage — all chips live here with absolute positioning */
+.stage { position: relative; max-width: 1100px; margin: 0 auto; height: 620px; }
+
+/* Lane backgrounds */
+.lane-bg { position: absolute; left: 0; right: 0; height: 72px; border: 1px solid #1A1A1A; border-radius: 8px; background: #0E0E0E; transition: all 0.4s; }
+.lane-bg.active { border-color: #C084FC; background: rgba(192,132,252,0.03); box-shadow: 0 0 24px rgba(192,132,252,0.15); border-left: 3px solid #C084FC; }
+.lane-label { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3A3A3A; transition: color 0.4s; z-index: 1; }
+.lane-bg.active .lane-label { color: #C084FC; }
+
+/* Staging label */
+.staging-label { position: absolute; top: 6px; left: 10px; font-size: 9px; color: #3A3A3A; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Chips — absolute within .stage */
+.chip {
+  position: absolute;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  z-index: 5;
+  transition: left 0.7s cubic-bezier(0.34, 1.2, 0.64, 1), top 0.7s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.3s ease, transform 0.4s ease;
+  cursor: default;
+}
+.chip.fast { transition-duration: 0.45s, 0.45s, 0.3s, 0.3s; }
+.chip.highlight { filter: brightness(1.8); transform: scale(1.15); }
+.chip.settling { transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), top 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease; }
+
+/* Group colors */
+.g1 { background: rgba(192,132,252,0.25); color: #C084FC; border: 1px solid rgba(192,132,252,0.4); }
+.g2 { background: rgba(96,165,250,0.25); color: #60A5FA; border: 1px solid rgba(96,165,250,0.4); }
+.g3 { background: rgba(74,222,128,0.25); color: #4ADE80; border: 1px solid rgba(74,222,128,0.4); }
+.g4 { background: rgba(251,191,36,0.25); color: #FBBF24; border: 1px solid rgba(251,191,36,0.4); }
+.g5 { background: rgba(248,113,113,0.25); color: #F87171; border: 1px solid rgba(248,113,113,0.4); }
+.g6 { background: rgba(52,211,153,0.25); color: #34D399; border: 1px solid rgba(52,211,153,0.4); }
+
+/* Group cards */
+.groups { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-width: 1100px; margin: 20px auto 0; }
+.group-card { border: 1px solid #1A1A1A; border-radius: 8px; padding: 10px; background: #0E0E0E; transition: all 0.5s; min-height: 150px; }
+.group-card.done { border-color: #4ADE80; box-shadow: 0 0 16px rgba(74,222,128,0.12); }
+.group-title { font-size: 11px; font-weight: 700; color: #5A5A5A; text-align: center; margin-bottom: 6px; transition: color 0.3s; }
+.group-card.done .group-title { color: #F0EDE8; }
+.group-slot { height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; margin-bottom: 3px; background: #141414; color: #2A2A2A; transition: all 0.3s; }
+.group-slot.filled { transform: scale(1); animation: slot-pop 0.3s ease; }
+@keyframes slot-pop { 0% { transform: scale(0.85); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+.group-slot.g1f { background: rgba(192,132,252,0.2); color: #C084FC; }
+.group-slot.g2f { background: rgba(96,165,250,0.2); color: #60A5FA; }
+.group-slot.g3f { background: rgba(74,222,128,0.2); color: #4ADE80; }
+.group-slot.g4f { background: rgba(251,191,36,0.2); color: #FBBF24; }
+.group-slot.g5f { background: rgba(248,113,113,0.2); color: #F87171; }
+.group-slot.g6f { background: rgba(52,211,153,0.2); color: #34D399; }
+
+.status { max-width: 1100px; margin: 12px auto 0; text-align: center; font-size: 11px; min-height: 18px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div><div class="title">VENTURE — Grouping Pipeline</div><div class="subtitle">30 students &rarr; 5 sorting phases &rarr; 6 groups</div></div>
+  <div class="controls">
+    <button class="btn" id="runBtn" onclick="run()">Run Algorithm</button>
+    <button class="btn" id="replayBtn" onclick="replay()" disabled>Replay</button>
+  </div>
+</div>
+
+<div class="progress" id="progress"></div>
+
+<div class="stage" id="stage">
+  <div class="staging-label">30 students — unsorted</div>
+</div>
+
+<div class="status" id="status"></div>
+<div class="groups" id="groups"></div>
+
+<script>
+const STUDENTS = [
+  { name: 'Aaliyah T.', full: 'Aaliyah Torres', group: 1 },
+  { name: 'Jordan R.', full: 'Jordan Reyes', group: 1 },
+  { name: 'Caleb J.', full: 'Caleb Johnson', group: 1 },
+  { name: 'Aaliya H.', full: 'Aaliya Hassan', group: 1 },
+  { name: 'Elijah B.', full: 'Elijah Brown', group: 1 },
+  { name: 'Marcus W.', full: 'Marcus Webb', group: 2 },
+  { name: 'Ethan P.', full: 'Ethan Park', group: 2 },
+  { name: 'Tyler N.', full: 'Tyler Nguyen', group: 2 },
+  { name: 'Liam F.', full: 'Liam Foster', group: 2 },
+  { name: 'Jasmine L.', full: 'Jasmine Lee', group: 2 },
+  { name: 'Priya N.', full: 'Priya Nair', group: 3 },
+  { name: 'Sofia M.', full: 'Sofia Mendez', group: 3 },
+  { name: 'Zara A.', full: 'Zara Ahmed', group: 3 },
+  { name: 'Maya P.', full: 'Maya Patel', group: 3 },
+  { name: 'Fatima A.', full: 'Fatima Ali', group: 3 },
+  { name: 'Destiny B.', full: 'Destiny Banks', group: 4 },
+  { name: 'Amara O.', full: 'Amara Osei', group: 4 },
+  { name: 'Isabella C.', full: 'Isabella Cruz', group: 4 },
+  { name: 'Nia R.', full: 'Nia Robinson', group: 4 },
+  { name: 'Leila M.', full: 'Leila Morales', group: 4 },
+  { name: 'Noah W.', full: 'Noah Williams', group: 5 },
+  { name: 'Kai T.', full: 'Kai Thompson', group: 5 },
+  { name: 'Aiden S.', full: 'Aiden Scott', group: 5 },
+  { name: 'Chloe K.', full: 'Chloe Kim', group: 5 },
+  { name: 'Luna G.', full: 'Luna Garcia', group: 5 },
+  { name: 'Devon M.', full: 'Devon Mitchell', group: 6 },
+  { name: 'Connor W.', full: 'Connor Walsh', group: 6 },
+  { name: 'Oscar R.', full: 'Oscar Rivera', group: 6 },
+  { name: 'Isaiah D.', full: 'Isaiah Davis', group: 6 },
+  { name: 'Xavier J.', full: 'Xavier James', group: 6 },
+];
+
+const GROUP_COLORS = { 1: 'g1', 2: 'g2', 3: 'g3', 4: 'g4', 5: 'g5', 6: 'g6' };
+const LANE_LABELS = ['The Wish', 'The Mind', 'The Lens', 'The Scale', 'The Voice'];
+const LANE_Y_START = 100; // px from top of stage
+const LANE_H = 72;
+const LANE_GAP = 8;
+const CHIP_AREA_LEFT = 100; // left margin for lane labels
+
+let chipEls = [];
+let laneBgs = [];
+let running = false;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+
+function laneTop(i) { return LANE_Y_START + i * (LANE_H + LANE_GAP); }
+
+function chipPos(groupIdx, posInGroup, laneIdx) {
+  const stageW = document.getElementById('stage').offsetWidth;
+  const usable = stageW - CHIP_AREA_LEFT - 20;
+  const groupW = usable / 6;
+  const x = CHIP_AREA_LEFT + groupIdx * groupW + posInGroup * (groupW / 5) + 8;
+  const y = laneTop(laneIdx) + 24;
+  return { x, y };
+}
+
+function init() {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '<div class="staging-label">30 students — unsorted</div>';
+  chipEls = [];
+
+  // Progress steps
+  const prog = document.getElementById('progress');
+  prog.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const s = document.createElement('div');
+    s.className = 'prog-step';
+    s.id = `prog-${i}`;
+    prog.appendChild(s);
+  }
+
+  // Lane backgrounds
+  laneBgs = [];
+  for (let i = 0; i < 5; i++) {
+    const bg = document.createElement('div');
+    bg.className = 'lane-bg';
+    bg.style.top = laneTop(i) + 'px';
+    bg.innerHTML = `<div class="lane-label">${LANE_LABELS[i]}</div>`;
+    bg.id = `lane-${i}`;
+    stage.appendChild(bg);
+    laneBgs.push(bg);
+  }
+
+  // Chips — all in stage, absolute positioned
+  const shuffled = shuffle(STUDENTS);
+  const stageW = stage.offsetWidth;
+  shuffled.forEach((s, i) => {
+    const chip = document.createElement('div');
+    chip.className = `chip ${GROUP_COLORS[s.group]}`;
+    chip.textContent = s.name;
+    chip.id = `chip-${s.full.replace(/\s/g, '')}`;
+    chip.dataset.group = s.group;
+
+    // Scattered in staging area (top 90px)
+    const cols = 6;
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const colW = (stageW - 40) / cols;
+    chip.style.left = (20 + col * colW + Math.random() * 20) + 'px';
+    chip.style.top = (10 + row * 16) + 'px';
+    chip.style.opacity = '0';
+    chip.style.transform = 'scale(0.7)';
+
+    stage.appendChild(chip);
+    chipEls.push({ el: chip, student: s });
+  });
+
+  // Group cards
+  const groupsEl = document.getElementById('groups');
+  groupsEl.innerHTML = '';
+  for (let g = 1; g <= 6; g++) {
+    const card = document.createElement('div');
+    card.className = 'group-card';
+    card.id = `gcard-${g}`;
+    const names = STUDENTS.filter(s => s.group === g);
+    card.innerHTML = `<div class="group-title">Group ${g}</div>` +
+      names.map((s, i) => `<div class="group-slot" id="gs-${g}-${i}">—</div>`).join('');
+    groupsEl.appendChild(card);
+  }
+
+  document.getElementById('status').textContent = '';
+}
+
+async function fadeInChips() {
+  for (const c of chipEls) {
+    c.el.style.opacity = '1';
+    c.el.style.transform = 'scale(1)';
+    await sleep(25);
+  }
+  await sleep(400);
+}
+
+function setLaneActive(idx) {
+  laneBgs.forEach((l, i) => l.classList.toggle('active', i === idx));
+  for (let i = 0; i < 5; i++) {
+    const p = document.getElementById(`prog-${i}`);
+    if (i < idx) { p.className = 'prog-step done'; }
+    else if (i === idx) { p.className = 'prog-step active'; }
+    else { p.className = 'prog-step'; }
+  }
+}
+
+async function moveChipTo(chipData, x, y, delayMs) {
+  chipData.el.style.left = x + 'px';
+  chipData.el.style.top = y + 'px';
+  if (delayMs) await sleep(delayMs);
+}
+
+async function phase1() {
+  setLaneActive(0);
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC">Phase 1:</span> Sorting by invention category...';
+
+  // First, scatter all chips into lane 1 unsorted
+  const stageW = document.getElementById('stage').offsetWidth;
+  const usable = stageW - CHIP_AREA_LEFT - 20;
+  for (const [i, c] of chipEls.entries()) {
+    const x = CHIP_AREA_LEFT + (i / chipEls.length) * usable + Math.random() * 20;
+    const y = laneTop(0) + 20 + Math.random() * 30;
+    c.el.style.left = x + 'px';
+    c.el.style.top = y + 'px';
+    await sleep(30);
+  }
+  await sleep(600);
+
+  // Then sort into group clusters
+  for (let g = 1; g <= 6; g++) {
+    const group = chipEls.filter(c => c.student.group === g);
+    for (const [i, c] of group.entries()) {
+      const pos = chipPos(g - 1, i, 0);
+      c.el.style.left = pos.x + 'px';
+      c.el.style.top = pos.y + 'px';
+      await sleep(60);
+    }
+    await sleep(150);
+  }
+  await sleep(600);
+}
+
+async function phase2() {
+  setLaneActive(1);
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC">Phase 2:</span> Distributing archetypes across groups...';
+  await sleep(400);
+
+  // Move chips to lane 2 with shuffled order within each group (archetype spread)
+  for (let g = 1; g <= 6; g++) {
+    const group = shuffle(chipEls.filter(c => c.student.group === g));
+    for (const [i, c] of group.entries()) {
+      const pos = chipPos(g - 1, i, 1);
+      c.el.style.left = pos.x + 'px';
+      c.el.style.top = pos.y + 'px';
+      await sleep(70);
+    }
+    await sleep(100);
+  }
+  await sleep(800);
+}
+
+async function phase3() {
+  setLaneActive(2);
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC">Phase 3:</span> Optimizing knowledge diversity...';
+  await sleep(400);
+
+  // Chips shift to lane 3 — slight within-group reorder
+  for (let g = 1; g <= 6; g++) {
+    const group = chipEls.filter(c => c.student.group === g);
+    // Reverse order to show a visible change
+    const reordered = [...group].reverse();
+    for (const [i, c] of reordered.entries()) {
+      const pos = chipPos(g - 1, i, 2);
+      c.el.style.left = pos.x + 'px';
+      c.el.style.top = pos.y + 'px';
+      await sleep(40);
+    }
+  }
+  await sleep(700);
+
+  // Briefly dim 2 chips to show "checking diversity"
+  const dimTargets = [chipEls[7], chipEls[19]]; // arbitrary
+  dimTargets.forEach(c => { c.el.style.opacity = '0.4'; });
+  await sleep(500);
+  dimTargets.forEach(c => { c.el.style.opacity = '1'; });
+  await sleep(400);
+}
+
+async function phase4() {
+  setLaneActive(3);
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC">Phase 4:</span> Checking scale balance...';
+  await sleep(400);
+
+  // Move to lane 4 — compact positions
+  for (let g = 1; g <= 6; g++) {
+    const group = chipEls.filter(c => c.student.group === g);
+    for (const [i, c] of group.entries()) {
+      const pos = chipPos(g - 1, i, 3);
+      c.el.style.left = pos.x + 'px';
+      c.el.style.top = pos.y + 'px';
+    }
+    await sleep(80);
+  }
+  await sleep(600);
+
+  // Flash groups 1 and 2 amber briefly (scale imbalance warning)
+  const warn1 = chipEls.filter(c => c.student.group === 1 || c.student.group === 2);
+  warn1.forEach(c => { c.el.style.filter = 'brightness(1.5) hue-rotate(30deg)'; });
+  document.getElementById('status').innerHTML = '<span style="color:#FBBF24">Groups 1 & 2: scale D/C overrepresented — accepted with note</span>';
+  await sleep(1000);
+  warn1.forEach(c => { c.el.style.filter = ''; });
+  await sleep(400);
+}
+
+async function phase5() {
+  setLaneActive(4);
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC">Phase 5:</span> Resolving voice coverage...';
+  await sleep(400);
+
+  // Move to lane 5
+  for (let g = 1; g <= 6; g++) {
+    const group = chipEls.filter(c => c.student.group === g);
+    for (const [i, c] of group.entries()) {
+      const pos = chipPos(g - 1, i, 4);
+      c.el.style.left = pos.x + 'px';
+      c.el.style.top = pos.y + 'px';
+    }
+    await sleep(60);
+  }
+  await sleep(600);
+
+  // Swap animation: Jasmine (G2) ↔ Isaiah (G6)
+  const jasmine = chipEls.find(c => c.student.full === 'Jasmine Lee');
+  const isaiah = chipEls.find(c => c.student.full === 'Isaiah Davis');
+  if (jasmine && isaiah) {
+    jasmine.el.classList.add('highlight');
+    isaiah.el.classList.add('highlight');
+    document.getElementById('status').innerHTML = '<span style="color:#FBBF24">Swapping Jasmine L. ↔ Isaiah D. for verbal coverage</span>';
+    await sleep(600);
+
+    // Swap positions
+    const jPos = { x: jasmine.el.style.left, y: jasmine.el.style.top };
+    const iPos = { x: isaiah.el.style.left, y: isaiah.el.style.top };
+    jasmine.el.style.left = iPos.x;
+    jasmine.el.style.top = iPos.y;
+    isaiah.el.style.left = jPos.x;
+    isaiah.el.style.top = jPos.y;
+    await sleep(900);
+
+    jasmine.el.classList.remove('highlight');
+    isaiah.el.classList.remove('highlight');
+  }
+
+  // Swap 2: Nia (G4) ↔ Oscar (G6)
+  const nia = chipEls.find(c => c.student.full === 'Nia Robinson');
+  const oscar = chipEls.find(c => c.student.full === 'Oscar Rivera');
+  if (nia && oscar) {
+    nia.el.classList.add('highlight');
+    oscar.el.classList.add('highlight');
+    document.getElementById('status').innerHTML = '<span style="color:#FBBF24">Swapping Nia R. ↔ Oscar R. for verbal coverage</span>';
+    await sleep(600);
+
+    const nPos = { x: nia.el.style.left, y: nia.el.style.top };
+    const oPos = { x: oscar.el.style.left, y: oscar.el.style.top };
+    nia.el.style.left = oPos.x;
+    nia.el.style.top = oPos.y;
+    oscar.el.style.left = nPos.x;
+    oscar.el.style.top = nPos.y;
+    await sleep(900);
+
+    nia.el.classList.remove('highlight');
+    oscar.el.classList.remove('highlight');
+  }
+
+  await sleep(400);
+  document.getElementById('status').innerHTML = '<span style="color:#4ADE80">✓ 2 swaps executed. All groups have visual + verbal coverage.</span>';
+  await sleep(800);
+}
+
+async function settleIntoCards() {
+  // Mark all progress done
+  for (let i = 0; i < 5; i++) document.getElementById(`prog-${i}`).className = 'prog-step done';
+  laneBgs.forEach(l => l.classList.remove('active'));
+
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC">Settling into final groups...</span>';
+
+  // Fill all groups simultaneously, interleaved
+  for (let slot = 0; slot < 5; slot++) {
+    for (let g = 1; g <= 6; g++) {
+      const groupStudents = STUDENTS.filter(s => s.group === g);
+      const s = groupStudents[slot];
+      const slotEl = document.getElementById(`gs-${g}-${slot}`);
+      slotEl.textContent = s.full.split(' ')[0] + ' ' + s.full.split(' ')[1][0] + '.';
+      slotEl.classList.add('filled', `g${g}f`);
+    }
+    await sleep(200);
+  }
+
+  // Fade out floating chips
+  chipEls.forEach(c => {
+    c.el.style.opacity = '0';
+    c.el.style.transform = 'scale(0.5)';
+  });
+
+  await sleep(300);
+
+  // Mark cards done one by one
+  for (let g = 1; g <= 6; g++) {
+    document.getElementById(`gcard-${g}`).classList.add('done');
+    await sleep(150);
+  }
+
+  document.getElementById('status').innerHTML = '<span style="color:#C084FC; font-weight:700">Algorithm complete. 6 groups formed. Ready for admin review.</span>';
+}
+
+async function run() {
+  if (running) return;
+  running = true;
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('replayBtn').disabled = true;
+
+  await fadeInChips();
+  await phase1();
+  await phase2();
+  await phase3();
+  await phase4();
+  await phase5();
+  await settleIntoCards();
+
+  running = false;
+  document.getElementById('replayBtn').disabled = false;
+}
+
+function replay() {
+  document.getElementById('status').textContent = '';
+  init();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => run());
+  });
+}
+
+init();
+</script>
+
+</body>
+</html>

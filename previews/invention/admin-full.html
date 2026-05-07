@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview: Invention Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #F9FAFB; color: #111827; }
+
+nav { border-bottom: 1px solid #E5E7EB; background: #fff; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+.logo { font-size: 18px; font-weight: 700; color: #0D9488; }
+.nav-badge { background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
+
+.container { max-width: 1000px; margin: 0 auto; padding: 32px 24px; }
+.header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #0D9488; }
+h1 { font-size: 24px; font-weight: 700; margin-top: 4px; }
+.header-right { display: flex; align-items: center; gap: 6px; }
+.tab { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: none; color: #4B5563; transition: all 0.15s; }
+.tab.active { background: #0D9488; color: #fff; }
+.algo-btn { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; color: #fff; background: #C084FC; transition: all 0.15s; animation: purpleGlow 2s ease-in-out infinite alternate; }
+.algo-btn:hover { transform: scale(1.05); }
+@keyframes purpleGlow {
+  0% { box-shadow: 0 0 12px rgba(192,132,252,0.3), 0 0 30px rgba(192,132,252,0.1); }
+  100% { box-shadow: 0 0 18px rgba(192,132,252,0.5), 0 0 45px rgba(192,132,252,0.2); }
+}
+
+.card { border: 1px solid #E5E7EB; border-radius: 12px; background: #fff; padding: 20px; margin-top: 16px; }
+.share-card { border-radius: 12px; border: 1px solid rgba(13,148,136,0.2); background: rgba(13,148,136,0.05); padding: 20px; margin-top: 24px; }
+.meter-bar { height: 12px; border-radius: 9999px; background: #F3F4F6; overflow: hidden; margin-top: 12px; }
+.meter-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0); }
+.meter-legend { display: flex; gap: 16px; font-size: 12px; color: #9CA3AF; margin-top: 8px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.bd-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #0D9488; margin-bottom: 12px; }
+.bd-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; }
+.alert-card { border: 1px solid #FCD34D; background: #FFFBEB; border-radius: 12px; padding: 16px; margin-top: 16px; }
+.dot-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; font-size: 14px; }
+.pdots { display: flex; gap: 3px; }
+.pd { width: 16px; height: 8px; border-radius: 4px; }
+.pd-d { background: #0D9488; }
+.pd-p { background: #E5E7EB; }
+
+/* Groups */
+.print-bar { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.print-btn { border: 2px solid #D1D5DB; border-radius: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; background: #fff; cursor: pointer; text-decoration: none; color: #111827; }
+.reveal-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.reveal-btn { background: #F59E0B; border: none; border-radius: 8px; padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.gc { border: 1px solid #E5E7EB; border-radius: 12px; background: #fff; padding: 20px; margin-top: 12px; }
+.gc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.gc-title { font-weight: 600; }
+.gc-cat { font-size: 12px; color: #9CA3AF; margin-left: 8px; }
+.bp { background: #D1FAE5; color: #065F46; font-size: 11px; padding: 2px 10px; border-radius: 9999px; }
+.br { background: #FEF3C7; color: #92400E; font-size: 11px; padding: 2px 10px; border-radius: 9999px; }
+.sr { display: flex; justify-content: space-between; padding: 3px 0; font-size: 14px; }
+.metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; text-align: center; font-size: 12px; }
+.ml { color: #9CA3AF; }
+.mp { color: #059669; font-weight: 500; }
+.mg { color: #D97706; font-weight: 500; }
+.staff { margin-top: 12px; border-radius: 8px; border: 1px solid #BFDBFE; background: #EFF6FF; padding: 12px; font-size: 12px; color: #2563EB; }
+
+/* Terminal */
+.terminal { border-radius: 12px; border: 1px solid #2A2A2A; background: #0A0A0A; overflow: hidden; margin-top: 24px; }
+.th { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #2A2A2A; background: #1A1A1A; }
+.wd { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; padding: 0; }
+.tt { font-family: 'Space Mono', monospace; font-size: 11px; color: #6A6A6A; }
+.rb { font-family: 'Space Mono', monospace; font-size: 11px; padding: 4px 14px; border-radius: 5px; cursor: pointer; border: 1px solid #C084FC; background: #1A1A1A; color: #C084FC; }
+.rb:disabled { border-color: #2A2A2A; color: #4A4A4A; cursor: not-allowed; }
+.tb { height: 480px; overflow-y: auto; font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.8; }
+.tf { display: flex; align-items: center; justify-content: flex-end; gap: 16px; padding: 8px 16px; border-top: 1px solid #2A2A2A; background: #1A1A1A; }
+.sw { display: flex; align-items: center; gap: 8px; }
+.sl { font-family: 'Space Mono', monospace; font-size: 10px; color: #4A4A4A; }
+.ss { width: 64px; height: 4px; -webkit-appearance: none; appearance: none; border-radius: 2px; background: #2A2A2A; cursor: pointer; }
+.ss::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #C084FC; }
+.pill { display: flex; gap: 2px; border-radius: 6px; padding: 2px; background: #2A2A2A; }
+.pb { border-radius: 4px; padding: 4px 12px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 500; border: none; cursor: pointer; }
+.pb.on { background: #3A3A3A; color: #E8E8E8; }
+.pb:not(.on) { background: transparent; color: #6A6A6A; }
+.cursor { display: inline-block; width: 6px; height: 13px; background: #C084FC; margin-left: 1px; vertical-align: text-bottom; animation: blink 0.8s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.terminal:fullscreen { border-radius: 0; }
+.terminal:fullscreen .tb { height: calc(100vh - 90px); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Adaptable</span>
+  <span class="nav-badge">Invention Mode</span>
+</nav>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <p class="label">Invention Mode</p>
+      <h1>VENTURE Dashboard</h1>
+    </div>
+    <div class="header-right">
+      <button class="tab active" onclick="showTab('overview')">Overview</button>
+      <button class="tab" onclick="showTab('groups')">Groups</button>
+      <button class="algo-btn" id="algoBtn" onclick="openTerminal()">View Algorithm</button>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="tab-overview">
+    <div class="share-card">
+      <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#0D9488;margin-bottom:8px">Shareable Link</p>
+      <p style="font-size:13px;color:#4B5563">Send this to participants. Single entry point for all students.</p>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <input style="flex:1;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:13px" value="https://adaptable.vercel.app/venture" readonly onclick="this.select()">
+        <button style="border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;border:none;cursor:pointer;background:#0D9488;color:#fff">Copy</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:600">Wizard Completion</span><span style="font-size:14px;color:#9CA3AF">138 / 165 (84%)</span></div>
+      <div class="meter-bar"><div class="meter-fill" style="width:84%"></div></div>
+      <div class="meter-legend"><span>138 completed</span><span>19 in progress</span><span>8 not started</span></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><p class="bd-title">Circle 1 — Invention Type</p><div class="bd-row"><span>Environmental</span><span style="font-weight:600">31</span></div><div class="bd-row"><span>Medical/health</span><span style="font-weight:600">28</span></div><div class="bd-row"><span>Digital tool/app</span><span style="font-weight:600">22</span></div><div class="bd-row"><span>Social/community</span><span style="font-weight:600">19</span></div><div class="bd-row"><span>Physical product</span><span style="font-weight:600">16</span></div><div class="bd-row"><span>Learning tool</span><span style="font-weight:600">11</span></div></div>
+      <div class="card"><p class="bd-title">Circle 2 — Archetype</p><div class="bd-row"><span>Builder</span><span style="font-weight:600">38</span></div><div class="bd-row"><span>Empath</span><span style="font-weight:600">34</span></div><div class="bd-row"><span>Systems Thinker</span><span style="font-weight:600">29</span></div><div class="bd-row"><span>Connector</span><span style="font-weight:600">22</span></div><div class="bd-row"><span>Storyteller</span><span style="font-weight:600">15</span></div></div>
+    </div>
+    <div class="alert-card">
+      <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#92400E;margin-bottom:12px">Started but not completed (19)</p>
+      <div class="dot-row"><span style="font-weight:500;min-width:130px">Sofia Reyes</span><div class="pdots"><div class="pd pd-d"></div><div class="pd pd-d"></div><div class="pd pd-d"></div><div class="pd pd-d"></div><div class="pd pd-p"></div></div></div>
+      <div class="dot-row"><span style="font-weight:500;min-width:130px">Marcus Chen</span><div class="pdots"><div class="pd pd-d"></div><div class="pd pd-d"></div><div class="pd pd-d"></div><div class="pd pd-p"></div><div class="pd pd-p"></div></div></div>
+      <div class="dot-row"><span style="font-weight:500;min-width:130px">Jaylen Carter</span><div class="pdots"><div class="pd pd-d"></div><div class="pd pd-d"></div><div class="pd pd-p"></div><div class="pd pd-p"></div><div class="pd pd-p"></div></div></div>
+      <p style="font-size:12px;color:#9CA3AF;margin-top:8px">+ 16 more</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <p style="font-size:14px;color:#4B5563;margin-bottom:16px">Grouping threshold: 80% — currently at 84%</p>
+      <button style="background:#0D9488;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer">Run Grouping Algorithm</button>
+    </div>
+  </div>
+
+  <!-- GROUPS -->
+  <div id="tab-groups" style="display:none">
+    <div class="print-bar"><span style="font-size:14px;font-weight:500">Print:</span><a href="#" class="print-btn">Group Roster</a><a href="#" class="print-btn">Student Slips</a></div>
+    <div class="reveal-bar"><p style="font-size:14px;color:#4B5563">5 groups · Hidden from students</p><button class="reveal-btn">Reveal Groups to Students</button></div>
+    <div class="gc">
+      <div class="gc-head"><div><span class="gc-title">Group 1</span><span class="gc-cat">Digital</span></div><span class="bp">All criteria met</span></div>
+      <div class="sr"><span>Marcus Webb</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Ethan Park</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Tyler Nguyen</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Liam Foster</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Jasmine Lee</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Isaiah Davis</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="metrics"><div><p class="ml">Archetypes</p><p class="mp">Pass</p></div><div><p class="ml">Diversity</p><p class="mp">33%</p></div><div><p class="ml">Scale</p><p class="mg">Review</p></div><div><p class="ml">Visual</p><p class="mp">Pass</p></div><div><p class="ml">Verbal</p><p class="mp">Pass</p></div></div>
+    </div>
+    <div class="gc">
+      <div class="gc-head"><div><span class="gc-title">Group 2</span><span class="gc-cat">Environmental</span></div><span class="br">Needs review</span></div>
+      <div class="sr"><span>Aaliyah Torres</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Jordan Reyes</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Caleb Johnson</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Aaliya Hassan</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Elijah Brown</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="sr"><span>Devon Mitchell</span><span style="font-size:12px;color:#9CA3AF;cursor:pointer">Move</span></div>
+      <div class="metrics"><div><p class="ml">Archetypes</p><p class="mp">Pass</p></div><div><p class="ml">Diversity</p><p class="mp">30%</p></div><div><p class="ml">Scale</p><p class="mg">Review</p></div><div><p class="ml">Visual</p><p class="mp">Pass</p></div><div><p class="ml">Verbal</p><p class="mp">Pass</p></div></div>
+      <div class="staff"><strong style="color:#1D4ED8">Staff support:</strong> Scale imbalance — all students selected "world." Assign a staff mentor for scoping.</div>
+    </div>
+    <p style="text-align:center;color:#9CA3AF;font-size:13px;margin-top:16px">+ 3 more groups</p>
+  </div>
+
+  <!-- TERMINAL (inline, shown by purple button) -->
+  <div class="terminal" id="terminal" style="display:none">
+    <div class="th">
+      <div style="display:flex;gap:6px">
+        <button class="wd" style="background:#F87171" onclick="closeTerminal()"></button>
+        <button class="wd" style="background:#FBBF24" onclick="closeTerminal()"></button>
+        <button class="wd" style="background:#4ADE80" onclick="document.getElementById('terminal').requestFullscreen()"></button>
+      </div>
+      <span class="tt" id="termTitle">VENTURE — Grouping Algorithm</span>
+      <button class="rb" id="runBtn" onclick="runReplay()">Run Algorithm</button>
+    </div>
+    <div class="tb" id="termBody">
+      <div id="normalView" style="padding:14px"></div>
+      <div id="rawView" style="display:none;padding:12px 0"></div>
+    </div>
+    <div class="tf">
+      <div class="sw"><span class="sl">Speed</span><input type="range" class="ss" min="0" max="3" value="1" oninput="sp=[0.5,1,2,4][this.value]"></div>
+      <div class="pill">
+        <button class="pb on" id="pN" onclick="setMode('normal')">Normal</button>
+        <button class="pb" id="pR" onclick="setMode('raw')">Raw</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(t) {
+  document.getElementById('tab-overview').style.display = t === 'overview' ? 'block' : 'none';
+  document.getElementById('tab-groups').style.display = t === 'groups' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', ['overview','groups'][i] === t));
+}
+
+function openTerminal() {
+  document.getElementById('algoBtn').style.display = 'none';
+  document.getElementById('terminal').style.display = 'block';
+}
+function closeTerminal() {
+  if (document.fullscreenElement) document.exitFullscreen();
+  document.getElementById('terminal').style.display = 'none';
+  document.getElementById('algoBtn').style.display = 'inline-flex';
+}
+
+let mode = 'normal', sp = 1, isRunning = false, userScrolled = false;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('pN').classList.toggle('on', m === 'normal');
+  document.getElementById('pR').classList.toggle('on', m === 'raw');
+  document.getElementById('termTitle').textContent = m === 'raw' ? 'invention-grouping.ts' : 'VENTURE — Grouping Algorithm';
+  const nv = document.getElementById('normalView'), rv = document.getElementById('rawView');
+  if (nv) nv.style.display = m === 'normal' ? 'block' : 'none';
+  if (rv) rv.style.display = m === 'raw' ? 'block' : 'none';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms / sp)); }
+
+const tb = document.getElementById('termBody');
+tb.addEventListener('scroll', () => { userScrolled = tb.scrollHeight - tb.scrollTop - tb.clientHeight > 80; });
+function autoScroll() { if (!userScrolled) tb.scrollTop = tb.scrollHeight; }
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function colorize(l) {
+  if (!l) return '&nbsp;';
+  let s = esc(l);
+  if (s.trimStart().startsWith('//')) return '<span style="color:#8B8B8B;font-style:italic">' + s + '</span>';
+  s = s.replace(/(\[REDACTED\])/g, '<span style="color:#F87171;font-weight:600">$1</span>');
+  s = s.replace(/("(?:[^"\\]|\\.)*")/g, '<span style="color:#C4B5FD">$1</span>');
+  s = s.replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|continue)\b/g, '<span style="color:#D8B4FE">$1</span>');
+  s = s.replace(/\b(Map|Set|Object|null|true|false)\b/g, '<span style="color:#93C5FD">$1</span>');
+  s = s.replace(/\b(\d+)\b/g, '<span style="color:#FCD34D">$1</span>');
+  s = s.replace(/\.(findIndex|flatMap|some|includes|every|splice|push|shift|get|set|from|select|eq|not|delete|insert|update|values|has|length)\b/g, '.<span style="color:#5EEAD4">$1</span>');
+  s = s.replace(/\b(createClient)\b/g, '<span style="color:#5EEAD4">$1</span>');
+  return s;
+}
+
+const RAW = `import [REDACTED];
+import { createClient } from [REDACTED];
+
+// Invention Mode Grouping Algorithm
+// Five-step sort: category \u2192 archetype \u2192 chips \u2192 scale \u2192 voice
+
+const VISUAL_CHIPS = ["Draw it", "Build a prototype", "Build a slide or poster"];
+const VERBAL_CHIPS = ["Explain it out loud", "Write it out"];
+const TARGET_ARCHETYPES = ["builder", "empath", "systems_thinker"];
+
+export async function runGroupingAlgorithm(classCode, groupSize = 5) {
+  const db = await createClient();
+  const { data: sessions } = await db
+    .from("invention_sessions")
+    .select("student_id, circle_1_category, ...")
+    .eq("class_code", classCode)
+    .not("completed_at", "is", null);
+
+  // \u2500\u2500 Step 1: Primary sort on Circle 1 \u2500\u2500
+  const pools = new Map();
+  for (const s of students) {
+    pools.get(s.circle_1_category) ?? [];
+    pool.push(s);
+    pools.set(s.circle_1_category, pool);
+  }
+
+  // \u2500\u2500 Step 2: Archetype distribution \u2500\u2500
+  for (const [category, pool] of pools) {
+    const remaining = [...pool];
+    while (remaining.length > 0) {
+      if (remaining.length < 3) { /* merge */ }
+      for (const archetype of TARGET_ARCHETYPES) {
+        const idx = remaining.findIndex(s => s.archetype === archetype);
+        if (idx !== -1) group.push(remaining.splice(idx, 1)[0]);
+      }
+      while (group.length < targetSize) { /* fill */ }
+    }
+  }
+
+  // \u2500\u2500 Step 3: Chip diversity \u2500\u2500
+  const allChips = group.flatMap(s => s.chips);
+  const diversity = new Set(allChips).size / allChips.length;
+
+  // \u2500\u2500 Step 4: Scale balance \u2500\u2500
+  const dist = {};
+  for (const s of group) dist[s.scale] = (dist[s.scale] ?? 0) + 1;
+  const balanced = Object.values(dist).every(c => c <= 3);
+
+  // \u2500\u2500 Step 5: Voice coverage \u2500\u2500
+  const visual = group.some(s => s.voice.some(v => VISUAL.includes(v)));
+  const verbal = group.some(s => s.voice.some(v => VERBAL.includes(v)));
+
+  // \u2500\u2500 Database writes \u2500\u2500
+  await db.from([REDACTED]).delete().eq("class_code", classCode);
+  for (const group of allGroups) {
+    await db.from([REDACTED]).insert({ ... });
+  }
+  return { log };
+}`;
+
+const LOG = [
+  {t:'$ venture-group --class VENTURE --run',c:'#F0EDE8',d:400,b:1},{t:'',d:200},
+  {t:'Initializing grouping algorithm for VENTURE...',c:'#9A9A9A',d:250},
+  {t:'Loading 30 student profiles...',c:'#9A9A9A',d:350},
+  {t:'Configuration: group_size=5, threshold=80%',c:'#9A9A9A',d:200},{t:'',d:200},
+  {t:'\u2500\u2500 Step 1: Sorting by invention category (The Wish) \u2500\u2500',c:'#C084FC',d:500,b:1},
+  {t:'  digital \u2014 6    environmental \u2014 6    medical \u2014 6',c:'#F0EDE8',d:150},
+  {t:'  learning \u2014 5   social \u2014 7',c:'#F0EDE8',d:150},
+  {t:'  \u2713 5 category pools formed',c:'#4ADE80',d:300},{t:'',d:200},
+  {t:'\u2500\u2500 Step 2: Distributing archetypes (The Mind) \u2500\u2500',c:'#C084FC',d:500,b:1},
+  {t:'  Group 1 (digital): builder \u2192 empath \u2192 sys_thinker \u2192 connector \u2192 storyteller \u2192 builder',c:'#60A5FA',d:120},
+  {t:'    \u2713 Core archetypes present',c:'#4ADE80',d:150},
+  {t:'  Group 2 (environmental): builder \u2192 empath \u2192 sys_thinker \u2192 connector \u00d72 \u2192 empath',c:'#60A5FA',d:120},
+  {t:'    \u2713 Core archetypes present',c:'#4ADE80',d:150},
+  {t:'  Groups 3\u20135: \u2713 All core archetypes present',c:'#4ADE80',d:200},{t:'',d:200},
+  {t:'\u2500\u2500 Step 3: Evaluating chip diversity (The Lens) \u2500\u2500',c:'#C084FC',d:500,b:1},
+  {t:'  G1: 33%  G2: 30%  G3: 27%  G4: 44%  G5: 45%',c:'#9A9A9A',d:200},{t:'',d:200},
+  {t:'\u2500\u2500 Step 4: Checking scale balance (The Scale) \u2500\u2500',c:'#C084FC',d:500,b:1},
+  {t:'  Group 1: \u26a0 generation overrepresented (4\u00d7)',c:'#FBBF24',d:200},
+  {t:'  Group 2: \u26a0 world overrepresented (6\u00d7)',c:'#FBBF24',d:200},
+  {t:'  Groups 3\u20134: \u2713 balanced',c:'#4ADE80',d:130},
+  {t:'  Group 5: \u26a0 one_person overrepresented (4\u00d7)',c:'#FBBF24',d:200},{t:'',d:200},
+  {t:'\u2500\u2500 Step 5: Checking voice coverage (The Voice) \u2500\u2500',c:'#C084FC',d:500,b:1},
+  {t:'  All groups: visual \u2713  verbal \u2713',c:'#4ADE80',d:200},{t:'',d:200},
+  {t:'\u2500\u2500 Writing results to database \u2500\u2500',c:'#C084FC',d:400,b:1},
+  {t:'  Groups 1\u20135 \u2192 [REDACTED]',c:'#9A9A9A',d:200},
+  {t:'  Updating group_number for 30 students...',c:'#9A9A9A',d:300},{t:'',d:300},
+  {t:'\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550',c:'#C084FC',d:200},
+  {t:'Algorithm complete. 5 groups formed.',c:'#C084FC',d:400,b:1},
+  {t:'2 groups met all criteria. 3 with compromises.',c:'#4ADE80',d:300},
+  {t:'',d:800},
+  {t:'"Have a great day" \u2014 AJ Rogers',c:'#A78BFA',d:0,i:1},
+];
+
+async function runReplay() {
+  if (isRunning) return;
+  isRunning = true; userScrolled = false;
+  document.getElementById('runBtn').disabled = true;
+  const nv = document.getElementById('normalView');
+  const rv = document.getElementById('rawView');
+  nv.innerHTML = ''; rv.innerHTML = '';
+  setMode(mode);
+
+  let rawIdx = 0, rawDone = false;
+  const rawTotal = RAW.length;
+
+  function renderRaw(n) {
+    const text = RAW.slice(0, n), lines = text.split('\n');
+    rv.innerHTML = '';
+    lines.forEach((l, i) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'padding:0 12px;display:flex;gap:10px';
+      const last = i === lines.length - 1;
+      const done = !last || n >= rawTotal;
+      const html = done ? colorize(l) : ('<span style="color:#E8E8E8">' + esc(l) + '</span>' + (rawDone ? '' : '<span class="cursor"></span>'));
+      div.innerHTML = '<span style="color:#3A3A3A;width:24px;text-align:right;flex-shrink:0;user-select:none;font-size:10px">' + (i+1) + '</span><span style="white-space:pre;color:#E8E8E8">' + html + '</span>';
+      rv.appendChild(div);
+    });
+    if (mode === 'raw') autoScroll();
+  }
+
+  const rt = setInterval(() => {
+    if (!isRunning) { clearInterval(rt); return; }
+    const ch = RAW[rawIdx] || '';
+    rawIdx += (ch === ' ' || ch === '\n') ? 2 : 1;
+    if (rawIdx >= rawTotal) { rawIdx = rawTotal; rawDone = true; clearInterval(rt); }
+    renderRaw(rawIdx);
+  }, 30 / sp);
+
+  for (const line of LOG) {
+    if (line.t === '') { const d = document.createElement('div'); d.innerHTML = '&nbsp;'; nv.appendChild(d); await sleep(line.d); if (mode === 'normal') autoScroll(); continue; }
+    const d = document.createElement('div');
+    d.style.color = line.c || '#9A9A9A';
+    if (line.b) d.style.fontWeight = '700';
+    if (line.i) d.style.fontStyle = 'italic';
+    nv.appendChild(d);
+    for (let c = 0; c < line.t.length; c++) {
+      d.textContent = line.t.slice(0, c + 1);
+      const old = nv.querySelector('.cursor'); if (old) old.remove();
+      const cur = document.createElement('span'); cur.className = 'cursor'; d.appendChild(cur);
+      if (mode === 'normal') autoScroll();
+      await sleep(18);
+    }
+    const oc = d.querySelector('.cursor'); if (oc) oc.remove();
+    await sleep(line.d);
+    if (mode === 'normal') autoScroll();
+  }
+  const last = nv.lastElementChild;
+  if (last) last.style.textShadow = '0 0 8px rgba(167,139,250,0.3)';
+  clearInterval(rt); rawDone = true; renderRaw(rawTotal);
+  isRunning = false;
+  document.getElementById('runBtn').disabled = false;
+  document.getElementById('runBtn').textContent = 'Replay';
+}
+</script>
+
+</body>
+</html>

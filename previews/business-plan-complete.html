@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elsa's Art Studio — Complete Business Plan | Adaptable</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@700,600,500,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0D9488;
+    --primary-light: #14B8A6;
+    --primary-dark: #0F766E;
+    --accent: #F59E0B;
+    --accent-light: #FBBF24;
+    --bg: #FAFAF9;
+    --bg-subtle: #FFFFFF;
+    --bg-muted: #F5F5F4;
+    --border: #E7E5E4;
+    --border-strong: #D6D3D1;
+    --text-primary: #1C1917;
+    --text-secondary: #57534E;
+    --text-muted: #A8A29E;
+    --font-display: 'Satoshi', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    /* Ikigai circle colors */
+    --love: #F5E642;
+    --good-at: #A8DB5A;
+    --needs: #F4A79D;
+    --paid: #6DD5D0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 672px;
+    margin: 0 auto;
+    padding: 40px 16px 60px;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 40px;
+  }
+  .header-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .header-title {
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+  .header-meta {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .header-meta strong { color: var(--primary); font-weight: 600; }
+
+  /* Ikigai grid */
+  .ikigai-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 32px;
+  }
+  .ikigai-cell {
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+  .ikigai-cell-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .ikigai-cell-content {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .ikigai-love { background: var(--love); color: #1C1917; }
+  .ikigai-good { background: var(--good-at); color: #1C1917; }
+  .ikigai-needs { background: var(--needs); color: #1C1917; }
+  .ikigai-paid { background: var(--paid); color: #1C1917; }
+
+  /* Section */
+  .section {
+    margin-bottom: 32px;
+  }
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .section-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-number.accent { background: var(--accent); }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .section-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--bg-subtle);
+    padding: 24px;
+  }
+
+  /* Field */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .field-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  /* Decision item */
+  .decision {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .decision:last-child { border-bottom: none; }
+  .decision-lesson {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .decision-text {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  /* Pitch */
+  .pitch-card {
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    background: rgba(245, 158, 11, 0.04);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .pitch-text {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .pitch-attribution {
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* Badge row */
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+  }
+  .badge.gold { background: #FEF3C7; border-color: #FDE68A; color: #92400E; }
+  .badge.silver { background: #F1F5F9; border-color: #CBD5E1; color: #475569; }
+  .badge.bronze { background: #FFF7ED; border-color: #FED7AA; color: #9A3412; }
+
+  /* Pill indicator */
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(13, 148, 136, 0.08);
+    color: var(--primary);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 16px;
+  }
+  .footer a:hover { text-decoration: underline; }
+
+  /* Completion banner */
+  .completion-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.08), rgba(245, 158, 11, 0.08));
+    border: 1px solid rgba(13, 148, 136, 0.15);
+    margin-bottom: 32px;
+  }
+  .completion-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .completion-text {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .completion-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* Divider */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 32px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <p class="header-label">Business Plan</p>
+    <h1 class="header-title">Elsa's Art Studio</h1>
+    <p class="header-meta">by Elsa Martinez · <strong>22/22 lessons complete</strong></p>
+  </div>
+
+  <!-- Completion banner -->
+  <div class="completion-banner">
+    <span class="completion-icon">&#x1F393;</span>
+    <div>
+      <div class="completion-text">Program Complete — Adaptable Graduate</div>
+      <div class="completion-sub">All 22 lessons finished across 6 modules. This business plan is the living record of every decision you made.</div>
+    </div>
+  </div>
+
+  <!-- Ikigai -->
+  <div class="ikigai-grid">
+    <div class="ikigai-cell ikigai-love">
+      <div class="ikigai-cell-label">What I Love</div>
+      <div class="ikigai-cell-content">Drawing, painting, pet portraits, watercolors</div>
+    </div>
+    <div class="ikigai-cell ikigai-good">
+      <div class="ikigai-cell-label">What I'm Good At</div>
+      <div class="ikigai-cell-content">Capturing likeness, color mixing, working from photo references</div>
+    </div>
+    <div class="ikigai-cell ikigai-needs">
+      <div class="ikigai-cell-label">What People Need</div>
+      <div class="ikigai-cell-content">Affordable custom pet portraits, gifts that feel personal</div>
+    </div>
+    <div class="ikigai-cell ikigai-paid">
+      <div class="ikigai-cell-label">How I Get Paid</div>
+      <div class="ikigai-cell-content">Per-portrait pricing, $15-35 depending on size and detail</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Vision -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">1</span>
+      <span class="section-title">Vision</span>
+    </div>
+    <div class="section-card">
+      <div class="field">
+        <div class="field-label">What We Do</div>
+        <div class="field-value">Custom watercolor pet portraits for classmates and their families — hand-painted from photos, delivered framed or unframed</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Why This Matters to Me</div>
+        <div class="field-value">I've been drawing animals since I was 8 and people always say my portraits "look alive." I want to turn the thing I already do for fun into something people value enough to pay for — and every portrait I paint is a gift someone gives to a person who loves their pet.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">The Golden Circle</div>
+        <div class="field-value"><strong>WHY:</strong> Every pet owner wants to freeze a moment with their best friend. I believe art should be personal, not mass-produced. <strong>HOW:</strong> Hand-painted from the owner's favorite photo. <strong>WHAT:</strong> Custom watercolor pet portraits.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Customer -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">2</span>
+      <span class="section-title">Customer</span>
+    </div>
+    <div class="section-card">
+      <div class="field">
+        <div class="field-label">Target Customer</div>
+        <div class="field-value">Girls at school whose families have pets — especially around Christmas, Mother's Day, and pet birthdays. The buyer is usually a parent paying for a gift, or a student buying for their own room.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Customer Profile</div>
+        <div class="field-value"><strong>Sarah, 15.</strong> Has a golden retriever named Biscuit that she posts on Instagram constantly. Her mom's birthday is next month and she wants something personal but can't afford a $200 Etsy commission. She'd pay $25 for a hand-painted portrait if she could see examples first.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Revenue Model</div>
+        <div class="field-value">$15 for a 5×7 pencil sketch, $25 for an 8×10 watercolor, $35 for 11×14 with background detail. Payment via Venmo or cash. Takes 3-5 days per portrait.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Interview Insights</div>
+        <div class="field-value">
+          <span class="pill">4 interviews completed</span>
+          <div style="margin-top: 8px;">Key insight: People don't just want a picture of their pet — they want the PERSONALITY captured. "Make him look goofy, that's how he really is." The emotional connection matters more than technical accuracy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Competition -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">3</span>
+      <span class="section-title">Competition & Differentiation</span>
+    </div>
+    <div class="section-card">
+      <div class="decision">
+        <div class="decision-lesson">Research Your Competition</div>
+        <div class="decision-text">My main competitors are Etsy portrait artists ($60-200, 2-4 week wait) and phone filter apps (free but generic). My edge: I'm local, fast (3-5 days), cheap ($15-35), and I know the pets personally — I can capture personality, not just appearance.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">Define Your Target Customer</div>
+        <div class="decision-text">I'm not competing with professional artists. I'm competing with the "I'll just print a photo at Walgreens" default. My customer is someone who wants something more personal than a photo but can't justify $100+ for professional art.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Brand -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">4</span>
+      <span class="section-title">Brand</span>
+    </div>
+    <div class="section-card">
+      <div class="field">
+        <div class="field-label">Brand Voice</div>
+        <div class="field-value"><strong>Gut-feeling words:</strong> warm, personal, handmade, joyful, real<br><strong>We are NOT:</strong> corporate, mass-produced, sterile, generic, "luxury"</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Business Name</div>
+        <div class="field-value">Elsa's Art Studio — tested with 5 friends over 24 hours. Runner-ups: "Paws & Paint," "Pet Canvas." Chose the personal name because customers are buying from ME, not a brand.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Visual Identity</div>
+        <div class="field-value"><strong>Color:</strong> Warm cream (#FFF8F0) — feels handmade, not clinical. <strong>Font:</strong> Hand-written category — matches the hand-painted product. <strong>First impression:</strong> "This was made by a real person who cares about your pet."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Marketing & Sales -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">5</span>
+      <span class="section-title">Marketing & Sales</span>
+    </div>
+    <div class="section-card">
+      <div class="decision">
+        <div class="decision-lesson">Zero-Budget Marketing</div>
+        <div class="decision-text">Three channels: (1) Instagram — post process videos of paintings, (2) school art hallway — display sample portraits with QR code, (3) word of mouth through friends who have pets. First action: DM 5 classmates with pet Instagrams offering a free sample portrait this week.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">Social Media Strategy</div>
+        <div class="decision-text">1-1-1 rule: one process timelapse, one happy customer reaction, one behind-the-scenes of my workspace. Post 3x/week. Film the painting process on my phone propped against a book.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">Word of Mouth & Referrals</div>
+        <div class="decision-text">Remarkable moment: include a tiny pencil sketch of the pet on the back of the portrait as a surprise bonus. Referral script: "Hey, I painted [friend]'s dog — she loved it. Want me to do yours? I have two spots open this week." 5 people to tell: Mom (she knows everyone), my art teacher, Sarah, Diego, Coach Kim (she has 3 dogs).</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">The Pitch</div>
+        <div class="decision-text">You know how everyone has a million photos of their pet on their phone but nothing on their wall? I paint custom watercolor portraits from your favorite photo — hand-painted, not printed — so you get something that actually captures their personality. Most people pay $25 and have it in less than a week.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6: Financials -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">6</span>
+      <span class="section-title">The Numbers</span>
+    </div>
+    <div class="section-card">
+      <div class="field">
+        <div class="field-label">Cost Per Portrait (8×10 watercolor)</div>
+        <div class="field-value">
+          Paper: $2 · Paints/water: $1 · Frame (if included): $4 · My time: ~2 hours<br>
+          <strong>Total hard cost: $7</strong> · At $25 price → <strong>$18 profit per portrait</strong>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Pricing Rationale</div>
+        <div class="field-value">Etsy custom portraits start at $60. Local print shops charge $15 just for framing. At $25, I'm the only option between "free phone photo" and "$60+ professional art." The $15 sketch tier exists for friends who want something but can't spend $25.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Tracking System</div>
+        <div class="field-value">Google Sheet: Date | Money In | Money Out | What For. Review every Sunday at 7pm. Two questions: Am I making more than I'm spending? What's my biggest cost I could cut?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 7: Launch -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number">7</span>
+      <span class="section-title">Launch & First Sale</span>
+    </div>
+    <div class="section-card">
+      <div class="decision">
+        <div class="decision-lesson">Shipping Before I'm Ready</div>
+        <div class="decision-text">MVP: one 5×7 pencil sketch for Sarah's dog Biscuit. Not watercolor, not framed — just the sketch. Perfectionism traps I'm ignoring: "I need a website first," "I should practice more breeds," "what if the likeness isn't perfect." Delivering Thursday after school.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">First Customer Protocol</div>
+        <div class="decision-text">Confirmation: "Hey Sarah! I'll have Biscuit's portrait ready by Thursday. I'm working from that photo you posted last week — the one where he's sleeping on the couch. I'll text you when it's done." Risk #1: likeness is off → show her a work-in-progress and ask if she wants changes. Risk #2: she doesn't like it → offer a redo at no charge. Remarkable moment: include a tiny bonus sketch of Biscuit with sunglasses on the back.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">Getting Feedback</div>
+        <div class="decision-text">Two questions: "Walk me through what happened when you showed it to your mom" and "If you could change one thing about the whole experience — ordering, waiting, the portrait itself — what would it be?" Pre-committed response to "it took too long": offer a rush option at $5 extra for 2-day turnaround.</div>
+      </div>
+      <div class="decision">
+        <div class="decision-lesson">After the First Sale</div>
+        <div class="decision-text">Celebration: photo of me holding the finished portrait → post on Instagram. 24-hour next action: DM three people who liked the post. Customer #2 targets: Diego (has a cat), my neighbor Mrs. Chen (just got a puppy), my art teacher (has two rescue dogs). Wisdom: "The hardest part wasn't painting — it was sending that first DM. Everything after that was just doing the thing I already know how to do."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Pitch (featured) -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number accent">&#9733;</span>
+      <span class="section-title">The Elevator Pitch</span>
+    </div>
+    <div class="pitch-card">
+      <div class="pitch-text">"You know how everyone has a million photos of their pet on their phone but nothing on their wall? I paint custom watercolor portraits from your favorite photo — hand-painted, not printed — so you get something that actually captures their personality. $25, less than a week."</div>
+      <div class="pitch-attribution">— Elsa Martinez, Founder of Elsa's Art Studio</div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number" style="background: var(--accent);">&#9734;</span>
+      <span class="section-title">Achievements Earned</span>
+    </div>
+    <div class="badge-row">
+      <span class="badge gold">&#x1F31F; Venture Founded</span>
+      <span class="badge gold">&#x1F3AF; Named & Claimed</span>
+      <span class="badge gold">&#x1F4B0; Price Is Right</span>
+      <span class="badge silver">&#x1F525; 7-Day Streak</span>
+      <span class="badge silver">&#x1F4AC; First Words</span>
+      <span class="badge silver">&#x1F9E0; Deep Thinker</span>
+      <span class="badge bronze">&#x1F4E3; Pitch Perfect</span>
+      <span class="badge bronze">&#x1F504; Pivot</span>
+      <span class="badge bronze">&#x1F91D; Real Conversation</span>
+      <span class="badge gold">&#x1F3C6; Full Sweep</span>
+    </div>
+  </div>
+
+  <!-- Founder's Log preview -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number" style="background: var(--text-secondary);">&#x270E;</span>
+      <span class="section-title">Founder's Log</span>
+    </div>
+    <div class="section-card" style="background: var(--bg-muted); border-style: dashed;">
+      <div class="field-value" style="font-style: italic; color: var(--text-secondary); font-size: 13px;">
+        22 reflections written across 6 modules. This log is private — only you can read it.
+        <br><br>
+        <strong style="color: var(--text-primary); font-style: normal;">Latest entry:</strong> "I used to think art was just a hobby. Now I know it's a skill people will pay for. The weirdest part is that charging money made me take my own work more seriously."
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: 4-Week Action Timeline -->
+  <div class="section">
+    <div class="section-heading">
+      <span class="section-number" style="background: var(--primary-dark);">&#x1F4C5;</span>
+      <span class="section-title">Your 4-Week Launch Plan</span>
+    </div>
+    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+      Everything you decided across 22 lessons, organized into a month of real action. Check off each task as you go.
+    </p>
+
+    <!-- Week 1 -->
+    <div class="timeline-week">
+      <div class="timeline-week-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="timeline-week-left">
+          <span class="timeline-arrow">&#9660;</span>
+          <span class="timeline-week-label">Week 1</span>
+          <span class="timeline-week-title">Ship to One Person</span>
+        </div>
+        <span class="timeline-progress" id="w1-progress">0/5</span>
+      </div>
+      <div class="timeline-tasks">
+        <label class="task" data-week="1"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Paint the MVP: one 5&times;7 pencil sketch of Sarah's dog Biscuit. Not watercolor, not framed &mdash; just the sketch.</span><span class="task-source">from: Shipping Before I'm Ready</span></label>
+        <label class="task" data-week="1"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Send confirmation DM: &ldquo;Hey Sarah! Working from that couch photo. I'll text you when it's done.&rdquo;</span><span class="task-source">from: First Customer Protocol</span></label>
+        <label class="task" data-week="1"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Deliver the portrait to Sarah. Include the surprise Biscuit-with-sunglasses sketch on the back.</span><span class="task-source">from: First Customer Protocol</span></label>
+        <label class="task" data-week="1"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Ask Sarah the 2 feedback questions: &ldquo;Walk me through showing it to your mom&rdquo; + &ldquo;One thing you'd change?&rdquo;</span><span class="task-source">from: Getting Feedback</span></label>
+        <label class="task" data-week="1"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Post a photo of you holding the finished portrait on Instagram. Caption it, don't overthink it.</span><span class="task-source">from: After the First Sale</span></label>
+      </div>
+    </div>
+
+    <!-- Week 2 -->
+    <div class="timeline-week">
+      <div class="timeline-week-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="timeline-week-left">
+          <span class="timeline-arrow">&#9660;</span>
+          <span class="timeline-week-label">Week 2</span>
+          <span class="timeline-week-title">Get Customers #2 and #3</span>
+        </div>
+        <span class="timeline-progress" id="w2-progress">0/5</span>
+      </div>
+      <div class="timeline-tasks">
+        <label class="task" data-week="2"><input type="checkbox" onchange="updateProgress()"><span class="task-text">DM Diego (cat), Mrs. Chen (new puppy), and your art teacher (2 rescue dogs). Use the referral script: &ldquo;I painted Sarah's dog &mdash; she loved it. Want me to do yours?&rdquo;</span><span class="task-source">from: Word of Mouth & Referrals</span></label>
+        <label class="task" data-week="2"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Set up the Google Sheet tracker: Date | Money In | Money Out | What For. Log Sarah's payment as row #1.</span><span class="task-source">from: Reading Simple Financials</span></label>
+        <label class="task" data-week="2"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Post your first process timelapse (1-1-1 rule: work post). Film yourself painting with phone propped against a book.</span><span class="task-source">from: Social Media Strategy</span></label>
+        <label class="task" data-week="2"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Complete and deliver portrait #2. Apply anything you learned from Sarah's feedback.</span><span class="task-source">from: Iteration</span></label>
+        <label class="task" data-week="2"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Tell Mom about the business. She knows everyone &mdash; she's your best referral channel.</span><span class="task-source">from: Word of Mouth & Referrals</span></label>
+      </div>
+    </div>
+
+    <!-- Week 3 -->
+    <div class="timeline-week">
+      <div class="timeline-week-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="timeline-week-left">
+          <span class="timeline-arrow">&#9660;</span>
+          <span class="timeline-week-label">Week 3</span>
+          <span class="timeline-week-title">Build the System</span>
+        </div>
+        <span class="timeline-progress" id="w3-progress">0/5</span>
+      </div>
+      <div class="timeline-tasks">
+        <label class="task" data-week="3"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Display a sample portrait in the school art hallway with a QR code linking to your Instagram.</span><span class="task-source">from: Zero-Budget Marketing</span></label>
+        <label class="task" data-week="3"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Post a customer reaction story (1-1-1 rule: customer post). Ask Sarah or customer #2 if you can repost their reaction.</span><span class="task-source">from: Social Media Strategy</span></label>
+        <label class="task" data-week="3"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Sunday 7pm: first weekly financial review. Am I making more than I'm spending? What's my biggest cost?</span><span class="task-source">from: Reading Simple Financials</span></label>
+        <label class="task" data-week="3"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Practice the elevator pitch out loud with a friend: &ldquo;You know how everyone has a million pet photos on their phone but nothing on their wall?&rdquo;</span><span class="task-source">from: Writing Your First Pitch</span></label>
+        <label class="task" data-week="3"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Complete and deliver portrait #3. You now have 3 customers, 3 data points, and a pattern.</span><span class="task-source">from: First 3 Customers</span></label>
+      </div>
+    </div>
+
+    <!-- Week 4 -->
+    <div class="timeline-week">
+      <div class="timeline-week-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="timeline-week-left">
+          <span class="timeline-arrow">&#9660;</span>
+          <span class="timeline-week-label">Week 4</span>
+          <span class="timeline-week-title">Decide What's Next</span>
+        </div>
+        <span class="timeline-progress" id="w4-progress">0/5</span>
+      </div>
+      <div class="timeline-tasks">
+        <label class="task" data-week="4"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Post a behind-the-scenes photo of your workspace (1-1-1 rule: BTS post). Show the real, messy process.</span><span class="task-source">from: Social Media Strategy</span></label>
+        <label class="task" data-week="4"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Review all 3 customers' feedback. What pattern do you see? What would you change about your process?</span><span class="task-source">from: Getting Feedback</span></label>
+        <label class="task" data-week="4"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Decide: should you raise your price? You've delivered 3+ portraits &mdash; you have data now. Cost was $7, price was $25. Is that right?</span><span class="task-source">from: How Real Teens Price Their Work</span></label>
+        <label class="task" data-week="4"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Sunday financial review #2. Total revenue, total costs, total profit. Write one sentence: &ldquo;This month I learned _____.&rdquo;</span><span class="task-source">from: Reading Simple Financials</span></label>
+        <label class="task" data-week="4"><input type="checkbox" onchange="updateProgress()"><span class="task-text">Set your next 30-day goal. More customers? Higher prices? New product tier? New channel? Write it down.</span><span class="task-source">from: After the First Sale</span></label>
+      </div>
+    </div>
+
+    <!-- Overall progress bar -->
+    <div class="overall-progress">
+      <div class="overall-progress-bar">
+        <div class="overall-progress-fill" id="overall-fill" style="width: 0%"></div>
+      </div>
+      <div class="overall-progress-text"><span id="overall-count">0</span>/20 tasks complete</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>22/22 lessons · Adaptable</span>
+    <span>
+      <a href="#">Business Card</a>
+      <a href="#">Dashboard</a>
+      <a href="#">Print Plan</a>
+    </span>
+  </div>
+
+</div>
+
+<style>
+  /* Timeline */
+  .timeline-week {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    background: var(--bg-subtle);
+  }
+  .timeline-week.collapsed .timeline-tasks {
+    max-height: 0;
+    padding: 0 20px;
+    opacity: 0;
+  }
+  .timeline-week.collapsed .timeline-arrow {
+    transform: rotate(-90deg);
+  }
+  .timeline-week-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .timeline-week-header:hover {
+    background: var(--bg-muted);
+  }
+  .timeline-week-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .timeline-arrow {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.25s ease;
+    display: inline-block;
+  }
+  .timeline-week-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .timeline-week-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .timeline-progress {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 32px;
+    text-align: right;
+  }
+  .timeline-tasks {
+    padding: 0 20px 16px;
+    max-height: 600px;
+    opacity: 1;
+    transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
+  }
+
+  /* Task */
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+  }
+  .task:last-child { border-bottom: none; }
+  .task input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid var(--border-strong);
+    border-radius: 6px;
+    margin-top: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: var(--bg-subtle);
+  }
+  .task input[type="checkbox"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: '\\2713';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .task input[type="checkbox"]:hover {
+    border-color: var(--primary-light);
+  }
+  .task-text {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    transition: opacity 0.2s;
+  }
+  .task input[type="checkbox"]:checked ~ .task-text {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+  .task input[type="checkbox"]:checked ~ .task-source {
+    opacity: 0.3;
+  }
+  .task-source {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-style: italic;
+    transition: opacity 0.2s;
+  }
+
+  /* Overall progress */
+  .overall-progress {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .overall-progress-bar {
+    height: 6px;
+    background: var(--bg-muted);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .overall-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 999px;
+    transition: width 0.5s ease;
+  }
+  .overall-progress-text {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+</style>
+
+<script>
+function updateProgress() {
+  const weeks = [1, 2, 3, 4];
+  let total = 0;
+  let checked = 0;
+
+  weeks.forEach(w => {
+    const tasks = document.querySelectorAll(`.task[data-week="${w}"] input[type="checkbox"]`);
+    let wChecked = 0;
+    tasks.forEach(t => { if (t.checked) wChecked++; });
+    document.getElementById(`w${w}-progress`).textContent = `${wChecked}/${tasks.length}`;
+    total += tasks.length;
+    checked += wChecked;
+
+    // Color the progress green when week is complete
+    const prog = document.getElementById(`w${w}-progress`);
+    if (wChecked === tasks.length) {
+      prog.style.color = 'var(--primary)';
+    } else {
+      prog.style.color = 'var(--text-muted)';
+    }
+  });
+
+  document.getElementById('overall-count').textContent = checked;
+  document.getElementById('overall-fill').style.width = `${(checked / total) * 100}%`;
+}
+</script>
+</body>
+</html>

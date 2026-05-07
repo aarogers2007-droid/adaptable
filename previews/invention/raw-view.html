@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview: Algorithm Terminal — Normal / Raw</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #F9FAFB; color: #111827; padding: 32px 24px; }
+.container { max-width: 900px; margin: 0 auto; }
+
+.toggle-wrap { display: flex; justify-content: center; margin-bottom: 12px; }
+.toggle-inner { display: flex; gap: 3px; background: #F3F4F6; border-radius: 8px; padding: 3px; }
+.toggle-btn { padding: 6px 18px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #9CA3AF; transition: all 0.15s; }
+.toggle-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+.terminal { border-radius: 12px; border: 1px solid #2A2A2A; background: #0A0A0A; overflow: hidden; }
+.term-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #2A2A2A; background: #1A1A1A; }
+.dots { display: flex; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.term-title { font-family: 'Space Mono', monospace; font-size: 11px; color: #6A6A6A; transition: color 0.3s; }
+.run-btn { font-family: 'Space Mono', monospace; font-size: 11px; padding: 4px 14px; border-radius: 5px; cursor: pointer; border: 1px solid #C084FC; background: #1A1A1A; color: #C084FC; }
+.run-btn:disabled { border-color: #2A2A2A; color: #4A4A4A; cursor: not-allowed; }
+
+.term-body { height: 480px; overflow-y: auto; }
+.normal-view { padding: 14px; font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.8; }
+.raw-view { padding: 12px 0; font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.7; }
+.raw-line { padding: 0 12px; display: flex; gap: 10px; }
+.ln { color: #3A3A3A; width: 24px; text-align: right; flex-shrink: 0; user-select: none; font-size: 10px; }
+.lc { white-space: pre; color: #E8E8E8; }
+
+.cursor { display: inline-block; width: 6px; height: 13px; background: #C084FC; margin-left: 1px; vertical-align: text-bottom; animation: blink 0.8s step-end infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+.speed-bar { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; }
+.speed-label { font-size: 11px; color: #9CA3AF; }
+.speed-btn { padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid #E5E7EB; background: #fff; color: #4B5563; }
+.speed-btn.active { background: #0D9488; color: #fff; border-color: #0D9488; }
+
+/* Syntax colors */
+.kw { color: #C084FC; }
+.ty { color: #60A5FA; }
+.fn { color: #2DD4BF; }
+.str { color: #A78BFA; }
+.cmt { color: #6B7280; font-style: italic; }
+.num { color: #FBBF24; }
+.redact { color: #F87171; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="toggle-wrap">
+    <div class="toggle-inner">
+      <button class="toggle-btn active" id="btnNormal" onclick="setMode('normal')">Normal</button>
+      <button class="toggle-btn" id="btnRaw" onclick="setMode('raw')">Raw</button>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="term-header">
+      <div class="dots"><div class="dot" style="background:#F87171"></div><div class="dot" style="background:#FBBF24"></div><div class="dot" style="background:#4ADE80"></div></div>
+      <span class="term-title" id="termTitle">VENTURE — Grouping Algorithm</span>
+      <button class="run-btn" id="runBtn" onclick="runReplay()">Run Algorithm</button>
+    </div>
+    <div class="term-body" id="termBody">
+      <div class="normal-view" id="normalView"><div style="color:#3A3A3A">Click "Run Algorithm" to see the grouping process.</div></div>
+      <div class="raw-view" id="rawView" style="display:none"><div style="padding:14px;color:#3A3A3A">Click "Run Algorithm" to see the source code.</div></div>
+    </div>
+  </div>
+
+  <div class="speed-bar">
+    <span class="speed-label">Speed:</span>
+    <button class="speed-btn" onclick="setSpeed(0.5)">0.5x</button>
+    <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+    <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+    <button class="speed-btn" onclick="setSpeed(4)">4x</button>
+  </div>
+</div>
+
+<script>
+let mode = 'normal';
+let sp = 1;
+let isRunning = false;
+let normalScrollLocked = false;
+let rawScrollLocked = false;
+
+const RAW_SOURCE = `import [REDACTED];
+import { createClient } from [REDACTED];
+
+// Invention Mode Grouping Algorithm
+// Five-step sort: category \u2192 archetype \u2192 chips \u2192 scale \u2192 voice
+
+const VISUAL_CHIPS = ["Draw it", "Build a prototype", "Build a slide or poster"];
+const VERBAL_CHIPS = ["Explain it out loud", "Write it out"];
+const TARGET_ARCHETYPES = ["builder", "empath", "systems_thinker"];
+
+export async function runGroupingAlgorithm(classCode, groupSize = 5) {
+  const db = await createClient();
+  const { data: sessions } = await db
+    .from("invention_sessions")
+    .select("student_id, circle_1_category, ...")
+    .eq("class_code", classCode)
+    .not("completed_at", "is", null);
+
+  // \u2500\u2500 Step 1: Primary sort on Circle 1 (category pools) \u2500\u2500
+  const pools = new Map();
+  for (const s of students) {
+    const pool = pools.get(s.circle_1_category) ?? [];
+    pool.push(s);
+    pools.set(s.circle_1_category, pool);
+  }
+
+  // \u2500\u2500 Step 2: Form groups \u2014 archetype distribution \u2500\u2500
+  for (const [category, pool] of pools) {
+    const remaining = [...pool];
+    while (remaining.length > 0) {
+      if (remaining.length < 3) { /* merge into last group */ }
+      for (const archetype of TARGET_ARCHETYPES) {
+        const idx = remaining.findIndex(s => s.archetype === archetype);
+        if (idx !== -1) group.push(remaining.splice(idx, 1)[0]);
+      }
+      // Fill remaining \u2014 prioritize archetype diversity
+      while (group.length < targetSize && remaining.length > 0) {
+        const diverse = remaining.findIndex(s => !used.has(s.archetype));
+        if (diverse !== -1) group.push(remaining.splice(diverse, 1)[0]);
+        else group.push(remaining.shift());
+      }
+    }
+  }
+
+  // \u2500\u2500 Step 3: Chip diversity scoring \u2500\u2500
+  const allChips = group.flatMap(s => s.circle_3_chips);
+  const chipDiversity = new Set(allChips).size / allChips.length;
+
+  // \u2500\u2500 Step 4: Scale balance check \u2500\u2500
+  const scaleDist = {};
+  for (const s of group)
+    scaleDist[s.scale] = (scaleDist[s.scale] ?? 0) + 1;
+  const balanced = Object.values(scaleDist).every(c => c <= 3);
+
+  // \u2500\u2500 Step 5: Voice coverage & cross-group swaps \u2500\u2500
+  const hasVisual = group.some(s =>
+    s.voice.some(v => VISUAL_CHIPS.includes(v)));
+  const hasVerbal = group.some(s =>
+    s.voice.some(v => VERBAL_CHIPS.includes(v)));
+  // Cross-group swaps for voice coverage
+  for (const group of poolGroups) {
+    if (group.has_visual && group.has_verbal) continue;
+    const swapId = group.student_ids[j];
+    group.student_ids[j] = candidateId;
+    other.student_ids[i] = swapId;
+  }
+
+  // \u2500\u2500 Write results to database \u2500\u2500
+  await db.from([REDACTED]).delete().eq("class_code", classCode);
+  for (const group of allGroups) {
+    await db.from([REDACTED]).insert({
+      class_code, group_number, student_ids, composition_log
+    });
+    for (const studentId of group.student_ids) {
+      await db.from([REDACTED])
+        .update({ group_number }).eq("student_id", studentId);
+    }
+  }
+  return { log };
+}`;
+
+function colorize(line) {
+  if (!line) return '&nbsp;';
+  let s = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Full-line comments
+  if (s.trimStart().startsWith('//')) return '<span style="color:#8B8B8B;font-style:italic">' + s + '</span>';
+  // [REDACTED]
+  s = s.replace(/(\[REDACTED\])/g, '<span style="color:#F87171;font-weight:600">$1</span>');
+  // Strings
+  s = s.replace(/("(?:[^"\\]|\\.)*")/g, '<span style="color:#C4B5FD">$1</span>');
+  // Keywords
+  s = s.replace(/\b(import|export|from|const|let|var|function|async|await|return|if|else|for|while|of|in|new|continue)\b/g, '<span style="color:#D8B4FE">$1</span>');
+  // Types
+  s = s.replace(/\b(Map|Set|Object|null|true|false|undefined)\b/g, '<span style="color:#93C5FD">$1</span>');
+  // Numbers
+  s = s.replace(/\b(\d+)\b/g, '<span style="color:#FCD34D">$1</span>');
+  // Method calls
+  s = s.replace(/\.(findIndex|flatMap|some|includes|every|splice|push|shift|get|set|from|select|eq|not|delete|insert|update|values|reverse|find|filter|has|length)\b/g, '.<span style="color:#5EEAD4">$1</span>');
+  s = s.replace(/\b(createClient)\b/g, '<span style="color:#5EEAD4">$1</span>');
+  return s;
+}
+
+const LOG = [
+  { t: '$ venture-group --class VENTURE --run', c: '#F0EDE8', d: 400, b: 1 },
+  { t: '', d: 200 },
+  { t: 'Initializing grouping algorithm for VENTURE...', c: '#9A9A9A', d: 250 },
+  { t: 'Loading 30 student profiles...', c: '#9A9A9A', d: 350 },
+  { t: 'Configuration: group_size=5, threshold=80%', c: '#9A9A9A', d: 200 },
+  { t: '', d: 200 },
+  { t: '\u2500\u2500 Step 1: Sorting by invention category (The Wish) \u2500\u2500', c: '#C084FC', d: 500, b: 1 },
+  { t: '  digital                      \u2014 6 students', c: '#F0EDE8', d: 130 },
+  { t: '  environmental                \u2014 6 students', c: '#F0EDE8', d: 130 },
+  { t: '  medical                      \u2014 6 students', c: '#F0EDE8', d: 130 },
+  { t: '  learning                     \u2014 5 students', c: '#F0EDE8', d: 130 },
+  { t: '  social                       \u2014 7 students', c: '#F0EDE8', d: 130 },
+  { t: '  \u2713 5 category pools formed', c: '#4ADE80', d: 300 },
+  { t: '', d: 200 },
+  { t: '\u2500\u2500 Step 2: Distributing archetypes (The Mind) \u2500\u2500', c: '#C084FC', d: 500, b: 1 },
+  { t: '  Group 1 (digital): builder \u2192 empath \u2192 sys_thinker \u2192 connector \u2192 storyteller \u2192 builder', c: '#60A5FA', d: 150 },
+  { t: '    \u2713 Core archetypes present', c: '#4ADE80', d: 150 },
+  { t: '  Group 2 (environmental): builder \u2192 empath \u2192 sys_thinker \u2192 connector \u00d7 2 \u2192 empath', c: '#60A5FA', d: 150 },
+  { t: '    \u2713 Core archetypes present', c: '#4ADE80', d: 150 },
+  { t: '  Group 3 (medical): builder \u2192 empath \u2192 sys_thinker \u2192 storyteller \u2192 connector \u2192 sys_thinker', c: '#60A5FA', d: 150 },
+  { t: '    \u2713 Core archetypes present', c: '#4ADE80', d: 150 },
+  { t: '  Group 4 (learning): builder \u2192 empath \u2192 sys_thinker \u2192 storyteller \u2192 connector', c: '#60A5FA', d: 150 },
+  { t: '    \u2713 Core archetypes present', c: '#4ADE80', d: 150 },
+  { t: '  Group 5 (social): builder \u2192 empath \u2192 sys_thinker \u2192 connector \u2192 storyteller \u00d7 2 \u2192 builder', c: '#60A5FA', d: 150 },
+  { t: '    \u2713 Core archetypes present', c: '#4ADE80', d: 150 },
+  { t: '', d: 200 },
+  { t: '\u2500\u2500 Step 3: Evaluating chip diversity (The Lens) \u2500\u2500', c: '#C084FC', d: 500, b: 1 },
+  { t: '  G1: 33%  G2: 30%  G3: 27%  G4: 44%  G5: 45%', c: '#9A9A9A', d: 200 },
+  { t: '', d: 200 },
+  { t: '\u2500\u2500 Step 4: Checking scale balance (The Scale) \u2500\u2500', c: '#C084FC', d: 500, b: 1 },
+  { t: '  Group 1: \u26a0 generation overrepresented (4\u00d7)', c: '#FBBF24', d: 200 },
+  { t: '  Group 2: \u26a0 world overrepresented (6\u00d7)', c: '#FBBF24', d: 200 },
+  { t: '  Group 3: \u2713 balanced    Group 4: \u2713 balanced', c: '#4ADE80', d: 130 },
+  { t: '  Group 5: \u26a0 one_person overrepresented (4\u00d7)', c: '#FBBF24', d: 200 },
+  { t: '', d: 200 },
+  { t: '\u2500\u2500 Step 5: Checking voice coverage (The Voice) \u2500\u2500', c: '#C084FC', d: 500, b: 1 },
+  { t: '  Group 1: visual \u2713  verbal \u2713', c: '#4ADE80', d: 100 },
+  { t: '  Group 2: visual \u2713  verbal \u2713', c: '#4ADE80', d: 100 },
+  { t: '  Group 3: visual \u2713  verbal \u2713', c: '#4ADE80', d: 100 },
+  { t: '  Group 4: visual \u2713  verbal \u2713', c: '#4ADE80', d: 100 },
+  { t: '  Group 5: visual \u2713  verbal \u2713', c: '#4ADE80', d: 100 },
+  { t: '', d: 200 },
+  { t: '\u2500\u2500 Writing results to database \u2500\u2500', c: '#C084FC', d: 400, b: 1 },
+  { t: '  Groups 1\u20135 \u2192 [REDACTED]', c: '#9A9A9A', d: 200 },
+  { t: '  Updating group_number for 30 students...', c: '#9A9A9A', d: 300 },
+  { t: '', d: 300 },
+  { t: '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550', c: '#C084FC', d: 200 },
+  { t: 'Algorithm complete. 5 groups formed.', c: '#C084FC', d: 400, b: 1 },
+  { t: '2 groups met all criteria. 3 with compromises.', c: '#4ADE80', d: 300 },
+  { t: '', d: 800 },
+  { t: '"Have a great day" \u2014 AJ Rogers', c: '#A78BFA', d: 0, italic: 1 },
+];
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnNormal').classList.toggle('active', m === 'normal');
+  document.getElementById('btnRaw').classList.toggle('active', m === 'raw');
+  document.getElementById('termTitle').textContent = m === 'raw' ? 'invention-grouping.ts' : 'VENTURE \u2014 Grouping Algorithm';
+  document.getElementById('normalView').style.display = m === 'normal' ? 'block' : 'none';
+  document.getElementById('rawView').style.display = m === 'raw' ? 'block' : 'none';
+}
+
+function setSpeed(s) {
+  sp = s;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.toggle('active', b.textContent === s + 'x'));
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms / sp)); }
+
+// Smart scroll — track per-view, don't yank if user scrolled up
+const bodyEl = document.getElementById('termBody');
+bodyEl.addEventListener('scroll', () => {
+  const near = bodyEl.scrollHeight - bodyEl.scrollTop - bodyEl.clientHeight < 80;
+  if (mode === 'normal') normalScrollLocked = !near;
+  else rawScrollLocked = !near;
+});
+function autoScroll() {
+  const locked = mode === 'normal' ? normalScrollLocked : rawScrollLocked;
+  if (!locked) bodyEl.scrollTop = bodyEl.scrollHeight;
+}
+
+async function runReplay() {
+  if (isRunning) return;
+  isRunning = true;
+  normalScrollLocked = false;
+  rawScrollLocked = false;
+  bodyEl.scrollTop = 0;
+  document.getElementById('runBtn').disabled = true;
+
+  const normalEl = document.getElementById('normalView');
+  const rawEl = document.getElementById('rawView');
+  normalEl.innerHTML = '';
+  rawEl.innerHTML = '';
+
+  // Raw typewriter — slower, cinematic
+  const rawLines = RAW_SOURCE.split('\n');
+  const rawTotal = RAW_SOURCE.length;
+  let rawIdx = 0;
+  let rawDone = false;
+
+  function renderRaw(charCount) {
+    const text = RAW_SOURCE.slice(0, charCount);
+    const visibleLines = text.split('\n');
+    rawEl.innerHTML = '';
+    visibleLines.forEach((line, i) => {
+      const div = document.createElement('div');
+      div.className = 'raw-line';
+      const isLast = i === visibleLines.length - 1;
+      const isComplete = !isLast || charCount >= rawTotal;
+      const codeHtml = isComplete ? colorize(line) : ('<span style="color:#E8E8E8">' + escHtml(line) + '</span>' + (!rawDone ? '<span class="cursor"></span>' : ''));
+      div.innerHTML = `<span class="ln">${i+1}</span><span class="lc">${codeHtml}</span>`;
+      rawEl.appendChild(div);
+    });
+    if (mode === 'raw') autoScroll();
+  }
+
+  const rawTimer = setInterval(() => {
+    if (!isRunning) { clearInterval(rawTimer); return; }
+    const ch = RAW_SOURCE[rawIdx] || '';
+    const isWs = ch === ' ' || ch === '\n';
+    rawIdx += isWs ? 2 : 1;
+    if (rawIdx >= rawTotal) { rawIdx = rawTotal; rawDone = true; clearInterval(rawTimer); }
+    renderRaw(rawIdx);
+  }, 30 / sp); // ~30ms per char base for cinematic feel
+
+  // Normal log typewriter
+  for (const line of LOG) {
+    if (line.t === '') {
+      const div = document.createElement('div');
+      div.innerHTML = '&nbsp;';
+      normalEl.appendChild(div);
+      await sleep(line.d);
+      if (mode === 'normal') autoScroll();
+      continue;
+    }
+
+    const div = document.createElement('div');
+    div.style.color = line.c || '#9A9A9A';
+    if (line.b) div.style.fontWeight = '700';
+    if (line.italic) div.style.fontStyle = 'italic';
+    normalEl.appendChild(div);
+
+    for (let c = 0; c < line.t.length; c++) {
+      div.textContent = line.t.slice(0, c + 1);
+      const old = normalEl.querySelector('.cursor');
+      if (old) old.remove();
+      const cur = document.createElement('span');
+      cur.className = 'cursor';
+      div.appendChild(cur);
+      if (mode === 'normal') autoScroll();
+      await sleep(18);
+    }
+    const oldCur = div.querySelector('.cursor');
+    if (oldCur) oldCur.remove();
+    await sleep(line.d);
+    if (mode === 'normal') autoScroll();
+  }
+
+  // Easter egg glow
+  const last = normalEl.lastElementChild;
+  if (last) last.style.textShadow = '0 0 8px rgba(167,139,250,0.3)';
+
+  clearInterval(rawTimer);
+  rawDone = true;
+  renderRaw(rawTotal);
+
+  isRunning = false;
+  document.getElementById('runBtn').disabled = false;
+  document.getElementById('runBtn').textContent = 'Replay';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+
+</body>
+</html>

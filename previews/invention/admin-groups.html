@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview: Invention Admin — Groups Tab</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #F9FAFB; color: #111827; }
+  nav { border-bottom: 1px solid #E5E7EB; background: #fff; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+  .logo { font-size: 18px; font-weight: 700; color: #0D9488; }
+  .badge { background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 32px 24px; }
+  .header { display: flex; align-items: center; justify-content: space-between; }
+  .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #0D9488; }
+  h1 { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .tabs { display: flex; gap: 8px; }
+  .tab { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: none; color: #4B5563; }
+  .tab.active { background: #0D9488; color: #fff; }
+
+  .card { border: 1px solid #E5E7EB; border-radius: 12px; background: #fff; padding: 20px; margin-top: 16px; }
+  .print-bar { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
+  .print-bar span { font-size: 14px; font-weight: 500; }
+  .btn-outline { border: 2px solid #D1D5DB; border-radius: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; background: #fff; cursor: pointer; text-decoration: none; color: #111827; }
+  .btn-outline:hover { background: #F3F4F6; }
+  .btn-reveal { background: #F59E0B; border: none; border-radius: 8px; padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; color: #111827; }
+
+  .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .group-title { font-weight: 600; font-size: 16px; }
+  .group-category { font-size: 12px; color: #9CA3AF; margin-left: 8px; }
+  .badge-pass { background: #D1FAE5; color: #065F46; font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 9999px; }
+  .badge-review { background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 9999px; }
+  .student-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 14px; }
+  .move-btn { font-size: 12px; color: #9CA3AF; cursor: pointer; border: none; background: none; }
+  .move-btn:hover { color: #0D9488; }
+  .metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; text-align: center; font-size: 12px; }
+  .metric-label { color: #9CA3AF; }
+  .metric-pass { color: #059669; font-weight: 500; }
+  .metric-gap { color: #D97706; font-weight: 500; }
+  .compromise { font-size: 12px; color: #D97706; margin-top: 8px; }
+
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+  .status-text { font-size: 14px; color: #4B5563; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Adaptable</span>
+  <span class="badge">Invention Mode</span>
+</nav>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <p class="label">Invention Mode</p>
+      <h1>VENTURE Dashboard</h1>
+    </div>
+    <div class="tabs">
+      <button class="tab">Overview</button>
+      <button class="tab active">Groups</button>
+    </div>
+  </div>
+
+  <!-- Print options -->
+  <div class="print-bar">
+    <span>Print:</span>
+    <a href="#" class="btn-outline">Print Group Roster</a>
+    <a href="#" class="btn-outline">Print Student Slips</a>
+  </div>
+
+  <!-- Reveal bar -->
+  <div class="top-bar">
+    <p class="status-text">33 groups &middot; Hidden from students</p>
+    <button class="btn-reveal">Reveal Groups to Students</button>
+  </div>
+
+  <!-- Group cards -->
+  <div class="card">
+    <div class="group-header">
+      <div><span class="group-title">Group 1</span><span class="group-category">Environmental</span></div>
+      <span class="badge-pass">All criteria met</span>
+    </div>
+    <div class="student-row"><span>Maria Santos</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>David Kim</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Aaliyah Washington</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>James Rivera</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Priya Mehta</span><button class="move-btn">Move</button></div>
+    <div class="metrics">
+      <div><p class="metric-label">Archetypes</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Diversity</p><p class="metric-pass">80%</p></div>
+      <div><p class="metric-label">Scale</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Visual</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Verbal</p><p class="metric-pass">Pass</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="group-header">
+      <div><span class="group-title">Group 2</span><span class="group-category">Environmental</span></div>
+      <span class="badge-review">Needs review</span>
+    </div>
+    <div class="student-row"><span>Tyler Johnson</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Sofia Hernandez</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Ethan Brooks</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Zara Ali</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Connor O'Brien</span><button class="move-btn">Move</button></div>
+    <div class="metrics">
+      <div><p class="metric-label">Archetypes</p><p class="metric-gap">Gap</p></div>
+      <div><p class="metric-label">Diversity</p><p class="metric-pass">60%</p></div>
+      <div><p class="metric-label">Scale</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Visual</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Verbal</p><p class="metric-gap">Missing</p></div>
+    </div>
+    <p class="compromise">Missing archetypes: systems_thinker</p>
+    <p class="compromise">No verbal communicator (explain out loud/write)</p>
+  </div>
+
+  <div class="card">
+    <div class="group-header">
+      <div><span class="group-title">Group 3</span><span class="group-category">Medical/health</span></div>
+      <span class="badge-pass">All criteria met</span>
+    </div>
+    <div class="student-row"><span>Amara Okafor</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Lucas Nguyen</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Emma Petrov</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Isaiah Williams</span><button class="move-btn">Move</button></div>
+    <div class="student-row"><span>Mia Chang</span><button class="move-btn">Move</button></div>
+    <div class="metrics">
+      <div><p class="metric-label">Archetypes</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Diversity</p><p class="metric-pass">100%</p></div>
+      <div><p class="metric-label">Scale</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Visual</p><p class="metric-pass">Pass</p></div>
+      <div><p class="metric-label">Verbal</p><p class="metric-pass">Pass</p></div>
+    </div>
+  </div>
+
+  <p style="text-align: center; color: #9CA3AF; font-size: 13px; margin-top: 24px;">+ 30 more groups</p>
+</div>
+
+</body>
+</html>

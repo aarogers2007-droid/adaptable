@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Reveal — Side by Side</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Satoshi', sans-serif; background: #111; color: #fff; }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100vh;
+  }
+
+  .side {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .side-label {
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; z-index: 50; text-align: center; line-height: 1.5;
+  }
+  .side-label span { display: block; font-weight: 400; font-size: 9px; letter-spacing: 0.12em; margin-top: 2px; }
+
+  .divider {
+    position: fixed; left: 50%; top: 0; bottom: 0; width: 1px;
+    background: rgba(255,255,255,0.08); z-index: 100;
+  }
+
+  /* ═══════════════════════════════════════════
+     LEFT: CURRENT WIZARD REVEAL
+     White bg, card slides up, functional UI
+     ═══════════════════════════════════════════ */
+  .current {
+    background: #f9fafb;
+    transition: background 1.5s ease-out;
+  }
+  .current.warmed {
+    background: #f9fafb;
+  }
+  .current .side-label { color: rgba(0,0,0,0.25); }
+  .current .side-label span { color: rgba(0,0,0,0.15); }
+
+  /* Ikigai diagram — simplified representation */
+  .curr-diagram {
+    position: relative;
+    width: min(280px, 50vh);
+    aspect-ratio: 1/1;
+    transition: all 800ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .curr-diagram.dimmed {
+    opacity: 0.3;
+    transform: scale(0.7) translateY(-20%);
+  }
+
+  /* ── GLOW LAYERS ── the card radiates light through multiple shells */
+  .curr-glow-shell {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+  }
+  /* Inner glow — tight, warm, the card's own heat */
+  .curr-glow-inner {
+    box-shadow:
+      0 0 30px rgba(245,230,66,0.25),
+      0 0 40px rgba(168,219,90,0.2),
+      0 0 50px rgba(244,167,157,0.2),
+      0 0 60px rgba(109,213,208,0.25);
+    animation: glow-breathe-inner 4s ease-in-out infinite;
+  }
+  /* Middle glow — wider, softer, the aura */
+  .curr-glow-mid {
+    inset: -8px;
+    border-radius: 18px;
+    box-shadow:
+      0 0 60px rgba(245,230,66,0.18),
+      0 0 90px rgba(168,219,90,0.15),
+      0 0 90px rgba(244,167,157,0.15),
+      0 0 120px rgba(109,213,208,0.18);
+    animation: glow-breathe-mid 5.5s ease-in-out infinite;
+  }
+  /* Outer glow — the halo, barely there, enormous */
+  .curr-glow-outer {
+    inset: -20px;
+    border-radius: 28px;
+    box-shadow:
+      0 0 100px rgba(245,230,66,0.1),
+      0 0 160px rgba(168,219,90,0.08),
+      0 0 160px rgba(244,167,157,0.08),
+      0 0 200px rgba(109,213,208,0.1),
+      0 0 300px rgba(74,103,65,0.06);
+    animation: glow-breathe-outer 7s ease-in-out infinite;
+  }
+  .curr-card.revealed .curr-glow-shell {
+    animation-play-state: running;
+  }
+  .curr-card.revealed .curr-glow-inner {
+    animation: glow-burst-inner 0.8s ease-out forwards, glow-breathe-inner 4s ease-in-out 0.8s infinite;
+  }
+  .curr-card.revealed .curr-glow-mid {
+    animation: glow-burst-mid 1.2s ease-out forwards, glow-breathe-mid 5.5s ease-in-out 1.2s infinite;
+  }
+  .curr-card.revealed .curr-glow-outer {
+    animation: glow-burst-outer 1.6s ease-out forwards, glow-breathe-outer 7s ease-in-out 1.6s infinite;
+  }
+
+  /* Burst — the flash of creation */
+  @keyframes glow-burst-inner {
+    0% { opacity: 0; transform: scale(0.9); }
+    30% { opacity: 1.2; transform: scale(1.05); }
+    100% { opacity: 0.85; transform: scale(1); }
+  }
+  @keyframes glow-burst-mid {
+    0% { opacity: 0; transform: scale(0.85); }
+    25% { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 0.7; transform: scale(1); }
+  }
+  @keyframes glow-burst-outer {
+    0% { opacity: 0; transform: scale(0.8); }
+    20% { opacity: 0.8; transform: scale(1.1); }
+    100% { opacity: 0.5; transform: scale(1); }
+  }
+
+  /* Breathing — alive, not pulsing */
+  @keyframes glow-breathe-inner {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.01); }
+  }
+  @keyframes glow-breathe-mid {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.015); }
+  }
+  @keyframes glow-breathe-outer {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.65; transform: scale(1.02); }
+  }
+
+  /* ── GRADIENT BAR GLOW ── casts light downward into the card */
+  .curr-gradient-glow {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(245,230,66,0.15) 0%,
+      rgba(168,219,90,0.12) 20%,
+      rgba(244,167,157,0.08) 40%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    animation: gradient-glow-breathe 5s ease-in-out infinite;
+  }
+  .curr-card.revealed .curr-gradient-glow {
+    animation: gradient-glow-in 1s ease-out forwards, gradient-glow-breathe 5s ease-in-out 1s infinite;
+  }
+  @keyframes gradient-glow-in {
+    0% { opacity: 0; }
+    40% { opacity: 1; }
+    100% { opacity: 0.8; }
+  }
+  @keyframes gradient-glow-breathe {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+  }
+  /* The gradient bar strip itself glows */
+  .curr-gradient-bar-glow {
+    position: absolute;
+    top: -2px; left: 10%; right: 10%;
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(to right, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+    filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .curr-card.revealed .curr-gradient-bar-glow {
+    animation: bar-glow-in 0.6s ease-out 0.2s forwards, bar-glow-breathe 4s ease-in-out 0.8s infinite;
+  }
+  @keyframes bar-glow-in {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
+  @keyframes bar-glow-breathe {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.9; }
+  }
+
+  /* Creation flash removed — was causing dark void */
+
+  /* ── BURST PARTICLES ── initial spray at creation, then fade */
+  .curr-burst-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 26;
+    opacity: 0;
+  }
+  .curr-card.revealed .curr-burst-particle {
+    animation: burst-fly var(--burst-dur, 1.2s) ease-out var(--burst-delay, 0s) forwards;
+  }
+  @keyframes burst-fly {
+    0% { opacity: 0; transform: translate(0, 0) scale(1); }
+    10% { opacity: 1; }
+    40% { opacity: 0.8; }
+    100% { opacity: 0; transform: translate(var(--bx, 0px), var(--by, 0px)) scale(0.2); }
+  }
+  .curr-circle {
+    position: absolute; border-radius: 50%;
+    width: 47%; height: 47%;
+    transform: translate(-50%,-50%);
+    opacity: 0.4;
+  }
+  .curr-circle.c1 { background: #F5E642; left: 50%; top: 25%; }
+  .curr-circle.c2 { background: #A8DB5A; left: 25%; top: 50%; }
+  .curr-circle.c3 { background: #F4A79D; left: 75%; top: 50%; }
+  .curr-circle.c4 { background: #6DD5D0; left: 50%; top: 80%; }
+  .curr-center {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 15%; height: 15%; border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 40%, #8B9E6A 100%);
+  }
+
+  /* Card that slides up — ceremonial entrance */
+  .curr-card {
+    position: absolute;
+    left: 50%; width: 85%; max-width: 320px;
+    top: 110%; transform: translate(-50%, 0) scale(0.92);
+    opacity: 0;
+    transition: top 900ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 600ms ease-out;
+    background: #fff;
+    border: 1px solid rgba(229,231,235,0.6);
+    border-radius: 12px;
+    overflow: visible;
+  }
+  .curr-card.revealed {
+    top: 50%; transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    box-shadow:
+      0 4px 30px rgba(0,0,0,0.06),
+      0 1px 0 rgba(255,255,255,0.8) inset;
+  }
+
+  /* Slight shimmer on the card surface — like light catching */
+  .curr-card.revealed::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      rgba(245,230,66,0.03) 25%,
+      transparent 50%,
+      rgba(109,213,208,0.03) 75%,
+      transparent 100%
+    );
+    background-size: 200% 200%;
+    animation: card-shimmer 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes card-shimmer {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+  }
+
+  /* Aura particles — sparks/embers with trails, varied motion */
+  .curr-particles { position: absolute; inset: -30px; pointer-events: none; overflow: visible; z-index: 20; }
+  .curr-particle {
+    position: absolute;
+    border-radius: 50%; opacity: 0;
+  }
+  /* Spark trail effect — elongated glow behind the particle */
+  .curr-particle::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.3;
+    filter: blur(3px);
+    left: -50%;
+    top: 0;
+  }
+  .curr-card.revealed .curr-particle {
+    animation: var(--particle-anim, curr-particle-rise) ease-in-out infinite;
+  }
+  /* Rising sparks — default, most particles */
+  @keyframes curr-particle-rise {
+    0% { opacity: 0; transform: translateY(0) translateX(0) scale(0.3); }
+    15% { opacity: var(--p-brightness, 0.9); transform: translateY(-6px) translateX(var(--drift-x, 2px)) scale(1); }
+    50% { opacity: calc(var(--p-brightness, 0.9) * 0.6); transform: translateY(-28px) translateX(calc(var(--drift-x, 2px) * 3)) scale(0.7); }
+    100% { opacity: 0; transform: translateY(-55px) translateX(calc(var(--drift-x, 2px) * 5)) scale(0.15); }
+  }
+  /* Drifting sparks — lateral movement */
+  @keyframes curr-particle-drift {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+    15% { opacity: var(--p-brightness, 0.8); transform: translate(var(--drift-x, 10px), -4px) scale(1); }
+    50% { opacity: calc(var(--p-brightness, 0.8) * 0.5); transform: translate(calc(var(--drift-x, 10px) * 2.5), -18px) scale(0.6); }
+    100% { opacity: 0; transform: translate(calc(var(--drift-x, 10px) * 4), -40px) scale(0.1); }
+  }
+  /* Falling embers — some particles gently descend */
+  @keyframes curr-particle-fall {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+    15% { opacity: var(--p-brightness, 0.7); transform: translate(var(--drift-x, -3px), 4px) scale(1); }
+    50% { opacity: calc(var(--p-brightness, 0.7) * 0.5); transform: translate(calc(var(--drift-x, -3px) * 3), 20px) scale(0.6); }
+    100% { opacity: 0; transform: translate(calc(var(--drift-x, -3px) * 5), 45px) scale(0.1); }
+  }
+  /* Orbiting sparks — circle around the card */
+  @keyframes curr-particle-orbit {
+    0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.4); }
+    15% { opacity: var(--p-brightness, 0.7); transform: translate(var(--drift-x, 8px), var(--drift-y, -8px)) rotate(60deg) scale(1); }
+    50% { opacity: calc(var(--p-brightness, 0.7) * 0.4); transform: translate(calc(var(--drift-x, 8px) * 2), calc(var(--drift-y, -8px) * 2)) rotate(180deg) scale(0.5); }
+    100% { opacity: 0; transform: translate(calc(var(--drift-x, 8px) * 3), calc(var(--drift-y, -8px) * 3)) rotate(300deg) scale(0.1); }
+  }
+  .curr-gradient-bar {
+    display: flex; height: 6px;
+  }
+  .curr-gradient-bar div { flex: 1; }
+  .curr-card-content {
+    padding: 20px; text-align: left;
+  }
+  .curr-card-content .label {
+    font-size: 11px; font-weight: 500; color: #9ca3af; letter-spacing: 0.05em;
+  }
+  .curr-card-content h2 {
+    margin-top: 6px; font-size: 24px; font-weight: 800; color: #111827; line-height: 1.1;
+  }
+  .curr-card-content .niche {
+    margin-top: 6px; font-size: 13px; color: #6b7280;
+  }
+  .curr-card-content .why {
+    margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;
+    font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .curr-card-content .why-text {
+    margin-top: 4px; font-size: 13px; color: #6b7280; line-height: 1.5;
+  }
+  .curr-btn {
+    margin-top: 16px;
+    width: 100%; padding: 12px;
+    background: #0D9488; color: #fff; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+
+  /* ═══════════════════════════════════════════
+     RIGHT: NEW GRAVITATIONAL COLLAPSE
+     Black bg, cinematic, golden ratio
+     ═══════════════════════════════════════════ */
+  .new {
+    background: #000;
+  }
+  .new .side-label { color: rgba(255,255,255,0.25); }
+  .new .side-label span { color: rgba(255,255,255,0.15); }
+
+  .new-ambient {
+    position: absolute; width: 50vh; height: 50vh;
+    left: 50%; top: 50%; transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%);
+    animation: new-glow 6.854s ease-in-out infinite;
+  }
+  @keyframes new-glow {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%,-50%) scale(1.146); opacity: 1; }
+  }
+
+  .new-particles { position: absolute; inset: 0; overflow: hidden; }
+  .new-particle {
+    position: absolute; width: 1.618px; height: 1.618px;
+    background: rgba(180,200,230,0.07); border-radius: 50%;
+    animation: new-drift var(--dur, 18s) linear infinite;
+    animation-delay: var(--del, 0s);
+  }
+  @keyframes new-drift {
+    from { transform: translateY(110vh); opacity: 0; }
+    8% { opacity: 0.7; } 92% { opacity: 0.7; }
+    to { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  .new-wrap {
+    position: relative;
+    width: min(280px, 50vh);
+    aspect-ratio: 1/1; z-index: 2;
+  }
+  .new-circle {
+    position: absolute; border-radius: 50%;
+    width: 50%; height: 50%;
+    transform: translate(-50%,-50%);
+    opacity: 0.618;
+  }
+  .new-circle.c1 { background: #F5E642; left: 50%; top: 19.1%; }
+  .new-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
+  .new-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
+  .new-circle.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
+  .new-center {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 19.1%; height: 19.1%; border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74,103,65,0.5), 0 0 80px rgba(74,103,65,0.2);
+    z-index: 4; transition: all 1.618s cubic-bezier(0.33,0,0.67,1);
+  }
+  .new-center.absorb {
+    transform: translate(-50%,-50%) scale(1.618);
+    box-shadow: 0 0 80px rgba(74,103,65,0.9), 0 0 160px rgba(139,158,106,0.5);
+  }
+  .new-center.collapse {
+    transform: translate(-50%,-50%) scale(0.382);
+    opacity: 0;
+  }
+
+  .new-circle.contracting { animation: new-contract 2.618s cubic-bezier(0.55,0,0.2,1) forwards; }
+  .new-circle.c1.contracting { animation-name: new-c1; }
+  .new-circle.c2.contracting { animation-name: new-c2; }
+  .new-circle.c3.contracting { animation-name: new-c3; }
+  .new-circle.c4.contracting { animation-name: new-c4; }
+  @keyframes new-c1 { 0%{left:50%;top:19.1%;width:50%;height:50%;opacity:0.618}38.2%{opacity:0.85}100%{left:50%;top:50%;width:3%;height:3%;opacity:0} }
+  @keyframes new-c2 { 0%{left:19.1%;top:50%;width:50%;height:50%;opacity:0.618}38.2%{opacity:0.85}100%{left:50%;top:50%;width:3%;height:3%;opacity:0} }
+  @keyframes new-c3 { 0%{left:80.9%;top:50%;width:50%;height:50%;opacity:0.618}38.2%{opacity:0.85}100%{left:50%;top:50%;width:3%;height:3%;opacity:0} }
+  @keyframes new-c4 { 0%{left:50%;top:80.9%;width:50%;height:50%;opacity:0.618}38.2%{opacity:0.85}100%{left:50%;top:50%;width:3%;height:3%;opacity:0} }
+
+  .new-circle.returning { opacity: 0; }
+  .new-circle.c1.returning { animation: new-r1 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  .new-circle.c2.returning { animation: new-r2 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  .new-circle.c3.returning { animation: new-r3 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  .new-circle.c4.returning { animation: new-r4 2.618s cubic-bezier(0.33,0,0.67,1) forwards; }
+  @keyframes new-r1 { from{left:50%;top:50%;width:3%;height:3%;opacity:0}to{left:50%;top:19.1%;width:50%;height:50%;opacity:0.236} }
+  @keyframes new-r2 { from{left:50%;top:50%;width:3%;height:3%;opacity:0}to{left:19.1%;top:50%;width:50%;height:50%;opacity:0.236} }
+  @keyframes new-r3 { from{left:50%;top:50%;width:3%;height:3%;opacity:0}to{left:80.9%;top:50%;width:50%;height:50%;opacity:0.236} }
+  @keyframes new-r4 { from{left:50%;top:50%;width:3%;height:3%;opacity:0}to{left:50%;top:80.9%;width:50%;height:50%;opacity:0.236} }
+
+  .new-shockwave {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 0; height: 0; border-radius: 50%;
+    border: 1.618px solid rgba(139,158,106,0.7);
+    z-index: 15; pointer-events: none;
+  }
+  .new-shockwave.expanding { animation: new-shock 1.618s cubic-bezier(0,0.618,0.382,1) forwards; }
+  .new-shockwave.s2.expanding { animation-duration: 2.618s; border-width: 0.618px; }
+  @keyframes new-shock { 0%{width:0;height:0;opacity:0.8;border-width:1.618px}61.8%{opacity:0.3}100%{width:130%;height:130%;opacity:0;border-width:0.382px} }
+
+  .new-biz {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    z-index: 30; text-align: center; opacity: 0; pointer-events: none;
+  }
+  .new-biz.birthing {
+    animation: new-biz-fade 2.618s ease-out forwards, new-biz-glow 2.618s ease-out forwards;
+  }
+  @keyframes new-biz-fade { 0%{opacity:0;transform:translate(-50%,-50%)}100%{opacity:1;transform:translate(-50%,-50%)} }
+  @keyframes new-biz-glow { 0%{filter:drop-shadow(0 0 60px rgba(255,255,255,0.9)) drop-shadow(0 0 120px rgba(74,103,65,0.8))}100%{filter:drop-shadow(0 0 28px rgba(74,103,65,0.5)) drop-shadow(0 0 56px rgba(74,103,65,0.2))} }
+  .new-biz .name { font-size: 24px; font-weight: 800; color: #fff; text-shadow: 0 0 28px rgba(74,103,65,0.5); white-space: nowrap; }
+  .new-biz .origin {
+    display: block; margin-top: 11px; font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0); letter-spacing: 0.146em;
+    transition: color 2.618s ease-out;
+  }
+  .new-biz .origin.visible { color: rgba(255,255,255,0.35); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="split">
+
+  <!-- LEFT: Current wizard reveal -->
+  <div class="side current">
+    <div class="side-label">
+      Wizard Reveal — Ignited
+      <span>Creation flash. Multi-layer glow. Breathing aura. Spark embers.</span>
+    </div>
+    <div class="curr-diagram" id="curr-diagram">
+      <div class="curr-circle c1"></div>
+      <div class="curr-circle c2"></div>
+      <div class="curr-circle c3"></div>
+      <div class="curr-circle c4"></div>
+      <div class="curr-center"></div>
+    </div>
+    <div class="curr-card" id="curr-card">
+      <!-- Creation flash -->
+      <!-- Burst particles container -->
+      <div id="curr-burst"></div>
+      <!-- Multi-layer glow shells -->
+      <div class="curr-glow-shell curr-glow-outer"></div>
+      <div class="curr-glow-shell curr-glow-mid"></div>
+      <div class="curr-glow-shell curr-glow-inner"></div>
+      <!-- Gradient bar glow (blurred copy behind) -->
+      <div class="curr-gradient-bar-glow"></div>
+      <!-- Gradient bar light cast downward -->
+      <div class="curr-gradient-glow"></div>
+      <!-- Aura particles -->
+      <div class="curr-particles" id="curr-particles"></div>
+      <div class="curr-gradient-bar" style="position:relative; z-index:2; border-radius:12px 12px 0 0; overflow:hidden;">
+        <div style="background:#F5E642"></div>
+        <div style="background:#A8DB5A"></div>
+        <div style="background:#F4A79D"></div>
+        <div style="background:#6DD5D0"></div>
+      </div>
+      <div class="curr-card-content">
+        <div class="label">Maria's venture</div>
+        <h2>Harmony Art Studio</h2>
+        <div class="niche">A creative wellness venture connecting art therapy with community mental health.</div>
+        <div class="why">Why this fits you</div>
+        <div class="why-text">You love art and helping people, you're good at creative expression, and your community needs accessible mental health resources.</div>
+        <button class="curr-btn">I'm in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: New gravitational collapse -->
+  <div class="side new">
+    <div class="side-label">
+      Gravitational Collapse
+      <span>Circles compress. Glow. Birth. Golden ratio.</span>
+    </div>
+    <div class="new-particles" id="new-particles"></div>
+    <div class="new-ambient"></div>
+    <div class="new-wrap">
+      <div class="new-circle c1" id="nc1"></div>
+      <div class="new-circle c2" id="nc2"></div>
+      <div class="new-circle c3" id="nc3"></div>
+      <div class="new-circle c4" id="nc4"></div>
+      <div class="new-center" id="ncenter"></div>
+      <div class="new-shockwave" id="ns1"></div>
+      <div class="new-shockwave s2" id="ns2"></div>
+      <div class="new-biz" id="nbiz">
+        <span class="name">Harmony Art Studio</span>
+        <span class="origin" id="norigin">This came from who you are.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<script>
+  const PHI = 1.618034;
+  const BASE = 1000;
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Particles
+  const pe = document.getElementById('new-particles');
+  for (let i = 0; i < 15; i++) {
+    const d = document.createElement('div');
+    d.className = 'new-particle';
+    d.style.left = (Math.random()*100)+'%';
+    d.style.setProperty('--dur', (12+Math.random()*8)+'s');
+    d.style.setProperty('--del', (Math.random()*10)+'s');
+    pe.appendChild(d);
+  }
+
+  // Generate aura particles — sparks/embers with trails, varied behaviors
+  const colors = ['#F5E642','#A8DB5A','#F4A79D','#6DD5D0'];
+  const anims = ['curr-particle-rise', 'curr-particle-drift', 'curr-particle-fall', 'curr-particle-orbit'];
+  const cp = document.getElementById('curr-particles');
+  for (let i = 0; i < 32; i++) {
+    const d = document.createElement('div');
+    d.className = 'curr-particle';
+
+    // Varied sizes: most small sparks, some bright embers
+    const isBright = Math.random() < 0.25;
+    const size = isBright ? (6 + Math.random() * 5) : (2 + Math.random() * 4);
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+
+    const color = colors[i % 4];
+    d.style.backgroundColor = color;
+    // Bright particles get stronger glow
+    const glowMult = isBright ? 1.5 : 1;
+    d.style.boxShadow = `0 0 ${size*3*glowMult}px ${color}88, 0 0 ${size*6*glowMult}px ${color}44, 0 0 ${size*9*glowMult}px ${color}22`;
+
+    // Brightness variation
+    d.style.setProperty('--p-brightness', isBright ? '1' : (0.5 + Math.random() * 0.4).toString());
+
+    // Drift direction — randomized per particle
+    const driftX = (-12 + Math.random() * 24);
+    const driftY = (-12 + Math.random() * 24);
+    d.style.setProperty('--drift-x', driftX + 'px');
+    d.style.setProperty('--drift-y', driftY + 'px');
+
+    // Pick animation type — weighted toward rise/drift
+    const animRoll = Math.random();
+    let anim;
+    if (animRoll < 0.4) anim = 'curr-particle-rise';
+    else if (animRoll < 0.7) anim = 'curr-particle-drift';
+    else if (animRoll < 0.85) anim = 'curr-particle-fall';
+    else anim = 'curr-particle-orbit';
+    d.style.setProperty('--particle-anim', anim);
+
+    // Distribute around all four edges
+    const edge = i % 4;
+    if (edge === 0) { // left
+      d.style.left = (-5 + Math.random() * 8) + '%';
+      d.style.top = (5 + Math.random() * 90) + '%';
+    } else if (edge === 1) { // right
+      d.style.left = (97 + Math.random() * 8) + '%';
+      d.style.top = (5 + Math.random() * 90) + '%';
+    } else if (edge === 2) { // top
+      d.style.left = (5 + Math.random() * 90) + '%';
+      d.style.top = (-5 + Math.random() * 8) + '%';
+    } else { // bottom
+      d.style.left = (5 + Math.random() * 90) + '%';
+      d.style.top = (97 + Math.random() * 8) + '%';
+    }
+    d.style.animationDelay = (Math.random() * 4.5) + 's';
+    d.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+    cp.appendChild(d);
+  }
+
+  // Generate burst particles — spray outward at creation moment
+  const burstContainer = document.getElementById('curr-burst');
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div');
+    d.className = 'curr-burst-particle';
+    const size = 2 + Math.random() * 4;
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+    const color = colors[i % 4];
+    d.style.backgroundColor = color;
+    d.style.boxShadow = `0 0 ${size*3}px ${color}aa, 0 0 ${size*6}px ${color}55`;
+    // Start from center of card
+    d.style.left = '50%';
+    d.style.top = '50%';
+    // Radial burst direction
+    const angle = (Math.PI * 2 * i / 20) + (Math.random() - 0.5) * 0.5;
+    const distance = 60 + Math.random() * 100;
+    d.style.setProperty('--bx', Math.cos(angle) * distance + 'px');
+    d.style.setProperty('--by', Math.sin(angle) * distance + 'px');
+    d.style.setProperty('--burst-dur', (0.8 + Math.random() * 0.8) + 's');
+    d.style.setProperty('--burst-delay', (Math.random() * 0.15) + 's');
+    burstContainer.appendChild(d);
+  }
+
+  async function runBoth() {
+    await sleep(2 * BASE);
+
+    // ── LEFT: Current reveal ──
+    const currDiagram = document.getElementById('curr-diagram');
+    const currCard = document.getElementById('curr-card');
+
+    // ── RIGHT: Gravitational collapse ──
+    const circles = ['nc1','nc2','nc3','nc4'].map(id => document.getElementById(id));
+    const center = document.getElementById('ncenter');
+    const s1 = document.getElementById('ns1');
+    const s2el = document.getElementById('ns2');
+    const biz = document.getElementById('nbiz');
+    const origin = document.getElementById('norigin');
+
+    // Start both simultaneously
+    // LEFT: dim diagram, slide card up, warm the environment
+    currDiagram.classList.add('dimmed');
+    setTimeout(() => {
+      currCard.classList.add('revealed');
+      // The environment reacts to the card's birth
+      setTimeout(() => document.querySelector('.current').classList.add('warmed'), 200);
+    }, 400);
+
+    // RIGHT: contraction sequence
+    circles.forEach((c, i) => {
+      setTimeout(() => c.classList.add('contracting'), i * 382);
+    });
+
+    await sleep(2 * BASE);
+
+    // RIGHT: center absorb
+    center.classList.add('absorb');
+    await sleep(PHI * BASE);
+
+    // RIGHT: center collapse
+    center.classList.add('collapse');
+    center.classList.remove('absorb');
+    await sleep(382);
+
+    // RIGHT: shockwaves
+    s1.classList.add('expanding');
+    setTimeout(() => s2el.classList.add('expanding'), 236);
+
+    await sleep(382);
+
+    // RIGHT: name birth
+    biz.classList.add('birthing');
+
+    await sleep(PHI * PHI * BASE);
+
+    // RIGHT: origin
+    origin.classList.add('visible');
+
+    await sleep(PHI * BASE);
+
+    // RIGHT: circles return
+    circles.forEach((c, i) => {
+      setTimeout(() => { c.className = `new-circle c${i+1} returning`; }, i * 236);
+    });
+  }
+
+  runBoth();
+</script>
+
+</body>
+</html>

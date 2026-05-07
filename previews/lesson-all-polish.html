@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson — All 8 Polish Features</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #000; overflow: hidden; height: 100vh; }
+
+  /* ═══════════════════════════════════════════
+     SCENE 1: LESSON ENTRANCE (chapter opening)
+     ═══════════════════════════════════════════ */
+  #entrance {
+    position: fixed; inset: 0; z-index: 100; background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 1s ease-out;
+  }
+  #entrance.gone { opacity: 0; pointer-events: none; }
+  .entrance-module {
+    font-family: 'Satoshi', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.4);
+    opacity: 0; transition: opacity 1s ease-out;
+  }
+  .entrance-module.show { opacity: 1; }
+  .entrance-title {
+    font-family: 'Satoshi', sans-serif; font-size: 28px; font-weight: 700;
+    color: #fff; margin-top: 12px; opacity: 0; transition: opacity 1s ease-out;
+  }
+  .entrance-title.show { opacity: 1; }
+  .entrance-line {
+    width: 0; height: 2px; margin-top: 20px; border-radius: 1px;
+    background: linear-gradient(90deg, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .entrance-line.show { width: 120px; }
+
+  /* ═══════════════════════════════════════════
+     LESSON INTERFACE
+     ═══════════════════════════════════════════ */
+  #lesson {
+    position: fixed; inset: 0; display: flex; flex-direction: column;
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13,148,136,0.03) 0%, transparent 70%), #fff;
+    opacity: 0; transition: opacity 0.8s ease-out;
+  }
+  #lesson.show { opacity: 1; }
+
+  /* Header */
+  .l-header {
+    padding: 12px 24px; border-bottom: 1px solid #e5e7eb; background: #fff;
+  }
+  .l-goal { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 14px; margin-bottom: 8px;
+    max-height: 52px; overflow: hidden; transition: max-height 0.4s ease, padding 0.4s ease; cursor: pointer; }
+  .l-goal.collapsed { max-height: 24px; padding: 4px 14px; }
+  .l-goal .label { font-size: 11px; font-weight: 600; color: #0d9488; }
+  .l-goal .text { font-size: 13px; color: #4b5563; margin-top: 2px; }
+  .l-progress { display: flex; align-items: center; gap: 10px; }
+  .l-progress .info { flex-shrink: 0; }
+  .l-progress .mod { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
+  .l-progress .title { font-size: 13px; font-weight: 600; color: #111827; }
+  .l-bar { flex: 1; height: 8px; border-radius: 99px; background: #f3f4f6; overflow: hidden; position: relative; }
+  .l-bar-fill {
+    height: 100%; border-radius: 99px; width: 0%;
+    background: linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%);
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  /* #4: Progress shimmer on checkpoint */
+  .l-bar-fill.shimmer::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    background-size: 200% 100%;
+    animation: bar-shimmer 0.8s ease-out;
+  }
+  @keyframes bar-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+  .l-frac { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
+
+  /* Checkpoint banner */
+  .l-checkpoint {
+    max-width: 500px; margin: 8px auto; text-align: center; border-radius: 8px; padding: 8px 14px;
+    background: linear-gradient(90deg, rgba(245,230,66,0.08), rgba(168,219,90,0.08), rgba(244,167,157,0.08), rgba(109,213,208,0.08));
+    border: 1px solid rgba(13,148,136,0.15);
+    opacity: 0; transform: translateY(-8px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .l-checkpoint.show { opacity: 1; transform: translateY(0); }
+  .l-checkpoint .cp-title { font-size: 13px; font-weight: 600; color: #0d9488; }
+  .l-checkpoint .cp-sub { font-size: 11px; color: #9ca3af; }
+
+  /* Messages */
+  .l-messages { flex: 1; overflow-y: auto; padding: 20px 24px; }
+  .l-messages-inner { max-width: 500px; margin: 0 auto; }
+
+  .msg { margin-bottom: 20px; opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+  .msg.show { opacity: 1; transform: translateY(0); }
+  .msg-right { text-align: right; }
+  .msg-right .bubble { display: inline-block; background: #0d9488; color: #fff; border-radius: 16px; padding: 10px 16px; max-width: 80%; text-align: left; }
+  /* #6: Student message lands with weight */
+  .msg-right .bubble.land { animation: msg-land 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes msg-land { 0% { transform: scale(0.96); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+
+  .msg-left .bubble {
+    display: inline-block; background: #f3f4f6; color: #111827;
+    border-radius: 16px; padding: 16px 20px; max-width: 85%; text-align: left;
+    box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  /* Gradient line — only on text bubbles */
+  .msg-left .bubble.has-text::before {
+    content: ''; position: absolute; left: 0; top: 12px; bottom: 12px;
+    width: 2px; border-radius: 1px;
+    background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  }
+  .bubble p { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+  .bubble p:last-child { margin-bottom: 0; }
+  /* Paragraph stagger */
+  .bubble p.stagger { opacity: 0; animation: p-stagger 0.4s ease-out forwards; }
+  @keyframes p-stagger { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* #7: Ikigai avatar micro-animation */
+  .guide-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; margin-left: 4px; }
+  .guide-label { font-size: 9px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
+  .ikigai-icon { position: relative; width: 12px; height: 12px; flex-shrink: 0; animation: icon-breathe 3s ease-in-out infinite; }
+  .ikigai-icon .dot { position: absolute; width: 5px; height: 5px; border-radius: 50%; }
+  .ikigai-icon .d1 { background: #F5E642; top: 0; left: 3.5px; }
+  .ikigai-icon .d2 { background: #A8DB5A; top: 3.5px; left: 0; }
+  .ikigai-icon .d3 { background: #F4A79D; top: 3.5px; right: 0; }
+  .ikigai-icon .d4 { background: #6DD5D0; bottom: 0; left: 3.5px; }
+  @keyframes icon-breathe { 0%,100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
+
+  /* #1 enhanced: Thinking dots with breathing border glow */
+  .thinking-bubble {
+    position: relative;
+  }
+  .thinking-bubble::after {
+    content: ''; position: absolute; inset: -2px; border-radius: 18px;
+    background: conic-gradient(#F5E642, #A8DB5A, #F4A79D, #6DD5D0, #F5E642);
+    z-index: -1; opacity: 0; filter: blur(4px);
+    animation: think-glow 3s ease-in-out infinite;
+  }
+  @keyframes think-glow { 0%,100% { opacity: 0.15; } 50% { opacity: 0.35; } }
+  .thinking-dots { display: flex; align-items: center; gap: 5px; padding: 8px 4px; }
+  .tdot { width: 7px; height: 7px; border-radius: 50%; animation: tdot-pulse 1.2s ease-in-out infinite; }
+  .tdot:nth-child(1) { background: #F5E642; animation-delay: 0ms; }
+  .tdot:nth-child(2) { background: #A8DB5A; animation-delay: 150ms; }
+  .tdot:nth-child(3) { background: #F4A79D; animation-delay: 300ms; }
+  @keyframes tdot-pulse { 0%,60%,100% { opacity: 0.3; transform: scale(0.8); } 30% { opacity: 1; transform: scale(1); } }
+
+  /* #3: Suggestion chips cascade */
+  .suggestions { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 4px; margin-bottom: 16px; }
+  .suggestions .stuck { font-size: 11px; color: #9ca3af; align-self: center; margin-right: 4px; }
+  .chip {
+    background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 99px;
+    padding: 6px 14px; font-size: 12px; color: #4b5563; cursor: pointer;
+    opacity: 0; transform: translateY(6px) scale(0.95);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .chip.show { animation: chip-cascade 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes chip-cascade { to { opacity: 1; transform: translateY(0) scale(1); } }
+  .chip:hover { background: #f3f4f6; border-color: #0d9488; }
+
+  /* Input area */
+  .l-input {
+    padding: 12px 24px; border-top: 1px solid #e5e7eb;
+    background: rgba(249,250,251,0.8);
+  }
+  .l-input-inner { max-width: 500px; margin: 0 auto; display: flex; gap: 10px; }
+  .l-input input {
+    flex: 1; border: 1px solid #d1d5db; border-radius: 12px; padding: 10px 14px;
+    font-size: 15px; font-family: inherit; outline: none;
+    transition: border-color 0.2s, box-shadow 0.3s;
+  }
+  /* #5: Input focus glow */
+  .l-input input:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13,148,136,0.1), 0 0 16px rgba(245,230,66,0.06), 0 0 16px rgba(109,213,208,0.06);
+  }
+  .l-input button {
+    background: #0d9488; color: #fff; border: none; border-radius: 12px;
+    padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .l-input button:hover { background: #0f766e; }
+
+  /* #3b: Completion overlay */
+  .l-dim { position: fixed; inset: 0; background: rgba(0,0,0,0); pointer-events: none; transition: background 0.6s; z-index: 50; }
+  .l-dim.show { background: rgba(0,0,0,0.3); pointer-events: auto; }
+  .l-complete-card {
+    position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.95);
+    background: #fff; border-radius: 16px; padding: 32px 40px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15); z-index: 51;
+    opacity: 0; transition: opacity 0.5s, transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+  .l-complete-card.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .l-complete-check {
+    width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 16px;
+    background: linear-gradient(135deg, rgba(245,230,66,0.15), rgba(168,219,90,0.15), rgba(244,167,157,0.15), rgba(109,213,208,0.15));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #0d9488;
+  }
+  .l-complete-title { font-family: 'Satoshi', sans-serif; font-size: 18px; font-weight: 700; color: #111827; }
+  .l-complete-sub { font-size: 13px; color: #9ca3af; margin-top: 4px; }
+  .l-complete-btn {
+    margin-top: 20px; background: #0d9488; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 28px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.1s !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ENTRANCE -->
+<div id="entrance">
+  <div class="entrance-module" id="ent-mod">Module 1</div>
+  <div class="entrance-title" id="ent-title">Define Your Target Customer</div>
+  <div class="entrance-line" id="ent-line"></div>
+</div>
+
+<!-- LESSON -->
+<div id="lesson">
+  <div class="l-header">
+    <div class="l-goal" id="goal" onclick="this.classList.toggle('collapsed')">
+      <div class="label">Goal</div>
+      <div class="text">Define your target customer and understand their specific needs.</div>
+    </div>
+    <div class="l-progress">
+      <div class="info">
+        <div class="mod">Module 1</div>
+        <div class="title">Define Your Target Customer</div>
+      </div>
+      <div class="l-bar"><div class="l-bar-fill" id="bar-fill"></div></div>
+      <div class="l-frac" id="frac">0/4</div>
+    </div>
+  </div>
+
+  <div id="checkpoint-area" style="padding: 0 24px;"></div>
+
+  <div class="l-messages" id="messages">
+    <div class="l-messages-inner" id="msg-inner"></div>
+  </div>
+
+  <div id="suggestions-area" style="max-width: 500px; margin: 0 auto; padding: 0 24px;"></div>
+
+  <div class="l-input">
+    <div class="l-input-inner">
+      <input type="text" id="user-input" placeholder="What are you thinking?" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Completion overlay -->
+<div class="l-dim" id="dim"></div>
+<div class="l-complete-card" id="complete-card">
+  <div class="l-complete-check">✓</div>
+  <div class="l-complete-title">Define Your Target Customer</div>
+  <div class="l-complete-sub">Lesson complete</div>
+  <button class="l-complete-btn">Next Lesson →</button>
+</div>
+
+<script>
+const PHI = 1.618034;
+const BASE = 1000;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const GUIDE_LABEL = `<div class="guide-row"><div class="ikigai-icon"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div><div class="dot d4"></div></div><span class="guide-label">Guide</span></div>`;
+
+function addMsg(role, html, options = {}) {
+  const inner = document.getElementById('msg-inner');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role === 'ai' ? 'left' : 'right'}`;
+
+  if (role === 'ai') {
+    const hasText = !options.thinking;
+    div.innerHTML = `${GUIDE_LABEL}<div class="bubble ${hasText ? 'has-text' : ''} ${options.thinking ? 'thinking-bubble' : ''}">${html}</div>`;
+  } else {
+    div.innerHTML = `<div class="bubble ${options.land ? 'land' : ''}">${html}</div>`;
+  }
+
+  inner.appendChild(div);
+  // Trigger entrance animation (#2)
+  requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('show')));
+  document.getElementById('messages').scrollTop = 999999;
+  return div;
+}
+
+function setProgress(n, total) {
+  document.getElementById('bar-fill').style.width = `${(n/total)*100}%`;
+  document.getElementById('frac').textContent = `${n}/${total}`;
+  // Shimmer on checkpoint
+  const fill = document.getElementById('bar-fill');
+  fill.classList.add('shimmer');
+  setTimeout(() => fill.classList.remove('shimmer'), 1000);
+}
+
+function showCheckpoint(n, total) {
+  const area = document.getElementById('checkpoint-area');
+  area.innerHTML = `<div class="l-checkpoint" id="cp-banner"><div class="cp-title">Checkpoint reached</div><div class="cp-sub">${n}/${total} complete</div></div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('cp-banner').classList.add('show')));
+  setTimeout(() => { area.innerHTML = ''; }, 2500);
+}
+
+function showSuggestions() {
+  const area = document.getElementById('suggestions-area');
+  const chips = ['What age range?', 'Where do they hang out online?', 'What do they struggle with?'];
+  area.innerHTML = `<div class="suggestions"><span class="stuck">Stuck?</span>${chips.map((c, i) => `<div class="chip" id="chip-${i}">${c}</div>`).join('')}</div>`;
+  chips.forEach((_, i) => {
+    setTimeout(() => document.getElementById(`chip-${i}`).classList.add('show'), i * 200);
+  });
+}
+
+function removeSuggestions() { document.getElementById('suggestions-area').innerHTML = ''; }
+
+// Simulated conversation
+async function runDemo() {
+  // ENTRANCE (#1)
+  await sleep(800);
+  document.getElementById('ent-mod').classList.add('show');
+  await sleep(600);
+  document.getElementById('ent-title').classList.add('show');
+  await sleep(500);
+  document.getElementById('ent-line').classList.add('show');
+  await sleep(2000);
+  document.getElementById('entrance').classList.add('gone');
+  await sleep(300);
+  document.getElementById('lesson').classList.add('show');
+  await sleep(600);
+
+  // AI opener — paragraphs stagger in (#2)
+  const opener = addMsg('ai', `
+    <p class="stagger" style="animation-delay:0ms">Let's think about who your ideal customer really is. Not just "everyone" — but the specific person who would be MOST excited about what you're building.</p>
+    <p class="stagger" style="animation-delay:150ms">Think about age, location, interests, and what problem they're trying to solve.</p>
+    <p class="stagger" style="animation-delay:300ms">Who comes to mind first?</p>
+  `);
+  setProgress(0, 4);
+
+  await sleep(4000);
+
+  // Show suggestions (#3 cascade)
+  showSuggestions();
+
+  await sleep(3000);
+  removeSuggestions();
+
+  // Student message (#6 land effect)
+  addMsg('user', '<p>I think it would be teenagers who are into art and want to express themselves creatively</p>', { land: true });
+
+  await sleep(1500);
+
+  // AI thinking (#1 enhanced — glowing border)
+  const thinking = addMsg('ai', `<div class="thinking-dots"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>`, { thinking: true });
+
+  await sleep(3000);
+
+  // Replace thinking with response
+  thinking.remove();
+  addMsg('ai', `
+    <p class="stagger" style="animation-delay:0ms">Good start! But "teenagers who are into art" is still pretty broad.</p>
+    <p class="stagger" style="animation-delay:150ms">Are we talking about 13-year-olds or 19-year-olds? City kids or suburban? Kids who draw for fun or kids building portfolios for art school?</p>
+    <p class="stagger" style="animation-delay:300ms">The more specific you get, the easier everything else becomes. Try narrowing it down.</p>
+  `);
+
+  // Checkpoint! (#4 progress shimmer + celebration)
+  await sleep(1000);
+  setProgress(1, 4);
+  showCheckpoint(1, 4);
+
+  // Goal collapses (#6b)
+  await sleep(1500);
+  document.getElementById('goal').classList.add('collapsed');
+
+  await sleep(3000);
+
+  // Student responds
+  addMsg('user', '<p>Okay, I think my target customer is a 15-17 year old girl who does digital art and wants to sell custom stickers online</p>', { land: true });
+
+  await sleep(2000);
+
+  // Thinking again
+  const thinking2 = addMsg('ai', `<div class="thinking-dots"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>`, { thinking: true });
+
+  await sleep(3000);
+  thinking2.remove();
+
+  addMsg('ai', `
+    <p class="stagger" style="animation-delay:0ms">Now THAT is a target customer. A 15-17 year old digital artist who wants to monetize her work through custom stickers.</p>
+    <p class="stagger" style="animation-delay:150ms">You can picture her. You know what apps she uses, what she cares about, where she spends time online.</p>
+    <p class="stagger" style="animation-delay:300ms">That's exactly the kind of specificity that makes a business real.</p>
+  `);
+
+  await sleep(1000);
+  setProgress(2, 4);
+  showCheckpoint(2, 4);
+
+  await sleep(5000);
+
+  // Fast forward to completion
+  setProgress(4, 4);
+
+  await sleep(500);
+
+  // Completion (#3b — dim + card)
+  document.getElementById('dim').classList.add('show');
+  await sleep(300);
+  document.getElementById('complete-card').classList.add('show');
+}
+
+// Allow user to type too
+function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+  removeSuggestions();
+  addMsg('user', `<p>${text}</p>`, { land: true });
+  input.value = '';
+}
+
+document.getElementById('user-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
+});
+
+runDemo();
+</script>
+</body>
+</html>

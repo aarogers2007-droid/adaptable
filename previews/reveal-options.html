@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Name Reveal — 3 Options</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Satoshi', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .option-section {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .option-label {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    z-index: 100;
+    text-align: center;
+    line-height: 1.618;
+  }
+  .option-label .subtitle {
+    display: block;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.146em;
+    color: rgba(255,255,255,0.15);
+    margin-top: 4px;
+  }
+
+  /* ═══════════════════════════════════════════
+     SHARED: IKIGAI CIRCLES (all 3 options)
+     Starting state: all 4 visible at 0.618 opacity
+     ═══════════════════════════════════════════ */
+
+  .ik-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1 / 1;
+  }
+
+  .ik-c {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .ik-c.c1 { background: #F5E642; left: 50%; top: 19.1%; opacity: 0.618; }
+  .ik-c.c2 { background: #A8DB5A; left: 19.1%; top: 50%; opacity: 0.618; }
+  .ik-c.c3 { background: #F4A79D; left: 80.9%; top: 50%; opacity: 0.618; }
+  .ik-c.c4 { background: #6DD5D0; left: 50%; top: 80.9%; opacity: 0.618; }
+
+  /* Center glow — always visible as starting state */
+  .ik-center {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 19.1%;
+    height: 19.1%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2);
+    opacity: 1;
+    z-index: 4;
+  }
+
+  /* Ambient glow */
+  .ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(25, 50, 82, 0.090) 0%, transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+  }
+  @keyframes glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OPTION A: SUPERNOVA
+     Center glow intensifies → white flash → name is just THERE,
+     enormous, like it was always written behind the light.
+     Scale: starts at 200% with blur, settles to 100%.
+     The flash is the universe saying "here it is."
+     ═══════════════════════════════════════════════════════════ */
+
+  #option-a .ik-center {
+    animation: a-center-charge 3s ease-in forwards;
+    animation-delay: 2s;
+  }
+  @keyframes a-center-charge {
+    0% {
+      box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2);
+      transform: translate(-50%, -50%) scale(1);
+    }
+    40% {
+      box-shadow: 0 0 60px rgba(74, 103, 65, 0.8), 0 0 120px rgba(139, 158, 106, 0.5);
+      transform: translate(-50%, -50%) scale(1.236);
+    }
+    70% {
+      box-shadow: 0 0 80px rgba(74, 103, 65, 1), 0 0 160px rgba(139, 158, 106, 0.8), 0 0 240px rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%) scale(1.382);
+    }
+    100% {
+      box-shadow: 0 0 100px rgba(255, 255, 255, 0.9), 0 0 200px rgba(139, 158, 106, 0.6), 0 0 300px rgba(74, 103, 65, 0.3);
+      transform: translate(-50%, -50%) scale(1.618);
+    }
+  }
+
+  #option-a .a-flash {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 30%, rgba(139,158,106,0.4) 60%, transparent 100%);
+    z-index: 20;
+    opacity: 0;
+    animation: a-flash-expand 1.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 5s;
+  }
+  @keyframes a-flash-expand {
+    0% {
+      width: 0; height: 0;
+      opacity: 1;
+    }
+    30% {
+      width: 200%; height: 200%;
+      opacity: 1;
+    }
+    100% {
+      width: 300%; height: 300%;
+      opacity: 0;
+    }
+  }
+
+  /* Circles react to the flash — momentary brightness spike */
+  #option-a .ik-c {
+    animation: a-circle-flash 1s ease-out forwards;
+    animation-delay: 5s;
+  }
+  @keyframes a-circle-flash {
+    0% { opacity: 0.618; filter: brightness(1); }
+    20% { opacity: 0.9; filter: brightness(1.8); }
+    100% { opacity: 0.5; filter: brightness(1); }
+  }
+
+  /* Business name — appears THROUGH the flash, already there, massive */
+  #option-a .a-biz-name {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(2);
+    z-index: 30;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0;
+    filter: blur(20px);
+    text-shadow: 0 0 40px rgba(74, 103, 65, 0.8), 0 0 80px rgba(74, 103, 65, 0.4);
+    animation: a-name-emerge 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 5.2s;
+  }
+  @keyframes a-name-emerge {
+    0% {
+      opacity: 0;
+      filter: blur(20px);
+      transform: translate(-50%, -50%) scale(2);
+    }
+    30% {
+      opacity: 1;
+      filter: blur(8px);
+      transform: translate(-50%, -50%) scale(1.382);
+    }
+    60% {
+      filter: blur(2px);
+      transform: translate(-50%, -50%) scale(1.09);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* Origin line */
+  #option-a .a-biz-origin {
+    position: absolute;
+    left: 50%; top: calc(50% + 32px);
+    transform: translateX(-50%);
+    z-index: 30;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0);
+    letter-spacing: 0.146em;
+    white-space: nowrap;
+    animation: a-origin-fade 2.618s ease-out forwards;
+    animation-delay: 8s;
+  }
+  @keyframes a-origin-fade {
+    0% { color: rgba(255,255,255,0); }
+    100% { color: rgba(255,255,255,0.35); }
+  }
+
+  /* Loop reset */
+  #option-a {
+    animation: a-loop 15s linear infinite;
+  }
+  @keyframes a-loop {
+    0%, 93% { opacity: 1; }
+    97% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  #option-a > * {
+    animation-iteration-count: infinite;
+  }
+  /* Re-trigger all child animations on loop via wrapper */
+  #option-a .ik-center,
+  #option-a .a-flash,
+  #option-a .ik-c,
+  #option-a .a-biz-name,
+  #option-a .a-biz-origin {
+    animation-iteration-count: 1;
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OPTION B: GRAVITATIONAL COLLAPSE
+     The four circles CONTRACT inward toward center,
+     shrinking and brightening. As they converge to a point,
+     the business name EXPANDS outward from that point —
+     as if the circles compressed into the name itself.
+     The name IS what the circles became.
+     ═══════════════════════════════════════════════════════════ */
+
+  #option-b .ik-c.c1 {
+    animation: b-contract-c1 2.618s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation-delay: 2s;
+  }
+  #option-b .ik-c.c2 {
+    animation: b-contract-c2 2.618s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation-delay: 2.236s;
+  }
+  #option-b .ik-c.c3 {
+    animation: b-contract-c3 2.618s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation-delay: 2.382s;
+  }
+  #option-b .ik-c.c4 {
+    animation: b-contract-c4 2.618s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    animation-delay: 2.618s;
+  }
+
+  @keyframes b-contract-c1 {
+    0% { left: 50%; top: 19.1%; width: 50%; height: 50%; opacity: 0.618; }
+    60% { opacity: 0.8; }
+    100% { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+  }
+  @keyframes b-contract-c2 {
+    0% { left: 19.1%; top: 50%; width: 50%; height: 50%; opacity: 0.618; }
+    60% { opacity: 0.8; }
+    100% { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+  }
+  @keyframes b-contract-c3 {
+    0% { left: 80.9%; top: 50%; width: 50%; height: 50%; opacity: 0.618; }
+    60% { opacity: 0.8; }
+    100% { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+  }
+  @keyframes b-contract-c4 {
+    0% { left: 50%; top: 80.9%; width: 50%; height: 50%; opacity: 0.618; }
+    60% { opacity: 0.8; }
+    100% { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+  }
+
+  /* Center glow absorbs the circles — intensifies as they arrive */
+  #option-b .ik-center {
+    animation: b-center-absorb 2s ease-out forwards;
+    animation-delay: 4s;
+  }
+  @keyframes b-center-absorb {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+      box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2);
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.618);
+      box-shadow: 0 0 80px rgba(74, 103, 65, 0.9), 0 0 160px rgba(139, 158, 106, 0.6);
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(0.382);
+      box-shadow: 0 0 20px rgba(74, 103, 65, 0.3), 0 0 40px rgba(74, 103, 65, 0.1);
+      opacity: 0.382;
+    }
+  }
+
+  /* Shockwave ring — the moment of convergence */
+  #option-b .b-shockwave {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 158, 106, 0.8);
+    z-index: 15;
+    opacity: 0;
+    animation: b-shockwave 1.618s cubic-bezier(0, 0.5, 0.3, 1) forwards;
+    animation-delay: 5s;
+  }
+  @keyframes b-shockwave {
+    0% {
+      width: 10px; height: 10px;
+      opacity: 0.8;
+      border-width: 2px;
+    }
+    100% {
+      width: 120%; height: 120%;
+      opacity: 0;
+      border-width: 0.5px;
+    }
+  }
+
+  /* Second shockwave, staggered */
+  #option-b .b-shockwave-2 {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(139, 158, 106, 0.5);
+    z-index: 15;
+    opacity: 0;
+    animation: b-shockwave 2s cubic-bezier(0, 0.5, 0.3, 1) forwards;
+    animation-delay: 5.236s;
+  }
+
+  /* Business name — born from the convergence point, scale 0 to 1 */
+  #option-b .b-biz-name {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 30;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0;
+    text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25);
+    animation: b-name-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 5s;
+  }
+  @keyframes b-name-birth {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0);
+      letter-spacing: -0.1em;
+    }
+    20% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(0.5);
+      letter-spacing: -0.05em;
+    }
+    60% {
+      transform: translate(-50%, -50%) scale(1.09);
+      letter-spacing: 0.02em;
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      letter-spacing: 0em;
+    }
+  }
+
+  /* After name settles, circles softly re-emerge behind it */
+  #option-b .ik-c.c1 { animation: b-contract-c1 2.618s cubic-bezier(0.7, 0, 0.3, 1) forwards, b-circle-return-c1 2.618s ease-out 7.5s forwards; }
+  #option-b .ik-c.c2 { animation: b-contract-c2 2.618s cubic-bezier(0.7, 0, 0.3, 1) 2.236s forwards, b-circle-return-c2 2.618s ease-out 7.8s forwards; }
+  #option-b .ik-c.c3 { animation: b-contract-c3 2.618s cubic-bezier(0.7, 0, 0.3, 1) 2.382s forwards, b-circle-return-c3 2.618s ease-out 8.1s forwards; }
+  #option-b .ik-c.c4 { animation: b-contract-c4 2.618s cubic-bezier(0.7, 0, 0.3, 1) 2.618s forwards, b-circle-return-c4 2.618s ease-out 8.4s forwards; }
+
+  @keyframes b-circle-return-c1 {
+    from { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+    to   { left: 50%; top: 19.1%; width: 50%; height: 50%; opacity: 0.236; }
+  }
+  @keyframes b-circle-return-c2 {
+    from { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+    to   { left: 19.1%; top: 50%; width: 50%; height: 50%; opacity: 0.236; }
+  }
+  @keyframes b-circle-return-c3 {
+    from { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+    to   { left: 80.9%; top: 50%; width: 50%; height: 50%; opacity: 0.236; }
+  }
+  @keyframes b-circle-return-c4 {
+    from { left: 50%; top: 50%; width: 8%; height: 8%; opacity: 0; }
+    to   { left: 50%; top: 80.9%; width: 50%; height: 50%; opacity: 0.236; }
+  }
+
+  /* Origin line */
+  #option-b .b-biz-origin {
+    position: absolute;
+    left: 50%; top: calc(50% + 32px);
+    transform: translateX(-50%);
+    z-index: 30;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0);
+    letter-spacing: 0.146em;
+    white-space: nowrap;
+    animation: b-origin-fade 2.618s ease-out forwards;
+    animation-delay: 8s;
+  }
+  @keyframes b-origin-fade {
+    0% { color: rgba(255,255,255,0); }
+    100% { color: rgba(255,255,255,0.35); }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OPTION C: THE INSCRIPTION
+     The name writes itself in from left to right with a
+     glowing leading edge — like a laser etching or a pen
+     made of light tracing the words into existence.
+     Calligraphic energy without an actual script font.
+     Each letter is revealed by a traveling light.
+     ═══════════════════════════════════════════════════════════ */
+
+  /* The traveling light / stylus that writes the name */
+  #option-c .c-stylus {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 25;
+    width: 200px; /* approximate name width */
+    height: 50px;
+    pointer-events: none;
+  }
+
+  #option-c .c-stylus-dot {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 30px rgba(139, 158, 106, 0.8), 0 0 60px rgba(74, 103, 65, 0.5);
+    opacity: 0;
+    animation: c-stylus-move 3.236s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation-delay: 3s;
+  }
+  @keyframes c-stylus-move {
+    0% { left: 0; opacity: 0; }
+    3% { opacity: 1; }
+    85% { opacity: 1; }
+    95% { left: 100%; opacity: 0.6; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  /* Stylus trail — fading glow that follows the dot */
+  #option-c .c-stylus-trail {
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+    width: 0;
+    background: linear-gradient(90deg, transparent, rgba(139, 158, 106, 0.3), rgba(255,255,255,0.15));
+    z-index: 24;
+    animation: c-trail-grow 3.236s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation-delay: 3s;
+  }
+  @keyframes c-trail-grow {
+    0% { width: 0; opacity: 0.8; }
+    90% { width: 100%; opacity: 0.5; }
+    100% { width: 100%; opacity: 0; }
+  }
+
+  /* The name itself — revealed via clip-path traveling left to right */
+  #option-c .c-biz-name {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25);
+    clip-path: inset(0 100% 0 0);
+    animation: c-name-inscribe 3.236s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation-delay: 3s;
+  }
+  @keyframes c-name-inscribe {
+    0%   { clip-path: inset(0 100% 0 0); }
+    100% { clip-path: inset(0 0% 0 0); }
+  }
+
+  /* Each letter gets a subtle glow as the stylus passes — simulated via text-shadow pulse */
+  #option-c .c-biz-name-glow {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 29;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: transparent;
+    white-space: nowrap;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(139, 158, 106, 0.4);
+    clip-path: inset(0 100% 0 0);
+    animation: c-glow-inscribe 3.236s cubic-bezier(0.25, 0.1, 0.25, 1) forwards,
+               c-glow-fade 2s ease-out 6s forwards;
+    animation-delay: 2.9s, 6.5s;
+  }
+  @keyframes c-glow-inscribe {
+    0%   { clip-path: inset(0 100% 0 0); }
+    100% { clip-path: inset(0 0% 0 0); }
+  }
+  @keyframes c-glow-fade {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Center glow dims as the name writes — the name replaces it as the focal point */
+  #option-c .ik-center {
+    animation: c-center-dim 2s ease-out forwards;
+    animation-delay: 3.5s;
+  }
+  @keyframes c-center-dim {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0.236; transform: translate(-50%, -50%) scale(0.618); }
+  }
+
+  /* Circles pulse subtly as the name is being written — they feel it */
+  #option-c .ik-c {
+    animation: c-circle-pulse 3.236s ease-in-out forwards;
+    animation-delay: 3s;
+  }
+  @keyframes c-circle-pulse {
+    0% { opacity: 0.618; }
+    30% { opacity: 0.75; }
+    60% { opacity: 0.618; }
+    100% { opacity: 0.5; }
+  }
+
+  /* After inscription completes: a brief shimmer travels across the finished name */
+  #option-c .c-shimmer {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 31;
+    width: 260px; /* approximate */
+    height: 50px;
+    overflow: hidden;
+    opacity: 0;
+    animation: c-shimmer-appear 0.1s forwards;
+    animation-delay: 6.5s;
+  }
+  #option-c .c-shimmer-bar {
+    position: absolute;
+    top: 0; left: -60px;
+    width: 60px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: skewX(-20deg);
+    animation: c-shimmer-sweep 1s ease-in-out forwards;
+    animation-delay: 6.6s;
+  }
+  @keyframes c-shimmer-appear {
+    to { opacity: 1; }
+  }
+  @keyframes c-shimmer-sweep {
+    0% { left: -60px; }
+    100% { left: 320px; }
+  }
+
+  /* Origin line */
+  #option-c .c-biz-origin {
+    position: absolute;
+    left: 50%; top: calc(50% + 32px);
+    transform: translateX(-50%);
+    z-index: 30;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0);
+    letter-spacing: 0.146em;
+    white-space: nowrap;
+    animation: c-origin-fade 2.618s ease-out forwards;
+    animation-delay: 8s;
+  }
+  @keyframes c-origin-fade {
+    0% { color: rgba(255,255,255,0); }
+    100% { color: rgba(255,255,255,0.35); }
+  }
+
+
+  /* ═══════════════════════════════════════════
+     REDUCED MOTION
+     ═══════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPTION A: SUPERNOVA
+     Center charges up → white flash erupts → name is revealed
+     behind the light, already written, massive, settling into place.
+     Like the PS2 boot: the thing you were waiting for was always there.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="option-section" id="option-a">
+  <div class="option-label">
+    Option A: Supernova
+    <span class="subtitle">Light flash reveals what was always there</span>
+  </div>
+  <div class="ambient-glow"></div>
+  <div class="ik-wrap">
+    <div class="ik-c c1"></div>
+    <div class="ik-c c2"></div>
+    <div class="ik-c c3"></div>
+    <div class="ik-c c4"></div>
+    <div class="ik-center"></div>
+    <div class="a-flash"></div>
+    <div class="a-biz-name">Harmony Art Studio</div>
+    <div class="a-biz-origin">This came from who you are.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPTION B: GRAVITATIONAL COLLAPSE
+     The four circles contract inward, compressing into the center.
+     Shockwave. The name is BORN from their convergence — scale 0 to 1.
+     Then the circles softly re-emerge at low opacity behind it.
+     The name is what the circles became.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="option-section" id="option-b">
+  <div class="option-label">
+    Option B: Gravitational Collapse
+    <span class="subtitle">Circles compress into the name itself</span>
+  </div>
+  <div class="ambient-glow"></div>
+  <div class="ik-wrap">
+    <div class="ik-c c1"></div>
+    <div class="ik-c c2"></div>
+    <div class="ik-c c3"></div>
+    <div class="ik-c c4"></div>
+    <div class="ik-center"></div>
+    <div class="b-shockwave"></div>
+    <div class="b-shockwave-2"></div>
+    <div class="b-biz-name">Harmony Art Studio</div>
+    <div class="b-biz-origin">This came from who you are.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPTION C: THE INSCRIPTION
+     A point of light travels left-to-right across the center,
+     inscribing the business name letter by letter — like a laser
+     etching into the universe. A shimmer passes after completion.
+     Precise, deliberate, earned.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="option-section" id="option-c">
+  <div class="option-label">
+    Option C: The Inscription
+    <span class="subtitle">A traveling light writes the name into existence</span>
+  </div>
+  <div class="ambient-glow"></div>
+  <div class="ik-wrap">
+    <div class="ik-c c1"></div>
+    <div class="ik-c c2"></div>
+    <div class="ik-c c3"></div>
+    <div class="ik-c c4"></div>
+    <div class="ik-center"></div>
+    <div class="c-stylus">
+      <div class="c-stylus-dot"></div>
+      <div class="c-stylus-trail"></div>
+    </div>
+    <div class="c-biz-name-glow">Harmony Art Studio</div>
+    <div class="c-biz-name">Harmony Art Studio</div>
+    <div class="c-shimmer">
+      <div class="c-shimmer-bar"></div>
+    </div>
+    <div class="c-biz-origin">This came from who you are.</div>
+  </div>
+</div>
+
+<script>
+  /*
+   * Auto-loop: reset each option section every 15s
+   * by cloning and replacing the inner content.
+   * Pure DOM — no frameworks needed.
+   */
+  function resetSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+  }
+
+  setInterval(() => { resetSection('option-a'); }, 15000);
+  setInterval(() => { resetSection('option-b'); }, 15000);
+  setInterval(() => { resetSection('option-c'); }, 15000);
+</script>
+
+</body>
+</html>

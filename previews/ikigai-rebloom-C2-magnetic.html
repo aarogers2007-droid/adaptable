@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Rebloom — C2 Tether & Draw</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * IKIGAI REBLOOM — VARIATION C2: TETHER & DRAW
+   * ═══════════════════════════════════════════════════════════
+   * Golden ratio timing throughout. Base = 1000ms.
+   * φ intervals: 382, 618, 1000, 1618, 2618, 4236ms
+   *
+   * ACT I   — Entrance (KEPT EXACTLY):       ~8.0s
+   *   4 circles fade in one-by-one, blurred→sharp, opacity 0.618
+   *   stagger 1.618s; breathe together ~3.236s
+   * ACT II  — Tether & Draw (NEW):           ~8.0s
+   *   Filaments draw toward center (2.618s)
+   *   Braid into a knot (1.000s)
+   *   Three heartbeat pulses (0.618 + 0.618 + 1.000s)
+   *   On third pulse: circles pulled along filaments → white impact burst
+   * ACT III — Name reveal (KEPT EXACTLY):    2.618s + 3s hold
+   *   Business name fades in; drop-shadow softens
+   *
+   * Total scene: ~21.6s, then loops.
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Satoshi', sans-serif;
+  }
+
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Ambient deep-blue hum */
+  .ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(25, 50, 82, 0.09) 0%, transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.618; }
+    50%      { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     IKIGAI WRAP — classes match src/app/globals.css 565-707
+     ───────────────────────────────────────────────────────── */
+  .ceremony-ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+  }
+
+  /* ACT I — Circle entrance (KEPT EXACTLY) */
+  .ceremony-ik-circle {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%, -50%) scale(0.236);
+    mix-blend-mode: screen; /* additive, so four colors can sum to white */
+  }
+  .ceremony-ik-circle.reveal {
+    animation: ceremony-circle-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes ceremony-circle-birth {
+    0%   { opacity: 0;     transform: translate(-50%, -50%) scale(0.236); filter: blur(10px); }
+    50%  { opacity: 0.382; filter: blur(3px); }
+    100% { opacity: 0.618; transform: translate(-50%, -50%) scale(1);     filter: blur(0); }
+  }
+  .ceremony-ik-circle.c1 { background: #F5E642; left: 50%;   top: 19.1%; }
+  .ceremony-ik-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%;   }
+  .ceremony-ik-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%;   }
+  .ceremony-ik-circle.c4 { background: #6DD5D0; left: 50%;   top: 80.9%; }
+
+  /* ACT II — TETHER & DRAW */
+
+  /* SVG filament layer — spider silk in moonlight */
+  .filaments {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .filament {
+    fill: none;
+    stroke-width: 0.6;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    opacity: 0;
+    filter: url(#silk-glow);
+  }
+  .filament.f1 { stroke: rgba(255, 248, 200, 0.85); }
+  .filament.f2 { stroke: rgba(220, 245, 200, 0.85); }
+  .filament.f3 { stroke: rgba(255, 225, 215, 0.85); }
+  .filament.f4 { stroke: rgba(210, 245, 243, 0.85); }
+
+  .filament.drawing {
+    animation: filament-draw 2.618s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes filament-draw {
+    0%   { stroke-dashoffset: 100; opacity: 0; }
+    12%  { opacity: 0.618; }
+    100% { stroke-dashoffset: 0;   opacity: 0.85; }
+  }
+
+  /* After draw, gentle shimmer travels the length */
+  .filament.alive {
+    animation: filament-shimmer 3.236s ease-in-out infinite;
+    stroke-dashoffset: 0;
+    opacity: 0.7;
+  }
+  @keyframes filament-shimmer {
+    0%, 100% { opacity: 0.45; stroke-width: 0.5; }
+    50%      { opacity: 0.85; stroke-width: 0.75; }
+  }
+
+  /* The knot — a bright point where four silks meet */
+  .knot {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 6%; height: 6%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: radial-gradient(circle,
+      rgba(255, 255, 255, 1)   0%,
+      rgba(255, 250, 220, 0.9) 30%,
+      rgba(200, 220, 180, 0.4) 60%,
+      transparent 100%);
+    box-shadow:
+      0 0 12px rgba(255, 255, 255, 0.9),
+      0 0 36px rgba(200, 220, 180, 0.5),
+      0 0 72px rgba(139, 158, 106, 0.35);
+    z-index: 7;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .knot.braiding {
+    animation: knot-form 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes knot-form {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0)    rotate(0deg); }
+    60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05) rotate(180deg); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1)    rotate(360deg); }
+  }
+
+  /* Three heartbeat pulses — anticipation */
+  .knot.pulsing {
+    animation: knot-heartbeat 2.236s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes knot-heartbeat {
+    /* Pulse 1 (small) @ 0-0.618s */
+    0%   { transform: translate(-50%, -50%) scale(1);    box-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 36px rgba(200,220,180,0.5); }
+    14%  { transform: translate(-50%, -50%) scale(1.25); box-shadow: 0 0 20px rgba(255,255,255,1),   0 0 56px rgba(200,220,180,0.7); }
+    27%  { transform: translate(-50%, -50%) scale(1);    box-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 36px rgba(200,220,180,0.5); }
+    /* Pulse 2 (medium) @ 0.618-1.236s */
+    41%  { transform: translate(-50%, -50%) scale(1.4);  box-shadow: 0 0 28px rgba(255,255,255,1),   0 0 72px rgba(200,220,180,0.8); }
+    55%  { transform: translate(-50%, -50%) scale(1);    box-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 36px rgba(200,220,180,0.5); }
+    /* Hold the breath */
+    72%  { transform: translate(-50%, -50%) scale(1);    box-shadow: 0 0 14px rgba(255,255,255,0.9), 0 0 40px rgba(200,220,180,0.55); }
+    /* Pulse 3 (big, the pull) @ 1.618-2.236s */
+    100% { transform: translate(-50%, -50%) scale(1.8);  box-shadow: 0 0 48px rgba(255,255,255,1),   0 0 120px rgba(255,255,255,0.8), 0 0 200px rgba(200,220,180,0.6); }
+  }
+
+  /* On third pulse, circles are drawn along their filament into center */
+  .ceremony-ik-circle.drawn-c1 { animation: draw-c1 1s cubic-bezier(0.55, 0, 0.2, 1) forwards; }
+  .ceremony-ik-circle.drawn-c2 { animation: draw-c2 1s cubic-bezier(0.55, 0, 0.2, 1) forwards; }
+  .ceremony-ik-circle.drawn-c3 { animation: draw-c3 1s cubic-bezier(0.55, 0, 0.2, 1) forwards; }
+  .ceremony-ik-circle.drawn-c4 { animation: draw-c4 1s cubic-bezier(0.55, 0, 0.2, 1) forwards; }
+
+  @keyframes draw-c1 {
+    0%   { left: 50%;   top: 19.1%; width: 50%; height: 50%; opacity: 0.618; filter: blur(0); }
+    61.8%{ opacity: 0.9; filter: blur(1px); }
+    100% { left: 50%;   top: 50%;   width: 14%; height: 14%; opacity: 1;     filter: blur(2px); }
+  }
+  @keyframes draw-c2 {
+    0%   { left: 19.1%; top: 50%;   width: 50%; height: 50%; opacity: 0.618; filter: blur(0); }
+    61.8%{ opacity: 0.9; filter: blur(1px); }
+    100% { left: 50%;   top: 50%;   width: 14%; height: 14%; opacity: 1;     filter: blur(2px); }
+  }
+  @keyframes draw-c3 {
+    0%   { left: 80.9%; top: 50%;   width: 50%; height: 50%; opacity: 0.618; filter: blur(0); }
+    61.8%{ opacity: 0.9; filter: blur(1px); }
+    100% { left: 50%;   top: 50%;   width: 14%; height: 14%; opacity: 1;     filter: blur(2px); }
+  }
+  @keyframes draw-c4 {
+    0%   { left: 50%;   top: 80.9%; width: 50%; height: 50%; opacity: 0.618; filter: blur(0); }
+    61.8%{ opacity: 0.9; filter: blur(1px); }
+    100% { left: 50%;   top: 50%;   width: 14%; height: 14%; opacity: 1;     filter: blur(2px); }
+  }
+
+  /* Filaments collapse with the circles */
+  .filament.retracting {
+    animation: filament-retract 1s cubic-bezier(0.55, 0, 0.2, 1) forwards;
+  }
+  @keyframes filament-retract {
+    0%   { opacity: 0.85; stroke-dashoffset: 0; stroke-width: 0.8; }
+    100% { opacity: 0;    stroke-dashoffset: 0; stroke-width: 0.2; }
+  }
+
+  /* The white burst — four colors = one white (additive light) */
+  .white-burst {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 8%; height: 8%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: radial-gradient(circle,
+      rgba(255, 255, 255, 1)   0%,
+      rgba(255, 255, 255, 0.9) 20%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%);
+    box-shadow:
+      0 0 60px rgba(255, 255, 255, 1),
+      0 0 160px rgba(255, 255, 255, 0.85),
+      0 0 320px rgba(255, 255, 255, 0.4);
+    z-index: 8;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .white-burst.igniting {
+    animation: white-burst 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes white-burst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0);   }
+    8%   { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(2);   }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(3);   }
+  }
+
+  /* ACT III — Name reveal pulse (KEPT EXACTLY) */
+  .ceremony-biz-wrap {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .ceremony-biz-wrap.birthing {
+    animation:
+      ceremony-name-fade 2.618s ease-out forwards,
+      ceremony-name-glow 2.618s ease-out forwards;
+  }
+  @keyframes ceremony-name-fade {
+    0%   { opacity: 0; transform: translate(-50%, -50%); }
+    100% { opacity: 1; transform: translate(-50%, -50%); }
+  }
+  @keyframes ceremony-name-glow {
+    0%   { filter: drop-shadow(0 0 60px rgba(255,255,255,0.9))
+                   drop-shadow(0 0 120px rgba(74,103,65,0.8)); }
+    100% { filter: drop-shadow(0 0 28px rgba(74,103,65,0.5))
+                   drop-shadow(0 0 56px rgba(74,103,65,0.2)); }
+  }
+  .ceremony-biz-name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 28px rgba(74,103,65,0.5), 0 0 56px rgba(74,103,65,0.2);
+    letter-spacing: -0.01em;
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     Chrome — label + replay
+     ───────────────────────────────────────────────────────── */
+  .variation-label {
+    position: fixed;
+    top: 24px; left: 28px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    color: rgba(255, 255, 255, 0.32);
+    text-transform: uppercase;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .replay-btn {
+    position: fixed;
+    bottom: 24px; right: 28px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.38);
+    padding: 10px 22px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.618s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .replay-btn:hover {
+    border-color: rgba(255, 255, 255, 0.38);
+    color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="variation-label">Variation C2 — Tether &amp; Draw</div>
+
+<div class="stage">
+  <div class="ambient-glow"></div>
+
+  <div class="ceremony-ik-wrap" id="wrap">
+
+    <!-- Four ikigai circles — entrance kept exactly as-is -->
+    <div class="ceremony-ik-circle c1" id="c1"></div>
+    <div class="ceremony-ik-circle c2" id="c2"></div>
+    <div class="ceremony-ik-circle c3" id="c3"></div>
+    <div class="ceremony-ik-circle c4" id="c4"></div>
+
+    <!-- SVG filament layer: percent coordinates on 100×100 viewBox,
+         preserveAspectRatio=none so it aligns to the square wrap. -->
+    <svg class="filaments" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <filter id="silk-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="0.4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Each filament curves gently from its circle's center toward the wrap center (50,50).
+           Quadratic bezier gives each a slight, distinct arc so they feel woven, not radial spokes. -->
+      <path class="filament f1" id="fil1" d="M 50 19.1 Q 46 34 50 50"></path>
+      <path class="filament f2" id="fil2" d="M 19.1 50 Q 34 54 50 50"></path>
+      <path class="filament f3" id="fil3" d="M 80.9 50 Q 66 46 50 50"></path>
+      <path class="filament f4" id="fil4" d="M 50 80.9 Q 54 66 50 50"></path>
+    </svg>
+
+    <!-- The braided knot -->
+    <div class="knot" id="knot"></div>
+
+    <!-- The white impact burst -->
+    <div class="white-burst" id="burst"></div>
+
+    <!-- Name -->
+    <div class="ceremony-biz-wrap" id="biz-wrap">
+      <span class="ceremony-biz-name">Cristal's Art Studio</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay-btn" id="replay" onclick="runScene()">Replay</button>
+
+<script>
+  /*
+   * TETHER & DRAW ORCHESTRATOR
+   * All timings in ms; golden-ratio grid.
+   */
+  const PHI  = 1.618034;
+  const BASE = 1000;
+
+  const $ = id => document.getElementById(id);
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Clear all animation state so we can replay cleanly
+  function reset() {
+    ['c1','c2','c3','c4'].forEach(id => {
+      const el = $(id);
+      el.className = 'ceremony-ik-circle ' + id;
+    });
+    ['fil1','fil2','fil3','fil4'].forEach(id => {
+      const el = $(id);
+      el.setAttribute('class', 'filament f' + id.slice(-1));
+    });
+    $('knot').className  = 'knot';
+    $('burst').className = 'white-burst';
+    $('biz-wrap').className = 'ceremony-biz-wrap';
+    // Force reflow so restarting animations actually restart
+    void document.body.offsetWidth;
+  }
+
+  async function runScene() {
+    reset();
+    await sleep(618);
+
+    // ─── ACT I — ENTRANCE (KEPT) ───
+    // Four circles, staggered 1.618s apart, 2.618s birth each.
+    const circles = ['c1', 'c2', 'c3', 'c4'];
+    for (let i = 0; i < 4; i++) {
+      $(circles[i]).classList.add('reveal');
+      if (i < 3) await sleep(1.618 * BASE);
+    }
+    // Let the four breathe together after all revealed
+    await sleep(3.236 * BASE);
+
+    // ─── ACT II — TETHER & DRAW ───
+
+    // Phase 1: filaments draw inward, staggered by 382ms for interlace feel
+    const fils = ['fil1', 'fil2', 'fil3', 'fil4'];
+    fils.forEach((id, i) => {
+      setTimeout(() => $(id).classList.add('drawing'), i * 382);
+    });
+    // Draw duration 2.618s + stagger ~1.146s => finishes ~3.764s later
+    await sleep(2.618 * BASE + 382 * 3);
+
+    // Hand off to shimmer loop (stable filament line)
+    fils.forEach(id => {
+      $(id).classList.remove('drawing');
+      $(id).classList.add('alive');
+    });
+
+    // Phase 2: the knot braids into existence
+    await sleep(236);
+    $('knot').classList.add('braiding');
+    await sleep(1.000 * BASE);
+
+    // Phase 3: three heartbeat pulses (2.236s total, timed to pull on #3)
+    $('knot').classList.remove('braiding');
+    $('knot').classList.add('pulsing');
+
+    // Wait through pulse 1 + pulse 2 + breath hold => ~1.618s
+    await sleep(1.618 * BASE);
+
+    // On the third pulse: circles are drawn along their filaments,
+    // filaments retract with them, everything collides at center.
+    circles.forEach(id => {
+      $(id).classList.remove('reveal');
+      $(id).classList.add('drawn-' + id);
+    });
+    fils.forEach(id => {
+      $(id).classList.remove('alive');
+      $(id).classList.add('retracting');
+    });
+
+    // Impact at 1.000s from now (tuned so they arrive as knot hits max expand)
+    await sleep(1.000 * BASE);
+
+    // ─── THE WHITE BURST — four colors = one white ───
+    $('burst').classList.add('igniting');
+    // Knot dissolves into the burst
+    $('knot').style.opacity = '0';
+    $('knot').style.transition = 'opacity 0.382s ease-out';
+
+    // ACT III — Name reveal pulse (KEPT) starts ~236ms into burst
+    await sleep(236);
+    $('biz-wrap').classList.add('birthing');
+
+    // Hold the name in its softened glow
+    await sleep(2.618 * BASE);
+    await sleep(3.000 * BASE);
+
+    // Auto-loop
+    runScene();
+  }
+
+  // Begin
+  runScene();
+</script>
+
+</body>
+</html>

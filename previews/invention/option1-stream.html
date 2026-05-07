@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENTURE — Grouping Algorithm Stream</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0A0A; color: #9A9A9A; font-family: 'Space Mono', monospace; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.terminal { width: 100%; max-width: 820px; border: 1px solid #2A2A2A; border-radius: 12px; overflow: hidden; box-shadow: 0 0 60px rgba(0,0,0,0.5); }
+.terminal-header { background: #1A1A1A; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2A2A2A; }
+.dots { display: flex; gap: 8px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-r { background: #F87171; }
+.dot-y { background: #FBBF24; }
+.dot-g { background: #4ADE80; }
+.terminal-title { font-size: 13px; color: #6A6A6A; letter-spacing: 0.05em; }
+.terminal-controls { display: flex; gap: 8px; }
+.btn { font-family: 'Space Mono', monospace; font-size: 12px; padding: 6px 16px; border-radius: 6px; cursor: pointer; border: 1px solid #3A3A3A; background: #1A1A1A; color: #C084FC; transition: all 0.15s; }
+.btn:hover:not(:disabled) { background: #2A2A2A; border-color: #C084FC; }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-run { border-color: #C084FC; }
+.terminal-body { padding: 20px; height: 600px; overflow-y: auto; font-size: 13px; line-height: 1.8; }
+.terminal-body::-webkit-scrollbar { width: 6px; }
+.terminal-body::-webkit-scrollbar-track { background: #0A0A0A; }
+.terminal-body::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 3px; }
+.line { white-space: pre-wrap; word-break: break-word; }
+.line-step { color: #C084FC; }
+.line-data { color: #F0EDE8; }
+.line-pass { color: #4ADE80; }
+.line-warn { color: #FBBF24; }
+.line-final { color: #C084FC; font-weight: 700; }
+.cursor { display: inline-block; width: 8px; height: 16px; background: #C084FC; animation: blink 0.8s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div class="terminal">
+  <div class="terminal-header">
+    <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    <div class="terminal-title">VENTURE — Grouping Algorithm</div>
+    <div class="terminal-controls">
+      <button class="btn btn-run" id="runBtn" onclick="runAlgorithm()">Run Algorithm</button>
+      <button class="btn" id="replayBtn" onclick="replay()" disabled>Replay</button>
+    </div>
+  </div>
+  <div class="terminal-body" id="output"></div>
+</div>
+
+<script>
+const LINES = [
+  { text: '$ venture-group --class VENTURE --run', cls: 'line-data', delay: 600 },
+  { text: '', cls: '', delay: 400 },
+  { text: 'Initializing grouping algorithm for VENTURE...', cls: '', delay: 300 },
+  { text: 'Loading 30 student profiles...', cls: '', delay: 500 },
+  { text: 'Configuration: group_size=5, threshold=80%', cls: '', delay: 200 },
+  { text: '', cls: '', delay: 300 },
+
+  // Step 1
+  { text: '── Step 1: Sorting by invention category (The Wish) ──', cls: 'line-step', delay: 600 },
+  { text: '  Environmental Solution    — 6 students identified', cls: 'line-data', delay: 250 },
+  { text: '  Digital Tool or App       — 6 students identified', cls: 'line-data', delay: 200 },
+  { text: '  Medical or Health         — 6 students identified', cls: 'line-data', delay: 200 },
+  { text: '  Social or Community       — 6 students identified', cls: 'line-data', delay: 200 },
+  { text: '  Learning Tool             — 5 students identified', cls: 'line-data', delay: 200 },
+  { text: '  Remaining (cross-pool)    — 1 student (Xavier James → Social)', cls: 'line-warn', delay: 350 },
+  { text: '  ✓ 6 category pools formed', cls: 'line-pass', delay: 400 },
+  { text: '', cls: '', delay: 300 },
+
+  // Step 2
+  { text: '── Step 2: Distributing archetypes (The Mind) ──', cls: 'line-step', delay: 600 },
+  { text: '  Target per group: Builder + Empath + Systems Thinker (minimum)', cls: '', delay: 300 },
+  { text: '', cls: '', delay: 200 },
+  { text: '  Group 1 (Environmental):', cls: 'line-data', delay: 300 },
+  { text: '    Aaliyah Torres    → Empath', cls: '', delay: 120 },
+  { text: '    Jordan Reyes      → Connector', cls: '', delay: 120 },
+  { text: '    Caleb Johnson     → Systems Thinker', cls: '', delay: 120 },
+  { text: '    Aaliya Hassan      → Empath', cls: '', delay: 120 },
+  { text: '    Elijah Brown      → Builder', cls: '', delay: 120 },
+  { text: '    ✓ Builder + Empath + Systems Thinker present', cls: 'line-pass', delay: 300 },
+  { text: '', cls: '', delay: 150 },
+  { text: '  Group 2 (Digital):', cls: 'line-data', delay: 300 },
+  { text: '    Marcus Webb       → Builder', cls: '', delay: 120 },
+  { text: '    Ethan Park        → Empath', cls: '', delay: 120 },
+  { text: '    Tyler Nguyen      → Builder', cls: '', delay: 120 },
+  { text: '    Liam Foster       → Connector', cls: '', delay: 120 },
+  { text: '    Jasmine Lee       → Storyteller', cls: '', delay: 120 },
+  { text: '    ⚠ Missing: Systems Thinker', cls: 'line-warn', delay: 350 },
+  { text: '', cls: '', delay: 150 },
+  { text: '  Group 3 (Medical):', cls: 'line-data', delay: 300 },
+  { text: '    Priya Nair        → Systems Thinker', cls: '', delay: 120 },
+  { text: '    Sofia Mendez      → Builder', cls: '', delay: 120 },
+  { text: '    Zara Ahmed        → Storyteller', cls: '', delay: 120 },
+  { text: '    Maya Patel        → Empath', cls: '', delay: 120 },
+  { text: '    Fatima Ali        → Systems Thinker', cls: '', delay: 120 },
+  { text: '    ✓ Builder + Empath + Systems Thinker present', cls: 'line-pass', delay: 300 },
+  { text: '', cls: '', delay: 150 },
+  { text: '  Group 4 (Social):', cls: 'line-data', delay: 300 },
+  { text: '    Destiny Banks     → Storyteller', cls: '', delay: 120 },
+  { text: '    Amara Osei        → Empath', cls: '', delay: 120 },
+  { text: '    Isabella Cruz     → Builder', cls: '', delay: 120 },
+  { text: '    Nia Robinson      → Storyteller', cls: '', delay: 120 },
+  { text: '    Leila Morales     → Systems Thinker', cls: '', delay: 120 },
+  { text: '    ✓ Builder + Empath + Systems Thinker present', cls: 'line-pass', delay: 300 },
+  { text: '', cls: '', delay: 150 },
+  { text: '  Group 5 (Learning):', cls: 'line-data', delay: 300 },
+  { text: '    Noah Williams     → Systems Thinker', cls: '', delay: 120 },
+  { text: '    Kai Thompson      → Builder', cls: '', delay: 120 },
+  { text: '    Aiden Scott       → Empath', cls: '', delay: 120 },
+  { text: '    Chloe Kim         → Storyteller', cls: '', delay: 120 },
+  { text: '    Luna Garcia       → Connector', cls: '', delay: 120 },
+  { text: '    ✓ Builder + Empath + Systems Thinker present', cls: 'line-pass', delay: 300 },
+  { text: '', cls: '', delay: 150 },
+  { text: '  Group 6 (Cross-pool):', cls: 'line-data', delay: 300 },
+  { text: '    Devon Mitchell    → Connector', cls: '', delay: 120 },
+  { text: '    Connor Walsh      → Connector', cls: '', delay: 120 },
+  { text: '    Oscar Rivera      → Connector', cls: '', delay: 120 },
+  { text: '    Isaiah Davis      → Systems Thinker', cls: '', delay: 120 },
+  { text: '    Xavier James      → Builder', cls: '', delay: 120 },
+  { text: '    ⚠ Missing: Empath', cls: 'line-warn', delay: 350 },
+  { text: '', cls: '', delay: 300 },
+
+  // Step 3
+  { text: '── Step 3: Evaluating chip diversity (The Lens) ──', cls: 'line-step', delay: 600 },
+  { text: '  Group 1: 3 unique chips / 7 total = 43% diversity', cls: '', delay: 200 },
+  { text: '  Group 2: 3 unique chips / 5 total = 60% diversity', cls: '', delay: 200 },
+  { text: '  Group 3: 2 unique chips / 7 total = 29% diversity', cls: '', delay: 200 },
+  { text: '  Group 4: 3 unique chips / 6 total = 50% diversity', cls: '', delay: 200 },
+  { text: '  Group 5: 4 unique chips / 6 total = 67% diversity  ← highest', cls: 'line-pass', delay: 300 },
+  { text: '  Group 6: 4 unique chips / 5 total = 80% diversity  ← highest', cls: 'line-pass', delay: 300 },
+  { text: '', cls: '', delay: 300 },
+
+  // Step 4
+  { text: '── Step 4: Checking scale balance (The Scale) ──', cls: 'line-step', delay: 600 },
+  { text: '  Group 1: D=4, — ⚠ D overrepresented, checking swap candidates...', cls: 'line-warn', delay: 400 },
+  { text: '           No swap available without breaking category constraint', cls: '', delay: 300 },
+  { text: '           Accepted with note: scale D dominant', cls: 'line-warn', delay: 300 },
+  { text: '  Group 2: C=4, B=1 — ⚠ C overrepresented, accepted with note', cls: 'line-warn', delay: 300 },
+  { text: '  Group 3: B=3, A=1, C=1 — ✓ balanced', cls: 'line-pass', delay: 200 },
+  { text: '  Group 4: A=3, B=1, C=1 — ✓ balanced', cls: 'line-pass', delay: 200 },
+  { text: '  Group 5: B=2, A=1, C=2 — ✓ balanced', cls: 'line-pass', delay: 200 },
+  { text: '  Group 6: C=2, D=2, B=1 — ✓ balanced', cls: 'line-pass', delay: 200 },
+  { text: '', cls: '', delay: 300 },
+
+  // Step 5
+  { text: '── Step 5: Checking voice coverage (The Voice) ──', cls: 'line-step', delay: 600 },
+  { text: '  Visual = draw it | build a prototype | build a slide or poster', cls: '', delay: 200 },
+  { text: '  Verbal = explain out loud | write it out', cls: '', delay: 200 },
+  { text: '', cls: '', delay: 200 },
+  { text: '  Group 1: visual ✓ (draw it)  verbal ✓ (explain out loud)', cls: 'line-pass', delay: 200 },
+  { text: '  Group 2: visual ✓ (prototype) verbal ✗', cls: 'line-warn', delay: 350 },
+  { text: '           Scanning for swap... Isaiah Davis (G6) has write+explain', cls: '', delay: 300 },
+  { text: '           Swapping Jasmine Lee (G2) ↔ Isaiah Davis (G6)', cls: 'line-warn', delay: 400 },
+  { text: '           G2 verbal ✓  G6 verbal ✓ (no coverage lost)', cls: 'line-pass', delay: 300 },
+  { text: '  Group 3: visual ✓ (draw it)  verbal ✓ (write it out)', cls: 'line-pass', delay: 200 },
+  { text: '  Group 4: visual ✓ (draw it)  verbal ✗', cls: 'line-warn', delay: 350 },
+  { text: '           Oscar Rivera (G6) has explain out loud', cls: '', delay: 300 },
+  { text: '           Swapping Nia Robinson (G4) ↔ Oscar Rivera (G6)', cls: 'line-warn', delay: 400 },
+  { text: '           G4 verbal ✓  G6 still has verbal coverage', cls: 'line-pass', delay: 300 },
+  { text: '  Group 5: visual ✓ (prototype) verbal ✓ (explain out loud)', cls: 'line-pass', delay: 200 },
+  { text: '  Group 6: visual ✓ (prototype) verbal ✓ (write it out)', cls: 'line-pass', delay: 200 },
+  { text: '', cls: '', delay: 400 },
+
+  // Final
+  { text: '═══════════════════════════════════════════════════', cls: 'line-step', delay: 300 },
+  { text: '', cls: '', delay: 200 },
+  { text: 'Algorithm complete. 6 groups formed.', cls: 'line-final', delay: 500 },
+  { text: '4 groups met all 5 criteria.', cls: 'line-final', delay: 300 },
+  { text: '2 groups accepted with notes (scale imbalance).', cls: 'line-warn', delay: 300 },
+  { text: '2 voice-coverage swaps executed successfully.', cls: 'line-pass', delay: 300 },
+  { text: '', cls: '', delay: 200 },
+  { text: 'Groups written to invention_groups. Ready for admin review.', cls: 'line-final', delay: 500 },
+];
+
+let running = false;
+const output = document.getElementById('output');
+
+function replay() {
+  output.innerHTML = '';
+  document.getElementById('replayBtn').disabled = true;
+  runAlgorithm();
+}
+
+async function runAlgorithm() {
+  if (running) return;
+  running = true;
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('replayBtn').disabled = true;
+  output.innerHTML = '';
+
+  for (let i = 0; i < LINES.length; i++) {
+    const line = LINES[i];
+    const el = document.createElement('div');
+    el.className = 'line ' + (line.cls || '');
+    output.appendChild(el);
+
+    // Remove any existing cursor
+    const oldCursor = output.querySelector('.cursor');
+    if (oldCursor) oldCursor.remove();
+
+    if (line.text === '') {
+      el.innerHTML = '&nbsp;';
+      await sleep(line.delay || 200);
+    } else {
+      // Typewriter effect
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+
+      for (let c = 0; c < line.text.length; c++) {
+        el.textContent = line.text.slice(0, c + 1);
+        el.appendChild(cursor);
+        output.scrollTop = output.scrollHeight;
+        const charDelay = 20 + Math.random() * 30; // 20-50ms per char
+        await sleep(charDelay);
+      }
+      cursor.remove();
+      await sleep(line.delay || 200);
+    }
+
+    output.scrollTop = output.scrollHeight;
+  }
+
+  running = false;
+  document.getElementById('replayBtn').disabled = false;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+
+</body>
+</html>

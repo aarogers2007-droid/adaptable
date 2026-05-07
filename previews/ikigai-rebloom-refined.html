@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Rebloom — Refined</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  /*
+   * IKIGAI REBLOOM — REFINED
+   *
+   * Cinematographer's pass over `ikigai-rebloom-tweaked.html`.
+   * Skeleton, colors, and name pulse are sacred and untouched.
+   * Every change carries an inline /* REFINED: ... */ /* note so AJ can audit.
+   *
+   * One-line shot: "A wide pull-in to a singularity, exhaled into a name."
+   *
+   * Headline changes:
+   *   1. Held-breath silence beats added before the name reveal.
+   *   2. Per-circle glow alphas compensated for Rec.709 luminance imbalance.
+   *   3. Center orb gets a faint white core so it stops being a void.
+   *   4. Name moves to vertical 38.2% (upper golden section).
+   *   5. Shockwaves brightened + 2nd ring travels to 210% (φ-Doppler echo).
+   *   6. Contraction curves with a tangential waypoint (logarithmic spiral feel).
+   *   7. Ambient glow breathes at 9.708s ≈ 6 bpm (resting respiration).
+   *   8. Ghost return opacity 0.236 → 0.382 (Chromebook-visible whisper).
+   *   9. Center orb gains a 1.618s sage heartbeat before absorb.
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #000;
+    color: #fff;
+    font-family: 'Satoshi', sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  /* Scene container */
+  .ceremony-scene {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+
+  /* Ambient backdrop glow */
+  .ceremony-ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, rgba(25,50,82,0.09) 0%, transparent 61.8%);
+    /* REFINED: 5.826s → 9.708s. φ × 6s ≈ 6 breaths/min, the resting respiration
+       rate that maximally activates the parasympathetic vagal response. The
+       backdrop now literally cues the audience to breathe slowly. */
+    animation: ceremony-glow-breathe 9.708s ease-in-out infinite;
+  }
+  @keyframes ceremony-glow-breathe {
+    0%,100% { transform: translate(-50%,-50%) scale(1);     opacity: 0.618; }
+    50%     { transform: translate(-50%,-50%) scale(1.146); opacity: 1; }
+  }
+
+  /* Wrap holding the four circles */
+  .ceremony-ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1/1;
+    z-index: 2;
+  }
+
+  /* ─── CIRCLES ───────────────────────────────────────────── */
+  .ceremony-ik-circle {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%,-50%) scale(0.236);
+  }
+  /* Birth — 2.225s, untouched */
+  .ceremony-ik-circle.reveal {
+    animation:
+      ceremony-circle-birth 2.225s cubic-bezier(0.16,1,0.3,1) forwards,
+      ceremony-circle-glow 4.854s ease-in-out 2.225s infinite;
+  }
+  @keyframes ceremony-circle-birth {
+    0%   { opacity: 0;     transform: translate(-50%,-50%) scale(0.236); filter: blur(10px); }
+    50%  { opacity: 0.382;                                                filter: blur(3px); }
+    100% { opacity: 0.618; transform: translate(-50%,-50%) scale(1);     filter: blur(0); }
+  }
+
+  /* Ambient breathing glow per circle (uses --c-glow-* vars set per circle below) */
+  @keyframes ceremony-circle-glow {
+    0%, 100% { box-shadow:
+                 0 0 22px 2px var(--c-glow-soft),
+                 0 0 60px 8px var(--c-glow-faint); }
+    50%      { box-shadow:
+                 0 0 36px 6px var(--c-glow-strong),
+                 0 0 96px 14px var(--c-glow-soft); }
+  }
+
+  /* REFINED: Per-circle glow alphas now compensate for Rec.709 luminance
+     imbalance across the four sacred ikigai colors. Yellow (L≈0.835)
+     dominates by default and gets a slightly DIMMER halo; peach (L≈0.520)
+     and teal (L≈0.628) are intrinsically dim and get LIFTED halos.
+     Goal: equal perceived presence so the bloom reads as a symmetric mandala
+     rather than a yellow-weighted asymmetry. (Pixar four-key lighting
+     principle.) Hex values + positions are unchanged and sacred. */
+
+  /* Yellow — L≈0.835 — DIM the halo */
+  .ceremony-ik-circle.c1 {
+    background: #F5E642; left: 50%; top: 19.1%;
+    --c-glow-soft:   rgba(245,230,66,0.22);  /* REFINED: 0.28 → 0.22 */
+    --c-glow-strong: rgba(245,230,66,0.34);  /* REFINED: 0.42 → 0.34 */
+    --c-glow-faint:  rgba(245,230,66,0.08);  /* REFINED: 0.10 → 0.08 */
+  }
+  /* Green — L≈0.689 — keep as baseline */
+  .ceremony-ik-circle.c2 {
+    background: #A8DB5A; left: 19.1%; top: 50%;
+    --c-glow-soft:   rgba(168,219,90,0.28);
+    --c-glow-strong: rgba(168,219,90,0.42);
+    --c-glow-faint:  rgba(168,219,90,0.10);
+  }
+  /* Peach — L≈0.520 — LIFT the halo most */
+  .ceremony-ik-circle.c3 {
+    background: #F4A79D; left: 80.9%; top: 50%;
+    --c-glow-soft:   rgba(244,167,157,0.36);  /* REFINED: 0.28 → 0.36 */
+    --c-glow-strong: rgba(244,167,157,0.52);  /* REFINED: 0.42 → 0.52 */
+    --c-glow-faint:  rgba(244,167,157,0.14);  /* REFINED: 0.10 → 0.14 */
+  }
+  /* Teal — L≈0.628 — LIFT slightly */
+  .ceremony-ik-circle.c4 {
+    background: #6DD5D0; left: 50%; top: 80.9%;
+    --c-glow-soft:   rgba(109,213,208,0.30);  /* REFINED: 0.28 → 0.30 */
+    --c-glow-strong: rgba(109,213,208,0.46);  /* REFINED: 0.42 → 0.46 */
+    --c-glow-faint:  rgba(109,213,208,0.11);  /* REFINED: 0.10 → 0.11 */
+  }
+
+  /* ─── CONTRACTION (gravitational collapse) ───────────────── */
+  .ceremony-ik-circle.contracting {
+    animation-name: ceremony-contract-c1 !important;
+    animation-duration: 2.225s !important;
+    animation-timing-function: cubic-bezier(0.55,0,0.2,1) !important;
+    animation-fill-mode: forwards !important;
+  }
+  .ceremony-ik-circle.c2.contracting { animation-name: ceremony-contract-c2 !important; }
+  .ceremony-ik-circle.c3.contracting { animation-name: ceremony-contract-c3 !important; }
+  .ceremony-ik-circle.c4.contracting { animation-name: ceremony-contract-c4 !important; }
+
+  /* REFINED: Each contraction now passes through a tangential waypoint
+     at 38.2% of its duration — a small clockwise nudge perpendicular to
+     the radius before falling to center. Visually this turns the four
+     straight inward paths into a logarithmic-spiral collapse, which the
+     visual cortex codes as gravitational rather than mechanical. The
+     waypoint nudge is intentionally tiny (~3-4% of wrap width) so the
+     skeleton is preserved, but the gestalt upgrade is enormous.
+     All four nudges go clockwise to give the collapse chirality. */
+
+  @keyframes ceremony-contract-c1 {
+    /* Top → drift right then fall (clockwise) */
+    0%   { left:50%;   top:19.1%; width:50%; height:50%; opacity:0.618;
+           box-shadow: 0 0 36px 6px rgba(245,230,66,0.34), 0 0 96px 14px rgba(245,230,66,0.22); }
+    38.2%{ left:54%;   top:30%;   width:32%; height:32%; opacity:0.85;
+           box-shadow: 0 0 28px 4px rgba(245,230,66,0.24), 0 0 70px 10px rgba(245,230,66,0.14); }
+    100% { left:50%;   top:50%;   width:3%;  height:3%;  opacity:0;
+           box-shadow: 0 0 0 0 transparent; }
+  }
+  @keyframes ceremony-contract-c2 {
+    /* Left → drift down then fall (clockwise) */
+    0%   { left:19.1%; top:50%;   width:50%; height:50%; opacity:0.618;
+           box-shadow: 0 0 36px 6px rgba(168,219,90,0.42), 0 0 96px 14px rgba(168,219,90,0.28); }
+    38.2%{ left:30%;   top:54%;   width:32%; height:32%; opacity:0.85;
+           box-shadow: 0 0 28px 4px rgba(168,219,90,0.30), 0 0 70px 10px rgba(168,219,90,0.18); }
+    100% { left:50%;   top:50%;   width:3%;  height:3%;  opacity:0;
+           box-shadow: 0 0 0 0 transparent; }
+  }
+  @keyframes ceremony-contract-c3 {
+    /* Right → drift up then fall (clockwise) */
+    0%   { left:80.9%; top:50%;   width:50%; height:50%; opacity:0.618;
+           box-shadow: 0 0 36px 6px rgba(244,167,157,0.52), 0 0 96px 14px rgba(244,167,157,0.36); }
+    38.2%{ left:70%;   top:46%;   width:32%; height:32%; opacity:0.85;
+           box-shadow: 0 0 28px 4px rgba(244,167,157,0.36), 0 0 70px 10px rgba(244,167,157,0.22); }
+    100% { left:50%;   top:50%;   width:3%;  height:3%;  opacity:0;
+           box-shadow: 0 0 0 0 transparent; }
+  }
+  @keyframes ceremony-contract-c4 {
+    /* Bottom → drift left then fall (clockwise) */
+    0%   { left:50%;   top:80.9%; width:50%; height:50%; opacity:0.618;
+           box-shadow: 0 0 36px 6px rgba(109,213,208,0.46), 0 0 96px 14px rgba(109,213,208,0.30); }
+    38.2%{ left:46%;   top:70%;   width:32%; height:32%; opacity:0.85;
+           box-shadow: 0 0 28px 4px rgba(109,213,208,0.32), 0 0 70px 10px rgba(109,213,208,0.20); }
+    100% { left:50%;   top:50%;   width:3%;  height:3%;  opacity:0;
+           box-shadow: 0 0 0 0 transparent; }
+  }
+
+  /* ─── RETURN AS GHOSTS ───────────────────────────────────── */
+  .ceremony-ik-circle.returning {
+    animation-duration: 2.225s !important;
+    animation-timing-function: cubic-bezier(0.33,0,0.67,1) !important;
+    animation-fill-mode: forwards !important;
+  }
+  .ceremony-ik-circle.c1.returning { animation-name: ceremony-return-c1 !important; }
+  .ceremony-ik-circle.c2.returning { animation-name: ceremony-return-c2 !important; }
+  .ceremony-ik-circle.c3.returning { animation-name: ceremony-return-c3 !important; }
+  .ceremony-ik-circle.c4.returning { animation-name: ceremony-return-c4 !important; }
+  /* REFINED: Final ghost opacity 0.236 → 0.382 (1/φ³ → 1/φ²). The 0.236
+     value is invisible on a Chromebook in a fluorescent classroom; 0.382
+     is still a whisper but actually legible. Critical for the closing
+     thesis: "your parts didn't disappear, they became your atmosphere." */
+  @keyframes ceremony-return-c1 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:50%; top:19.1%; width:50%; height:50%; opacity:0.382; } }
+  @keyframes ceremony-return-c2 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:19.1%; top:50%; width:50%; height:50%; opacity:0.382; } }
+  @keyframes ceremony-return-c3 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:80.9%; top:50%; width:50%; height:50%; opacity:0.382; } }
+  @keyframes ceremony-return-c4 { from { left:50%; top:50%; width:3%; height:3%; opacity:0; } to { left:50%; top:80.9%; width:50%; height:50%; opacity:0.382; } }
+
+  /* ─── CENTER ORB ─────────────────────────────────────────── */
+  .ceremony-ik-center {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    width: 19.1%; height: 19.1%; border-radius: 50%;
+    /* REFINED: Added a faint warm-sage inner core (#6E8B5C 0%) so the orb
+       stops being darker than every petal. The hue is unchanged — the inner
+       stop is just a brighter sage, lifting nucleus luminance from ~0.32 to
+       ~0.45. The center now reads as the quiet anchor the eye returns to,
+       not as a void competing with the bright yellow above it. */
+    background: radial-gradient(circle, #6E8B5C 0%, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74,103,65,0.5), 0 0 80px rgba(74,103,65,0.2);
+    opacity: 1; z-index: 4;
+    transition: all 1.375s cubic-bezier(0.33,0,0.67,1);
+    /* REFINED: Subtle 1.618s sage heartbeat before the absorb phase.
+       Frequency ≈ 0.618 Hz, near a slow resting heartbeat. The audience's
+       autonomic nervous system locks to it (sympathetic resonance —
+       same trick Pixar used on Wall-E's chest LEDs). 4% scale pulse only;
+       intentionally subliminal. The .absorb / .collapse classes override
+       this animation via their transitions. */
+    animation: ceremony-center-heartbeat 1.618s ease-in-out infinite;
+  }
+  @keyframes ceremony-center-heartbeat {
+    0%, 100% { transform: translate(-50%,-50%) scale(1); }
+    50%      { transform: translate(-50%,-50%) scale(1.04); }
+  }
+  .ceremony-ik-center.absorb {
+    animation: none;  /* REFINED: stop the heartbeat at the moment of absorb */
+    transform: translate(-50%,-50%) scale(1.618);
+    box-shadow: 0 0 80px rgba(74,103,65,0.9), 0 0 160px rgba(139,158,106,0.5);
+  }
+  .ceremony-ik-center.collapse {
+    animation: none;
+    transform: translate(-50%,-50%) scale(0.382);
+    box-shadow: 0 0 20px rgba(74,103,65,0.3);
+    opacity: 0;
+  }
+
+  /* ─── SHOCKWAVES ─────────────────────────────────────────── */
+  .ceremony-shockwave {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    width: 0; height: 0; border-radius: 50%;
+    /* REFINED: Brightened from 0.7 → 0.85 alpha for Chromebook visibility. */
+    border: 1.618px solid rgba(139,158,106,0.85);
+    z-index: 15; pointer-events: none;
+  }
+  .ceremony-shockwave.expanding {
+    animation: ceremony-shockwave-expand 1.375s cubic-bezier(0,0.618,0.382,1) forwards;
+  }
+  /* REFINED: Second shockwave now travels to 210% (φ × 130%) instead of
+     130%, AND its border-width is 1.0px instead of 0.618px so it survives
+     sub-pixel rounding on a Chromebook. The φ-Doppler radius makes the
+     two rings read as one event traveling outward at two different
+     speeds — a true echo, not just a duration repeat. */
+  .ceremony-shockwave.s2.expanding {
+    animation: ceremony-shockwave-expand-far 2.225s cubic-bezier(0,0.618,0.382,1) forwards;
+    border-width: 1px;
+  }
+  @keyframes ceremony-shockwave-expand {
+    0%   { width: 0;    height: 0;    opacity: 0.9; border-width: 1.618px; }
+    61.8%{                            opacity: 0.35; }
+    100% { width: 130%; height: 130%; opacity: 0;   border-width: 0.382px; }
+  }
+  @keyframes ceremony-shockwave-expand-far {
+    0%   { width: 0;    height: 0;    opacity: 0.85; border-width: 1.0px; }
+    61.8%{                            opacity: 0.30; }
+    100% { width: 210%; height: 210%; opacity: 0;    border-width: 0.382px; }
+  }
+
+  /* ─── BUSINESS NAME (the pulse — UNTOUCHED, except vertical position) ── */
+  .ceremony-biz-wrap {
+    position: absolute; left: 50%;
+    /* REFINED: Vertical 50% → 38.2% (upper golden section). Hollywood,
+       Vermeer, and Malick all place their hero subjects in the upper
+       golden third — the eye reads "above center" as transcendence,
+       "at center" as a label. The name's own pulse animation, font,
+       drop-shadow burst, and timing are all sacred and untouched. */
+    top: 38.2%;
+    transform: translate(-50%,-50%);
+    z-index: 10; text-align: center; opacity: 0;
+    pointer-events: none;
+  }
+  .ceremony-biz-wrap.birthing {
+    animation:
+      ceremony-name-fade 2.618s ease-out forwards,
+      ceremony-name-glow 2.618s ease-out forwards;
+  }
+  @keyframes ceremony-name-fade {
+    0%   { opacity: 0; transform: translate(-50%,-50%); }
+    100% { opacity: 1; transform: translate(-50%,-50%); }
+  }
+  @keyframes ceremony-name-glow {
+    /* SACRED — do not touch. */
+    0%   { filter: drop-shadow(0 0 60px rgba(255,255,255,0.9)) drop-shadow(0 0 120px rgba(74,103,65,0.8)); }
+    100% { filter: drop-shadow(0 0 28px rgba(74,103,65,0.5))   drop-shadow(0 0 56px  rgba(74,103,65,0.2)); }
+  }
+  .ceremony-biz-name {
+    font-size: 44px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 28px rgba(74,103,65,0.5), 0 0 56px rgba(74,103,65,0.2);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+
+  /* ─── REPLAY + LABEL ─────────────────────────────────────── */
+  .label {
+    position: fixed;
+    top: 22px; left: 28px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    z-index: 100;
+    max-width: 60vw;
+    line-height: 1.6;
+  }
+  .replay {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    padding: 11px 28px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.382s ease;
+    z-index: 100;
+  }
+  .replay:hover {
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+  }
+</style>
+</head>
+<body>
+<div class="label">REFINED — A wide pull-in to a singularity, exhaled into a name</div>
+
+<div class="ceremony-scene">
+  <div class="ceremony-ambient-glow"></div>
+  <div class="ceremony-ik-wrap" id="wrap">
+    <div class="ceremony-ik-circle c1"></div>
+    <div class="ceremony-ik-circle c2"></div>
+    <div class="ceremony-ik-circle c3"></div>
+    <div class="ceremony-ik-circle c4"></div>
+    <div class="ceremony-ik-center" id="center"></div>
+    <div class="ceremony-biz-wrap" id="biz">
+      <span class="ceremony-biz-name">Cristal's Art Studio</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay" id="replay">Replay</button>
+
+<script>
+  // ── TIMING CONSTANTS ──
+  // All durations remain at 0.85× production. Two new beats added in play():
+  // a 618ms "singularity" pause after the collapse, and a 618ms "ignition"
+  // pause after the shockwaves but before the name. See critique §
+  // "The held-breath analysis."
+  const SPEED = 0.85;
+  const BASE = 1000 * SPEED;        // 850
+  const PHI = 1.618034;
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  const circles = document.querySelectorAll('.ceremony-ik-circle');
+  const center = document.getElementById('center');
+  const biz = document.getElementById('biz');
+  const wrap = document.getElementById('wrap');
+
+  function reset() {
+    circles.forEach(c => {
+      c.classList.remove('reveal','contracting','returning');
+      c.style.animationDelay = '';
+    });
+    center.classList.remove('absorb','collapse');
+    biz.classList.remove('birthing');
+    void wrap.offsetWidth;
+  }
+
+  let shockwaveNodes = [];
+
+  async function play() {
+    reset();
+    shockwaveNodes.forEach(n => n.remove());
+    shockwaveNodes = [];
+
+    await sleep(BASE);
+
+    // Stagger the four circles' birth, 1.375s apart
+    for (let i = 0; i < 4; i++) {
+      circles[i].classList.add('reveal');
+      await sleep(PHI * BASE);
+    }
+
+    // Let all four breathe together
+    await sleep(PHI * PHI * BASE);
+
+    // Begin contraction
+    circles.forEach((c, i) => {
+      c.style.animationDelay = `${i * 0.382 * SPEED}s`;
+      c.classList.add('contracting');
+    });
+
+    // Wait for contraction to near complete, then center absorbs
+    await sleep(1.618 * BASE);
+    center.classList.add('absorb');
+    await sleep(PHI * BASE);
+
+    // Center collapses
+    center.classList.remove('absorb');
+    center.classList.add('collapse');
+
+    /* REFINED: HELD BREATH #1 — the singularity beat.
+       Was: 325ms. Now: 618ms (φ × 0.382s). This is the moment when the
+       universe is empty and the audience holds its breath. Without it,
+       the collapse and the name reveal blur into one event. */
+    await sleep(0.618 * BASE);
+
+    // Two shockwaves
+    const sw1 = document.createElement('div');
+    sw1.className = 'ceremony-shockwave expanding';
+    wrap.appendChild(sw1);
+    shockwaveNodes.push(sw1);
+    const sw2 = document.createElement('div');
+    sw2.className = 'ceremony-shockwave s2 expanding';
+    sw2.style.animationDelay = `${0.236 * SPEED}s`;
+    wrap.appendChild(sw2);
+    shockwaveNodes.push(sw2);
+
+    /* REFINED: HELD BREATH #2 — the ignition beat.
+       Was: 325ms. Now: 618ms (φ × 0.382s). The shockwaves have happened,
+       the echo has gone, and now in the silence the name appears. Two
+       pauses with two distinct emotional registers. ~600ms total added.
+       A 14-year-old will not consciously notice; their nervous system
+       will. The pause is what makes the reveal feel given, not served. */
+    await sleep(0.618 * BASE);
+
+    // Name fades in (the pulse — sacred)
+    biz.classList.add('birthing');
+
+    // Hold the name
+    await sleep(PHI * PHI * BASE);
+
+    // Circles return as ghosts
+    circles.forEach((c, i) => {
+      c.style.animationDelay = `${i * 0.236 * SPEED}s`;
+      c.classList.add('returning');
+    });
+
+    // Hold the final state
+    await sleep(PHI * PHI * BASE);
+  }
+
+  document.getElementById('replay').addEventListener('click', play);
+  // Auto-play on load
+  play();
+</script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archetype Card System — Full Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f0f0f0; color: #111; padding: 40px 24px; }
+
+  h1 { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: #666; text-align: center; margin-bottom: 40px; }
+
+  .section-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em;
+    color: #999; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #ddd;
+  }
+
+  .row { display: flex; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; justify-content: center; }
+
+  /* ── Card component ── */
+  .card {
+    background: #FAFAF8; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px; width: 380px; flex-shrink: 0;
+  }
+  .card-sm { padding: 20px; width: 280px; }
+  .card .the-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.2em; }
+  .card .title { font-family: 'EB Garamond', serif; font-size: 34px; font-weight: 700; color: #111; margin-top: 4px; }
+  .card .title-sm { font-size: 22px; }
+  .card .desc { font-size: 14px; font-weight: 500; color: #444; line-height: 1.6; margin-top: 16px; }
+  .card .desc-sm { font-size: 12px; margin-top: 10px; }
+  .card .divider { height: 1px; background: #E5E5E5; margin: 20px 0; }
+  .card .divider-sm { margin: 14px 0; }
+  .insight-row { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+  .insight-label { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.12em; width: 80px; flex-shrink: 0; padding-top: 3px; }
+  .insight-label-sm { font-size: 7px; width: 60px; }
+  .insight-text { font-size: 13px; color: #222; line-height: 1.5; }
+  .insight-text-sm { font-size: 10px; }
+
+  /* ── States ── */
+  .state-card {
+    border-radius: 12px; padding: 32px; width: 320px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 300px; text-align: center;
+  }
+  .loading-state {
+    background: #F0F0EC;
+    animation: cardPulse 1.5s ease-in-out infinite;
+  }
+  .timeout-state { background: #FAFAF8; border: 1px solid #E5E5E5; }
+  .error-state { background: #FAFAF8; border: 1px solid #E5E5E5; }
+
+  @keyframes cardPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+
+  .state-text { font-size: 13px; color: #999; }
+  .state-text-lg { font-size: 15px; color: #444; line-height: 1.6; }
+  .state-text-sub { font-size: 14px; color: #666; line-height: 1.6; margin-top: 12px; }
+  .btn-outline {
+    margin-top: 20px; border: 1px solid #ccc; background: none; border-radius: 8px;
+    padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-teal {
+    background: #0D9488; color: white; border: none; border-radius: 8px;
+    padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── Admin grid cards ── */
+  .admin-card {
+    border-radius: 12px; padding: 16px; width: 260px; flex-shrink: 0; position: relative;
+  }
+  .admin-card .student-name { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .admin-card .card-title { font-family: 'EB Garamond', serif; font-size: 18px; font-weight: 700; color: #111; }
+  .admin-card .insight-mini { font-size: 11px; color: #666; line-height: 1.4; margin-top: 2px; }
+  .group-pill {
+    position: absolute; top: 12px; right: 12px; border-radius: 999px;
+    padding: 2px 8px; font-size: 10px; font-weight: 600; color: white;
+  }
+  .ready-pill {
+    display: inline-block; border-radius: 999px; background: #f3f4f6;
+    padding: 2px 8px; font-size: 10px; font-weight: 500; color: #9ca3af; margin-top: 4px;
+  }
+  .gen-btn {
+    margin-top: 8px; border: 1px solid #ddd; background: none; border-radius: 6px;
+    padding: 4px 12px; font-size: 11px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; color: #666;
+  }
+  .not-done { font-size: 12px; font-style: italic; color: #999; margin-top: 4px; }
+  .not-done-sub { font-size: 10px; color: #bbb; margin-top: 2px; }
+
+  /* ── Print card ── */
+  .print-card {
+    width: 288px; /* 4in at 72dpi */
+    height: 432px; /* 6in at 72dpi */
+    background: #FAFAF8; border-radius: 4px; padding: 28px;
+    position: relative; flex-shrink: 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+  .print-card .student-tag { font-size: 8px; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .print-card .footer { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 7px; color: #CCC; }
+  .print-card.group-border { border-left: 3px solid; padding-left: 25px; }
+
+  /* ── Public page mock ── */
+  .public-page {
+    background: #f5f5f5; border-radius: 12px; padding: 32px 20px;
+    width: 360px; flex-shrink: 0; text-align: center;
+  }
+  .public-name { font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+  .public-footer { margin-top: 24px; font-size: 11px; color: #CCC; }
+
+  /* ── Modal mock ── */
+  .modal-mock {
+    background: #fff; border-radius: 12px; padding: 24px; width: 480px; flex-shrink: 0;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15); position: relative;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px; }
+  .modal-name { font-size: 16px; font-weight: 700; }
+  .modal-nav { display: flex; align-items: center; gap: 12px; justify-content: center; margin-bottom: 16px; }
+  .modal-nav button { background: none; border: 1px solid #ddd; border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
+  .modal-counter { font-size: 12px; color: #999; }
+  .modal-actions { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<h1>Student Archetype Card System</h1>
+<p class="subtitle">Complete visual preview — all states, admin view, print, public URL, modal</p>
+
+<!-- ═══ SECTION 1: Student Reveal States ═══ -->
+<p class="section-label">1. Student Reveal States — Loading / Timeout / Error</p>
+<div class="row">
+  <div class="state-card loading-state">
+    <p class="state-text">Finding your type...</p>
+  </div>
+
+  <div class="state-card timeout-state">
+    <p class="state-text-lg">Your card is still being prepared — this can take a moment when many students finish at the same time.</p>
+    <p class="state-text-sub">Hold tight — your card will be ready in just a moment.</p>
+  </div>
+
+  <div class="state-card error-state">
+    <p class="state-text-lg">Something went wrong preparing your card.</p>
+    <button class="btn-outline">Try again</button>
+  </div>
+
+  <div class="state-card error-state">
+    <p class="state-text-lg">Something went wrong preparing your card.</p>
+    <p class="state-text-sub">Please let your facilitator know. Your answers have been saved.</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 2: The Reveal Card ═══ -->
+<p class="section-label">2. The Reveal — Student's Final Card (3 example titles)</p>
+<div class="row">
+  <!-- The Frontier (Builder × World) -->
+  <div class="card">
+    <p class="the-label">THE</p>
+    <h2 class="title">Frontier</h2>
+    <p class="desc">A quiet observer who notices the small things that everyone else walks past, and wonders what would happen if those things were different.</p>
+    <div class="divider"></div>
+    <div class="insight-row"><span class="insight-label">THE WISH</span><span class="insight-text">You want to hold something real in your hands when the work is done.</span></div>
+    <div class="insight-row"><span class="insight-label">THE MIND</span><span class="insight-text">Your first instinct when something is broken is to figure out how to fix it yourself.</span></div>
+    <div class="insight-row"><span class="insight-label">THE LENS</span><span class="insight-text">You carry knowledge about the natural world that most people your age never think about.</span></div>
+    <div class="insight-row"><span class="insight-label">THE SCALE</span><span class="insight-text">You measure success by whether the whole world shifted, even slightly.</span></div>
+    <div class="insight-row"><span class="insight-label">THE VOICE</span><span class="insight-text">You reach for a pencil before you reach for words.</span></div>
+  </div>
+
+  <!-- The Hearth (Empath × Community) -->
+  <div class="card">
+    <p class="the-label">THE</p>
+    <h2 class="title">Hearth</h2>
+    <p class="desc">Someone who feels the temperature of a room before anyone speaks, and quietly makes sure everyone in it has what they need.</p>
+    <div class="divider"></div>
+    <div class="insight-row"><span class="insight-label">THE WISH</span><span class="insight-text">You imagine a place where people can gather and feel safe, even if it only exists in your mind right now.</span></div>
+    <div class="insight-row"><span class="insight-label">THE MIND</span><span class="insight-text">When you see someone struggling, your first thought is about what they must be feeling, not what went wrong.</span></div>
+    <div class="insight-row"><span class="insight-label">THE LENS</span><span class="insight-text">You understand how people from different backgrounds experience the same moment in completely different ways.</span></div>
+    <div class="insight-row"><span class="insight-label">THE SCALE</span><span class="insight-text">You care most about the ten people you can see, not the ten thousand you cannot.</span></div>
+    <div class="insight-row"><span class="insight-label">THE VOICE</span><span class="insight-text">You explain things by telling a story about someone you know.</span></div>
+  </div>
+
+  <!-- The Legend (Storyteller × World) -->
+  <div class="card">
+    <p class="the-label">THE</p>
+    <h2 class="title">Legend</h2>
+    <p class="desc">A person who believes the right words at the right time can change what an entire generation thinks is possible.</p>
+    <div class="divider"></div>
+    <div class="insight-row"><span class="insight-label">THE WISH</span><span class="insight-text">You see something no one has named yet and feel a pull to give it language.</span></div>
+    <div class="insight-row"><span class="insight-label">THE MIND</span><span class="insight-text">Before you solve a problem, you need to find the image or phrase that makes other people care about it too.</span></div>
+    <div class="insight-row"><span class="insight-label">THE LENS</span><span class="insight-text">You know things about music and rhythm that let you hear patterns most people walk right past.</span></div>
+    <div class="insight-row"><span class="insight-label">THE SCALE</span><span class="insight-text">You think in terms of millions, not because you want fame, but because the idea deserves it.</span></div>
+    <div class="insight-row"><span class="insight-label">THE VOICE</span><span class="insight-text">You make a video before you write a document, because you need to hear the idea spoken to know if it is real.</span></div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: Action Area ═══ -->
+<p class="section-label">3. Action Area — Below the Card</p>
+<div class="row">
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; background: white; border-radius: 12px; width: 320px;">
+    <button class="btn-outline">Save Your Card</button>
+    <button style="font-size: 14px; color: #666; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;">Share Your Card</button>
+    <div style="margin-top: 8px; border-radius: 999px; padding: 6px 16px; font-size: 14px; font-weight: 500; color: white; background: #0D9488;">You are in Group 3</div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; background: white; border-radius: 12px; width: 320px;">
+    <button class="btn-outline">Save Your Card</button>
+    <button style="font-size: 14px; color: #0D9488; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500;">Link copied!</button>
+    <p style="font-size: 12px; color: #bbb; margin-top: 8px;">(no group assigned yet — nothing shown)</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 4: Admin Grid — 3 States ═══ -->
+<p class="section-label">4. Admin Cards Tab — Grid with All 3 States + Group Colors</p>
+<div class="row">
+  <!-- Completed with card, Group 1 (blue) -->
+  <div class="admin-card" style="border: 2px solid #3B82F6; background: #3B82F60F;">
+    <div class="group-pill" style="background: #3B82F6;">Group 1</div>
+    <p class="student-name">Alex</p>
+    <p class="card-title">The Frontier</p>
+    <p class="insight-mini">You want to hold something real in your hands when the work is done.</p>
+    <p class="insight-mini">Your first instinct when something is broken is to figure out how to fix it yourself.</p>
+    <p class="insight-mini">You carry knowledge about the natural world...</p>
+    <p class="insight-mini">You measure success by whether the whole world shifted.</p>
+    <p class="insight-mini">You reach for a pencil before you reach for words.</p>
+  </div>
+
+  <!-- Completed with card, Group 3 (amber) -->
+  <div class="admin-card" style="border: 2px solid #F59E0B; background: #F59E0B0F;">
+    <div class="group-pill" style="background: #F59E0B;">Group 3</div>
+    <p class="student-name">Mia</p>
+    <p class="card-title">The Hearth</p>
+    <p class="insight-mini">You imagine a place where people can gather and feel safe.</p>
+    <p class="insight-mini">When you see someone struggling, your first thought is about what they feel.</p>
+    <p class="insight-mini">You understand how different backgrounds shape experience.</p>
+    <p class="insight-mini">You care most about the ten people you can see.</p>
+    <p class="insight-mini">You explain things by telling a story about someone you know.</p>
+  </div>
+
+  <!-- Completed with card, Group 5 (purple) -->
+  <div class="admin-card" style="border: 2px solid #8B5CF6; background: #8B5CF60F;">
+    <div class="group-pill" style="background: #8B5CF6;">Group 5</div>
+    <p class="student-name">Jordan</p>
+    <p class="card-title">The Legend</p>
+    <p class="insight-mini">You see something no one has named yet and feel a pull to give it language.</p>
+    <p class="insight-mini">Before you solve a problem, you find the image that makes people care.</p>
+    <p class="insight-mini">You know things about music and rhythm...</p>
+    <p class="insight-mini">You think in terms of millions, because the idea deserves it.</p>
+    <p class="insight-mini">You make a video before you write a document.</p>
+  </div>
+
+  <!-- Ready to generate -->
+  <div class="admin-card" style="border: 1px solid #E5E5E5; background: white;">
+    <p class="student-name">Kai</p>
+    <span class="ready-pill">Ready to generate</span>
+    <button class="gen-btn">Generate</button>
+  </div>
+
+  <!-- Not completed -->
+  <div class="admin-card" style="border: 1px solid #E5E5E5; background: white;">
+    <p class="student-name">Sam</p>
+    <p class="not-done">Not yet completed</p>
+    <p class="not-done-sub">3 of 5 complete</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 5: Admin Stats Bar ═══ -->
+<p class="section-label">5. Stats Bar + Sort Controls</p>
+<div class="row">
+  <div style="background: white; border-radius: 12px; padding: 20px 24px; width: 600px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <p style="font-size: 14px; color: #666;"><strong style="color: #111;">47</strong> cards generated · <strong style="color: #111;">12</strong> pending · <strong style="color: #111;">6</strong> not started</p>
+      <div style="display: flex; gap: 8px;">
+        <button class="gen-btn" style="border-color: #ccc;">Generate All (12)</button>
+        <button class="gen-btn" style="border-color: #ccc;">Print All Cards</button>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 11px; color: #999;">Sorted by:</span>
+      <button style="border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 500; background: #0D9488; color: white; border: none; cursor: pointer; font-family: 'DM Sans';">Last Name</button>
+      <button style="border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 500; background: none; color: #666; border: none; cursor: pointer; font-family: 'DM Sans';">Group</button>
+      <button style="border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 500; background: none; color: #666; border: none; cursor: pointer; font-family: 'DM Sans';">Most Recent</button>
+    </div>
+    <p style="margin-top: 12px; font-size: 10px; color: #bbb;">Last updated 2:34:12 PM</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 6: Admin Modal ═══ -->
+<p class="section-label">6. Admin Modal — Card Detail + Navigation</p>
+<div class="row">
+  <div class="modal-mock">
+    <div class="modal-header">
+      <div>
+        <p class="modal-name">Alex Martinez</p>
+        <span class="group-pill" style="position: static; background: #3B82F6; display: inline-block; margin-top: 4px;">Group 1</span>
+      </div>
+      <button style="background: none; border: none; font-size: 18px; cursor: pointer; color: #999;">✕</button>
+    </div>
+    <div class="modal-nav">
+      <button>←</button>
+      <span class="modal-counter">Showing card 12 of 47</span>
+      <button>→</button>
+    </div>
+    <div class="card" style="width: 100%; box-shadow: 0 2px 16px rgba(0,0,0,0.06);">
+      <p class="the-label">THE</p>
+      <h2 class="title">Frontier</h2>
+      <p class="desc">A quiet observer who notices the small things that everyone else walks past, and wonders what would happen if those things were different.</p>
+      <div class="divider"></div>
+      <div class="insight-row"><span class="insight-label">THE WISH</span><span class="insight-text">You want to hold something real in your hands when the work is done.</span></div>
+      <div class="insight-row"><span class="insight-label">THE MIND</span><span class="insight-text">Your first instinct when something is broken is to figure out how to fix it yourself.</span></div>
+      <div class="insight-row"><span class="insight-label">THE LENS</span><span class="insight-text">You carry knowledge about the natural world that most people your age never think about.</span></div>
+      <div class="insight-row"><span class="insight-label">THE SCALE</span><span class="insight-text">You measure success by whether the whole world shifted, even slightly.</span></div>
+      <div class="insight-row"><span class="insight-label">THE VOICE</span><span class="insight-text">You reach for a pencil before you reach for words.</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" style="font-size: 13px; padding: 8px 16px;">Download PDF</button>
+      <button style="font-size: 13px; color: #666; background: none; border: none; cursor: pointer; font-family: 'DM Sans';">Copy Share Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 7: Print PDF (4×6 postcard) ═══ -->
+<p class="section-label">7. Print PDF — 4×6 Inch Postcard (with + without group color border)</p>
+<div class="row">
+  <div class="print-card">
+    <p class="student-tag">Alex</p>
+    <p style="font-size: 8px; color: #999; text-transform: uppercase; letter-spacing: 0.2em;">THE</p>
+    <h2 style="font-family: 'EB Garamond', serif; font-size: 28px; font-weight: 700; color: #111; margin-top: 2px;">Frontier</h2>
+    <p style="font-size: 11px; font-weight: 500; color: #444; line-height: 1.6; margin-top: 10px;">A quiet observer who notices the small things that everyone else walks past, and wonders what would happen if those things were different.</p>
+    <div style="height: 1px; background: #E5E5E5; margin: 14px 0;"></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE WISH</span><span class="insight-text insight-text-sm">You want to hold something real in your hands when the work is done.</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE MIND</span><span class="insight-text insight-text-sm">Your first instinct when something is broken is to figure out how to fix it yourself.</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE LENS</span><span class="insight-text insight-text-sm">You carry knowledge about the natural world...</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE SCALE</span><span class="insight-text insight-text-sm">You measure success by whether the whole world shifted.</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE VOICE</span><span class="insight-text insight-text-sm">You reach for a pencil before you reach for words.</span></div>
+    <p class="footer">adaptable.one</p>
+  </div>
+
+  <div class="print-card group-border" style="border-left-color: #3B82F6;">
+    <p class="student-tag">Alex</p>
+    <p style="font-size: 8px; color: #999; text-transform: uppercase; letter-spacing: 0.2em;">THE</p>
+    <h2 style="font-family: 'EB Garamond', serif; font-size: 28px; font-weight: 700; color: #111; margin-top: 2px;">Frontier</h2>
+    <p style="font-size: 11px; font-weight: 500; color: #444; line-height: 1.6; margin-top: 10px;">A quiet observer who notices the small things that everyone else walks past, and wonders what would happen if those things were different.</p>
+    <div style="height: 1px; background: #E5E5E5; margin: 14px 0;"></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE WISH</span><span class="insight-text insight-text-sm">You want to hold something real in your hands when the work is done.</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE MIND</span><span class="insight-text insight-text-sm">Your first instinct when something is broken is to figure out how to fix it yourself.</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE LENS</span><span class="insight-text insight-text-sm">You carry knowledge about the natural world...</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE SCALE</span><span class="insight-text insight-text-sm">You measure success by whether the whole world shifted.</span></div>
+    <div class="insight-row"><span class="insight-label insight-label-sm">THE VOICE</span><span class="insight-text insight-text-sm">You reach for a pencil before you reach for words.</span></div>
+    <p class="footer">adaptable.one</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 8: Public URL ═══ -->
+<p class="section-label">8. Public Shareable URL — /c/[slug] (no auth required)</p>
+<div class="row">
+  <div class="public-page">
+    <p class="public-name">Alex</p>
+    <div class="card" style="width: 100%; text-align: left;">
+      <p class="the-label">THE</p>
+      <h2 class="title" style="font-size: 30px;">Frontier</h2>
+      <p class="desc" style="font-size: 13px;">A quiet observer who notices the small things that everyone else walks past, and wonders what would happen if those things were different.</p>
+      <div class="divider"></div>
+      <div class="insight-row"><span class="insight-label">THE WISH</span><span class="insight-text" style="font-size: 12px;">You want to hold something real in your hands when the work is done.</span></div>
+      <div class="insight-row"><span class="insight-label">THE MIND</span><span class="insight-text" style="font-size: 12px;">Your first instinct when something is broken is to figure out how to fix it yourself.</span></div>
+      <div class="insight-row"><span class="insight-label">THE LENS</span><span class="insight-text" style="font-size: 12px;">You carry knowledge about the natural world...</span></div>
+      <div class="insight-row"><span class="insight-label">THE SCALE</span><span class="insight-text" style="font-size: 12px;">You measure success by whether the whole world shifted.</span></div>
+      <div class="insight-row"><span class="insight-label">THE VOICE</span><span class="insight-text" style="font-size: 12px;">You reach for a pencil before you reach for words.</span></div>
+    </div>
+    <p class="public-footer">adaptable.one</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 9: All 10 Group Colors ═══ -->
+<p class="section-label">9. Group Color Palette — All 10 Colors at 6% Tint</p>
+<div class="row">
+  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 700px;">
+    <div style="border: 2px solid #3B82F6; background: #3B82F60F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #3B82F6; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 1</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Blue<br>#3B82F6<br>14.90:1</p>
+    </div>
+    <div style="border: 2px solid #10B981; background: #10B9810F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #10B981; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 2</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Emerald<br>#10B981<br>15.06:1</p>
+    </div>
+    <div style="border: 2px solid #F59E0B; background: #F59E0B0F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #F59E0B; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 3</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Amber<br>#F59E0B<br>15.17:1</p>
+    </div>
+    <div style="border: 2px solid #EF4444; background: #EF44440F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #EF4444; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 4</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Red<br>#EF4444<br>14.74:1</p>
+    </div>
+    <div style="border: 2px solid #8B5CF6; background: #8B5CF60F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #8B5CF6; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 5</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Purple<br>#8B5CF6<br>14.76:1</p>
+    </div>
+    <div style="border: 2px solid #EC4899; background: #EC48990F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #EC4899; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 6</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Pink<br>#EC4899<br>14.79:1</p>
+    </div>
+    <div style="border: 2px solid #14B8A6; background: #14B8A60F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #14B8A6; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 7</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Teal<br>#14B8A6<br>15.09:1</p>
+    </div>
+    <div style="border: 2px solid #F97316; background: #F973160F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #F97316; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 8</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Orange<br>#F97316<br>15.02:1</p>
+    </div>
+    <div style="border: 2px solid #6366F1; background: #6366F10F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #6366F1; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 9</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Indigo<br>#6366F1<br>14.80:1</p>
+    </div>
+    <div style="border: 2px solid #84CC16; background: #84CC160F; border-radius: 8px; padding: 12px; text-align: center;">
+      <div style="background: #84CC16; color: white; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 600; display: inline-block;">Group 10</div>
+      <p style="font-size: 10px; color: #222; margin-top: 8px;">Lime<br>#84CC16<br>15.29:1</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 10: Title Map ═══ -->
+<p class="section-label">10. Complete Title Map — All 20 Combinations</p>
+<div class="row">
+  <table style="border-collapse: collapse; font-size: 13px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+    <thead>
+      <tr style="background: #f9fafb;">
+        <th style="padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Archetype</th>
+        <th style="padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #e5e7eb;">One Person</th>
+        <th style="padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Community</th>
+        <th style="padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Generation</th>
+        <th style="padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #e5e7eb;">World</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6; font-weight: 600;">Builder</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Artisan</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Foundation</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Blueprint</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Frontier</td></tr>
+      <tr><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6; font-weight: 600;">Empath</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Anchor</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Hearth</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Lantern</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Pulse</td></tr>
+      <tr><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6; font-weight: 600;">Systems Thinker</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Decoder</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Lever</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Framework</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Cartographer</td></tr>
+      <tr><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6; font-weight: 600;">Connector</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Gateway</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Weaver</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Conductor</td><td style="padding: 8px 16px; border-bottom: 1px solid #f3f4f6;">The Nexus</td></tr>
+      <tr><td style="padding: 8px 16px; font-weight: 600;">Storyteller</td><td style="padding: 8px 16px;">The Chronicle</td><td style="padding: 8px 16px;">The Herald</td><td style="padding: 8px 16px;">The Myth</td><td style="padding: 8px 16px;">The Legend</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p style="text-align: center; font-size: 11px; color: #bbb; margin-top: 24px;">Archetype Card System — Adaptable · Built May 2026</p>
+
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reveal Options — Round 2</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * BUSINESS NAME REVEAL — 3 ALTERNATIVE APPROACHES
+   * ═══════════════════════════════════════════════════════════
+   *
+   * Golden Ratio governs all timing:
+   *   φ = 1.618034
+   *   Loop = 15s (each section auto-restarts)
+   *   Circles appear in first ~4s, center glow ~5s,
+   *   name reveal occupies the φ-weighted middle of the timeline.
+   *
+   * All three approaches share the same Ikigai base layout.
+   * Only the business name reveal differs.
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Satoshi', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ─── Section labels ─── */
+  .option-label {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.236em;
+    color: rgba(255,255,255,0.18);
+    text-transform: uppercase;
+    z-index: 100;
+  }
+  .option-sublabel {
+    position: absolute;
+    top: 38px;
+    left: 24px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.09em;
+    color: rgba(255,255,255,0.10);
+    z-index: 100;
+  }
+
+  /* ─── Each reveal section ─── */
+  .reveal-section {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* ─── Shared: Ambient glow ─── */
+  .ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(25, 50, 82, 0.090) 0%, transparent 61.8%);
+    animation: glow-breathe 6.854s ease-in-out infinite;
+  }
+  @keyframes glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+  /* ─── Shared: Ikigai layout ─── */
+  .ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+  }
+
+  .ik-c {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%, -50%) scale(0.236);
+  }
+  .ik-c.c1 { background: #F5E642; left: 50%; top: 19.1%; }
+  .ik-c.c2 { background: #A8DB5A; left: 19.1%; top: 50%; }
+  .ik-c.c3 { background: #F4A79D; left: 80.9%; top: 50%; }
+  .ik-c.c4 { background: #6DD5D0; left: 50%; top: 80.9%; }
+
+  .ik-center {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 19.1%;
+    height: 19.1%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #4A6741 38.2%, #8B9E6A 61.8%, transparent 100%);
+    box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2);
+    opacity: 0;
+    z-index: 4;
+  }
+
+  /* Shared circle + center animation (same across all 3) */
+  /* 15s loop: circles 0-4s, center 4-5.5s, name 5.5-11s, hold 11-13s, fade 13-15s */
+
+  .ik-c {
+    animation: circle-loop 15s ease-in-out infinite;
+  }
+  .ik-c.c1 { animation-delay: 0s; }
+  .ik-c.c2 { animation-delay: 0.618s; }
+  .ik-c.c3 { animation-delay: 1.236s; }
+  .ik-c.c4 { animation-delay: 1.854s; }
+
+  @keyframes circle-loop {
+    0%      { opacity: 0; filter: blur(10px); transform: translate(-50%, -50%) scale(0.236); }
+    6%      { opacity: 0; filter: blur(10px); transform: translate(-50%, -50%) scale(0.236); }
+    20%     { opacity: 0.618; filter: blur(0); transform: translate(-50%, -50%) scale(1); }
+    82%     { opacity: 0.618; filter: blur(0); transform: translate(-50%, -50%) scale(1); }
+    95%     { opacity: 0; filter: blur(6px); transform: translate(-50%, -50%) scale(0.8); }
+    100%    { opacity: 0; filter: blur(10px); transform: translate(-50%, -50%) scale(0.236); }
+  }
+
+  .ik-center {
+    animation: center-loop 15s ease-in-out infinite;
+  }
+  @keyframes center-loop {
+    0%    { opacity: 0; }
+    30%   { opacity: 0; }
+    40%   { opacity: 1; }
+    82%   { opacity: 1; }
+    95%   { opacity: 0; }
+    100%  { opacity: 0; }
+  }
+
+  /* ─── Shared: biz-name base ─── */
+  .biz-name-wrap {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+  }
+  .biz-origin {
+    display: block;
+    margin-top: 11px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.146em;
+    opacity: 0;
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OPTION A: LIGHT SWEEP
+     The name is already there, invisible. A luminous bar
+     sweeps left-to-right like a scanner, revealing text
+     beneath it. Like discovering something that was always
+     waiting for you.
+     ═══════════════════════════════════════════════════════════ */
+
+  .opt-a .biz-name-wrap {
+    overflow: hidden;
+  }
+
+  .opt-a .biz-name {
+    font-size: 28px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0);
+    text-shadow: none;
+    position: relative;
+    display: inline-block;
+    /* The text is invisible by default — the sweep paints it */
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(255,255,255,1) 50%,
+      rgba(255,255,255,1) 100%
+    );
+    background-size: 250% 100%;
+    background-position: 0% 0%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: sweep-reveal 15s ease-in-out infinite;
+  }
+
+  /* The sweep bar — a luminous edge that travels across */
+  .opt-a .biz-name::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 4px;
+    height: 140%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(139, 158, 106, 0.1) 20%,
+      rgba(139, 158, 106, 0.7) 50%,
+      rgba(139, 158, 106, 0.1) 80%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 20px rgba(74, 103, 65, 0.5),
+      0 0 40px rgba(74, 103, 65, 0.2),
+      8px 0 30px rgba(74, 103, 65, 0.15),
+      -8px 0 30px rgba(74, 103, 65, 0.15);
+    border-radius: 2px;
+    opacity: 0;
+    animation: sweep-bar 15s ease-in-out infinite;
+  }
+
+  @keyframes sweep-reveal {
+    0%    { background-position: 0% 0%; }
+    36%   { background-position: 0% 0%; }
+    /* φ-timed reveal: starts at 36%, finishes at 60% = 3.6s sweep */
+    42%   { background-position: 40% 0%; }
+    55%   { background-position: 100% 0%; }
+    60%   { background-position: 100% 0%;
+            text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25); }
+    82%   { background-position: 100% 0%; }
+    93%   { background-position: 100% 0%; opacity: 0; }
+    95%   { background-position: 0% 0%; opacity: 0; }
+    100%  { background-position: 0% 0%; }
+  }
+
+  @keyframes sweep-bar {
+    0%    { left: -10%; opacity: 0; }
+    35%   { left: -10%; opacity: 0; }
+    36%   { left: -10%; opacity: 1; }
+    55%   { left: 105%; opacity: 0.8; }
+    56%   { left: 105%; opacity: 0; }
+    100%  { left: 105%; opacity: 0; }
+  }
+
+  .opt-a .biz-origin {
+    animation: origin-loop 15s ease-in-out infinite;
+  }
+  @keyframes origin-loop {
+    0%    { opacity: 0; color: rgba(255,255,255,0); }
+    60%   { opacity: 0; color: rgba(255,255,255,0); }
+    68%   { opacity: 1; color: rgba(255,255,255,0.35); }
+    82%   { opacity: 1; color: rgba(255,255,255,0.35); }
+    93%   { opacity: 0; color: rgba(255,255,255,0); }
+    100%  { opacity: 0; color: rgba(255,255,255,0); }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OPTION B: CAMERA FOCUS
+     The name starts enormous and deeply blurred — an
+     abstraction, a feeling before a word. It contracts
+     and sharpens into readable form. Like a thought
+     becoming real. Like a camera pulling focus on
+     something that was always there.
+     ═══════════════════════════════════════════════════════════ */
+
+  .opt-b .biz-name {
+    font-size: 28px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25);
+    display: inline-block;
+    animation: focus-reveal 15s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  @keyframes focus-reveal {
+    0%    { opacity: 0; filter: blur(40px); transform: scale(4.236); letter-spacing: 0.5em; }
+    36%   { opacity: 0; filter: blur(40px); transform: scale(4.236); letter-spacing: 0.5em; }
+    /* The pull-focus moment — slow deceleration, φ-timed */
+    42%   { opacity: 0.3; filter: blur(25px); transform: scale(2.618); letter-spacing: 0.3em; }
+    50%   { opacity: 0.6; filter: blur(10px); transform: scale(1.618); letter-spacing: 0.12em; }
+    58%   { opacity: 0.9; filter: blur(2px); transform: scale(1.05); letter-spacing: 0.02em; }
+    /* Settle — tiny overshoot for organic feel */
+    62%   { opacity: 1; filter: blur(0); transform: scale(0.98); letter-spacing: 0em; }
+    65%   { opacity: 1; filter: blur(0); transform: scale(1); letter-spacing: 0em; }
+    82%   { opacity: 1; filter: blur(0); transform: scale(1); }
+    /* Fade by re-blurring slightly and shrinking — the inverse */
+    93%   { opacity: 0; filter: blur(8px); transform: scale(0.9); }
+    100%  { opacity: 0; filter: blur(40px); transform: scale(4.236); letter-spacing: 0.5em; }
+  }
+
+  .opt-b .biz-origin {
+    animation: origin-b-loop 15s ease-in-out infinite;
+  }
+  @keyframes origin-b-loop {
+    0%    { opacity: 0; color: rgba(255,255,255,0); }
+    66%   { opacity: 0; color: rgba(255,255,255,0); }
+    72%   { opacity: 1; color: rgba(255,255,255,0.35); }
+    82%   { opacity: 1; color: rgba(255,255,255,0.35); }
+    93%   { opacity: 0; color: rgba(255,255,255,0); }
+    100%  { opacity: 0; color: rgba(255,255,255,0); }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OPTION C: HEARTBEAT PULSE
+     The name pulses outward from the center glow — a
+     single, decisive heartbeat. It starts as a point
+     of light in the convergence zone, then EXPANDS
+     in one resonant pulse — not gradual, not gentle.
+     A detonation of clarity. The glow throbs once,
+     and when it recedes, the name remains.
+     ═══════════════════════════════════════════════════════════ */
+
+  .opt-c .ik-center {
+    animation: center-loop-c 15s ease-in-out infinite;
+  }
+  @keyframes center-loop-c {
+    0%    { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    30%   { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    40%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    /* The heartbeat — center glow throbs outward right before name appears */
+    48%   { opacity: 1; transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2); }
+    51%   { opacity: 1; transform: translate(-50%, -50%) scale(1.8);
+            box-shadow: 0 0 80px rgba(74, 103, 65, 0.8), 0 0 160px rgba(74, 103, 65, 0.4), 0 0 240px rgba(74, 103, 65, 0.15); }
+    55%   { opacity: 1; transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 0 40px rgba(74, 103, 65, 0.5), 0 0 80px rgba(74, 103, 65, 0.2); }
+    82%   { opacity: 1; }
+    95%   { opacity: 0; }
+    100%  { opacity: 0; }
+  }
+
+  /* The shockwave ring that expands outward from center */
+  .opt-c .shockwave {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 19.1%;
+    height: 19.1%;
+    border-radius: 50%;
+    border: 1px solid rgba(139, 158, 106, 0);
+    z-index: 5;
+    animation: shockwave-ring 15s ease-out infinite;
+  }
+
+  @keyframes shockwave-ring {
+    0%    { transform: translate(-50%, -50%) scale(1); border-color: rgba(139, 158, 106, 0); opacity: 0; }
+    49%   { transform: translate(-50%, -50%) scale(1); border-color: rgba(139, 158, 106, 0); opacity: 0; }
+    50%   { transform: translate(-50%, -50%) scale(1); border-color: rgba(139, 158, 106, 0.6); opacity: 1; }
+    60%   { transform: translate(-50%, -50%) scale(6); border-color: rgba(139, 158, 106, 0); opacity: 0; }
+    100%  { transform: translate(-50%, -50%) scale(6); border-color: rgba(139, 158, 106, 0); opacity: 0; }
+  }
+
+  .opt-c .biz-name {
+    font-size: 28px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25);
+    display: inline-block;
+    animation: pulse-name 15s ease-out infinite;
+  }
+
+  @keyframes pulse-name {
+    0%    { opacity: 0; transform: scale(0); filter: blur(0); }
+    49%   { opacity: 0; transform: scale(0); filter: blur(0); }
+    /* The detonation — fast expansion from nothing */
+    50%   { opacity: 0; transform: scale(0); }
+    51.5% { opacity: 1; transform: scale(1.236); filter: blur(2px);
+            text-shadow: 0 0 60px rgba(74, 103, 65, 0.9), 0 0 120px rgba(74, 103, 65, 0.4); }
+    /* Settle back — elastic overshoot */
+    54%   { opacity: 1; transform: scale(0.95); filter: blur(0);
+            text-shadow: 0 0 30px rgba(74, 103, 65, 0.6), 0 0 60px rgba(74, 103, 65, 0.25); }
+    57%   { opacity: 1; transform: scale(1); filter: blur(0); }
+    82%   { opacity: 1; transform: scale(1); }
+    93%   { opacity: 0; transform: scale(0.9); }
+    100%  { opacity: 0; transform: scale(0); }
+  }
+
+  .opt-c .biz-origin {
+    animation: origin-c-loop 15s ease-in-out infinite;
+  }
+  @keyframes origin-c-loop {
+    0%    { opacity: 0; color: rgba(255,255,255,0); }
+    60%   { opacity: 0; color: rgba(255,255,255,0); }
+    68%   { opacity: 1; color: rgba(255,255,255,0.35); }
+    82%   { opacity: 1; color: rgba(255,255,255,0.35); }
+    93%   { opacity: 0; color: rgba(255,255,255,0); }
+    100%  { opacity: 0; color: rgba(255,255,255,0); }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     REDUCED MOTION
+     ═══════════════════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPTION A: LIGHT SWEEP
+     "It was already there. You just needed to see it."
+     A luminous scanner bar passes left-to-right,
+     painting the name into existence beneath it.
+     ═══════════════════════════════════════════════════════════ -->
+<section class="reveal-section opt-a">
+  <div class="option-label">Option A — Light Sweep</div>
+  <div class="option-sublabel">The name was always there. A light reveals it.</div>
+  <div class="ambient-glow"></div>
+  <div class="ik-wrap">
+    <div class="ik-c c1"></div>
+    <div class="ik-c c2"></div>
+    <div class="ik-c c3"></div>
+    <div class="ik-c c4"></div>
+    <div class="ik-center"></div>
+    <div class="biz-name-wrap">
+      <span class="biz-name">Harmony Art Studio</span>
+      <span class="biz-origin">This came from who you are.</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPTION B: CAMERA FOCUS
+     "A thought becoming real."
+     Starts huge and blurred — an abstraction, a feeling.
+     Contracts and sharpens into readable form, like a
+     camera pulling focus on destiny.
+     ═══════════════════════════════════════════════════════════ -->
+<section class="reveal-section opt-b">
+  <div class="option-label">Option B — Camera Focus</div>
+  <div class="option-sublabel">Blurred enormity sharpens into clarity.</div>
+  <div class="ambient-glow"></div>
+  <div class="ik-wrap">
+    <div class="ik-c c1"></div>
+    <div class="ik-c c2"></div>
+    <div class="ik-c c3"></div>
+    <div class="ik-c c4"></div>
+    <div class="ik-center"></div>
+    <div class="biz-name-wrap">
+      <span class="biz-name">Harmony Art Studio</span>
+      <span class="biz-origin">This came from who you are.</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     OPTION C: HEARTBEAT PULSE
+     "A single heartbeat made of text."
+     The center glow throbs once — hard — and when
+     the shockwave passes, the name exists. Not gradual.
+     Decisive. Like the moment an idea clicks.
+     ═══════════════════════════════════════════════════════════ -->
+<section class="reveal-section opt-c">
+  <div class="option-label">Option C — Heartbeat Pulse</div>
+  <div class="option-sublabel">One pulse. The name detonates from the center.</div>
+  <div class="ambient-glow"></div>
+  <div class="ik-wrap">
+    <div class="ik-c c1"></div>
+    <div class="ik-c c2"></div>
+    <div class="ik-c c3"></div>
+    <div class="ik-c c4"></div>
+    <div class="ik-center"></div>
+    <div class="shockwave"></div>
+    <div class="biz-name-wrap">
+      <span class="biz-name">Harmony Art Studio</span>
+      <span class="biz-origin">This came from who you are.</span>
+    </div>
+  </div>
+</section>
+
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Diagram — All Options</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Satoshi', sans-serif; background: #F9FAFB; color: #111827; padding: 40px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  p.subtitle { font-size: 16px; color: #4B5563; margin-bottom: 40px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 1100px; }
+  .option { background: #fff; border: 1px solid #E5E7EB; border-radius: 12px; padding: 32px; }
+  .option h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #0D9488; }
+  .option p.desc { font-size: 13px; color: #9CA3AF; margin-bottom: 20px; line-height: 1.5; }
+  .diagram { position: relative; width: 100%; aspect-ratio: 1/1; max-width: 400px; margin: 0 auto; overflow: visible; }
+  .circle { position: absolute; border-radius: 50%; width: 50%; height: 50%; transform: translate(-50%, -50%); opacity: 0.55; }
+  .center-circle { position: absolute; border-radius: 50%; width: 18%; height: 18%; left: 50%; top: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, #4A6741 40%, #8B9E6A 100%); box-shadow: 0 0 24px rgba(74,103,65,0.3); z-index: 5; }
+  .center-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6; text-align: center; pointer-events: none; }
+  .center-label span { display: block; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 0.15em; line-height: 1.3; }
+  .label { position: absolute; font-size: 12px; font-weight: 600; color: #111827; pointer-events: none; transform: translate(-50%, -50%); }
+  .intersection-label { position: absolute; font-size: 9px; font-weight: 600; color: #4B5563; opacity: 0.7; pointer-events: none; transform: translate(-50%, -50%); }
+  .divider { grid-column: 1 / -1; border-top: 2px solid #0D9488; margin: 16px 0; padding-top: 12px; }
+  .divider h2 { font-size: 22px; font-weight: 700; color: #0D9488; margin-bottom: 4px; }
+  .divider p { font-size: 14px; color: #9CA3AF; }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>Ikigai Diagram — All Options</h1>
+<p class="subtitle">10 options. Same circles every time. Different ways to treat labels, layout, and concept.</p>
+
+<div class="grid">
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="divider"><h2>Traditional approaches</h2><p>Based on established Ikigai diagram patterns.</p></div>
+
+<!-- OPTION A -->
+<div class="option">
+  <h2>A — Labels Outside, Wide Spacing</h2>
+  <p class="desc">Classic Marc Winn style. Labels float outside with breathing room. Clean but bleeds past the diagram edge.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <span class="label" style="left:50%; top:-2%; white-space:nowrap;">What you love</span>
+    <span class="label" style="left:4%; top:50%; text-align:center; line-height:1.4;">What you're<br>good at</span>
+    <span class="label" style="left:96%; top:50%; text-align:center; line-height:1.4;">What the world<br>needs</span>
+    <span class="label" style="left:50%; top:102%; white-space:nowrap;">What you can be paid for</span>
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="option">
+  <h2>B — Labels Inside Petals</h2>
+  <p class="desc">Labels sit inside the non-overlapping part of each circle. Self-contained, nothing escapes the diagram.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <span class="label" style="left:50%; top:10%; white-space:nowrap;">What you love</span>
+    <span class="label" style="left:14%; top:50%; text-align:center; line-height:1.4;">What you're<br>good at</span>
+    <span class="label" style="left:86%; top:50%; text-align:center; line-height:1.4;">What the world<br>needs</span>
+    <span class="label" style="left:50%; top:90%; white-space:nowrap;">What you can be paid for</span>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="option">
+  <h2>C — Outside + Intersection Labels</h2>
+  <p class="desc">Full traditional Ikigai. Outer labels + Passion/Mission/Profession/Vocation in the overlaps. Teaches the concept completely.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <span class="label" style="left:50%; top:-2%; white-space:nowrap;">What you love</span>
+    <span class="label" style="left:4%; top:50%; text-align:center; line-height:1.4;">What you're<br>good at</span>
+    <span class="label" style="left:96%; top:50%; text-align:center; line-height:1.4;">What the world<br>needs</span>
+    <span class="label" style="left:50%; top:102%; white-space:nowrap;">What you can be paid for</span>
+    <span class="intersection-label" style="left:38%; top:35%;">Passion</span>
+    <span class="intersection-label" style="left:62%; top:35%;">Mission</span>
+    <span class="intersection-label" style="left:38%; top:65%;">Profession</span>
+    <span class="intersection-label" style="left:62%; top:65%;">Vocation</span>
+  </div>
+</div>
+
+<!-- OPTION D -->
+<div class="option">
+  <h2>D — Inside + Intersections</h2>
+  <p class="desc">Everything contained. Main labels in petals, intersections in overlaps. Dense but self-contained.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <span class="label" style="left:50%; top:10%; white-space:nowrap;">What you love</span>
+    <span class="label" style="left:14%; top:50%; text-align:center; line-height:1.4;">What you're<br>good at</span>
+    <span class="label" style="left:86%; top:50%; text-align:center; line-height:1.4;">What the world<br>needs</span>
+    <span class="label" style="left:50%; top:90%; white-space:nowrap;">What you can be paid for</span>
+    <span class="intersection-label" style="left:38%; top:35%;">Passion</span>
+    <span class="intersection-label" style="left:62%; top:35%;">Mission</span>
+    <span class="intersection-label" style="left:38%; top:65%;">Profession</span>
+    <span class="intersection-label" style="left:62%; top:65%;">Vocation</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="divider"><h2>Breaking the mold</h2><p>Forget Ikigai conventions. What if this was just... a beautiful diagram on a marketing page?</p></div>
+
+<!-- OPTION E: No labels at all — let the diagram breathe -->
+<div class="option">
+  <h2>E — No Labels, Pure Shapes</h2>
+  <p class="desc">Let the circles speak for themselves. The headline and copy next to it explain everything. The diagram is a visual anchor, not an infographic. Minimal, confident, premium.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+  </div>
+</div>
+
+<!-- OPTION F: Labels as connected lines (callout style) -->
+<div class="option">
+  <h2>F — Callout Lines</h2>
+  <p class="desc">Thin lines connect each circle to its label, placed neatly to the side. Architectural, precise. Like a blueprint annotation.</p>
+  <div class="diagram" style="overflow:visible;">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <!-- SVG callout lines -->
+    <svg style="position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:10;">
+      <!-- Top: line from circle top to label -->
+      <line x1="50%" y1="6%" x2="50%" y2="-4%" stroke="#9CA3AF" stroke-width="1" />
+      <circle cx="50%" cy="6%" r="2" fill="#9CA3AF" />
+      <!-- Left -->
+      <line x1="10%" y1="50%" x2="-2%" y2="50%" stroke="#9CA3AF" stroke-width="1" />
+      <circle cx="10%" cy="50%" r="2" fill="#9CA3AF" />
+      <!-- Right -->
+      <line x1="90%" y1="50%" x2="102%" y2="50%" stroke="#9CA3AF" stroke-width="1" />
+      <circle cx="90%" cy="50%" r="2" fill="#9CA3AF" />
+      <!-- Bottom -->
+      <line x1="50%" y1="94%" x2="50%" y2="104%" stroke="#9CA3AF" stroke-width="1" />
+      <circle cx="50%" cy="94%" r="2" fill="#9CA3AF" />
+    </svg>
+    <span class="label" style="left:50%; top:-8%; white-space:nowrap; font-size:11px; color:#4B5563;">What you love</span>
+    <span class="label" style="left:-10%; top:50%; text-align:right; line-height:1.4; font-size:11px; color:#4B5563;">What you're<br>good at</span>
+    <span class="label" style="left:110%; top:50%; text-align:left; line-height:1.4; font-size:11px; color:#4B5563;">What the world<br>needs</span>
+    <span class="label" style="left:50%; top:108%; white-space:nowrap; font-size:11px; color:#4B5563;">What you can be paid for</span>
+  </div>
+</div>
+
+<!-- OPTION G: Labels as bold corner pills -->
+<div class="option">
+  <h2>G — Corner Pills</h2>
+  <p class="desc">Labels are styled as rounded pills positioned at the four corners of the diagram. Distinct from the circles. Feels like a product UI, not an infographic.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <!-- Pill labels at corners -->
+    <span style="position:absolute; left:50%; top:-1%; transform:translate(-50%,-50%); background:#F5E642; color:#111827; font-size:10px; font-weight:700; padding:5px 14px; border-radius:99px; white-space:nowrap;">What you love</span>
+    <span style="position:absolute; left:3%; top:26%; transform:translate(-50%,-50%) rotate(-90deg); background:#A8DB5A; color:#111827; font-size:10px; font-weight:700; padding:5px 14px; border-radius:99px; white-space:nowrap;">What you're good at</span>
+    <span style="position:absolute; left:97%; top:26%; transform:translate(-50%,-50%) rotate(90deg); background:#F4A79D; color:#111827; font-size:10px; font-weight:700; padding:5px 14px; border-radius:99px; white-space:nowrap;">What the world needs</span>
+    <span style="position:absolute; left:50%; top:101%; transform:translate(-50%,-50%); background:#6DD5D0; color:#111827; font-size:10px; font-weight:700; padding:5px 14px; border-radius:99px; white-space:nowrap;">What you can be paid for</span>
+  </div>
+</div>
+
+<!-- OPTION H: Labels orbit outside with color-matched dots -->
+<div class="option">
+  <h2>H — Color-Matched Orbit</h2>
+  <p class="desc">Each label sits outside with a small colored dot matching its circle. Creates a clear visual link between label and circle without clutter. Elegant, modern.</p>
+  <div class="diagram" style="overflow:visible;">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <!-- Labels with color dots -->
+    <span style="position:absolute; left:50%; top:-3%; transform:translate(-50%,-50%); display:flex; align-items:center; gap:6px; white-space:nowrap;">
+      <span style="width:8px; height:8px; border-radius:50%; background:#F5E642; flex-shrink:0;"></span>
+      <span style="font-size:12px; font-weight:600; color:#111827;">What you love</span>
+    </span>
+    <span style="position:absolute; left:1%; top:50%; transform:translate(-50%,-50%); display:flex; align-items:center; gap:6px; flex-direction:column;">
+      <span style="width:8px; height:8px; border-radius:50%; background:#A8DB5A; flex-shrink:0;"></span>
+      <span style="font-size:11px; font-weight:600; color:#111827; text-align:center; line-height:1.3;">What you're<br>good at</span>
+    </span>
+    <span style="position:absolute; left:99%; top:50%; transform:translate(-50%,-50%); display:flex; align-items:center; gap:6px; flex-direction:column;">
+      <span style="width:8px; height:8px; border-radius:50%; background:#F4A79D; flex-shrink:0;"></span>
+      <span style="font-size:11px; font-weight:600; color:#111827; text-align:center; line-height:1.3;">What the world<br>needs</span>
+    </span>
+    <span style="position:absolute; left:50%; top:103%; transform:translate(-50%,-50%); display:flex; align-items:center; gap:6px; white-space:nowrap;">
+      <span style="width:8px; height:8px; border-radius:50%; background:#6DD5D0; flex-shrink:0;"></span>
+      <span style="font-size:12px; font-weight:600; color:#111827;">What you can be paid for</span>
+    </span>
+  </div>
+</div>
+
+<!-- OPTION I: Bigger circles, labels as overlay banners across each circle -->
+<div class="option">
+  <h2>I — Banner Overlays</h2>
+  <p class="desc">Semi-transparent white banner strips across the outer edge of each circle. Text sits ON the circle, not beside it. Bold, modern, magazine-style.</p>
+  <div class="diagram">
+    <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+    <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+    <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+    <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+    <div class="center-circle"></div>
+    <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    <!-- Banner overlays -->
+    <span style="position:absolute; left:50%; top:8%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.75); backdrop-filter:blur(4px); padding:4px 16px; border-radius:6px; font-size:11px; font-weight:700; color:#111827; white-space:nowrap;">What you love</span>
+    <span style="position:absolute; left:14%; top:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.75); backdrop-filter:blur(4px); padding:4px 12px; border-radius:6px; font-size:10px; font-weight:700; color:#111827; text-align:center; line-height:1.4;">What you're<br>good at</span>
+    <span style="position:absolute; left:86%; top:50%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.75); backdrop-filter:blur(4px); padding:4px 12px; border-radius:6px; font-size:10px; font-weight:700; color:#111827; text-align:center; line-height:1.4;">What the world<br>needs</span>
+    <span style="position:absolute; left:50%; top:92%; transform:translate(-50%,-50%); background:rgba(255,255,255,0.75); backdrop-filter:blur(4px); padding:4px 16px; border-radius:6px; font-size:11px; font-weight:700; color:#111827; white-space:nowrap;">What you can be paid for</span>
+  </div>
+</div>
+
+<!-- OPTION J: No outer labels — use color legend below diagram -->
+<div class="option">
+  <h2>J — Legend Below</h2>
+  <p class="desc">The diagram is clean circles only. A compact 2x2 color legend sits below, mapping each color to its concept. The diagram breathes. The labels are scannable. Separation of concerns.</p>
+  <div class="diagram" style="aspect-ratio: auto; height: auto;">
+    <div style="position:relative; width:100%; aspect-ratio:1/1;">
+      <div class="circle" style="background:#F5E642; left:50%; top:28%;"></div>
+      <div class="circle" style="background:#A8DB5A; left:32%; top:50%;"></div>
+      <div class="circle" style="background:#F4A79D; left:68%; top:50%;"></div>
+      <div class="circle" style="background:#6DD5D0; left:50%; top:72%;"></div>
+      <div class="center-circle"></div>
+      <div class="center-label"><span>YOUR</span><span>BUSINESS</span></div>
+    </div>
+    <!-- Legend -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; margin-top:16px; padding:0 8px;">
+      <span style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#111827;">
+        <span style="width:12px; height:12px; border-radius:50%; background:#F5E642; opacity:0.7; flex-shrink:0;"></span>What you love
+      </span>
+      <span style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#111827;">
+        <span style="width:12px; height:12px; border-radius:50%; background:#F4A79D; opacity:0.7; flex-shrink:0;"></span>What the world needs
+      </span>
+      <span style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#111827;">
+        <span style="width:12px; height:12px; border-radius:50%; background:#A8DB5A; opacity:0.7; flex-shrink:0;"></span>What you're good at
+      </span>
+      <span style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#111827;">
+        <span style="width:12px; height:12px; border-radius:50%; background:#6DD5D0; opacity:0.7; flex-shrink:0;"></span>What you can be paid for
+      </span>
+    </div>
+  </div>
+</div>
+
+</div><!-- end grid -->
+
+</body>
+</html>

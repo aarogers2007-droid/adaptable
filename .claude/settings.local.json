@@ -59,7 +59,17 @@
       "Bash($B fill:*)",
       "Bash(bunx tsx:*)",
       "Skill(office-hours)",
-      "Skill(investigate)"
+      "Skill(investigate)",
+      "Bash($B viewport:*)",
+      "Bash(OUTDIR=/Users/ajrogers/Adaptable/.gstack/qa-reports/full-qa-screenshots)",
+      "Bash(DIR=/Users/ajrogers/Adaptable/.gstack/qa-reports/full-qa-screenshots)",
+      "Bash($B click:*)",
+      "Bash($B eval:*)",
+      "Bash($B scroll:*)",
+      "Bash($B cleanup:*)",
+      "Bash($B stop:*)",
+      "Bash($B url:*)",
+      "Bash($B snapshot:*)"
     ]
   }
 }

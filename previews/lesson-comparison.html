@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson UI — Before & After</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f3f4f6; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; height: 100vh; }
+  .divider { position: fixed; left: 50%; top: 0; bottom: 0; width: 1px; background: #d1d5db; z-index: 100; }
+
+  .side { position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .side-label {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    font-family: 'Satoshi', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase; z-index: 50;
+    padding: 4px 12px; border-radius: 99px; white-space: nowrap;
+  }
+
+  /* ═══ SHARED LESSON CHROME ═══ */
+  .header {
+    padding: 12px 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .goal-box {
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+  }
+  .goal-box .label { font-size: 11px; font-weight: 600; color: #0d9488; }
+  .goal-box .text { font-size: 13px; color: #4b5563; }
+  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .progress-bar { flex: 1; height: 6px; border-radius: 99px; background: #f3f4f6; overflow: hidden; }
+  .progress-bar.thick { height: 8px; }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #F5E642 0%, #A8DB5A 35%, #F4A79D 65%, #6DD5D0 100%);
+    width: 40%; transition: width 0.5s;
+  }
+  .progress-text { font-size: 11px; color: #9ca3af; }
+
+  .messages { flex: 1; overflow-y: auto; padding: 20px; }
+  .messages > div { max-width: 420px; margin: 0 auto; }
+
+  .msg { margin-bottom: 16px; }
+  .msg.space { margin-bottom: 20px; }
+  .msg-right { text-align: right; }
+  .msg-right .bubble { display: inline-block; background: #0d9488; color: #fff; border-radius: 16px; padding: 10px 16px; max-width: 80%; text-align: left; }
+  .msg-left .bubble { display: inline-block; background: #f3f4f6; color: #111827; border-radius: 16px; padding: 16px 20px; max-width: 85%; text-align: left; }
+  .bubble p { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+  .bubble p:last-child { margin-bottom: 0; }
+
+  .input-area {
+    padding: 12px 20px; border-top: 1px solid #e5e7eb;
+  }
+  .input-row { display: flex; gap: 10px; max-width: 420px; margin: 0 auto; }
+  .input-row input {
+    flex: 1; border: 1px solid #d1d5db; border-radius: 12px;
+    padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit;
+  }
+  .input-row input:focus { border-color: #0d9488; box-shadow: 0 0 0 2px rgba(13,148,136,0.15); }
+  .input-row button {
+    background: #0d9488; color: #fff; border: none; border-radius: 12px;
+    padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  /* ═══ LEFT: OLD ═══ */
+  .old { background: #fff; }
+  .old .side-label { background: #f3f4f6; color: #9ca3af; }
+  .old .lesson-title { font-size: 11px; font-weight: 500; color: #111827; }
+
+  /* Pagination arrows */
+  .arrows { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding-left: 4px; }
+  .arrows button {
+    width: 28px; height: 28px; border-radius: 50%; border: 1px solid #e5e7eb;
+    background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 14px;
+  }
+  .arrows span { font-size: 11px; color: #9ca3af; font-variant-numeric: tabular-nums; }
+
+  /* Old spinner */
+  .old-spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid #d1d5db; border-top-color: #0d9488;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-right: 8px; vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ═══ RIGHT: NEW ═══ */
+  .new {
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13,148,136,0.03) 0%, transparent 70%), #fff;
+  }
+  .new .side-label { background: #0d9488; color: #fff; }
+  .new .module-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; }
+  .new .lesson-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .new .guide-label { font-size: 9px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; margin-left: 4px; }
+
+  /* New AI message styling */
+  .new .msg-left .bubble {
+    box-shadow: 0 0 20px rgba(13,148,136,0.04), 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .new .msg-left .bubble::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 2px; border-radius: 1px;
+    background: linear-gradient(to bottom, #F5E642, #A8DB5A, #F4A79D, #6DD5D0);
+  }
+
+  /* Thinking dots */
+  .thinking-dots { display: flex; align-items: center; gap: 5px; padding: 8px 0; }
+  .tdot {
+    width: 7px; height: 7px; border-radius: 50%;
+    animation: tdot-pulse 1.2s ease-in-out infinite;
+  }
+  .tdot:nth-child(1) { background: #F5E642; animation-delay: 0ms; }
+  .tdot:nth-child(2) { background: #A8DB5A; animation-delay: 150ms; }
+  .tdot:nth-child(3) { background: #F4A79D; animation-delay: 300ms; }
+  @keyframes tdot-pulse {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Checkpoint celebration */
+  .checkpoint-banner {
+    max-width: 420px; margin: 0 auto 12px;
+    background: linear-gradient(90deg, rgba(245,230,66,0.08), rgba(168,219,90,0.08), rgba(244,167,157,0.08), rgba(109,213,208,0.08));
+    border: 1px solid rgba(13,148,136,0.15);
+    border-radius: 8px; padding: 8px 12px; text-align: center;
+    animation: checkpoint-anim 2.5s ease-out forwards;
+  }
+  @keyframes checkpoint-anim {
+    0% { opacity: 0; transform: translateY(-8px); }
+    15% { opacity: 1; transform: translateY(0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .checkpoint-banner .title { font-size: 13px; font-weight: 600; color: #0d9488; }
+  .checkpoint-banner .sub { font-size: 11px; color: #9ca3af; }
+
+  /* Stagger entrance for paragraphs */
+  .stagger-p { opacity: 0; animation: stagger-fade 400ms ease-out forwards; }
+  @keyframes stagger-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Completion banners */
+  .complete-old { background: rgba(13,148,136,0.05); border-left: 3px solid #0d9488; padding: 12px 20px; }
+  .complete-new { background: linear-gradient(90deg, rgba(245,230,66,0.06), rgba(168,219,90,0.06), rgba(244,167,157,0.06), rgba(109,213,208,0.06)); border-left: 3px solid #0d9488; padding: 12px 20px; }
+</style>
+</head>
+<body>
+
+<div class="split">
+
+  <!-- LEFT: OLD -->
+  <div class="side old">
+    <div class="side-label">Before</div>
+
+    <div class="header">
+      <div class="goal-box">
+        <div class="label">Goal</div>
+        <div class="text">Define your target customer and understand their needs.</div>
+      </div>
+      <div class="progress-row">
+        <span class="lesson-title">Define Your Target Customer</span>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <span class="progress-text">2/5</span>
+      </div>
+    </div>
+
+    <div class="messages">
+      <div>
+        <div class="msg msg-left">
+          <div class="bubble">
+            <p>Let's think about who your ideal customer really is. Not just "everyone" — but the specific person who would be MOST excited about what you're building.</p>
+          </div>
+          <div class="arrows">
+            <button>&lt;</button>
+            <span>1 / 3</span>
+            <button>&gt;</button>
+          </div>
+        </div>
+
+        <div class="msg msg-right">
+          <div class="bubble"><p>I think it would be teenagers who are into art and want to express themselves</p></div>
+        </div>
+
+        <div class="msg msg-left">
+          <div class="bubble">
+            <p>Good start! But "teenagers who are into art" is still pretty broad. Let's narrow it down.</p>
+          </div>
+          <div class="arrows">
+            <button>&lt;</button>
+            <span>1 / 2</span>
+            <button>&gt;</button>
+          </div>
+        </div>
+
+        <div class="msg msg-left">
+          <div class="bubble">
+            <p><span class="old-spinner"></span><span style="opacity:0.6">Thinking...</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <input type="text" placeholder="Type your response..." />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: NEW -->
+  <div class="side new">
+    <div class="side-label">After</div>
+
+    <div class="header">
+      <div class="goal-box">
+        <div class="label">Goal</div>
+        <div class="text">Define your target customer and understand their needs.</div>
+      </div>
+      <div class="progress-row">
+        <div>
+          <div class="module-label">Module 1</div>
+          <div class="lesson-title">Define Your Target Customer</div>
+        </div>
+        <div class="progress-bar thick"><div class="progress-fill"></div></div>
+        <span class="progress-text">2/5</span>
+      </div>
+    </div>
+
+    <!-- Checkpoint celebration (auto-fades) -->
+    <div style="padding: 0 20px; padding-top: 8px;">
+      <div class="checkpoint-banner">
+        <div class="title">Checkpoint reached</div>
+        <div class="sub">2/5 complete</div>
+      </div>
+    </div>
+
+    <div class="messages">
+      <div>
+        <div class="msg space msg-left">
+          <div class="guide-label">Guide</div>
+          <div class="bubble">
+            <p class="stagger-p" style="animation-delay:0ms">Let's think about who your ideal customer really is. Not just "everyone" — but the specific person who would be MOST excited about what you're building.</p>
+            <p class="stagger-p" style="animation-delay:150ms">Think about age, location, interests, and what problem they're trying to solve. The more specific you get, the easier everything else becomes.</p>
+            <p class="stagger-p" style="animation-delay:300ms">Who comes to mind first?</p>
+          </div>
+        </div>
+
+        <div class="msg space msg-right">
+          <div class="bubble"><p>I think it would be teenagers who are into art and want to express themselves</p></div>
+        </div>
+
+        <div class="msg space msg-left">
+          <div class="guide-label">Guide</div>
+          <div class="bubble">
+            <p class="stagger-p" style="animation-delay:0ms">Good start! But "teenagers who are into art" is still pretty broad. Let's narrow it down.</p>
+            <p class="stagger-p" style="animation-delay:150ms">Are we talking about 13-year-olds or 19-year-olds? City kids or suburban kids? Kids who draw for fun or kids applying to art school?</p>
+          </div>
+        </div>
+
+        <div class="msg space msg-left">
+          <div class="guide-label">Guide</div>
+          <div class="bubble">
+            <div class="thinking-dots">
+              <span class="tdot"></span>
+              <span class="tdot"></span>
+              <span class="tdot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area" style="background: rgba(249,250,251,0.8);">
+      <div class="input-row">
+        <input type="text" placeholder="What are you thinking?" />
+        <button>Send</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+</body>
+</html>

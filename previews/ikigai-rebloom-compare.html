@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Rebloom — Side-by-Side</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #000;
+    color: #fff;
+    font-family: 'Satoshi', sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .compare-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* Top bar */
+  .compare-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: #000;
+    z-index: 10;
+  }
+  .compare-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+  }
+  .compare-replay {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    padding: 10px 24px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.382s ease;
+  }
+  .compare-replay:hover {
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Three columns */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    flex: 1;
+    min-height: 0;
+  }
+  .compare-cell {
+    position: relative;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    background: #000;
+  }
+  .compare-cell:last-child { border-right: none; }
+
+  .compare-label {
+    position: absolute;
+    top: 18px; left: 18px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  @media (max-width: 1100px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    .compare-cell { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  }
+</style>
+</head>
+<body>
+<div class="compare-shell">
+  <div class="compare-bar">
+    <div class="compare-title">Ikigai Rebloom — Three Variations</div>
+    <button class="compare-replay" id="replayAll">Replay All</button>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-cell">
+      <div class="compare-label">A2 — Spiral Merge</div>
+      <iframe id="frameA" src="ikigai-rebloom-A2-spiral.html"></iframe>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-label">B2 — Venn Bloom</div>
+      <iframe id="frameB" src="ikigai-rebloom-B2-fold.html"></iframe>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-label">C2 — Tether & Draw</div>
+      <iframe id="frameC" src="ikigai-rebloom-C2-magnetic.html"></iframe>
+    </div>
+  </div>
+</div>
+<script>
+  const frames = ['frameA', 'frameB', 'frameC'].map(id => document.getElementById(id));
+  document.getElementById('replayAll').addEventListener('click', () => {
+    // Simplest, most robust restart: reload each iframe simultaneously.
+    // All three start their sequences from the same instant.
+    frames.forEach(f => { f.src = f.src; });
+  });
+</script>
+</body>
+</html>

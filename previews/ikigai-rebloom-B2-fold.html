@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptable — Ikigai Rebloom B2 — Venn Bloom</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /*
+   * ═══════════════════════════════════════════════════════════
+   * IKIGAI REBLOOM — VARIATION B2: VENN BLOOM
+   * ═══════════════════════════════════════════════════════════
+   *
+   * Four compass circles. Each slides toward the center along
+   * its axis, retains full size & color, becomes semi-transparent,
+   * and where they overlap they lighten-blend into new hues.
+   * They settle into the literal 4-circle Ikigai Venn diagram.
+   * HOLD. The sweet spot at the center brightens, swells, and
+   * the name-reveal pulse fires from it.
+   *
+   * Golden ratio (φ = 1.618034) governs all timing.
+   * Base = 1000ms.  φ intervals: 1000, 1618, 2618, 4236.
+   * 1/φ intervals: 618, 382, 236.
+   * ═══════════════════════════════════════════════════════════
+   */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Satoshi', sans-serif;
+  }
+
+  /* ═══════════════════════════════════════════
+     STAGE
+     ═══════════════════════════════════════════ */
+  .stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+
+  /* Tiny variation label top-left */
+  .variant-label {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    color: rgba(255, 255, 255, 0.32);
+    text-transform: uppercase;
+    z-index: 50;
+  }
+
+  /* Replay button bottom-right */
+  .replay-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.38);
+    padding: 11px 22px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.236em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.618s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 50;
+  }
+  .replay-btn:hover {
+    border-color: rgba(255, 255, 255, 0.38);
+    color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 30px rgba(74, 103, 65, 0.18);
+    transform: translateY(-1px);
+  }
+
+  /* Ambient glow — the hum of the space */
+  .ceremony-ambient-glow {
+    position: absolute;
+    width: 61.8vh;
+    height: 61.8vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(25, 50, 82, 0.09) 0%, transparent 61.8%);
+    animation: ceremony-glow-breathe 6.854s ease-in-out infinite;
+    z-index: 1;
+  }
+  @keyframes ceremony-glow-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.618; }
+    50% { transform: translate(-50%, -50%) scale(1.146); opacity: 1; }
+  }
+
+  /* Drifting particles — 21 Fibonacci */
+  .ceremony-particles { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(180, 200, 230, 0.09);
+    border-radius: 50%;
+    animation: drift 17.944s linear infinite;
+  }
+  .particle.near {
+    width: 3px;
+    height: 3px;
+    background: rgba(160, 190, 240, 0.14);
+  }
+  @keyframes drift {
+    from { transform: translateY(110vh); opacity: 0; }
+    8%, 92% { opacity: 0.8; }
+    to { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  /* ═══════════════════════════════════════════
+     IKIGAI WRAP
+     ═══════════════════════════════════════════ */
+  .ceremony-ik-wrap {
+    position: relative;
+    width: min(420px, 61.8vh);
+    aspect-ratio: 1 / 1;
+    z-index: 2;
+    /* isolation lets blend-mode stay local to the wrap */
+    isolation: isolate;
+  }
+
+  /* ═══════════════════════════════════════════
+     THE FOUR CIRCLES
+     Initial entrance identical to reference.
+     Positioning via left/top; we animate
+     left/top during the slide so the existing
+     translate(-50%,-50%) stays intact.
+     ═══════════════════════════════════════════ */
+  .ceremony-ik-circle {
+    position: absolute;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translate(-50%, -50%) scale(0.236);
+    /* Screen blend: colors add together where they overlap */
+    mix-blend-mode: screen;
+    will-change: left, top, opacity, filter;
+  }
+
+  /* ENTRANCE — exact reference keyframe */
+  .ceremony-ik-circle.reveal {
+    animation: ceremony-circle-birth 2.618s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes ceremony-circle-birth {
+    0%   { opacity: 0;     transform: translate(-50%, -50%) scale(0.236); filter: blur(10px); }
+    50%  { opacity: 0.382;                                                  filter: blur(3px); }
+    100% { opacity: 0.618; transform: translate(-50%, -50%) scale(1);       filter: blur(0); }
+  }
+
+  /* Compass positions */
+  .ceremony-ik-circle.c1 { background: #F5E642; left: 50%;   top: 19.1%; }  /* yellow  — top    */
+  .ceremony-ik-circle.c2 { background: #A8DB5A; left: 19.1%; top: 50%;   }  /* green   — left   */
+  .ceremony-ik-circle.c3 { background: #F4A79D; left: 80.9%; top: 50%;   }  /* peach   — right  */
+  .ceremony-ik-circle.c4 { background: #6DD5D0; left: 50%;   top: 80.9%; }  /* teal    — bottom */
+
+  /* ─── BREATHE after all four are revealed ───
+     Gentle shared breath before the slide.
+     3.236s total (2 × 1.618) */
+  .ceremony-ik-circle.breathing {
+    animation: ceremony-circle-breathe 3.236s ease-in-out forwards;
+  }
+  @keyframes ceremony-circle-breathe {
+    0%   { opacity: 0.618; filter: blur(0); }
+    50%  { opacity: 0.72;  filter: blur(0.5px); }
+    100% { opacity: 0.618; filter: blur(0); }
+  }
+
+  /* ─── VENN SLIDE — the heart of this variation ───
+     Each circle moves along its axis toward an
+     overlap position. Distance is chosen so the
+     four circles form a perfect 4-way Venn with
+     a visible central sweet-spot lens.
+     Move from 19.1/80.9 → 38.2/61.8
+     and         50→50 stays on orthogonal axis.
+     Duration 4.236s (φ³). Slow. Sacred. */
+  .ceremony-ik-circle.sliding {
+    animation-duration: 4.236s;
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+    animation-fill-mode: forwards;
+  }
+  .ceremony-ik-circle.c1.sliding { animation-name: venn-slide-c1; }
+  .ceremony-ik-circle.c2.sliding { animation-name: venn-slide-c2; }
+  .ceremony-ik-circle.c3.sliding { animation-name: venn-slide-c3; }
+  .ceremony-ik-circle.c4.sliding { animation-name: venn-slide-c4; }
+
+  @keyframes venn-slide-c1 {
+    0%   { left: 50%;   top: 19.1%; opacity: 0.618; }
+    100% { left: 50%;   top: 38.2%; opacity: 0.618; }
+  }
+  @keyframes venn-slide-c2 {
+    0%   { left: 19.1%; top: 50%;   opacity: 0.618; }
+    100% { left: 38.2%; top: 50%;   opacity: 0.618; }
+  }
+  @keyframes venn-slide-c3 {
+    0%   { left: 80.9%; top: 50%;   opacity: 0.618; }
+    100% { left: 61.8%; top: 50%;   opacity: 0.618; }
+  }
+  @keyframes venn-slide-c4 {
+    0%   { left: 50%;   top: 80.9%; opacity: 0.618; }
+    100% { left: 50%;   top: 61.8%; opacity: 0.618; }
+  }
+
+  /* Held Venn state after slide — keeps circles parked */
+  .ceremony-ik-circle.venn.c1 { left: 50%;   top: 38.2%; opacity: 0.618; filter: blur(0); }
+  .ceremony-ik-circle.venn.c2 { left: 38.2%; top: 50%;   opacity: 0.618; filter: blur(0); }
+  .ceremony-ik-circle.venn.c3 { left: 61.8%; top: 50%;   opacity: 0.618; filter: blur(0); }
+  .ceremony-ik-circle.venn.c4 { left: 50%;   top: 61.8%; opacity: 0.618; filter: blur(0); }
+
+  /* ─── BLOOM — sweet spot swells, circles dissolve outward ───
+     After the HOLD, circles gently expand and fade,
+     letting the central glow take over. */
+  .ceremony-ik-circle.blooming {
+    animation-duration: 2.618s;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.2, 1);
+    animation-fill-mode: forwards;
+  }
+  .ceremony-ik-circle.c1.blooming { animation-name: venn-bloom-c1; }
+  .ceremony-ik-circle.c2.blooming { animation-name: venn-bloom-c2; }
+  .ceremony-ik-circle.c3.blooming { animation-name: venn-bloom-c3; }
+  .ceremony-ik-circle.c4.blooming { animation-name: venn-bloom-c4; }
+
+  @keyframes venn-bloom-c1 {
+    0%   { left: 50%;   top: 38.2%; opacity: 0.618; filter: blur(0); }
+    38.2%{ opacity: 0.72; filter: blur(2px); }
+    100% { left: 50%;   top: 30%;   opacity: 0;     filter: blur(18px); }
+  }
+  @keyframes venn-bloom-c2 {
+    0%   { left: 38.2%; top: 50%;   opacity: 0.618; filter: blur(0); }
+    38.2%{ opacity: 0.72; filter: blur(2px); }
+    100% { left: 30%;   top: 50%;   opacity: 0;     filter: blur(18px); }
+  }
+  @keyframes venn-bloom-c3 {
+    0%   { left: 61.8%; top: 50%;   opacity: 0.618; filter: blur(0); }
+    38.2%{ opacity: 0.72; filter: blur(2px); }
+    100% { left: 70%;   top: 50%;   opacity: 0;     filter: blur(18px); }
+  }
+  @keyframes venn-bloom-c4 {
+    0%   { left: 50%;   top: 61.8%; opacity: 0.618; filter: blur(0); }
+    38.2%{ opacity: 0.72; filter: blur(2px); }
+    100% { left: 50%;   top: 70%;   opacity: 0;     filter: blur(18px); }
+  }
+
+  /* ═══════════════════════════════════════════
+     SWEET SPOT — the ikigai
+     Sits above the circles but behind the name.
+     Brightens → swells → fires the pulse.
+     ═══════════════════════════════════════════ */
+  .ceremony-sweet-spot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 11.8%;
+    height: 11.8%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0.382);
+    background: radial-gradient(circle,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(232, 238, 210, 0.7) 28.2%,
+      rgba(139, 158, 106, 0.45) 61.8%,
+      rgba(74, 103, 65, 0.15) 82%,
+      transparent 100%);
+    box-shadow:
+      0 0 28px rgba(255, 255, 255, 0.25),
+      0 0 56px rgba(139, 158, 106, 0.35),
+      0 0 112px rgba(74, 103, 65, 0.22);
+    opacity: 0;
+    z-index: 4;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .ceremony-sweet-spot.kindling {
+    animation: sweet-kindle 2.618s cubic-bezier(0.33, 0, 0.67, 1) forwards;
+  }
+  @keyframes sweet-kindle {
+    0%   { opacity: 0;    transform: translate(-50%, -50%) scale(0.382); }
+    50%  { opacity: 0.5;  transform: translate(-50%, -50%) scale(0.618); }
+    100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+  }
+  .ceremony-sweet-spot.swelling {
+    animation: sweet-swell 2.618s cubic-bezier(0.55, 0, 0.2, 1) forwards;
+  }
+  @keyframes sweet-swell {
+    0%   {
+      opacity: 0.85;
+      transform: translate(-50%, -50%) scale(1);
+      box-shadow:
+        0 0 28px rgba(255, 255, 255, 0.25),
+        0 0 56px rgba(139, 158, 106, 0.35),
+        0 0 112px rgba(74, 103, 65, 0.22);
+    }
+    38.2% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(2.618);
+      box-shadow:
+        0 0 80px rgba(255, 255, 255, 0.7),
+        0 0 160px rgba(139, 158, 106, 0.55),
+        0 0 280px rgba(74, 103, 65, 0.3);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(4.236);
+      box-shadow:
+        0 0 40px rgba(255, 255, 255, 0.1),
+        0 0 80px rgba(139, 158, 106, 0.05),
+        0 0 160px rgba(74, 103, 65, 0.02);
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     BUSINESS NAME — untouched pulse
+     Fades in 2.618s, font 44px, strong shadow
+     softening from 60+120 → 28+56.
+     ═══════════════════════════════════════════ */
+  .ceremony-biz-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ceremony-biz-wrap.birthing {
+    animation:
+      ceremony-name-fade 2.618s ease-out forwards,
+      ceremony-name-glow 2.618s ease-out forwards;
+  }
+  @keyframes ceremony-name-fade {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes ceremony-name-glow {
+    0% {
+      filter:
+        drop-shadow(0 0 60px rgba(255, 255, 255, 0.9))
+        drop-shadow(0 0 120px rgba(74, 103, 65, 0.8));
+    }
+    100% {
+      filter:
+        drop-shadow(0 0 28px rgba(74, 103, 65, 0.5))
+        drop-shadow(0 0 56px rgba(139, 158, 106, 0.2));
+    }
+  }
+  .ceremony-biz-name {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow:
+      0 0 28px rgba(74, 103, 65, 0.5),
+      0 0 56px rgba(139, 158, 106, 0.2);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.2s !important;
+    }
+    .particle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="variant-label">Variation B2 — Venn Bloom</div>
+
+<div class="stage">
+  <div class="ceremony-particles" id="particles"></div>
+  <div class="ceremony-ambient-glow"></div>
+
+  <div class="ceremony-ik-wrap" id="wrap">
+    <div class="ceremony-ik-circle c1" id="c1"></div>
+    <div class="ceremony-ik-circle c2" id="c2"></div>
+    <div class="ceremony-ik-circle c3" id="c3"></div>
+    <div class="ceremony-ik-circle c4" id="c4"></div>
+
+    <div class="ceremony-sweet-spot" id="sweet"></div>
+
+    <div class="ceremony-biz-wrap" id="biz">
+      <span class="ceremony-biz-name">Cristal&rsquo;s Art Studio</span>
+    </div>
+  </div>
+</div>
+
+<button class="replay-btn" id="replay" onclick="runScene()">Replay</button>
+
+<script>
+  /*
+   * VENN BLOOM ORCHESTRATOR
+   * All timing based on φ = 1.618
+   */
+  const PHI = 1.618034;
+  const BASE = 1000;
+
+  // ─── particles (21 = Fibonacci) ───
+  const particlesEl = document.getElementById('particles');
+  (function seedParticles() {
+    for (let i = 0; i < 21; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle' + (i % 3 === 0 ? ' near' : '');
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.animationDelay = (Math.random() * 6.854) + 's';
+      p.style.animationDuration = (11.09 + Math.random() * 6.854) + 's';
+      particlesEl.appendChild(p);
+    }
+  })();
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function resetCircle(id) {
+    const el = document.getElementById(id);
+    el.className = 'ceremony-ik-circle ' + id.replace('c', 'c'); // keep c1/c2/...
+    // force reflow so animations can replay
+    void el.offsetWidth;
+  }
+
+  function resetScene() {
+    ['c1', 'c2', 'c3', 'c4'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'ceremony-ik-circle ' + id;
+      void el.offsetWidth;
+    });
+    const sweet = document.getElementById('sweet');
+    sweet.className = 'ceremony-sweet-spot';
+    void sweet.offsetWidth;
+
+    const biz = document.getElementById('biz');
+    biz.className = 'ceremony-biz-wrap';
+    void biz.offsetWidth;
+  }
+
+  async function runScene() {
+    resetScene();
+
+    const c = ['c1', 'c2', 'c3', 'c4'].map(id => document.getElementById(id));
+    const sweet = document.getElementById('sweet');
+    const biz = document.getElementById('biz');
+
+    // ─── ACT I — ENTRANCE ───
+    // Circles emerge one by one, 1.618s stagger.
+    // Birth is 2.618s each; last one finishes at 2.618 + 3×1.618 ≈ 7.47s.
+    await sleep(0.618 * BASE);              // brief breath before first
+    for (let i = 0; i < 4; i++) {
+      c[i].classList.add('reveal');
+      if (i < 3) await sleep(1.618 * BASE);
+    }
+    // Wait for the last circle to finish its birth
+    await sleep(2.618 * BASE);
+
+    // ─── ACT I.5 — SHARED BREATH (3.236s) ───
+    // All four breathe together before they find each other.
+    c.forEach(el => el.classList.add('breathing'));
+    await sleep(3.236 * BASE);
+    // Clear breathing; keep reveal (end state 0.618 opacity).
+    c.forEach(el => el.classList.remove('breathing'));
+
+    // ─── ACT II — VENN SLIDE (4.236s) ───
+    // Four parts of a single thing finally finding each other.
+    c.forEach(el => el.classList.add('sliding'));
+    await sleep(4.236 * BASE);
+    // Lock the Venn state (so animations can be removed cleanly).
+    c.forEach(el => {
+      el.classList.remove('sliding');
+      el.classList.add('venn');
+    });
+
+    // ─── ACT III — HOLD THE IKIGAI DIAGRAM (2.618s) ───
+    // THIS is what the student has been building. Let them see it.
+    await sleep(2.618 * BASE);
+
+    // ─── ACT IV — SWEET SPOT KINDLES (2.618s, overlaps next) ───
+    sweet.classList.add('kindling');
+    await sleep(1.618 * BASE);  // let kindling get bright before bloom begins
+
+    // ─── ACT V — BLOOM (circles dissolve outward, sweet spot swells) ───
+    c.forEach(el => {
+      el.classList.remove('venn');
+      el.classList.add('blooming');
+    });
+    // Wait briefly for kindling to finish naturally, then start the swell.
+    await sleep(1.0 * BASE);
+    sweet.classList.remove('kindling');
+    sweet.classList.add('swelling');
+
+    // Name fires from the sweet spot at the peak of the swell (~38.2%).
+    await sleep(1.0 * BASE);
+
+    // ─── ACT VI — NAME PULSE (2.618s) — unchanged ───
+    biz.classList.add('birthing');
+    await sleep(2.618 * BASE);
+
+    // ─── ACT VII — HOLD THE NAME (3s) ───
+    await sleep(3 * BASE);
+  }
+
+  runScene();
+</script>
+
+</body>
+</html>
