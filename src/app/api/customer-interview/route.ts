@@ -9,7 +9,8 @@ export async function POST(request: Request) {
   // CSRF protection
   const { validateOrigin } = await import("@/lib/csrf");
   if (!validateOrigin(request)) {
-    return new Response("Forbidden", { status: 403 });
+    console.error("[customer-interview] CSRF blocked request");
+    return Response.json({ error: "Request blocked. Please refresh the page and try again." }, { status: 403 });
   }
 
   const supabase = await createClient();
