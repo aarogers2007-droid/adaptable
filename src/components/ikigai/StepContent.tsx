@@ -96,13 +96,13 @@ export default function StepContent({
 
       {/* Title */}
       <div className="px-6 pt-8 pb-2 text-center">
-        <h2 className="font-[family-name:var(--font-display)] text-4xl font-bold text-[var(--text-primary)]">
+        <h2 className="font-[family-name:var(--font-display)] text-5xl font-bold" style={{ color: "#111827" }}>
           {step.label}
         </h2>
-        <p className="mt-3 text-base text-[var(--text-primary)]/70 max-w-lg mx-auto">
+        <p className="mt-3 text-lg max-w-lg mx-auto" style={{ color: "#1f2937" }}>
           {step.question}
         </p>
-        <p className="mt-2 text-sm text-[var(--text-primary)]/40">
+        <p className="mt-2 text-sm" style={{ color: "rgba(17,24,39,0.5)" }}>
           Pick 2-3 that feel most like you, or type your own
         </p>
       </div>
@@ -129,12 +129,12 @@ export default function StepContent({
                   <button
                     key={item}
                     onClick={() => toggleItem(item)}
-                    className={`chip-enter rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 ${
+                    className={`chip-enter rounded-full px-5 py-3 text-base font-medium transition-all duration-150 ${
                       isSelected
-                        ? "bg-[var(--text-primary)] text-white shadow-lg scale-105"
-                        : "bg-white/70 text-[var(--text-primary)] hover:bg-white hover:shadow-md"
+                        ? "bg-[#111827] text-white shadow-lg scale-105"
+                        : "bg-white/70 hover:bg-white hover:shadow-md"
                     }`}
-                    style={{ animationDelay: `${idx * 60}ms` }}
+                    style={{ animationDelay: `${idx * 60}ms`, ...(!isSelected ? { color: "#1f2937" } : {}) }}
                   >
                     {isSelected && <span className="mr-1.5">&#10003;</span>}
                     {item}

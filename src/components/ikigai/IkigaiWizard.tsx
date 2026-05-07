@@ -497,10 +497,10 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAd
           }}
         >
           <div className="max-w-md w-full text-center">
-            <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
+            <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold text-[var(--text-primary)]">
               What&apos;s your name?
             </h1>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            <p className="mt-3 text-base text-[var(--text-secondary)]">
               We&apos;ll use this to personalize your business idea.
             </p>
             <input
@@ -519,7 +519,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAd
             <button
               onClick={handleNameConfirm}
               disabled={!studentName.trim()}
-              className="mt-4 w-full rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-50 transition-colors"
+              className="mt-4 w-full rounded-lg bg-[var(--primary)] px-6 py-3.5 text-base font-semibold text-white hover:bg-[var(--primary-dark)] disabled:opacity-50 transition-colors"
             >
               Continue
             </button>
