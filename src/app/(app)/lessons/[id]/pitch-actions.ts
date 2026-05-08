@@ -48,8 +48,11 @@ export async function savePitch(moduleSequence: number, pitchText: string) {
 
   // Get AI feedback
   try {
-    const aiResult = await sendMessage({
-      feature: "pitch",
+    const { sendMessageAuto } = await import("@/lib/ai");
+    const { getModel } = await import("@/lib/model-config");
+    const aiResult = await sendMessageAuto({
+      model: getModel("pitch_feedback"),
+      maxTokens: 1024,
       systemPrompt: `You are a warm, insightful AI mentor. A student just pitched their business to you as if you were a brand new customer.
 
 Your response should:

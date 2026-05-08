@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendMessage } from "@/lib/ai";
+import { sendMessageAuto } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 
 export async function generateReengagementTeaser(studentId: string) {
   const supabase = await createClient();
@@ -60,8 +61,9 @@ export async function generateReengagementTeaser(studentId: string) {
   const teaserSystemPrompt = `Generate a 1-sentence teaser message from an AI co-founder to a student who hasn't engaged in a while. The student's business is "${businessIdea.name}" — ${businessIdea.niche}. Make it specific and curiosity-driven, like "I had an idea about your pricing" or "I think I know who your first customer should be". Never say "come back" or "we miss you". Sound like a friend with an idea, not a notification. Return ONLY the teaser sentence, nothing else.`;
 
   try {
-    const { text } = await sendMessage({
-      feature: "checkin",
+    const { text } = await sendMessageAuto({
+      model: getModel("reengagement"),
+      maxTokens: 800,
       systemPrompt: teaserSystemPrompt,
       messages: [
         {

@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendMessage } from "@/lib/ai";
+import { sendMessageAuto } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 import { moderateContent } from "@/lib/content-moderation";
 
 export async function submitCheckIn(prompt: string, response: string) {
@@ -86,8 +87,9 @@ export async function submitCheckIn(prompt: string, response: string) {
 
   // Get AI reply
   try {
-    const aiResult = await sendMessage({
-      feature: "checkin",
+    const aiResult = await sendMessageAuto({
+      model: getModel("checkin_reply"),
+      maxTokens: 800,
       systemPrompt:
         "You are a warm, encouraging AI co-founder. A student just shared a daily reflection about their business. Respond in 1-2 sentences. Be specific to what they said. No generic encouragement.",
       messages: [
@@ -108,7 +110,7 @@ export async function submitCheckIn(prompt: string, response: string) {
     await supabase.from("ai_usage_log").insert({
       student_id: user.id,
       feature: "checkin",
-      model: "claude-haiku-4-5-20251001",
+      model: aiResult.model_used,
       input_tokens: aiResult.usage.input_tokens,
       output_tokens: aiResult.usage.output_tokens,
       estimated_cost_usd:

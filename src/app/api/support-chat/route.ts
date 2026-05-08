@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { sendMessage } from "@/lib/ai";
+import { sendMessageAuto } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 import { moderateContent } from "@/lib/content-moderation";
-import type { AIFeature } from "@/lib/ai";
 
 const SUPPORT_SYSTEM_PROMPT = `You are the Adaptable support assistant. You help students and teachers resolve issues with the platform quickly and clearly.
 
@@ -115,9 +115,10 @@ export async function POST(request: Request) {
     { role: "user", content: message },
   ];
 
-  // Call Claude (non-streaming for simplicity in support chat)
-  const result = await sendMessage({
-    feature: "checkin" as AIFeature, // Uses Haiku, 800 tokens — good enough for support
+  // Call AI (non-streaming for simplicity in support chat)
+  const result = await sendMessageAuto({
+    model: getModel("support"),
+    maxTokens: 800,
     systemPrompt: SUPPORT_SYSTEM_PROMPT + `\n\nUser: ${userName} (${userRole})`,
     messages,
   });

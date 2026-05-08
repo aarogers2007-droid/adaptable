@@ -1,5 +1,6 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { sendMessageAuto } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 
 // ---------------------------------------------------------------------------
 // Founder's Mirror — prompt generation
@@ -8,8 +9,6 @@ import Anthropic from "@anthropic-ai/sdk";
 // Founder's Log. It states one factual observation and asks one question.
 // No advice, praise, reframing, encouragement, or suggestions — ever.
 // ---------------------------------------------------------------------------
-
-const anthropic = new Anthropic();
 
 // --- Types ------------------------------------------------------------------
 
@@ -33,9 +32,7 @@ const MIRROR_SYSTEM_PROMPT =
   "Maximum 40 words total. NO advice, praise, reframing, encouragement, or suggestions. " +
   "You are a mirror, not a teacher. State what you see. Ask what they see.";
 
-const MIRROR_MODEL = "claude-haiku-4-5-20251001";
 const MIRROR_MAX_TOKENS = 100;
-const MIRROR_TIMEOUT_MS = 5_000;
 
 export const MIRROR_FALLBACK = "You're here. That's the first step. What's on your mind?";
 
@@ -109,18 +106,14 @@ function assembleUserMessage(ctx: MirrorContext): string {
  */
 export async function generateMirrorPrompt(context: MirrorContext): Promise<string> {
   try {
-    const response = await anthropic.messages.create(
-      {
-        model: MIRROR_MODEL,
-        max_tokens: MIRROR_MAX_TOKENS,
-        system: MIRROR_SYSTEM_PROMPT,
-        messages: [{ role: "user", content: assembleUserMessage(context) }],
-      },
-      { timeout: MIRROR_TIMEOUT_MS },
-    );
+    const result = await sendMessageAuto({
+      model: getModel("mirror"),
+      maxTokens: MIRROR_MAX_TOKENS,
+      systemPrompt: MIRROR_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: assembleUserMessage(context) }],
+    });
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    const text = textBlock?.text?.trim() ?? "";
+    const text = result.text.trim();
 
     if (!text || !validateMirrorPrompt(text)) {
       return MIRROR_FALLBACK;

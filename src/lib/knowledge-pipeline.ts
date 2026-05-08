@@ -92,10 +92,12 @@ export async function challengeContent(
   topic: string,
   researcherOutput: string
 ): Promise<KnowledgeChunk | null> {
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
-    system: `You are a skeptical, smart 16-year-old entrepreneur who has heard a lot of generic business advice and is tired of it. You're reviewing educational content that an AI researcher prepared.
+  const { sendMessageAuto } = await import("@/lib/ai");
+  const { getModel } = await import("@/lib/model-config");
+  const aiResult = await sendMessageAuto({
+    model: getModel("kb_agent_2"),
+    maxTokens: 4096,
+    systemPrompt: `You are a skeptical, smart 16-year-old entrepreneur who has heard a lot of generic business advice and is tired of it. You're reviewing educational content that an AI researcher prepared.
 
 Your job:
 1. Read the researcher's output
@@ -126,11 +128,10 @@ Now challenge this content. Ask the hard questions. Make it real for a teenager 
     ],
   });
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock?.text) return null;
+  if (!aiResult.text) return null;
 
   try {
-    const challengeResult = JSON.parse(textBlock.text);
+    const challengeResult = JSON.parse(aiResult.text);
     const researchResult = JSON.parse(researcherOutput);
 
     // Merge into final knowledge chunk

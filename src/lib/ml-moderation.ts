@@ -62,8 +62,11 @@ export async function moderateContentML(text: string): Promise<MLModerationResul
   }
 
   try {
-    const result = await sendMessage({
-      feature: "moderation",
+    const { sendMessageAuto } = await import("@/lib/ai");
+    const { getModel } = await import("@/lib/model-config");
+    const result = await sendMessageAuto({
+      model: getModel("moderation"),
+      maxTokens: 200,
       systemPrompt: SYSTEM_PROMPT,
       messages: [
         {

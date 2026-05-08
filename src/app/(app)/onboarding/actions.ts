@@ -29,8 +29,11 @@ export async function generateSuggestions(
     const promptFn = STEP_PROMPTS[step];
     if (!promptFn) return { suggestions: [], error: "Invalid step" };
 
-    const result = await sendMessage({
-      feature: "ikigai",
+    const { sendMessageAuto } = await import("@/lib/ai");
+    const { getModel } = await import("@/lib/model-config");
+    const result = await sendMessageAuto({
+      model: getModel("ikigai_suggestions"),
+      maxTokens: 1024,
       systemPrompt:
         "You help teenagers discover their business niche through the Ikigai framework. Be encouraging, specific, and age-appropriate. Always return valid JSON arrays.",
       messages: [{ role: "user", content: promptFn(draft) }],

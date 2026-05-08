@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendMessage } from "@/lib/ai";
+import { sendMessageAuto } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 import type { Profile } from "@/lib/types";
 
 /**
@@ -40,8 +41,9 @@ export async function generateCheckin() {
   const completedCount = (progressRes.data ?? []).filter((p) => p.status === "completed").length;
   const inProgressCount = (progressRes.data ?? []).filter((p) => p.status === "in_progress").length;
 
-  const result = await sendMessage({
-    feature: "checkin",
+  const result = await sendMessageAuto({
+    model: getModel("checkin"),
+    maxTokens: 800,
     systemPrompt: "You are a supportive AI mentor for a student entrepreneur. Give a brief, encouraging weekly check-in. Reference their specific business. Suggest one concrete next step. Keep it to 2-3 sentences.",
     messages: [{
       role: "user",
@@ -59,7 +61,7 @@ export async function generateCheckin() {
   await supabase.from("ai_usage_log").insert({
     student_id: user.id,
     feature: "checkin",
-    model: "claude-haiku-4-5-20251001",
+    model: result.model_used,
     input_tokens: result.usage.input_tokens,
     output_tokens: result.usage.output_tokens,
     estimated_cost_usd: (result.usage.input_tokens * 0.25 + result.usage.output_tokens * 1.25) / 1_000_000,
@@ -91,8 +93,9 @@ export async function generateRecommendations() {
 
   if (!typedProfile?.business_idea) return { error: "No business idea" };
 
-  const result = await sendMessage({
-    feature: "recommendations",
+  const result = await sendMessageAuto({
+    model: getModel("recommendations"),
+    maxTokens: 1200,
     systemPrompt: "Generate business examples for a student entrepreneur. Return a JSON array of 3-5 objects, each with: business_name, description, pricing, customer_acquisition, key_lesson. Use real-sounding examples relevant to the niche. These are AI-generated illustrative examples for learning purposes.",
     messages: [{
       role: "user",
@@ -101,7 +104,13 @@ export async function generateRecommendations() {
   });
 
   try {
-    const recs = JSON.parse(result.text);
+    const parsed = JSON.parse(result.text);
+    // Validate structure: must be array of objects with expected fields
+    if (!Array.isArray(parsed)) throw new Error("Not an array");
+    const recs = parsed.filter((r: Record<string, unknown>) =>
+      r && typeof r === "object" && typeof r.business_name === "string" && typeof r.description === "string"
+    ).slice(0, 5);
+    if (recs.length === 0) throw new Error("No valid recommendations");
 
     // Cache on profile
     await supabase
@@ -113,7 +122,7 @@ export async function generateRecommendations() {
     await supabase.from("ai_usage_log").insert({
       student_id: user.id,
       feature: "recommendations",
-      model: "claude-haiku-4-5-20251001",
+      model: result.model_used,
       input_tokens: result.usage.input_tokens,
       output_tokens: result.usage.output_tokens,
       estimated_cost_usd: (result.usage.input_tokens * 0.25 + result.usage.output_tokens * 1.25) / 1_000_000,

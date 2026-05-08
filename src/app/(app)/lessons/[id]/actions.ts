@@ -46,8 +46,11 @@ export async function submitExercise(
   const niche = (profileData?.business_idea as { niche: string } | null)?.niche ?? "their niche";
 
   try {
-    const result = await sendMessage({
-      feature: "guide",
+    const { sendMessageAuto } = await import("@/lib/ai");
+    const { getModel } = await import("@/lib/model-config");
+    const result = await sendMessageAuto({
+      model: getModel("exercise_feedback"),
+      maxTokens: 1024,
       systemPrompt: `You are a venture studio mentor evaluating a student's exercise response. The student is designing a venture called "${businessName}" in the "${niche}" space.
 
 Your job is to evaluate whether their response meets the exercise requirements. Be encouraging but honest. A teenager wrote this, so calibrate your expectations for their age, but still require genuine effort and specificity.
