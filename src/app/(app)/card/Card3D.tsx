@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { useBranding } from "@/components/BrandingProvider";
 
 interface Card3DProps {
   businessName: string;
@@ -112,6 +113,7 @@ export default function Card3D(props: Card3DProps) {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const isFlipped = forceFlipped ?? false;
+  const branding = useBranding();
   const [isHovering, setIsHovering] = useState(false);
   const [lightX, setLightX] = useState(50);
   const [lightY, setLightY] = useState(50);
@@ -427,7 +429,7 @@ export default function Card3D(props: Card3DProps) {
                 letterSpacing: "0.05em",
               }}
             >
-              Adaptable
+              {branding.platform_name}
             </div>
           </div>
         )}

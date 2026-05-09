@@ -3,10 +3,11 @@ import { sendMessageAuto } from "@/lib/ai";
 import { getModel } from "@/lib/model-config";
 import { moderateContent } from "@/lib/content-moderation";
 
-const SUPPORT_SYSTEM_PROMPT = `You are the Adaptable support assistant. You help students and teachers resolve issues with the platform quickly and clearly.
+function buildSupportPrompt(brandName: string) {
+  return `You are the ${brandName} support assistant. You help students and teachers resolve issues with the platform quickly and clearly.
 
 WHAT YOU KNOW:
-- Adaptable is an AI venture studio where students design real businesses
+- ${brandName} is an AI venture studio where students design real businesses
 - Students complete an Ikigai wizard to discover their business idea (4 circles: passions, skills, needs, monetization)
 - There are 22 lessons across 6 modules, taught by a conversational AI mentor
 - Invention Mode is a separate flow with 5 circles (Wish, Mind, Lens, Scale, Voice) for group events
@@ -40,6 +41,7 @@ RULES:
 
 ESCALATION TRIGGER:
 If the issue cannot be resolved with the instructions above, respond normally but end your message with the exact tag [ESCALATE] on its own line. This signals the system to log the issue for manual review. Do not tell the user about this tag.`;
+}
 
 // Rate limiting: 20 messages per hour per user
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -83,12 +85,16 @@ export async function POST(request: Request) {
   // Get user info for context
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, role")
+    .select("full_name, role, org_id")
     .eq("id", user.id)
     .single();
 
   const userName = profile?.full_name ?? "User";
   const userRole = profile?.role ?? "student";
+
+  // Fetch org brand name for the support prompt
+  const { getOrgBrandName } = await import("@/lib/get-tenant-branding");
+  const brandName = await getOrgBrandName((profile as Record<string, unknown>)?.org_id as string | null);
 
   // Load or create conversation
   let convoId = conversationId;
@@ -119,7 +125,7 @@ export async function POST(request: Request) {
   const result = await sendMessageAuto({
     model: getModel("support"),
     maxTokens: 800,
-    systemPrompt: SUPPORT_SYSTEM_PROMPT + `\n\nUser: ${userName} (${userRole})`,
+    systemPrompt: buildSupportPrompt(brandName) + `\n\nUser: ${userName} (${userRole})`,
     messages,
   });
 

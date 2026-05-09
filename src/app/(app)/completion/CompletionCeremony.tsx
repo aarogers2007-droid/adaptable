@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useBranding } from "@/components/BrandingProvider";
 
 const PHI = 1.618034;
 const BASE = 1000;
@@ -52,6 +53,7 @@ export default function CompletionCeremony({
   showAnswerLabels = false,
   demoMode = false,
 }: CeremonyProps) {
+  const branding = useBranding();
   const [activeScene, setActiveScene] = useState<Scene>(demoMode ? "reveal" : "letter");
   const [exitingScene, setExitingScene] = useState<Scene | null>(null);
   const [letterPhase, setLetterPhase] = useState<"hidden" | "p1" | "p2" | "sig" | "reading" | "fading">("hidden");
@@ -278,7 +280,7 @@ export default function CompletionCeremony({
           </p>
           <p className={`ceremony-letter-signature ${letterPVisible("sig")}`}>
             <span className="ceremony-letter-name">&mdash; AJ Rogers, age 19</span>
-            <span className="ceremony-letter-title">Founder of Adaptable</span>
+            <span className="ceremony-letter-title">Founder of {branding.platform_name}</span>
           </p>
         </div>
       </div>
@@ -364,11 +366,11 @@ export default function CompletionCeremony({
       {/* Scene 4: Diploma */}
       <div className={sceneClass("diploma")}>
         <div className="ceremony-diploma">
-          <div className="ceremony-diploma-institution">Adaptable Venture Program</div>
+          <div className="ceremony-diploma-institution">{branding.platform_name} Venture Program</div>
           <div className="ceremony-diploma-title">Certificate of Completion</div>
           <div className="ceremony-diploma-name">{studentName}</div>
           <div className="ceremony-diploma-body">
-            has completed the Adaptable Venture Program and designed{" "}
+            has completed the {branding.platform_name} Venture Program and designed{" "}
             <strong>{businessName}</strong>, {businessNiche}
           </div>
           <div className="ceremony-diploma-date">

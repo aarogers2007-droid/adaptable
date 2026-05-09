@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useBranding } from "@/components/BrandingProvider";
 
 function computeAge(dob: string): number | null {
   if (!dob) return null;
@@ -17,6 +18,7 @@ function computeAge(dob: string): number | null {
 }
 
 export default function SignupPage() {
+  const branding = useBranding();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,7 +55,7 @@ export default function SignupPage() {
     if (tooYoung) {
       setError(inventionMode
         ? "This event is for students age 11 and older."
-        : "Adaptable is for students age 12 and older. If you're younger, please come back when you're 12.");
+        : "${branding.platform_name} is for students age 12 and older. If you're younger, please come back when you're 12.");
       return;
     }
 
@@ -242,7 +244,7 @@ export default function SignupPage() {
                 className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
               />
               <p className="mt-1 text-xs text-[var(--text-muted)]">
-                We need this to make sure Adaptable is right for you. Adaptable is for ages 12+.
+                We need this to make sure {branding.platform_name} is right for you. {branding.platform_name} is for ages 12+.
               </p>
             </div>
 
@@ -267,7 +269,7 @@ export default function SignupPage() {
 
             {tooYoung && (
               <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-xs text-red-900">
-                Adaptable is for students age 12 and older. Come back when you&apos;re 12!
+                ${branding.platform_name} is for students age 12 and older. Come back when you&apos;re 12!
               </div>
             )}
 

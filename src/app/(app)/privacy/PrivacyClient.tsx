@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { exportStudentData, requestDeletion, cancelDeletion } from "@/lib/data-rights";
+import { useBranding } from "@/components/BrandingProvider";
 
 interface PendingDeletion {
   id: string;
@@ -15,6 +16,7 @@ interface PrivacyClientProps {
 }
 
 export default function PrivacyClient({ studentId, pendingDeletion }: PrivacyClientProps) {
+  const branding = useBranding();
   const [pending, setPending] = useState<PendingDeletion | null>(pendingDeletion);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [deleteStatus, setDeleteStatus] = useState<string | null>(null);
@@ -95,7 +97,7 @@ export default function PrivacyClient({ studentId, pendingDeletion }: PrivacyCli
         <h2 className="text-lg font-semibold text-[var(--text-primary)]">Download your data</h2>
         <p className="mt-1 text-sm text-[var(--text-secondary)]">
           Get a complete JSON file containing your profile, business idea, lessons, conversations,
-          progress, and every interaction you&apos;ve had with Adaptable. You can take this anywhere.
+          progress, and every interaction you&apos;ve had with {branding.platform_name}. You can take this anywhere.
         </p>
         <button
           onClick={handleExport}
