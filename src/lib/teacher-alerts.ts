@@ -114,25 +114,63 @@ export async function alertCrisis(
   matchedText: string,
   flaggedMessage: string,
   feature: string,
-): Promise<{ alertId: string; classId: string; instructorId: string | null } | null> {
-  // Find the student's class + instructor in one query
+): Promise<{ alertId: string; classId: string; instructorId: string | null; orgAdminEmail: string | null; parentEmail: string | null; region: string } | null> {
+  // Find the student's class + instructor
   const { data: enrollment } = await supabase
     .from("class_enrollments")
-    .select("class_id, classes(instructor_id)")
+    .select("class_id, classes(instructor_id, org_id)")
     .eq("student_id", studentId)
     .limit(1)
-    .single<{ class_id: string; classes: { instructor_id: string } | null }>();
+    .single<{ class_id: string; classes: { instructor_id: string; org_id: string } | null }>();
 
-  if (!enrollment) return null;
+  const classId = enrollment?.class_id ?? "no-class";
+  const instructorId = enrollment?.classes?.instructor_id ?? null;
+  const orgId = enrollment?.classes?.org_id ?? null;
 
-  const classId = enrollment.class_id;
-  const instructorId = enrollment.classes?.instructor_id ?? null;
+  // Get org info (region, admin email) — try from enrollment first, then profile
+  let region = "US";
+  let orgAdminEmail: string | null = null;
+  let orgName = "the program";
 
-  // Insert without deduplication — every crisis signal must surface
+  const profileOrgId = orgId ?? await supabase
+    .from("profiles")
+    .select("org_id")
+    .eq("id", studentId)
+    .single()
+    .then(r => (r.data as { org_id: string } | null)?.org_id ?? null);
+
+  if (profileOrgId) {
+    const { data: org } = await supabase
+      .from("organizations")
+      .select("region, org_admin_alert_email, name")
+      .eq("id", profileOrgId)
+      .single();
+    if (org) {
+      region = (org as Record<string, unknown>).region as string ?? "US";
+      orgAdminEmail = (org as Record<string, unknown>).org_admin_alert_email as string ?? null;
+      orgName = org.name ?? "the program";
+    }
+  }
+
+  // Get verified parent email (if exists)
+  let parentEmail: string | null = null;
+  const { data: consent } = await supabase
+    .from("student_consent")
+    .select("consenting_party_email")
+    .eq("student_id", studentId)
+    .eq("consent_type", "parental_verified")
+    .is("revoked_at", null)
+    .limit(1)
+    .single();
+  if (consent?.consenting_party_email) {
+    parentEmail = consent.consenting_party_email;
+  }
+
+  // Insert alert — works even for classless students
   const { data: inserted, error } = await supabase
     .from("teacher_alerts")
     .insert({
-      class_id: classId,
+      class_id: classId !== "no-class" ? classId : null,
       student_id: studentId,
       alert_type: "crisis",
       severity: "urgent",
@@ -140,10 +178,11 @@ export async function alertCrisis(
       context: {
         crisis_type: crisisType,
         matched_phrase: matchedText.slice(0, 100),
-        surrounding_message: flaggedMessage.slice(0, 500),
         feature,
         timestamp: new Date().toISOString(),
         requires_immediate_attention: true,
+        org_name: orgName,
+        region,
       },
       crisis_type: crisisType,
       severity_at_creation: "urgent",
@@ -153,11 +192,18 @@ export async function alertCrisis(
     .single<{ id: string }>();
 
   if (error || !inserted) {
-    console.error("[alertCrisis] failed to insert alert", error);
+    // CRITICAL: classless student with no class — log to server
+    console.error("[alertCrisis] CRITICAL: failed to insert crisis alert", {
+      studentId,
+      crisisType,
+      feature,
+      hasEnrollment: !!enrollment,
+      error,
+    });
     return null;
   }
 
-  return { alertId: inserted.id, classId, instructorId };
+  return { alertId: inserted.id, classId, instructorId, orgAdminEmail, parentEmail, region };
 }
 
 /**

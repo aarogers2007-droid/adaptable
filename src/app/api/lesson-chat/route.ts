@@ -79,29 +79,41 @@ export async function POST(request: Request) {
         message,
         "lesson-chat"
       );
-      if (!result || !result.instructorId) return;
+      if (!result) return;
 
-      // Look up instructor email and send the real-time notification.
-      const { data: instructor } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("id", result.instructorId)
-        .single();
-      if (!instructor?.email) {
-        console.error("[crisis] instructor email missing for", result.instructorId);
-        return;
+      // Build recipient list: teacher + org admin + parent
+      const recipients: string[] = [];
+      if (result.instructorId) {
+        const { data: instructor } = await supabase.from("profiles").select("email").eq("id", result.instructorId).single();
+        if (instructor?.email) recipients.push(instructor.email as string);
+      }
+      if (result.orgAdminEmail) recipients.push(result.orgAdminEmail);
+
+      // Send educator/admin alert
+      if (recipients.length > 0) {
+        const { sendCrisisAlertEmail } = await import("@/lib/email");
+        await sendCrisisAlertEmail(supabase, {
+          to: recipients,
+          studentFirstName: firstName,
+          crisisType: crisisCheck.type ?? "hopelessness",
+          matchedPatternHint: (crisisCheck.matchedPattern ?? "").slice(0, 60),
+          alertId: result.alertId,
+          classId: result.classId,
+          timestamp: new Date().toISOString(),
+          programType: "Lesson Chat",
+          region: result.region,
+          alertRecipients: recipients,
+        });
+      } else {
+        // No teacher or org admin — log CRITICAL
+        console.error("[crisis] CRITICAL: no alert recipients found", { studentId: user.id });
       }
 
-      const { sendCrisisAlertEmail } = await import("@/lib/email");
-      await sendCrisisAlertEmail(supabase, {
-        to: instructor.email as string,
-        studentFirstName: firstName,
-        crisisType: crisisCheck.type ?? "hopelessness",
-        matchedPatternHint: (crisisCheck.matchedPattern ?? "").slice(0, 60),
-        alertId: result.alertId,
-        classId: result.classId,
-        timestamp: new Date().toISOString(),
-      });
+      // Send parent alert (separate warmer template)
+      if (result.parentEmail) {
+        const { sendParentCrisisEmail } = await import("@/lib/email");
+        await sendParentCrisisEmail({ to: result.parentEmail, studentFirstName: firstName, region: result.region });
+      }
     }).catch((err) => console.error("[crisis] alert pipeline failed:", err));
 
     // Return the supportive response immediately as a complete SSE stream

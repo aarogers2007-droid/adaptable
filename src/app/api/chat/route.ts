@@ -152,35 +152,34 @@ export async function POST(request: Request) {
       .single();
     const firstName = (nameData?.full_name as string | undefined)?.split(" ")[0] ?? "Hey";
 
-    // Fire URGENT teacher alert + email (non-blocking)
+    // Fire URGENT alert to teacher + org admin + parent (non-blocking)
     import("@/lib/teacher-alerts").then(async ({ alertCrisis }) => {
-      const result = await alertCrisis(
-        supabase,
-        user.id,
-        crisisCheck.type ?? "hopelessness",
-        crisisCheck.matchedPattern ?? "",
-        message,
-        "guide-chat"
-      );
-      if (!result || !result.instructorId) return;
+      const result = await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", message, "guide-chat");
+      if (!result) return;
 
-      const { data: instructor } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("id", result.instructorId)
-        .single();
-      if (!instructor?.email) return;
+      const recipients: string[] = [];
+      if (result.instructorId) {
+        const { data: instructor } = await supabase.from("profiles").select("email").eq("id", result.instructorId).single();
+        if (instructor?.email) recipients.push(instructor.email as string);
+      }
+      if (result.orgAdminEmail) recipients.push(result.orgAdminEmail);
 
-      const { sendCrisisAlertEmail } = await import("@/lib/email");
-      await sendCrisisAlertEmail(supabase, {
-        to: instructor.email as string,
-        studentFirstName: firstName,
-        crisisType: crisisCheck.type ?? "hopelessness",
-        matchedPatternHint: (crisisCheck.matchedPattern ?? "").slice(0, 60),
-        alertId: result.alertId,
-        classId: result.classId,
-        timestamp: new Date().toISOString(),
-      });
+      if (recipients.length > 0) {
+        const { sendCrisisAlertEmail } = await import("@/lib/email");
+        await sendCrisisAlertEmail(supabase, {
+          to: recipients, studentFirstName: firstName, crisisType: crisisCheck.type ?? "hopelessness",
+          matchedPatternHint: (crisisCheck.matchedPattern ?? "").slice(0, 60),
+          alertId: result.alertId, classId: result.classId, timestamp: new Date().toISOString(),
+          programType: "AI Guide", region: result.region, alertRecipients: recipients,
+        });
+      } else {
+        console.error("[crisis] CRITICAL: no alert recipients for guide-chat", { studentId: user.id });
+      }
+
+      if (result.parentEmail) {
+        const { sendParentCrisisEmail } = await import("@/lib/email");
+        await sendParentCrisisEmail({ to: result.parentEmail, studentFirstName: firstName, region: result.region });
+      }
     }).catch((err) => console.error("[crisis] guide-chat alert failed:", err));
 
     // Return supportive response with crisis resources
