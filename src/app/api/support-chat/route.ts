@@ -76,11 +76,26 @@ export async function POST(request: Request) {
     return Response.json({ error: "You've sent a lot of messages. Try again in a bit." }, { status: 429 });
   }
 
-  // Content moderation
+  // Content moderation (regex)
   const modCheck = moderateContent(message);
   if (!modCheck.safe) {
     return Response.json({ error: modCheck.reason }, { status: 400 });
   }
+
+  // ML moderation
+  const { moderateContentML } = await import("@/lib/ml-moderation");
+  const mlCheck = await moderateContentML(message);
+  if (!mlCheck.safe) {
+    return Response.json({ error: "That message couldn't be sent. Try rephrasing." }, { status: 400 });
+  }
+
+  // Crisis detection (non-blocking)
+  const { detectCrisisUniversal } = await import("@/lib/crisis-detection");
+  detectCrisisUniversal(message).then(async (crisisCheck) => {
+    if (!crisisCheck.detected) return;
+    const { alertCrisis } = await import("@/lib/teacher-alerts");
+    await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", message, "support-chat");
+  }).catch(() => {});
 
   // Get user info for context
   const { data: profile } = await supabase

@@ -108,19 +108,77 @@ export function detectCrisis(text: string): CrisisResult {
   return { detected: false };
 }
 
+// ── Universal two-layer detection ──
+
+export interface UniversalCrisisResult {
+  detected: boolean;
+  severity?: CrisisSeverity;
+  matchedPattern?: string;
+  type?: "ideation" | "self-harm" | "abuse" | "hopelessness";
+  detectedLanguage?: string;
+  source: "regex" | "ml" | "both";
+}
+
+/**
+ * Two-layer crisis detection. Runs regex first (instant), then ML in parallel.
+ * If regex fires, returns immediately. ML result triggers alert async if regex missed.
+ * Non-blocking — safe to call on every message.
+ */
+export async function detectCrisisUniversal(text: string): Promise<UniversalCrisisResult> {
+  // Layer 1: regex fast pass
+  const regexResult = detectCrisis(text);
+
+  if (regexResult.detected) {
+    // Regex fired — still kick off ML for language detection (non-blocking, don't await)
+    import("@/lib/crisis-detection-ml").then(({ detectCrisisML }) =>
+      detectCrisisML(text).catch(() => {})
+    ).catch(() => {});
+
+    return {
+      ...regexResult,
+      detectedLanguage: "English", // regex patterns are English/Spanish
+      source: "regex",
+    };
+  }
+
+  // Layer 2: ML universal detection (awaited since regex didn't fire)
+  try {
+    const { detectCrisisML } = await import("@/lib/crisis-detection-ml");
+    const mlResult = await detectCrisisML(text);
+
+    if (mlResult.crisis_detected && (mlResult.confidence === "high" || mlResult.confidence === "medium")) {
+      return {
+        detected: true,
+        severity: mlResult.confidence === "high" ? "critical" : "high",
+        type: mlResult.signal_type === "suicide" ? "ideation"
+          : mlResult.signal_type === "self_harm" ? "self-harm"
+          : mlResult.signal_type === "abuse" ? "abuse"
+          : "hopelessness",
+        detectedLanguage: mlResult.language,
+        source: "ml",
+      };
+    }
+  } catch {
+    // ML failure — fail safe
+  }
+
+  return { detected: false, source: "regex" };
+}
+
 /**
  * The supportive message to inject into the AI's response when crisis is detected.
- * Gentle, non-clinical, doesn't lecture. Tells the student they matter and
- * lists real resources.
+ * Uses regional crisis resources based on the org's configured region.
  */
-export function getCrisisResponse(studentName: string): string {
+export function getCrisisResponse(studentName: string, region?: string): string {
+  const { getRegionalResources, formatCrisisResourcesForStudent } = require("@/lib/crisis-resources");
+  const resources = getRegionalResources(region ?? "US");
+  const resourceText = formatCrisisResourcesForStudent(resources);
+
   return `${studentName}, I want to pause for a second. What you just said matters, and I want to make sure you have someone real to talk to — not just me.
 
-Your teacher has been notified, and they care about you. Please also consider reaching out to one of these:
+Someone who cares about you has been notified. Please also consider reaching out:
 
-**988 Suicide & Crisis Lifeline** — call or text **988** (US, 24/7)
-**Crisis Text Line** — text **HOME** to **741741** (US/Canada/UK/Ireland)
-**Trevor Project** (LGBTQ+) — call **1-866-488-7386** or text **START** to **678-678**
+${resourceText}
 
 You don't have to figure anything out alone. The people on these lines are there because they want to listen, with no judgment.
 

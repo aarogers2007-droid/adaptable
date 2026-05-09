@@ -45,11 +45,26 @@ export async function POST(request: Request) {
     return new Response("Invalid message", { status: 400 });
   }
 
-  // Content moderation
+  // Content moderation (regex)
   const modResult = moderateContent(message);
   if (!modResult.safe) {
     return Response.json({ error: modResult.reason }, { status: 400 });
   }
+
+  // ML moderation (catches what regex misses)
+  const { moderateContentML } = await import("@/lib/ml-moderation");
+  const mlCheck = await moderateContentML(message);
+  if (!mlCheck.safe) {
+    return Response.json({ error: "That message couldn't be sent. Try rephrasing." }, { status: 400 });
+  }
+
+  // Crisis detection (non-blocking, runs in parallel with response)
+  const { detectCrisisUniversal } = await import("@/lib/crisis-detection");
+  detectCrisisUniversal(message).then(async (crisisCheck) => {
+    if (!crisisCheck.detected) return;
+    const { alertCrisis } = await import("@/lib/teacher-alerts");
+    await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", message, "customer-interview");
+  }).catch(() => {});
 
   if (!personaId || typeof personaId !== "string") {
     return new Response("Missing personaId", { status: 400 });

@@ -46,23 +46,18 @@ export async function saveInventionProgress(data: {
     const check = moderateContent(data.circle_3_freetext);
     if (!check.safe) return { error: check.reason ?? "That content isn't appropriate. Try rephrasing." };
 
-    // Crisis detection — doesn't block, but fires teacher alert
-    const { detectCrisis } = await import("@/lib/crisis-detection");
-    const crisisCheck = detectCrisis(data.circle_3_freetext);
-    if (crisisCheck.detected) {
-      // Fire teacher alert (non-blocking)
-      import("@/lib/teacher-alerts").then(async ({ alertCrisis }) => {
-        await alertCrisis(
-          supabase,
-          user.id,
-          crisisCheck.type ?? "hopelessness",
-          crisisCheck.matchedPattern ?? "",
-          data.circle_3_freetext!,
-          "invention-wizard"
-        );
-      }).catch(() => {});
-      // Don't block the student — continue saving
-    }
+    // ML moderation (catches what regex misses)
+    const { moderateContentML } = await import("@/lib/ml-moderation");
+    const mlCheck = await moderateContentML(data.circle_3_freetext);
+    if (!mlCheck.safe) return { error: "That content isn't appropriate. Try rephrasing." };
+
+    // Universal crisis detection — regex + ML (non-blocking)
+    const { detectCrisisUniversal } = await import("@/lib/crisis-detection");
+    detectCrisisUniversal(data.circle_3_freetext).then(async (crisisCheck) => {
+      if (!crisisCheck.detected) return;
+      const { alertCrisis } = await import("@/lib/teacher-alerts");
+      await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", data.circle_3_freetext!, "invention-wizard");
+    }).catch(() => {});
   }
 
   // Moderate idea_freetext if present (legacy field, may still be submitted)
@@ -71,20 +66,16 @@ export async function saveInventionProgress(data: {
     const check = moderateContent(data.idea_freetext);
     if (!check.safe) return { error: check.reason ?? "That content isn't appropriate. Try rephrasing." };
 
-    const { detectCrisis } = await import("@/lib/crisis-detection");
-    const crisisCheck = detectCrisis(data.idea_freetext);
-    if (crisisCheck.detected) {
-      import("@/lib/teacher-alerts").then(async ({ alertCrisis }) => {
-        await alertCrisis(
-          supabase,
-          user.id,
-          crisisCheck.type ?? "hopelessness",
-          crisisCheck.matchedPattern ?? "",
-          data.idea_freetext!,
-          "invention-wizard"
-        );
-      }).catch(() => {});
-    }
+    const { moderateContentML } = await import("@/lib/ml-moderation");
+    const mlCheck = await moderateContentML(data.idea_freetext);
+    if (!mlCheck.safe) return { error: "That content isn't appropriate. Try rephrasing." };
+
+    const { detectCrisisUniversal } = await import("@/lib/crisis-detection");
+    detectCrisisUniversal(data.idea_freetext).then(async (crisisCheck) => {
+      if (!crisisCheck.detected) return;
+      const { alertCrisis } = await import("@/lib/teacher-alerts");
+      await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", data.idea_freetext!, "invention-wizard");
+    }).catch(() => {});
   }
 
   // Upsert the invention session
