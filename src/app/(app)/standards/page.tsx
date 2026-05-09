@@ -1,11 +1,14 @@
 import { LESSON_PLANS } from "@/lib/lesson-plans";
 import type { Metadata } from "next";
 import PrintButton from "./PrintButton";
+import { DEFAULT_BRANDING } from "@/lib/branding";
+
+const BN = DEFAULT_BRANDING.platform_name;
 
 export const metadata: Metadata = {
-  title: "Curriculum Alignment — Adaptable",
+  title: `Curriculum Alignment — ${BN}`,
   description:
-    "How Adaptable maps to recognized educational standards for entrepreneurship, business, financial literacy, and career readiness.",
+    `How ${BN} maps to recognized educational standards for entrepreneurship, business, financial literacy, and career readiness.`,
 };
 
 interface StandardMapping {
@@ -824,7 +827,7 @@ export default function CurriculumAlignmentPage() {
               href="/instructor/dashboard"
               className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]"
             >
-              Adaptable
+              {BN}
             </a>
             <span className="text-sm font-medium text-[var(--text-primary)]">
               Curriculum Alignment
@@ -847,10 +850,10 @@ export default function CurriculumAlignmentPage() {
               Curriculum Alignment
             </h1>
             <p className="mt-2 text-xl text-[var(--text-secondary)]">
-              How Adaptable maps to recognized educational standards
+              How {BN} maps to recognized educational standards
             </p>
             <p className="mt-4 max-w-[800px] text-base leading-relaxed text-[var(--text-secondary)]">
-              Every lesson in Adaptable is designed to meet national and state
+              Every lesson in {BN} is designed to meet national and state
               educational standards for entrepreneurship, business, financial
               literacy, and career readiness. This page maps all 22 lessons across
               the six modules — Find Your Niche, Know Your Customer, Build Your Brand,
@@ -971,7 +974,7 @@ export default function CurriculumAlignmentPage() {
                 <p>Standards mapped as of April 2026</p>
                 <p className="mt-1">
                   For questions about curriculum alignment, contact your
-                  school&apos;s Adaptable coordinator
+                  school&apos;s {BN} coordinator
                 </p>
               </div>
               <PrintButton />

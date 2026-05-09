@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, StudentProgress, Lesson, BusinessIdea, IkigaiResult } from "@/lib/types";
 import ParentPinForm from "./ParentPinForm";
+import { DEFAULT_BRANDING } from "@/lib/branding";
 import ParentMessageForm from "./ParentMessageForm";
 
 export const dynamic = "force-dynamic";
@@ -383,7 +384,7 @@ export default async function ParentViewPage({
         <div className="flex items-center justify-center relative">
           <div className="text-center">
             <span className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]">
-              Adaptable
+              {DEFAULT_BRANDING.platform_name}
             </span>
             <span className="mx-2 text-[var(--text-muted)]">&middot;</span>
             <span className="text-sm text-[var(--text-muted)]">Parent View</span>
@@ -692,7 +693,7 @@ export default async function ParentViewPage({
           <p className="text-xs text-[var(--text-muted)]">
             Powered by{" "}
             <span className="font-[family-name:var(--font-display)] font-semibold text-[var(--primary)]">
-              Adaptable
+              {DEFAULT_BRANDING.platform_name}
             </span>
           </p>
           <p className="mt-2 text-xs text-[var(--text-muted)]">

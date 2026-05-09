@@ -2,8 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { verifyParentalConsent } from "@/lib/parental-consent";
+import { useBranding } from "@/components/BrandingProvider";
 
 export default function ConsentForm({ token }: { token: string }) {
+  const branding = useBranding();
   const [parentName, setParentName] = useState("");
   const [outcome, setOutcome] = useState<null | "granted" | "denied" | "error">(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -31,10 +33,10 @@ export default function ConsentForm({ token }: { token: string }) {
       <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
         <h1 className="text-2xl font-bold text-green-900">Approved</h1>
         <p className="mt-3 text-sm text-green-800">
-          Thank you. Your child can now use Adaptable. They&apos;ll receive an email letting them know.
+          Thank you. Your child can now use {branding.platform_name}. They&apos;ll receive an email letting them know.
         </p>
         <p className="mt-6 text-xs text-green-700">
-          You can revoke this approval at any time by emailing privacy@adaptable.app.
+          You can revoke this approval at any time by emailing {branding.support_email || "privacy@adaptable.app"}.
         </p>
       </div>
     );
@@ -45,7 +47,7 @@ export default function ConsentForm({ token }: { token: string }) {
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
         <h1 className="text-2xl font-bold text-[var(--text-primary)]">Got it</h1>
         <p className="mt-3 text-sm text-[var(--text-secondary)]">
-          We won&apos;t enable the account. The child cannot use Adaptable. If this was a mistake,
+          We won&apos;t enable the account. The child cannot use {branding.platform_name}. If this was a mistake,
           they can sign up again.
         </p>
       </div>
@@ -58,7 +60,7 @@ export default function ConsentForm({ token }: { token: string }) {
         <h1 className="text-xl font-bold text-red-900">Link problem</h1>
         <p className="mt-3 text-sm text-red-800">{errorMsg}</p>
         <p className="mt-4 text-xs text-red-700">
-          If you believe this is wrong, contact privacy@adaptable.app.
+          If you believe this is wrong, contact {branding.support_email || "privacy@adaptable.app"}.
         </p>
       </div>
     );
@@ -67,10 +69,10 @@ export default function ConsentForm({ token }: { token: string }) {
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8">
       <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
-        Permission for Adaptable
+        Permission for {branding.platform_name}
       </h1>
       <p className="mt-3 text-sm text-[var(--text-secondary)]">
-        A child under 13 has signed up for Adaptable, an AI-powered platform where students design
+        A child under 13 has signed up for {branding.platform_name}, an AI-powered platform where students design
         and plan small businesses. Because of COPPA, we need your explicit permission before they can use it.
       </p>
 
@@ -124,8 +126,8 @@ export default function ConsentForm({ token }: { token: string }) {
 
       <p className="mt-6 text-xs text-[var(--text-muted)]">
         By clicking &ldquo;I approve&rdquo;, you confirm you are the parent or guardian of this child
-        and consent to Adaptable collecting and processing the data described above.
-        You can revoke at any time by emailing privacy@adaptable.app.
+        and consent to {branding.platform_name} collecting and processing the data described above.
+        You can revoke at any time by emailing {branding.support_email || "privacy@adaptable.app"}.
       </p>
     </div>
   );
