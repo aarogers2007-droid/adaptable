@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useBranding } from "@/components/BrandingProvider";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const branding = useBranding();
   const [activeSection, setActiveSection] = useState<"admin" | "student" | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -105,7 +107,7 @@ export default function LoginPage() {
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="w-full max-w-lg">
           <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-center text-[var(--text-primary)]">
-            Sign in to Adaptable
+            Sign in to {branding.platform_name}
           </h1>
           <p className="mt-2 text-center text-sm text-[var(--text-secondary)]">
             Choose how you&apos;re using the platform.

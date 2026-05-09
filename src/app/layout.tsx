@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono, EB_Garamond, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { headers } from "next/headers";
 import "./globals.css";
 import SplashScreen from "@/components/ui/SplashScreen";
 import SupportBubble from "@/components/ui/SupportBubble";
+import BrandingProvider from "@/components/BrandingProvider";
+import { getTenantBranding } from "@/lib/get-tenant-branding";
 
 const dmSans = DM_Sans({
   variable: "--font-body",
@@ -35,11 +38,15 @@ export const metadata: Metadata = {
     "An AI-native venture studio where students design, plan, and prepare to launch real businesses.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const hostname = headersList.get("host");
+  const branding = await getTenantBranding(hostname);
+
   return (
     <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} ${playfairDisplay.variable}`}>
       <head>
@@ -54,9 +61,11 @@ export default function RootLayout({
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[9999] focus:rounded-lg focus:bg-[var(--primary)] focus:px-4 focus:py-2 focus:text-white focus:text-sm">
           Skip to content
         </a>
-        <SplashScreen>
-          {children}
-        </SplashScreen>
+        <BrandingProvider branding={branding}>
+          <SplashScreen>
+            {children}
+          </SplashScreen>
+        </BrandingProvider>
         <SupportBubble />
         <Analytics />
       </body>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useBranding } from "@/components/BrandingProvider";
 
 // Pages where the bubble should NOT appear
 const HIDDEN_PATHS = ["/", "/join", "/login", "/signup", "/teacher-signup", "/for-schools", "/standards", "/demo", "/venture", "/privacy"];
@@ -15,6 +16,8 @@ export default function SupportBubble() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const branding = useBranding();
 
   // Hide on public pages and /c/* shareable card URLs
   const isPublic = HIDDEN_PATHS.includes(pathname) || pathname.startsWith("/c/") || pathname.startsWith("/parent/view") || pathname.startsWith("/auth/");
@@ -87,7 +90,7 @@ export default function SupportBubble() {
           <div className="flex items-center justify-between rounded-t-xl px-4 py-3" style={{ background: "#0D9488" }}>
             <div>
               <p className="text-sm font-semibold text-white">Support</p>
-              <p className="text-[11px] text-white/70">Ask me anything about Adaptable</p>
+              <p className="text-[11px] text-white/70">{`Ask me anything about ${branding.platform_name}`}</p>
             </div>
             <button
               onClick={() => setOpen(false)}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { useBranding } from "@/components/BrandingProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 // Extracted to module level to satisfy React compiler (no inline component creation during render)
@@ -43,6 +44,7 @@ interface AppNavProps {
 export default function AppNav({ isAdmin, studentName, previewMode = false }: AppNavProps) {
   const pathname = usePathname();
   const [adminMode, setAdminMode] = useState(isAdmin);
+  const branding = useBranding();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const tabs = [
@@ -70,7 +72,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
             className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)] mr-4"
             preview={previewMode}
           >
-            Adaptable
+            {branding.platform_name}
           </NavLink>
 
           {tabs.map((tab) => (
@@ -152,7 +154,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
             className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--primary)]"
             preview={previewMode}
           >
-            Adaptable
+            {branding.platform_name}
           </NavLink>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
