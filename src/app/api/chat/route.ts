@@ -1,23 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { streamMessage } from "@/lib/ai";
-import type { Profile } from "@/lib/types";
-import {
-  getCharacterConfig,
-  getAllCharacterConfigs,
-  assembleCharacterPrompt,
-  detectHandoff,
-  unlockCharacter,
-  getUnlockedCharacters,
-  type StudentContext,
-} from "@/lib/character-system";
+import type { Profile, GradeTier } from "@/lib/types";
 import { getEngagementContext } from "@/lib/engagement-context";
 import { getRelevantKnowledgeWithMeta, type StudentContext as KBStudentContext } from "@/lib/knowledge-retrieval";
+import { getMentorAdaptation } from "@/lib/grade-adaptation";
 
 // ---------------------------------------------------------------------------
-// Fallback system prompt (used when no character configs exist in the DB)
+// AI Guide system prompt
 // ---------------------------------------------------------------------------
 
-function buildFallbackSystemPrompt(
+function buildGuideSystemPrompt(
   businessContext: string,
   studentName: string,
   knowledgeContext: string,
@@ -25,8 +17,11 @@ function buildFallbackSystemPrompt(
   stuckCtx: string = "",
   guideMemoryCtx: string = "",
   mirrorCtx: string = "",
+  gradeAdaptation: string = "",
 ) {
   return `You are a friendly, conversational AI mentor helping a teenager design their first venture. Think of yourself as their co-founder in a venture studio. They're planning and preparing to launch a real business. Talk like a smart older friend who's been through it, not a textbook or a search engine.
+
+${gradeAdaptation}
 
 REACTION-FIRST PATTERN (use roughly every 3rd response):
 Instead of always asking open-ended questions, periodically make a confident statement about the student's business and invite correction. Correcting is cognitively easier than creating — students give better, more detailed answers when fixing something than answering a blank question.
@@ -67,7 +62,7 @@ CREATIVE MINDSET:
 You don't just teach business strategy. You inspire creative thinking. Draw from Rick Rubin's philosophy when it fits: start before you're ready, constraints are the path not the obstacle, subtract instead of add, ship imperfect work and iterate, creativity is a practice not a talent. When a student is stuck or overthinking, channel Rubin: "What if you stripped this down to the one thing that matters?" When they doubt themselves: "Rick Rubin started Def Jam from a dorm room with $5K. You don't need permission." Don't force it. Just let the creative philosophy inform your energy.
 
 KNOWLEDGE:
-You have a curated knowledge base from Harvard, Y Combinator, Rick Rubin, and real entrepreneurs. Use it to inform your thinking, but don't regurgitate it. Weave in ONE relevant example or quote naturally when it fits, like "Warby Parker had the same problem, they..." — not a bullet-pointed research report.
+Draw only from the knowledge context provided to you. If the knowledge context does not contain something relevant to the student's question, say so honestly or redirect rather than drawing on outside sources. Weave in relevant content naturally — not as bullet points, but as a co-founder who knows the material would.
 
 ${businessContext}
 
@@ -248,7 +243,7 @@ export async function POST(request: Request) {
   // Get profile for context
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name, ikigai_result")
+    .select("business_idea, full_name, ikigai_result, grade_tier")
     .eq("id", user.id)
     .single();
 
@@ -435,86 +430,25 @@ export async function POST(request: Request) {
   messages.push({ role: "user", content: message });
 
   // ---------------------------------------------------------------------------
-  // Character system integration
+  // Build system prompt (single path — no character system)
   // ---------------------------------------------------------------------------
 
-  // Determine active character key from conversation context or default to "nova"
-  const activeCharacterKey =
-    (existingSnapshot?.character_key as string | undefined) ?? "nova";
+  const engagementCtx = await getEngagementContext(supabase, user.id);
 
-  // Fetch character config and all configs in parallel
-  const [activeCharConfig, allCharConfigs, engagementCtx] = await Promise.all([
-    getCharacterConfig(supabase, activeCharacterKey),
-    getAllCharacterConfigs(supabase),
-    getEngagementContext(supabase, user.id),
-  ]);
+  // Grade tier adaptation
+  const gradeTier = ((profile as Record<string, unknown>)?.grade_tier as GradeTier) ?? "high_school";
+  const gradeAdaptation = getMentorAdaptation(gradeTier);
 
-  // Determine if this is a first encounter
-  let isFirstEncounter = false;
-  if (activeCharConfig) {
-    const unlocked = await getUnlockedCharacters(supabase, user.id);
-    isFirstEncounter = !unlocked.includes(activeCharConfig.character_key);
-    if (isFirstEncounter) {
-      // Unlock the character now so subsequent messages don't re-trigger intro
-      await unlockCharacter(supabase, user.id, activeCharConfig.character_key);
-    }
-  }
-
-  // Build the system prompt: character-based if available, fallback otherwise
-  let systemPrompt: string;
-
-  if (activeCharConfig && allCharConfigs.length > 0) {
-    const studentName = profile?.full_name?.split(" ")[0] ?? "there";
-    const studentContext: StudentContext = {
-      studentName,
-      businessName: profile?.business_idea?.name ?? "your business",
-      niche: profile?.business_idea?.niche ?? "",
-      targetCustomer: profile?.business_idea?.target_customer ?? "",
-      revenueModel: profile?.business_idea?.revenue_model ?? "",
-      recentDecisions: [],
-      recentCheckins: [],
-    };
-
-    systemPrompt = assembleCharacterPrompt(
-      activeCharConfig,
-      studentContext,
-      allCharConfigs,
-    );
-
-    // Append knowledge context and engagement context
-    if (knowledgeContext) {
-      systemPrompt += `\n\n${knowledgeContext}`;
-    }
-    if (engagementCtx) {
-      systemPrompt += `\n\n${engagementCtx}`;
-    }
-    if (crossLessonContext) systemPrompt += crossLessonContext;
-    if (stuckContext) systemPrompt += stuckContext;
-    if (guideMemory) systemPrompt += guideMemory;
-    if (mirrorContext) systemPrompt += mirrorContext;
-  } else {
-    // Graceful degradation: no characters seeded, use the original prompt
-    systemPrompt = buildFallbackSystemPrompt(
-      businessContext,
-      profile?.full_name || "there",
-      knowledgeContext,
-      crossLessonContext,
-      stuckContext,
-      guideMemory,
-      mirrorContext,
-    );
-    if (engagementCtx) {
-      systemPrompt += `\n\n${engagementCtx}`;
-    }
-  }
-
-  // Detect potential handoff before generating the response
-  let handoffResult: { shouldHandoff: boolean; targetCharacter?: string; reason?: string } = {
-    shouldHandoff: false,
-  };
-  if (activeCharConfig && allCharConfigs.length > 1) {
-    handoffResult = detectHandoff(message, activeCharConfig, allCharConfigs);
-  }
+  const systemPrompt = buildGuideSystemPrompt(
+    businessContext,
+    profile?.full_name || "there",
+    knowledgeContext,
+    crossLessonContext,
+    stuckContext,
+    guideMemory,
+    mirrorContext,
+    gradeAdaptation,
+  ) + (engagementCtx ? `\n\n${engagementCtx}` : "");
 
   try {
     const stream = await streamMessage({
@@ -530,42 +464,6 @@ export async function POST(request: Request) {
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          // If this is a first encounter, send character intro data before streaming
-          if (isFirstEncounter && activeCharConfig) {
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({
-                  characterIntro: {
-                    name: activeCharConfig.name,
-                    creature: activeCharConfig.creature,
-                    domain: activeCharConfig.domain,
-                    domainColor: activeCharConfig.domain_color,
-                    openingLine: activeCharConfig.signature_phrases[0] ?? `Hey! I'm ${activeCharConfig.name}.`,
-                    imageUrl: activeCharConfig.image_url,
-                  },
-                })}\n\n`,
-              ),
-            );
-          }
-
-          // Send active character info so the UI can display the indicator
-          if (activeCharConfig) {
-            controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({
-                  activeCharacter: {
-                    key: activeCharConfig.character_key,
-                    name: activeCharConfig.name,
-                    creature: activeCharConfig.creature,
-                    domain: activeCharConfig.domain,
-                    domainColor: activeCharConfig.domain_color,
-                    imageUrl: activeCharConfig.image_url,
-                  },
-                })}\n\n`,
-              ),
-            );
-          }
-
           for await (const event of stream) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
               const text = event.delta.text;
@@ -586,35 +484,11 @@ export async function POST(request: Request) {
             ).catch(() => {});
           }
 
-          // Consistency check (non-blocking, only if the module exists)
-          try {
-            const { checkConsistency, logConsistencyFailure } = await import("@/lib/character-consistency");
-            if (activeCharConfig) {
-              const studentCtx: import("@/lib/character-system").StudentContext = {
-                studentName: profile?.full_name?.split(" ")[0] ?? "there",
-                businessName: profile?.business_idea?.name ?? "your business",
-                niche: profile?.business_idea?.niche ?? "",
-                targetCustomer: profile?.business_idea?.target_customer ?? "",
-                revenueModel: profile?.business_idea?.revenue_model ?? "",
-                recentDecisions: [],
-                recentCheckins: [],
-              };
-              const consistency = checkConsistency(fullResponse, activeCharConfig, studentCtx);
-              if (!consistency.passed) {
-                const failureSummary = consistency.failures.join("; ");
-                logConsistencyFailure(supabase, user.id, activeCharConfig.character_key, failureSummary, fullResponse).catch(() => {});
-              }
-            }
-          } catch {
-            // character-consistency module not yet available — skip
-          }
-
           // Save conversation
           const allMessages = [...messages, { role: "assistant" as const, content: fullResponse }];
           const updatedSnapshot = {
             ...(existingSnapshot ?? {}),
             ...(profile?.business_idea ?? {}),
-            character_key: activeCharConfig?.character_key ?? "nova",
           };
 
           if (conversationId) {
@@ -642,32 +516,6 @@ export async function POST(request: Request) {
             if (newConvo) {
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ conversationId: newConvo.id })}\n\n`)
-              );
-            }
-          }
-
-          // Send handoff signal after response is complete
-          if (handoffResult.shouldHandoff && handoffResult.targetCharacter && allCharConfigs.length > 0) {
-            const targetConfig = allCharConfigs.find(
-              (c) => c.character_key === handoffResult.targetCharacter,
-            );
-            if (targetConfig && activeCharConfig) {
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({
-                    handoff: {
-                      fromKey: activeCharConfig.character_key,
-                      fromName: activeCharConfig.name,
-                      toKey: targetConfig.character_key,
-                      toName: targetConfig.name,
-                      toCreature: targetConfig.creature,
-                      toDomain: targetConfig.domain,
-                      toDomainColor: targetConfig.domain_color,
-                      toImageUrl: targetConfig.image_url,
-                      reason: handoffResult.reason,
-                    },
-                  })}\n\n`,
-                ),
               );
             }
           }

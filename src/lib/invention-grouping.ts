@@ -579,31 +579,33 @@ export async function runGroupingAlgorithm(
     }
   }
 
-  // ── Write results to database ──
+  // ── Write results to database (batched) ──
   // Clear existing groups for this class code
   await supabase
     .from("invention_groups")
     .delete()
     .eq("class_code", classCode);
 
-  // Insert new groups
-  for (const group of allGroups) {
-    await supabase.from("invention_groups").insert({
+  // Batch insert all groups in one call
+  await supabase.from("invention_groups").insert(
+    allGroups.map((group) => ({
       class_code: classCode,
       group_number: group.group_number,
       student_ids: group.student_ids,
       composition_log: group.composition,
-    });
+    }))
+  );
 
-    // Update each student's group_number
-    for (const studentId of group.student_ids) {
-      await supabase
+  // Batch update student group_numbers — one update per group using .in()
+  await Promise.all(
+    allGroups.map((group) =>
+      supabase
         .from("invention_sessions")
         .update({ group_number: group.group_number })
-        .eq("student_id", studentId)
-        .eq("class_code", classCode);
-    }
-  }
+        .in("student_id", group.student_ids)
+        .eq("class_code", classCode)
+    )
+  );
 
   const log: AlgorithmLog = {
     ran_at: new Date().toISOString(),
