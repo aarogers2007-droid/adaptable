@@ -43,22 +43,9 @@ ESCALATION TRIGGER:
 If the issue cannot be resolved with the instructions above, respond normally but end your message with the exact tag [ESCALATE] on its own line. This signals the system to log the issue for manual review. Do not tell the user about this tag.`;
 }
 
-// Rate limiting: 20 messages per hour per user
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const RATE_LIMIT_MAX = 20;
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false;
-  entry.count++;
-  return true;
-}
+// Rate limiting uses the database-backed reserve_ai_usage RPC
+// (same pattern as chat, lesson-chat, and customer-interview routes).
+// The previous in-memory Map did not persist across Vercel serverless invocations.
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -71,8 +58,16 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid message" }, { status: 400 });
   }
 
-  // Rate limit
-  if (!checkRateLimit(user.id)) {
+  // Rate limit (database-backed, persists across serverless invocations)
+  const { data: allowed, error: rpcError } = await supabase.rpc("reserve_ai_usage", {
+    p_student_id: user.id,
+    p_feature: "support",
+  });
+  if (rpcError) {
+    console.error("[support-chat] rate limit RPC error:", rpcError);
+    return Response.json({ error: "Service temporarily unavailable." }, { status: 503 });
+  }
+  if (!allowed) {
     return Response.json({ error: "You've sent a lot of messages. Try again in a bit." }, { status: 429 });
   }
 

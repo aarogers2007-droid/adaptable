@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * OAuth callback handler. Supabase Auth redirects here after Google SSO.
@@ -47,6 +48,35 @@ export async function GET(request: Request) {
         }
         if (profile?.role === "instructor" || profile?.role === "org_admin") {
           return NextResponse.redirect(`${origin}/instructor/dashboard`);
+        }
+
+        // ── SUBDOMAIN MISMATCH CHECK ──
+        // If user's org has a subdomain and they authenticated on a different
+        // one, redirect them to their org's subdomain. Prevents cross-tenant
+        // access. Platform owners are exempt (they access any subdomain).
+        if (profile?.org_id && !(profile as Record<string, unknown>).is_platform_owner) {
+          const requestHost = request.headers.get("host") ?? "";
+          const requestSubdomain = requestHost.split(".").length >= 3 ? requestHost.split(".")[0] : null;
+
+          if (requestSubdomain && requestSubdomain !== "www" && requestSubdomain !== "adaptable-one") {
+            const admin = createAdminClient();
+            const { data: userOrg } = await admin
+              .from("organizations")
+              .select("subdomain")
+              .eq("id", profile.org_id)
+              .single();
+
+            if (userOrg?.subdomain && userOrg.subdomain !== requestSubdomain) {
+              // User belongs to a different org than the subdomain they're on.
+              // Use URL parsing (not String.replace) to avoid replacing
+              // unintended substrings elsewhere in the origin.
+              const url = new URL(origin);
+              const hostParts = url.hostname.split(".");
+              hostParts[0] = userOrg.subdomain;
+              url.hostname = hostParts.join(".");
+              return NextResponse.redirect(`${url.origin}${next}`);
+            }
+          }
         }
 
         // ── PROGRESS-FIRST RULE ──

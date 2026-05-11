@@ -88,6 +88,16 @@ export async function provisionOrganization(formData: FormData): Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  // Guard: user must not already belong to an org
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("org_id")
+    .eq("id", user.id)
+    .single();
+  if (existingProfile?.org_id) {
+    return { error: "You already belong to an organization." };
+  }
+
   // Extract form fields (null-safe: formData.get returns null if key missing)
   const orgName = ((formData.get("orgName") as string) ?? "").trim();
   const subdomain = ((formData.get("subdomain") as string) ?? "").toLowerCase().trim();
