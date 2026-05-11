@@ -149,13 +149,13 @@ export async function provisionOrganizationManual(data: {
 
   // If contact email provided, assign them as org_admin
   if (contactEmail) {
-    const { data: contactProfile } = await admin
+    const { data: contactProfiles } = await admin
       .from("profiles")
       .select("id")
       .eq("email", contactEmail)
-      .limit(1)
-      .single();
+      .limit(1);
 
+    const contactProfile = (contactProfiles ?? [])[0];
     if (contactProfile) {
       await admin
         .from("profiles")

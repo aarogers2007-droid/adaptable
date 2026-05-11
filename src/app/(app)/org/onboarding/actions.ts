@@ -88,14 +88,14 @@ export async function provisionOrganization(formData: FormData): Promise<{
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  // Extract form fields
-  const orgName = (formData.get("orgName") as string)?.trim();
-  const subdomain = (formData.get("subdomain") as string)?.toLowerCase().trim();
-  const contactName = (formData.get("contactName") as string)?.trim();
-  const contactEmail = (formData.get("contactEmail") as string)?.trim();
-  const primaryColor = (formData.get("primaryColor") as string) || "#0D9488";
-  const secondaryColor = (formData.get("secondaryColor") as string) || "#C084FC";
-  const welcomeMessage = (formData.get("welcomeMessage") as string)?.trim() || "";
+  // Extract form fields (null-safe: formData.get returns null if key missing)
+  const orgName = ((formData.get("orgName") as string) ?? "").trim();
+  const subdomain = ((formData.get("subdomain") as string) ?? "").toLowerCase().trim();
+  const contactName = ((formData.get("contactName") as string) ?? "").trim();
+  const contactEmail = ((formData.get("contactEmail") as string) ?? "").trim();
+  const primaryColor = ((formData.get("primaryColor") as string) ?? "") || "#0D9488";
+  const secondaryColor = ((formData.get("secondaryColor") as string) ?? "") || "#C084FC";
+  const welcomeMessage = ((formData.get("welcomeMessage") as string) ?? "").trim();
   const logoFile = formData.get("logo") as File | null;
   const faviconFile = formData.get("favicon") as File | null;
 
@@ -234,18 +234,23 @@ export async function provisionOrganization(formData: FormData): Promise<{
     .single();
 
   if (cls) {
-    const code = orgName
+    const baseCode = orgName
       .replace(/[^a-zA-Z0-9]/g, "")
       .toUpperCase()
       .slice(0, 6) || "WELCOME";
 
-    await admin.from("invite_codes").insert({
-      code: `${code}1`,
-      class_id: cls.id,
-      created_by: user.id,
-      max_uses: 200,
-      current_uses: 0,
-    });
+    // Try base code + incrementing suffix to avoid collisions
+    for (let i = 1; i <= 99; i++) {
+      const code = `${baseCode}${i}`.slice(0, 8);
+      const { error: codeError } = await admin.from("invite_codes").insert({
+        code,
+        class_id: cls.id,
+        created_by: user.id,
+        max_uses: 200,
+        current_uses: 0,
+      });
+      if (!codeError) break;
+    }
   }
 
   redirect("/instructor/dashboard");
