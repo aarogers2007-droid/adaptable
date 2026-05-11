@@ -10,6 +10,7 @@ import DailyCheckIn from "@/components/dashboard/DailyCheckIn";
 import DashboardAchievements from "./DashboardAchievements";
 import FeedbackBox from "@/components/dashboard/FeedbackBox";
 import DashboardMirror from "@/components/dashboard/DashboardMirror";
+import ScenarioBadges from "@/components/dashboard/ScenarioBadges";
 import { detectAbsenceGap } from "@/lib/activity";
 import { generateAbsenceMirror, generateWeeklyMirror, hasMirrorFiredToday } from "./mirror-actions";
 
@@ -120,6 +121,24 @@ export default async function DashboardPage() {
       tier: e.tier,
     };
   });
+
+  // --- Scenario badges ---
+  const { data: allScenarios } = await supabase
+    .from("scenarios")
+    .select("id, title, badge_icon, badge_name")
+    .eq("is_active", true);
+  const { data: studentBadges } = await supabase
+    .from("student_badges")
+    .select("scenario_id, badge_level")
+    .eq("student_id", user.id);
+  const badgeMap = new Map((studentBadges ?? []).map((b) => [b.scenario_id, b.badge_level]));
+  const scenarioBadgesData = (allScenarios ?? []).map((s) => ({
+    id: s.id,
+    title: s.title,
+    badge_icon: s.badge_icon,
+    badge_name: s.badge_name,
+    badgeLevel: badgeMap.get(s.id) ?? null,
+  }));
 
   // --- Founder's Mirror trigger detection ---
   // Priority: absence > weekly. Only one fires per dashboard load.
@@ -414,6 +433,13 @@ export default async function DashboardPage() {
             earned={earnedDisplay}
           />
         </div>
+
+        {/* Scenario Badges */}
+        {scenarioBadgesData.length > 0 && (
+          <div className="mt-4">
+            <ScenarioBadges scenarios={scenarioBadgesData} />
+          </div>
+        )}
 
         {/* Founder's Log link — appears after first lesson completed */}
         {completedCount > 0 && (

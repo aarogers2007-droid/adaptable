@@ -42,7 +42,7 @@ const MAX_TOKENS_MAP: Record<AIFeature, number> = {
   recommendations: 1200,
   pitch: 1024,
   moderation: 200,
-  card: 600,
+  card: 1024,
 };
 
 // ── Shared types ──

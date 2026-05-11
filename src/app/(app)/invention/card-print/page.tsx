@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 /**
- * Print-ready archetype card — 4×6 inch postcard format.
+ * Print-ready archetype card — 4x6 inch postcard format.
  * Opens in a new tab, auto-triggers print dialog.
  * Student saves as PDF from the browser print dialog.
  */
@@ -40,26 +40,30 @@ export default async function CardPrintPage({
     }
   }
 
-  const card = sessionData.generated_card as {
-    title: string;
-    description: string;
-    insights: { wish: string; mind: string; lens: string; scale: string; voice: string };
-  };
+  const raw = sessionData.generated_card as Record<string, unknown>;
+  const insightsRaw = raw.insights as Record<string, string> | undefined;
 
-  const titleWord = card.title.replace(/^The\s+/i, "");
+  // Backward compat: old cards have `description`, new cards have `portrait`
+  const portrait = (raw.portrait as string) ?? (raw.description as string) ?? "";
+  const edge = (raw.edge as string) ?? "";
+  const watchOut = (raw.watch_out as string) ?? "";
+  const title = (raw.title as string) ?? "";
+
+  const titleWord = title.replace(/^The\s+/i, "");
+  const hasNewSections = !!edge;
 
   const insights = [
-    { label: "THE WISH", text: card.insights.wish },
-    { label: "THE MIND", text: card.insights.mind },
-    { label: "THE LENS", text: card.insights.lens },
-    { label: "THE SCALE", text: card.insights.scale },
-    { label: "THE VOICE", text: card.insights.voice },
+    { label: "THE WISH", text: insightsRaw?.wish ?? "" },
+    { label: "THE MIND", text: insightsRaw?.mind ?? "" },
+    { label: "THE LENS", text: insightsRaw?.lens ?? "" },
+    { label: "THE SCALE", text: insightsRaw?.scale ?? "" },
+    { label: "THE VOICE", text: insightsRaw?.voice ?? "" },
   ];
 
   return (
     <html>
       <head>
-        <title>{card.title}</title>
+        <title>{title}</title>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&family=DM+Sans:wght@400;500&display=swap');
 
@@ -81,70 +85,91 @@ export default async function CardPrintPage({
             font-family: 'DM Sans', sans-serif;
             display: flex;
             flex-direction: column;
-            padding: 0.4in 0.35in;
+            padding: 0.35in 0.3in;
             position: relative;
           }
 
           .the-label {
-            font-size: 8px;
+            font-size: 7px;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            font-family: 'DM Sans', sans-serif;
           }
 
           .title {
             font-family: 'EB Garamond', serif;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #111;
             margin-top: 2px;
           }
 
-          .description {
-            font-size: 11px;
+          .portrait {
+            font-size: ${hasNewSections ? "9px" : "11px"};
             font-weight: 500;
             color: #444;
-            line-height: 1.6;
-            margin-top: 10px;
+            line-height: 1.5;
+            margin-top: 8px;
+          }
+
+          .section-label {
+            font-size: 6px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-top: 8px;
+            margin-bottom: 2px;
+          }
+
+          .section-text {
+            font-size: 8.5px;
+            color: #222;
+            line-height: 1.4;
+          }
+
+          .section-text-italic {
+            font-size: 8.5px;
+            color: #555;
+            line-height: 1.4;
+            font-style: italic;
           }
 
           .divider {
             height: 1px;
             background: #E5E5E5;
-            margin: 14px 0;
+            margin: 10px 0;
           }
 
           .insight-row {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 8px;
+            margin-bottom: 5px;
           }
 
           .insight-label {
-            font-size: 7px;
+            font-size: 6px;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            width: 60px;
+            width: 50px;
             flex-shrink: 0;
-            padding-top: 2px;
+            padding-top: 1px;
           }
 
           .insight-text {
-            font-size: 10px;
+            font-size: 8px;
             color: #222;
-            line-height: 1.5;
+            line-height: 1.4;
           }
 
           .footer {
             position: absolute;
-            bottom: 0.2in;
+            bottom: 0.15in;
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 7px;
+            font-size: 6px;
             color: #CCC;
           }
         `}</style>
@@ -152,7 +177,22 @@ export default async function CardPrintPage({
       <body>
         <p className="the-label">THE</p>
         <h1 className="title">{titleWord}</h1>
-        <p className="description">{card.description}</p>
+        <p className="portrait">{portrait}</p>
+
+        {hasNewSections && edge && (
+          <>
+            <p className="section-label">THE EDGE</p>
+            <p className="section-text">{edge}</p>
+          </>
+        )}
+
+        {hasNewSections && watchOut && (
+          <>
+            <p className="section-label">WATCH OUT</p>
+            <p className="section-text-italic">{watchOut}</p>
+          </>
+        )}
+
         <div className="divider" />
         {insights.map((ins) => (
           <div key={ins.label} className="insight-row">

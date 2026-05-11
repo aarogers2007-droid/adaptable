@@ -25,7 +25,7 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
   const [phase, setPhase] = useState<Phase>("loading");
   const [card, setCard] = useState<GenerateCardResult["card"]>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [animStep, setAnimStep] = useState(-1); // -1 = not animating yet
+  const [animStep, setAnimStep] = useState(-1);
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -43,7 +43,6 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
     let cancelled = false;
 
     async function fetchCard() {
-      // Start 20s timeout
       timeoutRef.current = setTimeout(() => {
         if (!cancelled) setPhase("timeout");
       }, 20_000);
@@ -57,9 +56,8 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
         if (result.card) {
           setCard(result.card);
           setPhase("reveal");
-          // Skip animation for prefers-reduced-motion, show everything immediately
           if (prefersReducedMotion) {
-            setAnimStep(10);
+            setAnimStep(12);
           } else {
             requestAnimationFrame(() => setAnimStep(0));
           }
@@ -76,11 +74,11 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
     return () => { cancelled = true; if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, [sessionId, retryCount, prefersReducedMotion]);
 
-  // Animation stepper
+  // Animation stepper (12 steps: title, portrait, edge, watch_out, divider, 5 insights, actions)
   useEffect(() => {
-    if (animStep < 0 || animStep >= 10) return;
-    const delays = [0, 150, 300, 550, 750, 1000, 1150, 1300, 1450, 1600];
-    const nextDelay = (delays[animStep + 1] ?? 1850) - (delays[animStep] ?? 0);
+    if (animStep < 0 || animStep >= 12) return;
+    const delays = [0, 150, 300, 600, 850, 1050, 1200, 1350, 1500, 1650, 1800, 2000];
+    const nextDelay = (delays[animStep + 1] ?? 2200) - (delays[animStep] ?? 0);
     const timer = setTimeout(() => setAnimStep((s) => s + 1), nextDelay);
     return () => clearTimeout(timer);
   }, [animStep]);
@@ -106,7 +104,12 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
     window.open(`/invention/card-print?session=${sessionId}&filename=${nameSlug}-${titleSlug}.pdf`, "_blank");
   }
 
-  // Style helpers for animation
+  // Backward compat: old cards have `description`, new cards have `portrait`
+  const portraitText = card?.portrait ?? (card as Record<string, unknown> | null)?.description as string ?? "";
+  const edgeText = card?.edge ?? "";
+  const watchOutText = card?.watch_out ?? "";
+  const hasNewSections = !!card?.edge;
+
   const show = (step: number) => animStep >= step;
   const fadeUp = (step: number, translateY = 8) => ({
     opacity: show(step) ? 1 : 0,
@@ -190,45 +193,46 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
               }}
             >
               {/* THE label */}
-              <p
-                style={{
-                  fontSize: "10px",
-                  color: "#999",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.2em",
-                  ...fadeUp(1),
-                }}
-              >
+              <p style={{ fontSize: "10px", color: "#999", textTransform: "uppercase", letterSpacing: "0.2em", ...fadeUp(1) }}>
                 THE
               </p>
 
               {/* Title */}
               <h1
                 className="font-[family-name:var(--font-serif)]"
-                style={{
-                  fontSize: "34px",
-                  fontWeight: 700,
-                  color: "#111",
-                  marginTop: "4px",
-                  ...fadeUp(2),
-                }}
+                style={{ fontSize: "34px", fontWeight: 700, color: "#111", marginTop: "4px", ...fadeUp(2) }}
               >
                 {card.title.replace(/^The\s+/i, "")}
               </h1>
 
-              {/* Description */}
-              <p
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#444",
-                  lineHeight: 1.6,
-                  marginTop: "16px",
-                  ...fadeUp(3),
-                }}
-              >
-                {card.description}
+              {/* Portrait (replaces description) */}
+              <p style={{ fontSize: "14px", fontWeight: 500, color: "#444", lineHeight: 1.6, marginTop: "16px", ...fadeUp(3) }}>
+                {portraitText}
               </p>
+
+              {/* THE EDGE — only for new cards */}
+              {hasNewSections && edgeText && (
+                <div style={{ marginTop: "16px", ...fadeUp(4) }}>
+                  <p style={{ fontSize: "9px", color: "#999", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "4px" }}>
+                    THE EDGE
+                  </p>
+                  <p style={{ fontSize: "13px", color: "#222", lineHeight: 1.5 }}>
+                    {edgeText}
+                  </p>
+                </div>
+              )}
+
+              {/* WATCH OUT — only for new cards */}
+              {hasNewSections && watchOutText && (
+                <div style={{ marginTop: "12px", ...fadeUp(5) }}>
+                  <p style={{ fontSize: "9px", color: "#999", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "4px" }}>
+                    WATCH OUT
+                  </p>
+                  <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.5, fontStyle: "italic" }}>
+                    {watchOutText}
+                  </p>
+                </div>
+              )}
 
               {/* Divider */}
               <div
@@ -238,7 +242,7 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
                   height: "1px",
                   background: "#E5E5E5",
                   transformOrigin: "left",
-                  transform: show(4) ? "scaleX(1)" : "scaleX(0)",
+                  transform: show(6) ? "scaleX(1)" : "scaleX(0)",
                   transition: "transform 350ms ease-out",
                 }}
               />
@@ -249,7 +253,7 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
                   <div
                     key={insight.key}
                     className="flex flex-col md:flex-row md:items-start md:gap-4"
-                    style={slideLeft(5 + i)}
+                    style={slideLeft(7 + i)}
                   >
                     <span
                       className="shrink-0"
@@ -266,11 +270,7 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
                     </span>
                     <span
                       className="mt-1.5 md:mt-0"
-                      style={{
-                        fontSize: "13px",
-                        color: "#222",
-                        lineHeight: 1.5,
-                      }}
+                      style={{ fontSize: "13px", color: "#222", lineHeight: 1.5 }}
                     >
                       {card.insights[insight.key as keyof typeof card.insights]}
                     </span>
@@ -284,7 +284,7 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
               className="mx-auto mt-6 flex flex-col items-center gap-3"
               style={{
                 maxWidth: "480px",
-                opacity: animStep >= 10 ? 1 : 0,
+                opacity: animStep >= 12 ? 1 : 0,
                 transition: "opacity 250ms ease-out",
               }}
             >
@@ -301,7 +301,6 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
                 {copied ? "Link copied!" : "Share Your Card"}
               </button>
 
-              {/* Group number pill */}
               {groupRevealed && groupNumber && (
                 <div
                   className="mt-2 rounded-full px-4 py-1.5 text-sm font-medium text-white"
@@ -319,12 +318,6 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
         @keyframes cardPulse {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 0.8; }
-        }
-        @media (max-width: 480px) {
-          .card-insight-label {
-            font-size: 8px !important;
-            color: #BBBBBB !important;
-          }
         }
       `}</style>
     </main>

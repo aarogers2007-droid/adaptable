@@ -40,6 +40,36 @@ export async function getTenantBranding(hostname: string | null): Promise<Brandi
 }
 
 /**
+ * Fetch branding config by org ID. Used by the root layout when
+ * middleware has already resolved the tenant and injected x-tenant-id.
+ * Avoids a redundant subdomain lookup.
+ */
+export async function getTenantBrandingById(orgId: string | null): Promise<BrandingConfig> {
+  if (!orgId || orgId === "00000000-0000-0000-0000-000000000001") {
+    return DEFAULT_BRANDING;
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("organizations")
+      .select("branding_config, name")
+      .eq("id", orgId)
+      .eq("is_active", true)
+      .single();
+
+    if (!data) return DEFAULT_BRANDING;
+
+    const config = (data.branding_config as Partial<BrandingConfig>) ?? {};
+    if (!config.platform_name) config.platform_name = data.name;
+
+    return mergeBranding(config);
+  } catch {
+    return DEFAULT_BRANDING;
+  }
+}
+
+/**
  * Fetch platform_name for a user's org. Used in server-side API routes
  * where hostname isn't available but user's org_id is.
  */

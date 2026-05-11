@@ -6,7 +6,9 @@ export const dynamic = "force-dynamic";
 
 interface CardData {
   title: string;
-  description: string;
+  portrait: string;
+  edge: string;
+  watch_out: string;
   insights: { wish: string; mind: string; lens: string; scale: string; voice: string };
   shareable_slug: string;
 }
@@ -27,7 +29,7 @@ export async function generateMetadata({
 
   return {
     title: `${card.studentFirstName} is ${card.card.title} on Adaptable`,
-    description: card.card.description,
+    description: card.card.portrait,
   };
 }
 
@@ -46,16 +48,19 @@ async function fetchCardBySlug(slug: string) {
 
   if (!data?.generated_card) return null;
 
-  // Runtime allowlist — only extract fields needed for display.
-  // The JSONB also contains grade_tier, model_used, etc. that must not
-  // be exposed on the public page.
+  // Runtime allowlist — only extract fields needed for display
   const raw = data.generated_card as Record<string, unknown>;
   const insights = raw.insights as Record<string, string> | undefined;
-  if (!raw.title || !raw.description || !insights) return null;
+  if (!raw.title || !insights) return null;
+
+  // Backward compat: old cards have `description`, new cards have `portrait`
+  const portrait = (raw.portrait as string) ?? (raw.description as string) ?? "";
 
   const card: CardData = {
     title: raw.title as string,
-    description: raw.description as string,
+    portrait,
+    edge: (raw.edge as string) ?? "",
+    watch_out: (raw.watch_out as string) ?? "",
     insights: {
       wish: insights.wish ?? "",
       mind: insights.mind ?? "",
@@ -66,7 +71,6 @@ async function fetchCardBySlug(slug: string) {
     shareable_slug: raw.shareable_slug as string,
   };
 
-  // Get student first name only
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name")
@@ -96,7 +100,6 @@ export default async function PublicCardPage({
   const { slug } = await params;
   const result = await fetchCardBySlug(slug);
 
-  // Generic 404 — no info leakage about whether slug exists
   if (!result) notFound();
 
   const { card, studentFirstName } = result;
@@ -113,20 +116,10 @@ export default async function PublicCardPage({
         alignItems: "center",
       }}
     >
-      {/* Student first name */}
-      <p
-        style={{
-          fontSize: "13px",
-          color: "#999",
-          textTransform: "uppercase",
-          letterSpacing: "0.1em",
-          marginBottom: "16px",
-        }}
-      >
+      <p style={{ fontSize: "13px", color: "#999", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>
         {studentFirstName}
       </p>
 
-      {/* Card */}
       <div
         style={{
           maxWidth: "480px",
@@ -140,20 +133,37 @@ export default async function PublicCardPage({
         <p style={{ fontSize: "10px", color: "#999", textTransform: "uppercase", letterSpacing: "0.2em" }}>
           THE
         </p>
-        <h1
-          style={{
-            fontFamily: "'EB Garamond', serif",
-            fontSize: "34px",
-            fontWeight: 700,
-            color: "#111",
-            marginTop: "4px",
-          }}
-        >
+        <h1 style={{ fontFamily: "'EB Garamond', serif", fontSize: "34px", fontWeight: 700, color: "#111", marginTop: "4px" }}>
           {titleWord}
         </h1>
         <p style={{ fontSize: "14px", fontWeight: 500, color: "#444", lineHeight: 1.6, marginTop: "16px" }}>
-          {card.description}
+          {card.portrait}
         </p>
+
+        {/* THE EDGE — only for new cards */}
+        {card.edge && (
+          <div style={{ marginTop: "16px" }}>
+            <p style={{ fontSize: "9px", color: "#999", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "4px" }}>
+              THE EDGE
+            </p>
+            <p style={{ fontSize: "13px", color: "#222", lineHeight: 1.5 }}>
+              {card.edge}
+            </p>
+          </div>
+        )}
+
+        {/* WATCH OUT — only for new cards */}
+        {card.watch_out && (
+          <div style={{ marginTop: "12px" }}>
+            <p style={{ fontSize: "9px", color: "#999", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "4px" }}>
+              WATCH OUT
+            </p>
+            <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.5, fontStyle: "italic" }}>
+              {card.watch_out}
+            </p>
+          </div>
+        )}
+
         <div style={{ height: "1px", background: "#E5E5E5", margin: "20px 0" }} />
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {INSIGHT_LABELS.map((ins) => (
@@ -169,7 +179,6 @@ export default async function PublicCardPage({
         </div>
       </div>
 
-      {/* Footer */}
       <p style={{ marginTop: "32px", fontSize: "11px", color: "#CCC" }}>
         adaptable.one
       </p>

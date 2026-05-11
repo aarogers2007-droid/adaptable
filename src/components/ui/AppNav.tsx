@@ -50,6 +50,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
   const tabs = [
     { href: "/dashboard", label: "My Business", icon: "🏠" },
     { href: "/lessons", label: "Lessons", icon: "📖", matchPrefix: true },
+    { href: "/scenarios", label: "Scenarios", icon: "🎯", matchPrefix: true },
     { href: "/chat", label: "AI Guide", icon: "💬" },
     { href: "/leaderboard", label: "Leaderboard", icon: "📊" },
     { href: "/card", label: "Card", icon: "💳" },
@@ -57,7 +58,7 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
 
   function isActive(tab: { href: string; matchPrefix?: boolean }) {
     if (tab.matchPrefix) {
-      return pathname.startsWith(tab.href) || pathname.startsWith("/lessons/");
+      return pathname.startsWith(tab.href);
     }
     return pathname === tab.href;
   }

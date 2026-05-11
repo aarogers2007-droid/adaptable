@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { resolveTenant } from "@/lib/tenant/resolve";
 
 export async function updateSession(request: NextRequest) {
   // Skip auth when Supabase isn't configured (local dev only)
@@ -45,6 +46,27 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // ── Tenant resolution ──
+  // Resolve org from subdomain and inject headers into the request.
+  // Headers are overwritten unconditionally — prevents client spoofing.
+  const hostname = request.headers.get("host") ?? "";
+  const tenant = await resolveTenant(hostname);
+  request.headers.set("x-tenant-id", tenant.id);
+  request.headers.set("x-tenant-slug", tenant.slug);
+  if (tenant.ragNamespace) {
+    request.headers.set("x-tenant-rag-namespace", tenant.ragNamespace);
+  } else {
+    request.headers.delete("x-tenant-rag-namespace");
+  }
+
+  // Rebuild response to include tenant headers.
+  // Preserve any cookies that setAll put on the previous response.
+  const prevCookies = supabaseResponse.headers.getSetCookie();
+  supabaseResponse = NextResponse.next({ request });
+  for (const cookie of prevCookies) {
+    supabaseResponse.headers.append("set-cookie", cookie);
+  }
 
   // Redirect unauthenticated users to login (except public routes)
   const publicPaths = ["/", "/join", "/login", "/signup", "/teacher-signup", "/parent/view", "/auth/callback", "/auth/signout", "/for-schools", "/standards", "/demo", "/venture", "/privacy", "/c"];

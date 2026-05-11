@@ -6,7 +6,7 @@ import "./globals.css";
 import SplashScreen from "@/components/ui/SplashScreen";
 import SupportBubble from "@/components/ui/SupportBubble";
 import BrandingProvider from "@/components/BrandingProvider";
-import { getTenantBranding } from "@/lib/get-tenant-branding";
+import { getTenantBranding, getTenantBrandingById } from "@/lib/get-tenant-branding";
 
 const dmSans = DM_Sans({
   variable: "--font-body",
@@ -44,8 +44,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headersList = await headers();
-  const hostname = headersList.get("host");
-  const branding = await getTenantBranding(hostname);
+  const tenantId = headersList.get("x-tenant-id");
+  // Use org ID from middleware if available (avoids redundant DB query).
+  // Fall back to hostname-based lookup for safety.
+  const branding = tenantId
+    ? await getTenantBrandingById(tenantId)
+    : await getTenantBranding(headersList.get("host"));
 
   return (
     <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} ${playfairDisplay.variable}`}>

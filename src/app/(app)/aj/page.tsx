@@ -41,6 +41,12 @@ export default async function AJDashboard() {
     .order("created_at", { ascending: false })
     .limit(20);
 
+  // Fetch scenario count
+  const { count: scenarioCount } = await supabase
+    .from("scenarios")
+    .select("id", { count: "exact", head: true })
+    .eq("is_active", true);
+
   const sections = [
     {
       label: "Student Experience",
@@ -49,11 +55,12 @@ export default async function AJDashboard() {
         { href: "/onboarding", name: "Ikigai Wizard (Onboarding)" },
         { href: "/onboarding/ready", name: "Onboarding Complete" },
         { href: "/lessons", name: "Lessons Index" },
+        { href: "/scenarios", name: `Scenarios Library (${scenarioCount ?? 0} active)` },
         { href: "/chat", name: "AI Guide Chat" },
         { href: "/plan", name: "Business Plan" },
         { href: "/card", name: "Business Card Designer" },
         { href: "/achievements", name: "Achievements" },
-        { href: "/leaderboard", name: "Leaderboard" },
+        { href: "/leaderboard", name: "Leaderboard (Grade-Filtered)" },
         { href: "/completion", name: "Completion Ceremony" },
         { href: "/dashboard/founders-log", name: "Founder's Log" },
         { href: "/dashboard/founders-log/analytics", name: "Founder's Log Analytics" },
@@ -74,10 +81,16 @@ export default async function AJDashboard() {
     {
       label: "Admin & Instructor",
       links: [
-        { href: "/admin", name: "Platform Admin" },
+        { href: "/admin", name: "Platform Admin (Provision Orgs)" },
         { href: "/admin/feedback", name: "Tester Feedback" },
         { href: "/instructor/dashboard", name: "Instructor Dashboard" },
         { href: "/teacher-onboarding", name: "Teacher Onboarding" },
+      ],
+    },
+    {
+      label: "Org Onboarding",
+      links: [
+        { href: "/org/onboarding", name: "Self-Serve Org Onboarding" },
       ],
     },
     {
@@ -86,7 +99,7 @@ export default async function AJDashboard() {
         { href: "/login", name: "Login Page" },
         { href: "/signup", name: "Student Signup" },
         { href: "/teacher-signup", name: "Teacher Signup" },
-        { href: "/join", name: "Join a Class" },
+        { href: "/join", name: "Join a Class (Optional)" },
         { href: "/parental-consent-pending", name: "Parental Consent Pending" },
       ],
     },
@@ -183,14 +196,13 @@ export default async function AJDashboard() {
         {/* Flow diagram */}
         <div className="mt-12">
           <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)] mb-4">
-            Page Flow
+            Platform Flow
           </h2>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 overflow-x-auto">
             <FlowDiagram />
             {/* Legend */}
             <div className="mt-6 flex flex-wrap gap-x-8 gap-y-3 border-t border-[var(--border)] pt-4">
               <p className="w-full text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Key</p>
-              {/* Colors */}
               <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#9CA3AF" }} /><span className="text-xs text-[var(--text-secondary)]">Public pages</span></div>
               <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#60A5FA" }} /><span className="text-xs text-[var(--text-secondary)]">Auth flow</span></div>
               <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#C084FC" }} /><span className="text-xs text-[var(--text-secondary)]">Invention mode</span></div>
@@ -199,6 +211,8 @@ export default async function AJDashboard() {
               <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#F59E0B" }} /><span className="text-xs text-[var(--text-secondary)]">Completion</span></div>
               <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#0D9488" }} /><span className="text-xs text-[var(--text-secondary)]">Reflection</span></div>
               <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#F87171" }} /><span className="text-xs text-[var(--text-secondary)]">Admin</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#38BDF8" }} /><span className="text-xs text-[var(--text-secondary)]">Scenarios</span></div>
+              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded border-2" style={{ borderColor: "#A78BFA" }} /><span className="text-xs text-[var(--text-secondary)]">Org onboarding</span></div>
               {/* Arrows */}
               <div className="flex items-center gap-2"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="var(--border-strong)" strokeWidth="1.5" /></svg><span className="text-xs text-[var(--text-secondary)]">Natural navigation</span></div>
               <div className="flex items-center gap-2"><svg width="24" height="8"><line x1="0" y1="4" x2="24" y2="4" stroke="#60A5FA" strokeWidth="1.5" strokeDasharray="6 4" /></svg><span className="text-xs text-[var(--text-secondary)]">Auth redirect</span></div>
@@ -212,67 +226,82 @@ export default async function AJDashboard() {
 }
 
 function FlowDiagram() {
-  const W = 130, H = 44, GAP_X = 20, GAP_Y = 30;
+  const W = 120, H = 40, GAP_X = 16, GAP_Y = 26;
+  const COL = (c: number) => 20 + c * (W + GAP_X);
   const ROW_Y = (r: number) => 20 + r * (H + GAP_Y);
 
   const boxes: Array<{ x: number; y: number; w: number; h: number; label: string; color: string }> = [
-    // Row 0: Entry points
-    { x: 20, y: ROW_Y(0), w: W, h: H, label: "Landing /", color: "#9CA3AF" },
-    { x: 20 + (W + GAP_X), y: ROW_Y(0), w: W, h: H, label: "For Schools", color: "#9CA3AF" },
-    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(0), w: W, h: H, label: "Demo", color: "#9CA3AF" },
-    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(0), w: W, h: H, label: "VENTURE", color: "#C084FC" },
+    // Row 0: Entry points (4)
+    { x: COL(0), y: ROW_Y(0), w: W, h: H, label: "Landing /", color: "#9CA3AF" },         // 0
+    { x: COL(1), y: ROW_Y(0), w: W, h: H, label: "For Schools", color: "#9CA3AF" },        // 1
+    { x: COL(2), y: ROW_Y(0), w: W, h: H, label: "Demo", color: "#9CA3AF" },               // 2
+    { x: COL(3), y: ROW_Y(0), w: W, h: H, label: "VENTURE", color: "#C084FC" },            // 3
+    { x: COL(4), y: ROW_Y(0), w: W, h: H, label: "Subdomain", color: "#A78BFA" },          // 4
 
-    // Row 1: Auth
-    { x: 20, y: ROW_Y(1), w: W, h: H, label: "Login", color: "#60A5FA" },
-    { x: 20 + (W + GAP_X), y: ROW_Y(1), w: W, h: H, label: "Student Signup", color: "#60A5FA" },
-    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(1), w: W, h: H, label: "Join Class", color: "#60A5FA" },
-    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(1), w: W, h: H, label: "Teacher Signup", color: "#60A5FA" },
+    // Row 1: Auth (5)
+    { x: COL(0), y: ROW_Y(1), w: W, h: H, label: "Login", color: "#60A5FA" },              // 5
+    { x: COL(1), y: ROW_Y(1), w: W, h: H, label: "Student Signup", color: "#60A5FA" },     // 6
+    { x: COL(2), y: ROW_Y(1), w: W, h: H, label: "Join Class", color: "#60A5FA" },         // 7
+    { x: COL(3), y: ROW_Y(1), w: W, h: H, label: "Teacher Signup", color: "#60A5FA" },     // 8
+    { x: COL(4), y: ROW_Y(1), w: W, h: H, label: "Org Onboarding", color: "#A78BFA" },     // 9
 
-    // Row 2: Onboarding
-    { x: 20, y: ROW_Y(2), w: W, h: H, label: "Ikigai Wizard", color: "#F5E642" },
-    { x: 20 + (W + GAP_X), y: ROW_Y(2), w: W, h: H, label: "Invention Wizard", color: "#C084FC" },
-    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(2), w: W, h: H, label: "Teacher Onboarding", color: "#60A5FA" },
+    // Row 2: Onboarding (3)
+    { x: COL(0), y: ROW_Y(2), w: W, h: H, label: "Ikigai Wizard", color: "#F5E642" },      // 10
+    { x: COL(1), y: ROW_Y(2), w: W, h: H, label: "Invention Wizard", color: "#C084FC" },   // 11
+    { x: COL(3), y: ROW_Y(2), w: W, h: H, label: "Teacher Onboard", color: "#60A5FA" },    // 12
 
-    // Row 3: Main
-    { x: 20, y: ROW_Y(3), w: W, h: H, label: "Dashboard", color: "#4ADE80" },
-    { x: 20 + (W + GAP_X), y: ROW_Y(3), w: W, h: H, label: "Lessons", color: "#4ADE80" },
-    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(3), w: W, h: H, label: "AI Guide", color: "#4ADE80" },
-    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(3), w: W, h: H, label: "Plan / Card", color: "#4ADE80" },
+    // Row 3: Main experience (5)
+    { x: COL(0), y: ROW_Y(3), w: W, h: H, label: "Dashboard", color: "#4ADE80" },          // 13
+    { x: COL(1), y: ROW_Y(3), w: W, h: H, label: "Lessons", color: "#4ADE80" },            // 14
+    { x: COL(2), y: ROW_Y(3), w: W, h: H, label: "Scenarios", color: "#38BDF8" },          // 15
+    { x: COL(3), y: ROW_Y(3), w: W, h: H, label: "AI Guide", color: "#4ADE80" },           // 16
+    { x: COL(4), y: ROW_Y(3), w: W, h: H, label: "Plan / Card", color: "#4ADE80" },        // 17
 
-    // Row 4: Rewards + Admin
-    { x: 20, y: ROW_Y(4), w: W, h: H, label: "Achievements", color: "#4ADE80" },
-    { x: 20 + (W + GAP_X), y: ROW_Y(4), w: W, h: H, label: "Completion", color: "#F59E0B" },
-    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(4), w: W, h: H, label: "Founder's Log", color: "#0D9488" },
-    { x: 20 + 3 * (W + GAP_X), y: ROW_Y(4), w: W, h: H, label: "Parent View", color: "#9CA3AF" },
+    // Row 4: Rewards + Reflection (5)
+    { x: COL(0), y: ROW_Y(4), w: W, h: H, label: "Achievements", color: "#4ADE80" },       // 18
+    { x: COL(1), y: ROW_Y(4), w: W, h: H, label: "Leaderboard", color: "#4ADE80" },        // 19
+    { x: COL(2), y: ROW_Y(4), w: W, h: H, label: "Completion", color: "#F59E0B" },         // 20
+    { x: COL(3), y: ROW_Y(4), w: W, h: H, label: "Founder's Log", color: "#0D9488" },      // 21
+    { x: COL(4), y: ROW_Y(4), w: W, h: H, label: "Parent View", color: "#9CA3AF" },        // 22
 
-    // Row 5: Admin
-    { x: 20, y: ROW_Y(5), w: W, h: H, label: "Instructor Dash", color: "#F87171" },
-    { x: 20 + (W + GAP_X), y: ROW_Y(5), w: W, h: H, label: "Invention Admin", color: "#C084FC" },
-    { x: 20 + 2 * (W + GAP_X), y: ROW_Y(5), w: W, h: H, label: "Platform Admin", color: "#F87171" },
+    // Row 5: Admin (3)
+    { x: COL(0), y: ROW_Y(5), w: W, h: H, label: "Instructor Dash", color: "#F87171" },    // 23
+    { x: COL(1), y: ROW_Y(5), w: W, h: H, label: "Invention Admin", color: "#C084FC" },    // 24
+    { x: COL(2), y: ROW_Y(5), w: W, h: H, label: "Platform Admin", color: "#F87171" },     // 25
   ];
 
-  // Arrow types: "nav" = solid (natural flow), "auth" = dashed (sign-in redirect), "admin" = dotted (admin route)
   const arrows: Array<{ from: number; to: number; type: "nav" | "auth" | "admin" }> = [
-    // Entry → Auth (user clicks sign in)
-    { from: 0, to: 4, type: "auth" }, { from: 1, to: 4, type: "auth" }, { from: 2, to: 4, type: "auth" }, { from: 3, to: 5, type: "auth" },
-    // Login → destinations (auth redirect)
-    { from: 4, to: 11, type: "auth" }, { from: 4, to: 19, type: "admin" }, { from: 4, to: 21, type: "admin" },
-    // Signup → Join
-    { from: 5, to: 6, type: "nav" },
+    // Entry → Auth
+    { from: 0, to: 5, type: "auth" }, { from: 1, to: 5, type: "auth" },
+    { from: 2, to: 5, type: "auth" }, { from: 3, to: 6, type: "auth" },
+    { from: 4, to: 5, type: "auth" },
+    // Login → destinations
+    { from: 5, to: 13, type: "auth" }, { from: 5, to: 23, type: "admin" }, { from: 5, to: 25, type: "admin" },
+    { from: 5, to: 9, type: "auth" }, // org_admin without org → org onboarding
+    // Signup → Join (optional)
+    { from: 6, to: 7, type: "nav" },
     // Join → Wizards
-    { from: 6, to: 8, type: "nav" }, { from: 6, to: 9, type: "nav" },
+    { from: 7, to: 10, type: "nav" }, { from: 7, to: 11, type: "nav" },
     // Teacher flows
-    { from: 7, to: 10, type: "nav" }, { from: 10, to: 19, type: "admin" },
+    { from: 8, to: 12, type: "nav" }, { from: 12, to: 23, type: "admin" },
+    // Org onboarding → Instructor
+    { from: 9, to: 23, type: "nav" },
     // Wizards → destinations
-    { from: 8, to: 11, type: "nav" }, { from: 9, to: 16, type: "nav" },
-    // Dashboard navigation
-    { from: 11, to: 12, type: "nav" }, { from: 11, to: 13, type: "nav" }, { from: 11, to: 14, type: "nav" }, { from: 11, to: 15, type: "nav" },
-    { from: 12, to: 16, type: "nav" }, { from: 11, to: 17, type: "nav" },
+    { from: 10, to: 13, type: "nav" }, { from: 11, to: 20, type: "nav" },
+    // Dashboard navigation (main tabs)
+    { from: 13, to: 14, type: "nav" }, { from: 13, to: 15, type: "nav" },
+    { from: 13, to: 16, type: "nav" }, { from: 13, to: 17, type: "nav" },
+    // Lessons → Achievements
+    { from: 14, to: 18, type: "nav" },
+    // Scenarios → badges (back to dashboard)
+    { from: 15, to: 18, type: "nav" },
+    // Dashboard → rewards
+    { from: 13, to: 19, type: "nav" }, { from: 13, to: 21, type: "nav" },
     // Admin
-    { from: 19, to: 20, type: "admin" },
+    { from: 23, to: 24, type: "admin" },
   ];
 
-  const totalW = 20 + 4 * (W + GAP_X);
+  const totalW = 20 + 5 * (W + GAP_X);
   const totalH = ROW_Y(5) + H + 20;
 
   return (
@@ -289,7 +318,7 @@ function FlowDiagram() {
         { y: ROW_Y(1), label: "Auth" },
         { y: ROW_Y(2), label: "Onboarding" },
         { y: ROW_Y(3), label: "Experience" },
-        { y: ROW_Y(4), label: "Completion" },
+        { y: ROW_Y(4), label: "Rewards" },
         { y: ROW_Y(5), label: "Admin" },
       ].map((r, i) => (
         <text key={i} x={8} y={r.y + H / 2} textAnchor="end" dominantBaseline="middle"
@@ -321,7 +350,7 @@ function FlowDiagram() {
         <g key={i}>
           <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="8" fill="var(--bg)" stroke={b.color} strokeWidth="2" />
           <text x={b.x + b.w / 2} y={b.y + b.h / 2} textAnchor="middle" dominantBaseline="middle"
-            fontSize="11" fontWeight="500" fill="var(--text-primary)" fontFamily="var(--font-body, system-ui)">
+            fontSize="10" fontWeight="500" fill="var(--text-primary)" fontFamily="var(--font-body, system-ui)">
             {b.label}
           </text>
         </g>

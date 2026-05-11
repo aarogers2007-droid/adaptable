@@ -34,7 +34,9 @@ export type ModelFeature =
   | "checkin_reply"   // Daily check-in response (Mini)
   | "recommendations" // Business resource recommendations (Mini)
   | "reengagement"    // Re-engagement teaser (Mini)
-  | "support"         // Support chat (Mini);
+  | "support"         // Support chat (Mini)
+  | "scenario_chat"   // Scenario conversation (Sonnet)
+  | "scenario_eval"   // Criteria evaluation (Mini);
 
 // ── Default model assignments ──
 
@@ -64,6 +66,10 @@ const MODEL_CONFIG: Record<ModelFeature, string> = {
   recommendations: MODELS.MINI,
   reengagement: MODELS.MINI,
   support: MODELS.MINI,
+
+  // Scenario system
+  scenario_chat: MODELS.SONNET,
+  scenario_eval: MODELS.MINI,
 };
 
 // ── Public API ──
