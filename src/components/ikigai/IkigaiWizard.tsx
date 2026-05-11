@@ -77,6 +77,8 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAd
   const [studentName, setStudentName] = useState(initialName ?? "");
   const [nameConfirmed, setNameConfirmed] = useState(!!initialName);
   const [nameExiting, setNameExiting] = useState(false);
+  const [gradeLevelSelected, setGradeLevelSelected] = useState(false);
+  const [gradeLevelExiting, setGradeLevelExiting] = useState(false);
   const [ikigaiIntroSeen, setIkigaiIntroSeen] = useState(!!initialName);
   const [ikigaiEntering, setIkigaiEntering] = useState(false);
   const [ikigaiExiting, setIkigaiExiting] = useState(false);
@@ -527,8 +529,54 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAd
         </div>
       )}
 
+      {/* GRADE LEVEL SELECTION — after name, before Ikigai */}
+      {nameConfirmed && !gradeLevelSelected && !demoMode && (
+        <div
+          className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+          style={{
+            opacity: gradeLevelExiting ? 0 : 1,
+            transition: "opacity 0.8s ease-in-out",
+          }}
+        >
+          <div className="max-w-lg w-full text-center">
+            <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold text-[var(--text-primary)]">
+              What grade are you in?
+            </h1>
+            <p className="mt-3 text-base text-[var(--text-secondary)]">
+              This helps us match the experience to you.
+            </p>
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              {[
+                { id: "elementary", label: "Elementary School", sub: "Grades K-5" },
+                { id: "middle", label: "Middle School", sub: "Grades 6-8" },
+                { id: "high", label: "High School", sub: "Grades 9-12" },
+                { id: "college", label: "College & Beyond", sub: "" },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={async () => {
+                    const { saveGradeLevel } = await import("@/app/(app)/onboarding/actions");
+                    await saveGradeLevel(opt.id);
+                    setGradeLevelExiting(true);
+                    setTimeout(() => {
+                      setGradeLevelSelected(true);
+                      requestAnimationFrame(() => setIkigaiEntering(true));
+                    }, 800);
+                  }}
+                  className="rounded-xl border-2 border-[var(--border)] bg-[var(--bg)] p-6 text-center transition-all hover:border-[var(--primary)] hover:shadow-md"
+                >
+                  <p className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">{opt.label}</p>
+                  {opt.sub && <p className="mt-1 text-sm text-[var(--text-muted)]">{opt.sub}</p>}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* IKIGAI DICTIONARY INTRO */}
-      {nameConfirmed && !ikigaiIntroSeen && (
+      {nameConfirmed && (gradeLevelSelected || demoMode) && !ikigaiIntroSeen && (
         <div
           className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
           style={{

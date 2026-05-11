@@ -528,7 +528,7 @@ export async function checkAndAwardAchievements(
   // These require leaderboard computation. We do a lightweight check using the admin client.
   // Since this function receives the admin client from the dashboard, we can query broadly.
   {
-    // Get student's class and org peers
+    // Get student's peers: class enrollment first, then org-wide fallback
     const { data: enrollmentData } = await supabase
       .from("class_enrollments")
       .select("class_id")
@@ -543,6 +543,24 @@ export async function checkAndAwardAchievements(
         .select("student_id")
         .eq("class_id", enrollment.class_id);
       peerIds = (peers ?? []).map((p: { student_id: string }) => p.student_id);
+    } else {
+      // Open platform student — use org-wide peers with same grade level
+      const { data: studentProfile } = await supabase
+        .from("profiles")
+        .select("org_id, grade_level")
+        .eq("id", studentId)
+        .single();
+      const orgId = (studentProfile as Record<string, unknown> | null)?.org_id as string | null;
+      const gradeLevel = (studentProfile as Record<string, unknown> | null)?.grade_level as string | null;
+      if (orgId && gradeLevel) {
+        const { data: orgPeers } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("org_id", orgId)
+          .eq("grade_level", gradeLevel)
+          .eq("role", "student");
+        peerIds = (orgPeers ?? []).map((p: { id: string }) => p.id);
+      }
     }
 
     if (peerIds.length > 1) {

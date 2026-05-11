@@ -75,10 +75,7 @@ export async function getStudentProfile(
   let displayName = "Anonymous";
   if (fullName) {
     const parts = fullName.trim().split(/\s+/);
-    displayName =
-      parts.length === 1
-        ? parts[0]
-        : `${parts[0]} ${parts[parts.length - 1][0]}.`;
+    displayName = parts[0];
   }
 
   const earned = await getStudentAchievements(admin, studentId);

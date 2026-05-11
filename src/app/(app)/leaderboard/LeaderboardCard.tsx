@@ -1,5 +1,7 @@
 "use client";
 
+import { formatRank } from "./LeaderboardClient";
+
 export interface LeaderboardEntry {
   studentId: string;
   displayName: string;
@@ -16,6 +18,7 @@ interface LeaderboardCardProps {
   currentStudentId: string;
   metricLabel: string;
   onStudentClick?: (studentId: string) => void;
+  totalStudents: number;
 }
 
 function getRankColor(rank: number): string | null {
@@ -31,6 +34,7 @@ export default function LeaderboardCard({
   entries,
   metricLabel,
   onStudentClick,
+  totalStudents,
 }: LeaderboardCardProps) {
   const top15 = entries.filter(e => e.rank <= 15);
   const currentInTop = top15.some(e => e.isCurrentStudent);
@@ -95,11 +99,11 @@ export default function LeaderboardCard({
                 <span className="text-[var(--text-muted)] text-xs tracking-widest">. . .</span>
               </div>
               <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm bg-[var(--primary)]/8">
-                <span className="w-6 text-right shrink-0">
-                  <span className="text-xs text-[var(--primary)]">&#9650;</span>
+                <span className="w-8 text-right shrink-0 text-xs text-[var(--primary)] font-medium tabular-nums">
+                  {formatRank(currentEntry.rank, totalStudents)}
                 </span>
                 <span className="truncate flex-1 text-[var(--text-primary)] font-medium">
-                  You — Keep going, you&apos;re climbing!
+                  You — Keep going!
                 </span>
                 <span className="shrink-0 text-[var(--text-secondary)] tabular-nums">
                   {currentEntry.primaryValue.toLocaleString()} <span className="text-[var(--text-muted)] text-xs">{metricLabel}</span>

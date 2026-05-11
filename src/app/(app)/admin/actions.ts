@@ -90,6 +90,83 @@ export async function resetSingleLesson(lessonId: string) {
   return { success: true };
 }
 
+/**
+ * Manual org provisioning — platform owner only.
+ * Creates an org row identical to the self-serve onboarding path.
+ */
+export async function provisionOrganizationManual(data: {
+  orgName: string;
+  slug: string;
+  subdomain: string;
+  subscriptionTier: string;
+  contactEmail: string;
+}): Promise<{ success?: boolean; orgId?: string; error?: string }> {
+  const { admin, error } = await verifyAdmin();
+  if (error || !admin) return { error: error ?? "Auth failed" };
+
+  // Extra check: platform owner only
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_platform_owner")
+    .eq("id", user.id)
+    .single();
+
+  if (!(profile as Record<string, unknown> | null)?.is_platform_owner) {
+    return { error: "Platform owner only" };
+  }
+
+  const { orgName, slug, subdomain, subscriptionTier, contactEmail } = data;
+
+  if (!orgName || !slug || !subdomain) {
+    return { error: "Name, slug, and subdomain are required." };
+  }
+
+  // Create org
+  const { data: org, error: orgError } = await admin
+    .from("organizations")
+    .insert({
+      name: orgName,
+      slug,
+      subdomain,
+      branding_config: { platform_name: orgName },
+      subscription_tier: subscriptionTier || "starter",
+      is_active: true,
+    })
+    .select("id")
+    .single();
+
+  if (orgError) {
+    if (orgError.code === "23505") {
+      return { error: "Subdomain or slug already taken." };
+    }
+    console.error("[admin] org provision failed:", orgError);
+    return { error: "Failed to create organization." };
+  }
+
+  // If contact email provided, assign them as org_admin
+  if (contactEmail) {
+    const { data: contactProfile } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("email", contactEmail)
+      .limit(1)
+      .single();
+
+    if (contactProfile) {
+      await admin
+        .from("profiles")
+        .update({ org_id: org.id, role: "org_admin" })
+        .eq("id", contactProfile.id);
+    }
+  }
+
+  return { success: true, orgId: org.id };
+}
+
 export async function unlockAllLessons() {
   const { supabase, userId, error } = await verifyAdmin();
   if (error || !supabase || !userId) return { error: error ?? "Auth failed" };

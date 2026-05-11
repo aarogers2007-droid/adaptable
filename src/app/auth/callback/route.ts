@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   // Validate redirect path to prevent open redirects
   const rawNext = searchParams.get("next") ?? "/dashboard";
-  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention", "/aj"];
+  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention", "/aj", "/org"];
   const next = (rawNext.startsWith("/") && !rawNext.startsWith("//") && SAFE_PREFIXES.some(p => rawNext.startsWith(p)))
     ? rawNext
     : "/dashboard";
@@ -41,6 +41,10 @@ export async function GET(request: Request) {
         if ((profile as Record<string, unknown> | null)?.is_platform_owner) {
           return NextResponse.redirect(`${origin}/admin`);
         }
+        // org_admin without org_id needs org onboarding first
+        if (profile?.role === "org_admin" && !profile?.org_id) {
+          return NextResponse.redirect(`${origin}/org/onboarding`);
+        }
         if (profile?.role === "instructor" || profile?.role === "org_admin") {
           return NextResponse.redirect(`${origin}/instructor/dashboard`);
         }
@@ -58,12 +62,7 @@ export async function GET(request: Request) {
         }
 
         // No business idea yet — they're mid-onboarding.
-        // No org_id either: they need a class first.
-        if (!profile?.org_id) {
-          return NextResponse.redirect(`${origin}/join`);
-        }
-
-        // Has org but no business idea — check session type to determine flow.
+        // Check if they have a class with a special session type.
         const { data: enrollment } = await supabase
           .from("class_enrollments")
           .select("class_id, classes(session_type)")
@@ -76,6 +75,8 @@ export async function GET(request: Request) {
           return NextResponse.redirect(`${origin}/invention`);
         }
 
+        // Open platform: class enrollment is optional.
+        // Send to onboarding (grade level + Ikigai) regardless of org_id.
         return NextResponse.redirect(`${origin}/onboarding`);
       }
 

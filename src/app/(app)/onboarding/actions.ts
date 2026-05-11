@@ -397,3 +397,39 @@ export async function loadDraft(): Promise<IkigaiDraft | null> {
 
   return (data?.ikigai_draft as IkigaiDraft) ?? null;
 }
+
+/**
+ * Save the student's self-reported grade level to their profile.
+ * Called once during onboarding before the Ikigai wizard.
+ */
+export async function saveGradeLevel(gradeLevel: string): Promise<{ success: boolean; error?: string }> {
+  const validLevels = ["elementary", "middle", "high", "college"];
+  if (!validLevels.includes(gradeLevel)) {
+    return { success: false, error: "Invalid grade level" };
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ grade_level: gradeLevel })
+    .eq("id", user.id);
+
+  if (error) return { success: false, error: error.message };
+
+  // Also update grade_tier to match for AI adaptation
+  const tierMap: Record<string, string> = {
+    elementary: "upper_elementary",
+    middle: "middle_school",
+    high: "high_school",
+    college: "high_school",
+  };
+  await supabase
+    .from("profiles")
+    .update({ grade_tier: tierMap[gradeLevel] })
+    .eq("id", user.id);
+
+  return { success: true };
+}

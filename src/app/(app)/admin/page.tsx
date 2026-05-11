@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
+import ProvisionOrg from "./ProvisionOrg";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const dynamic = "force-dynamic";
@@ -203,6 +204,16 @@ export default async function AdminPage() {
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* Provision Organization */}
+        <div className="mt-8">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
+            Provision Organization
+          </h2>
+          <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+            <ProvisionOrg />
           </div>
         </div>
 

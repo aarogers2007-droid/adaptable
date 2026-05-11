@@ -17,13 +17,13 @@ export interface LeaderboardData {
 }
 
 /**
- * Format full_name as "First L." (e.g., "Aisha Johnson" → "Aisha J.")
+ * Format full_name as first name only (e.g., "Aisha Johnson" → "Aisha").
+ * Privacy: leaderboard shows first name only, no last initial.
  */
 function formatDisplayName(fullName: string | null): string {
   if (!fullName) return "Anonymous";
   const parts = fullName.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0];
-  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+  return parts[0];
 }
 
 /**

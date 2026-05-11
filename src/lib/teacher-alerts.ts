@@ -26,6 +26,9 @@ interface CreateAlertParams {
  * Create a teacher alert. Finds the student's class and creates
  * the alert for the instructor to see.
  *
+ * For classless students (open platform), creates the alert with
+ * class_id = NULL so org admins can still see it.
+ *
  * Deduplication: won't create a duplicate if an unacknowledged alert
  * of the same type exists for the same student within the last 24h.
  */
@@ -37,7 +40,7 @@ export async function createAlert({
   message,
   context,
 }: CreateAlertParams) {
-  // Find the student's class
+  // Find the student's class (may be null for open platform students)
   const { data: enrollment } = await supabase
     .from("class_enrollments")
     .select("class_id")
@@ -45,23 +48,29 @@ export async function createAlert({
     .limit(1)
     .single();
 
-  if (!enrollment) return; // Student not in a class, no instructor to alert
+  const classId = enrollment?.class_id ?? null;
 
   // Deduplicate: check for recent unacknowledged alert of same type
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { count } = await supabase
+  let dedupeQuery = supabase
     .from("teacher_alerts")
     .select("*", { count: "exact", head: true })
     .eq("student_id", studentId)
-    .eq("class_id", enrollment.class_id)
     .eq("alert_type", alertType)
     .eq("acknowledged", false)
     .gte("created_at", oneDayAgo);
 
+  if (classId) {
+    dedupeQuery = dedupeQuery.eq("class_id", classId);
+  } else {
+    dedupeQuery = dedupeQuery.is("class_id", null);
+  }
+
+  const { count } = await dedupeQuery;
   if ((count ?? 0) > 0) return; // Already alerted
 
   await supabase.from("teacher_alerts").insert({
-    class_id: enrollment.class_id,
+    class_id: classId,
     student_id: studentId,
     alert_type: alertType,
     severity,
