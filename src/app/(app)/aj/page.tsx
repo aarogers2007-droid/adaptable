@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import AJAnalytics from "./AJAnalytics";
 
 export const dynamic = "force-dynamic";
 
@@ -145,6 +146,11 @@ export default async function AJDashboard() {
         <p className="mt-1 text-sm text-[var(--text-muted)]">
           Every page on the platform. Click and go.
         </p>
+
+        {/* Real-time analytics */}
+        <div className="mt-6">
+          <AJAnalytics />
+        </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {sections.map((section) => (
