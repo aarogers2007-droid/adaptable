@@ -55,15 +55,33 @@ interface MessageInput {
 interface AIResponse {
   text: string;
   model_used: string;
-  usage: { input_tokens: number; output_tokens: number };
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+    cache_creation_input_tokens?: number;
+    cache_read_input_tokens?: number;
+  };
 }
+
+// ── Content block type for prompt caching ──
+
+export interface CacheableTextBlock {
+  type: "text";
+  text: string;
+  cache_control?: { type: "ephemeral" };
+}
+
+/** System prompt: plain string (no caching) or content block array (with cache_control) */
+export type SystemPromptInput = string | CacheableTextBlock[];
 
 // ── Legacy Anthropic-only functions (for existing call sites) ──
 
 interface SendMessageOptions {
   feature: AIFeature;
-  systemPrompt: string;
+  systemPrompt: SystemPromptInput;
   messages: MessageInput[];
+  /** Override model for per-lesson assignments. If set, uses this instead of MODEL_MAP[feature]. */
+  modelOverride?: string;
 }
 
 /**
@@ -86,21 +104,129 @@ export async function sendMessage({ feature, systemPrompt, messages }: SendMessa
     usage: {
       input_tokens: response.usage.input_tokens,
       output_tokens: response.usage.output_tokens,
+      cache_creation_input_tokens: (response.usage as unknown as Record<string, number>).cache_creation_input_tokens,
+      cache_read_input_tokens: (response.usage as unknown as Record<string, number>).cache_read_input_tokens,
     },
   };
 }
 
+/** Common stream interface for both Anthropic and OpenAI streaming */
+export interface AIStream {
+  [Symbol.asyncIterator](): AsyncIterator<{
+    type: string;
+    delta: { type: string; text: string };
+  }>;
+  finalMessage(): Promise<{
+    content: { type: string; text: string }[];
+    usage: { input_tokens: number; output_tokens: number };
+  }>;
+}
+
 /**
- * Stream a message from Claude. Returns an async iterable of text chunks.
- * Used by the AI guide and lesson chat Route Handlers.
+ * Stream a message. Returns an async iterable of text chunks.
+ * Routes to Anthropic or OpenAI based on model prefix.
+ * Used by all chat Route Handlers.
  */
-export async function streamMessage({ feature, systemPrompt, messages }: SendMessageOptions) {
+export async function streamMessage({ feature, systemPrompt, messages, modelOverride }: SendMessageOptions): Promise<AIStream> {
+  const model = modelOverride ?? MODEL_MAP[feature];
+
+  // Route to OpenAI streaming for gpt-* models
+  if (model.startsWith("gpt-")) {
+    return streamMessageOpenAI(model, systemPrompt, messages, MAX_TOKENS_MAP[feature]);
+  }
+
   return anthropic.messages.stream({
-    model: MODEL_MAP[feature],
+    model,
     max_tokens: MAX_TOKENS_MAP[feature],
     system: systemPrompt,
     messages,
+  }) as unknown as AIStream;
+}
+
+/**
+ * OpenAI streaming wrapper that returns an async iterable matching
+ * the Anthropic stream shape (content_block_delta events) so the
+ * lesson-chat route handler works identically for both providers.
+ *
+ * Also exposes finalMessage() for usage extraction.
+ */
+async function streamMessageOpenAI(
+  model: string,
+  systemPrompt: SystemPromptInput,
+  messages: MessageInput[],
+  maxTokens: number,
+) {
+  const { default: OpenAI } = await import("openai");
+  const openai = new OpenAI();
+
+  const systemText = typeof systemPrompt === "string"
+    ? systemPrompt
+    : systemPrompt.map((b) => b.text).join("\n\n");
+
+  const stream = await openai.chat.completions.create({
+    model,
+    max_tokens: maxTokens,
+    stream: true,
+    messages: [
+      { role: "system", content: systemText },
+      ...messages,
+    ],
   });
+
+  let fullText = "";
+  let promptTokens = 0;
+  let completionTokens = 0;
+
+  // Create an async iterable that yields Anthropic-shaped events
+  const events: Array<{ type: string; delta: { type: string; text: string } }> = [];
+  const readers: Array<() => void> = [];
+  let done = false;
+
+  // Process in background
+  const processing = (async () => {
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullText += delta;
+        const event = { type: "content_block_delta", delta: { type: "text_delta", text: delta } };
+        events.push(event);
+        for (const resolve of readers.splice(0)) resolve();
+      }
+      if (chunk.usage) {
+        promptTokens = chunk.usage.prompt_tokens ?? 0;
+        completionTokens = chunk.usage.completion_tokens ?? 0;
+      }
+    }
+    done = true;
+    for (const resolve of readers.splice(0)) resolve();
+  })();
+
+  return {
+    [Symbol.asyncIterator]() {
+      let index = 0;
+      return {
+        async next() {
+          while (index >= events.length && !done) {
+            await new Promise<void>((resolve) => readers.push(resolve));
+          }
+          if (index < events.length) {
+            return { value: events[index++], done: false as const };
+          }
+          return { value: undefined, done: true as const };
+        },
+      };
+    },
+    async finalMessage() {
+      await processing;
+      return {
+        content: [{ type: "text" as const, text: fullText }],
+        usage: {
+          input_tokens: promptTokens,
+          output_tokens: completionTokens,
+        },
+      };
+    },
+  };
 }
 
 // ── New multi-provider functions ──
