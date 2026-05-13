@@ -588,7 +588,14 @@ When discussing customer conversations, explicitly reference the Mom Test princi
       },
     ];
     // Check for per-lesson model override (14 lessons use gpt-4o-mini instead of Sonnet)
-    const lessonModel = await getLessonModel(lessonId);
+    let lessonModel = "claude-sonnet-4-20250514";
+    if (lessonId) {
+      try {
+        lessonModel = await getLessonModel(lessonId);
+      } catch (modelErr) {
+        console.error("[lesson-chat] getLessonModel failed, defaulting to Sonnet:", modelErr);
+      }
+    }
     console.log("[lesson-chat] Starting stream, model:", lessonModel, "system prompt length:", systemPrompt.length, "messages:", messages.length);
     const stream = await streamMessage({
       feature: "guide",
