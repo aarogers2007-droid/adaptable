@@ -12,11 +12,10 @@ export default async function CompletionPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [profileRes, progressRes, lessonsRes, decisionsRes, pitchRes, achievementsRes] = await Promise.all([
+  const [profileRes, progressRes, lessonsRes, pitchRes, achievementsRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).single(),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
     supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
-    supabase.from("lesson_decisions").select("*").eq("student_id", user.id).order("created_at"),
     supabase.from("business_pitches").select("*").eq("student_id", user.id).order("created_at", { ascending: false }).limit(1).single(),
     supabase.from("student_achievements").select("*").eq("student_id", user.id),
   ]);
@@ -37,14 +36,6 @@ export default async function CompletionPage() {
   const ikigaiResult = profile.ikigai_result as IkigaiResult | null;
   const studentName = profile.full_name?.split(" ")[0] ?? "there";
   const isAdmin = profile.role === "org_admin";
-
-  // Decision journal entries with lesson titles
-  const decisions = (decisionsRes.data ?? []) as { decision_text: string; lesson_id: string }[];
-  const lessonMap = new Map(allLessons.map((l) => [l.id, l]));
-  const decisionsWithTitles = decisions.map((d) => ({
-    text: d.decision_text,
-    lessonTitle: lessonMap.get(d.lesson_id)?.title ?? "Lesson",
-  }));
 
   // Business pitch
   const pitch = pitchRes.data as { pitch_text: string; ai_feedback: string | null } | null;
@@ -138,27 +129,6 @@ export default async function CompletionPage() {
           </section>
         )}
 
-        {/* Key Decisions */}
-        {decisionsWithTitles.length > 0 && (
-          <section className="stagger-enter mt-6 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6" style={{ animationDelay: "300ms" }}>
-            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">
-              Key Decisions You Made
-            </p>
-            <div className="space-y-3">
-              {decisionsWithTitles.map((d, i) => (
-                <div key={i} className="flex gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--primary)]/10 text-xs font-medium text-[var(--primary)]">
-                    {i + 1}
-                  </span>
-                  <div>
-                    <p className="text-xs text-[var(--text-muted)]">{d.lessonTitle}</p>
-                    <p className="text-sm text-[var(--text-primary)]">{d.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Business Pitch — #15 signature typography */}
         {pitch?.pitch_text && (

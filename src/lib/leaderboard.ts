@@ -158,33 +158,23 @@ export async function getLeaderboardData(
     .not("artifacts", "is", null);
   if (weekStart) progressQuery = progressQuery.gte("created_at", weekStart);
 
-  // --- DEPTH: avg response length + decision journal entries ---
-  let decisionsQuery = supabase
-    .from("lesson_decisions")
-    .select("student_id")
-    .in("student_id", studentIds);
-  if (weekStart) decisionsQuery = decisionsQuery.gte("created_at", weekStart);
-
   // Execute all queries in parallel
   const [
     checkinRes,
     activeRes,
     messagesRes,
     progressRes,
-    decisionsRes,
   ] = await Promise.all([
     checkinQuery,
     usageQueryForActive,
     usageQueryForMessages,
     progressQuery,
-    decisionsQuery,
   ]);
 
   const checkins = checkinRes.data ?? [];
   const activeUsage = activeRes.data ?? [];
   const messages = messagesRes.data ?? [];
   const progressRows = progressRes.data ?? [];
-  const decisions = decisionsRes.data ?? [];
 
   // --- Compute CONSISTENCY ---
   const checkinsByStudent = new Map<string, string[]>();
@@ -238,18 +228,13 @@ export async function getLeaderboardData(
   }));
 
   // --- Compute DEPTH ---
-  // Checkpoint passage rate (checkpoints reached) + decision journal entries
-  // This rewards understanding, not verbosity. Fair to ESL students.
-  const decisionCountByStudent = new Map<string, number>();
-  for (const d of decisions) {
-    decisionCountByStudent.set(d.student_id, (decisionCountByStudent.get(d.student_id) ?? 0) + 1);
-  }
-
+  // Checkpoint passage rate (checkpoints reached).
+  // Rewards understanding, not verbosity. Fair to ESL students.
   const depthItems = studentIds.map(id => ({
     studentId: id,
     displayName: nameMap.get(id) ?? "Anonymous",
     primaryValue: checkpointsByStudent.get(id)?.size ?? 0,
-    secondaryValue: decisionCountByStudent.get(id) ?? 0,
+    secondaryValue: 0,
   }));
 
   // --- Compute MOST IMPROVED (weekly: this week's messages vs last week's) ---

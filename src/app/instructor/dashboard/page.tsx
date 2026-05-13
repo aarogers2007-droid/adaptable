@@ -480,7 +480,7 @@ export default async function InstructorDashboardPage() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      <DashboardClient classes={classDataArray} totalLessons={totalLessons} />
+      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id} />
     </main>
   );
 }

@@ -80,9 +80,11 @@ export default async function LeaderboardPage() {
     : [null, null];
 
   // Late-joiner detection
+  /* eslint-disable react-hooks/purity -- server component, Date.now() is safe here */
   const isRecentJoiner = profile.created_at
     ? (Date.now() - new Date(profile.created_at).getTime()) < 7 * 24 * 60 * 60 * 1000
     : false;
+  /* eslint-enable react-hooks/purity */
 
   const totalStudents = gradeStudentIds.length;
 

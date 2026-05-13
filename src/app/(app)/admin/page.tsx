@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
 import ProvisionOrg from "./ProvisionOrg";
+import SponsorReports from "./SponsorReports";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export const dynamic = "force-dynamic";
@@ -27,11 +28,12 @@ export default async function AdminPage() {
   }
 
   // ── Load platform-wide data ──
-  const [classesRes, profilesRes, inventionSessionsRes, progressRes] = await Promise.all([
+  const [classesRes, profilesRes, inventionSessionsRes, progressRes, scenariosRes] = await Promise.all([
     supabase.from("classes").select("id, name, session_type, instructor_id, org_id").order("created_at"),
     supabase.from("profiles").select("id, full_name, email, role, is_platform_owner, org_id").in("role", ["instructor", "org_admin"]),
     supabase.from("invention_sessions").select("id, completed_at"),
     supabase.from("student_progress").select("id, status"),
+    supabase.from("scenarios").select("id, title, is_sponsored, sponsor_name").eq("is_active", true),
   ]);
 
   const classes = classesRes.data ?? [];
@@ -214,6 +216,21 @@ export default async function AdminPage() {
           </h2>
           <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
             <ProvisionOrg />
+          </div>
+        </div>
+
+        {/* Sponsor Reports */}
+        <div className="mt-8">
+          <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
+            Sponsor Reports
+          </h2>
+          <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+            <SponsorReports scenarios={(scenariosRes.data ?? []).map((s) => ({
+              id: s.id,
+              title: s.title,
+              is_sponsored: s.is_sponsored,
+              sponsor_name: s.sponsor_name,
+            }))} />
           </div>
         </div>
 

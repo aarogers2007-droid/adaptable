@@ -144,7 +144,7 @@ export async function POST(request: Request) {
             ).catch(() => {});
           }
 
-          // Log usage
+          // Log usage with flywheel columns
           const finalMessage = await stream.finalMessage();
           await supabase.from("ai_usage_log").insert({
             student_id: user.id,
@@ -154,6 +154,7 @@ export async function POST(request: Request) {
             output_tokens: finalMessage.usage.output_tokens,
             estimated_cost_usd:
               (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+            response_length: fullResponse.length,
           });
 
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));

@@ -15,6 +15,8 @@
  * are spoken naturally rather than translated.
  */
 
+import { getRegionalResources, formatCrisisResourcesForStudent } from "@/lib/crisis-resources";
+
 // Direct self-harm and suicidal ideation signals
 const CRISIS_PATTERNS = [
   // ── Direct ideation ──
@@ -170,7 +172,6 @@ export async function detectCrisisUniversal(text: string): Promise<UniversalCris
  * Uses regional crisis resources based on the org's configured region.
  */
 export function getCrisisResponse(studentName: string, region?: string): string {
-  const { getRegionalResources, formatCrisisResourcesForStudent } = require("@/lib/crisis-resources");
   const resources = getRegionalResources(region ?? "US");
   const resourceText = formatCrisisResourcesForStudent(resources);
 

@@ -67,9 +67,8 @@ export async function resetIkigai() {
     .delete()
     .eq("student_id", userId);
 
-  // Also clear daily checkins, lesson decisions, business pitches, achievements
+  // Also clear daily checkins, business pitches, achievements
   await admin.from("daily_checkins").delete().eq("student_id", userId);
-  await admin.from("lesson_decisions").delete().eq("student_id", userId);
   await admin.from("business_pitches").delete().eq("student_id", userId);
   await admin.from("student_achievements").delete().eq("student_id", userId);
   await admin.from("founder_log_entries").delete().eq("student_id", userId);

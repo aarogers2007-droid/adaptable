@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import RatingWidget from "@/components/ui/RatingWidget";
 import AppNav from "@/components/ui/AppNav";
 
 function TypewriterText({ text, streaming }: { text: string; streaming: boolean }) {
@@ -247,6 +248,7 @@ export default function ChatInterface({
       {/* Input */}
       <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
         <form onSubmit={handleSend} className="mx-auto max-w-[700px] px-6 py-4">
+          <RatingWidget contextType="guide" />
           <div className="flex gap-3">
             <textarea
               ref={inputRef}

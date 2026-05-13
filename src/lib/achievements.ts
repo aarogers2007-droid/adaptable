@@ -125,19 +125,6 @@ export const ACHIEVEMENTS: AchievementDef[] = [
 
   // ── Depth of Thinking ──
   {
-    id: "decision-maker",
-    name: "Decision Maker",
-    description: "Journaled business decisions",
-    category: "depth",
-    icon: "📝",
-    tiers: ["bronze", "silver", "gold"],
-    tierDescriptions: {
-      bronze: "Journaled 3 business decisions",
-      silver: "Journaled 6 business decisions",
-      gold: "Journaled a business decision in every lesson of the program",
-    },
-  },
-  {
     id: "pitch-perfect",
     name: "Pitch Perfect",
     description: "Completed a business pitch",
@@ -344,7 +331,6 @@ export async function checkAndAwardAchievements(
     profileRes,
     progressRes,
     checkinsRes,
-    decisionsRes,
     pitchesRes,
     usageRes,
     lessonsRes,
@@ -356,10 +342,6 @@ export async function checkAndAwardAchievements(
       .select("id, created_at")
       .eq("student_id", studentId)
       .order("created_at", { ascending: false }),
-    supabase
-      .from("lesson_decisions")
-      .select("id, lesson_id, created_at")
-      .eq("student_id", studentId),
     supabase
       .from("business_pitches")
       .select("id")
@@ -382,7 +364,7 @@ export async function checkAndAwardAchievements(
     updated_at: string;
   }[];
   const checkins = (checkinsRes.data ?? []) as { id: string; created_at: string }[];
-  const decisions = (decisionsRes.data ?? []) as { id: string; lesson_id: string; created_at: string }[];
+  // Decision journal removed — Founder's Log supersedes
   const pitches = (pitchesRes.data ?? []) as { id: string }[];
   const usageLogs = (usageRes.data ?? []) as { id: string; feature: string; created_at: string }[];
   const lessons = (lessonsRes.data ?? []) as { id: string; lesson_sequence: number; module_sequence: number }[];
@@ -485,11 +467,7 @@ export async function checkAndAwardAchievements(
 
   // --- Depth of Thinking ---
 
-  // Decision Maker — decision journal count
-  const decisionCount = decisions.length;
-  if (decisionCount >= 8) award("decision-maker", "gold");
-  if (decisionCount >= 6) award("decision-maker", "silver");
-  if (decisionCount >= 3) award("decision-maker", "bronze");
+  // Decision Maker removed (Founder's Log supersedes)
 
   // Pitch Perfect — has at least 1 pitch
   if (pitches.length > 0) {
@@ -660,19 +638,12 @@ export async function checkAndAwardAchievements(
     }
   }
 
-  // Pivot: has lesson_decisions where the student updated (2+ different decisions for same concept).
-  // Since lesson_decisions uses upsert (unique on student_id + lesson_id), we can't directly detect
-  // multiple versions. Instead, check if any decision was updated (updated_at differs from created_at).
-  // Actually the table doesn't have updated_at. We'll check the profile's business_idea changes instead.
-  // Simplest: if the student has a decision AND any progress row's artifacts show the lesson was
-  // revisited. Actually, let's just check if there is any decision whose created_at is AFTER
-  // the lesson was already completed — meaning they came back and changed it.
-  for (const d of decisions) {
-    const matchingProgress = progressRows.find(
-      (p) => p.lesson_id === d.lesson_id && p.status === "completed"
-    );
-    if (matchingProgress?.completed_at) {
-      if (new Date(d.created_at) > new Date(matchingProgress.completed_at)) {
+  // Pivot: previously checked lesson_decisions for revisited decisions.
+  // Decision journal removed. Pivot achievement now checks if student
+  // revisited a completed lesson (progress row updated after completion).
+  for (const p of progressRows) {
+    if (p.status === "completed" && p.completed_at && p.updated_at) {
+      if (new Date(p.updated_at) > new Date(p.completed_at)) {
         award("pivot", "gold");
         break;
       }

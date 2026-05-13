@@ -21,7 +21,7 @@ export default async function ScenarioChatPage({
 
   const { data: scenario } = await supabase
     .from("scenarios")
-    .select("id, title, rubric_criteria, badge_name, badge_icon")
+    .select("id, title, situation, industry, difficulty, rubric_criteria, is_sponsored, sponsor_name, sponsor_logo_url, badge_name, badge_icon")
     .eq("id", scenarioId)
     .eq("is_active", true)
     .single();
@@ -58,14 +58,31 @@ export default async function ScenarioChatPage({
     }
   }
 
+  // Check if student has an existing badge for this scenario
+  const { data: badge } = await supabase
+    .from("student_badges")
+    .select("badge_level")
+    .eq("student_id", user.id)
+    .eq("scenario_id", scenarioId)
+    .single();
+
   return (
     <ScenarioChat
       scenarioId={scenario.id}
-      scenarioTitle={scenario.title}
-      badgeName={scenario.badge_name}
-      badgeIcon={scenario.badge_icon}
+      scenario={{
+        title: scenario.title,
+        situation: scenario.situation,
+        industry: scenario.industry,
+        difficulty: scenario.difficulty,
+        isSponsored: scenario.is_sponsored,
+        sponsorName: scenario.sponsor_name,
+        sponsorLogoUrl: scenario.sponsor_logo_url,
+        badgeName: scenario.badge_name,
+        badgeIcon: scenario.badge_icon,
+      }}
       criteriaLabels={criteriaLabels}
       existingSession={existingSession}
+      existingBadgeLevel={badge?.badge_level ?? null}
     />
   );
 }

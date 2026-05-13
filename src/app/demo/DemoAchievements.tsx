@@ -18,8 +18,8 @@ const DEMO_ACHIEVEMENTS: DemoAchievement[] = [
   { id: "named-and-claimed", name: "Named & Claimed", description: "Filled in your business name, niche, customer, and revenue model.", icon: "🏷️", tier: "gold" },
   { id: "know-thy-customer", name: "Know Thy Customer", description: "Completed the customer interview sandbox.", icon: "🎤", tier: "silver" },
   { id: "price-is-right", name: "Price Is Right", description: "Set your pricing strategy in the pricing lesson.", icon: "💰", tier: "silver" },
-  { id: "first-decision", name: "First Decision", description: "Logged your first decision in the decision journal.", icon: "💡", tier: "bronze" },
-  { id: "five-decisions", name: "Decision Maker", description: "Five decisions journaled — you're committing in writing.", icon: "🧠", tier: "silver" },
+  { id: "deep-thinker", name: "Deep Thinker", description: "Passed all checkpoints in a single lesson.", icon: "🧠", tier: "silver" },
+  { id: "first-words", name: "First Words", description: "Sent your first message to the AI mentor.", icon: "💬", tier: "bronze" },
   { id: "streak-week", name: "On Fire", description: "Seven-day check-in streak.", icon: "🔥", tier: "silver" },
   { id: "launch-ready", name: "Launch Ready", description: "Completed all 22 lessons and built a real plan.", icon: "🎓", tier: "gold" },
 ];

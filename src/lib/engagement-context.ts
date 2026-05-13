@@ -8,19 +8,13 @@ export async function getEngagementContext(
   supabase: SupabaseClient,
   studentId: string
 ): Promise<string> {
-  const [checkinsRes, decisionsRes, pitchRes] = await Promise.all([
+  const [checkinsRes, pitchRes] = await Promise.all([
     supabase
       .from("daily_checkins")
       .select("prompt, response")
       .eq("student_id", studentId)
       .order("created_at", { ascending: false })
       .limit(3),
-    supabase
-      .from("lesson_decisions")
-      .select("decision_text, lessons(title, lesson_sequence)")
-      .eq("student_id", studentId)
-      .order("created_at", { ascending: false })
-      .limit(5),
     supabase
       .from("business_pitches")
       .select("pitch_text")
@@ -41,24 +35,6 @@ export async function getEngagementContext(
     );
     sections.push(
       `RECENT CHECK-INS (the student's daily reflections — reference these to show you remember):\n${lines.join("\n")}`
-    );
-  }
-
-  // Decisions
-  const decisions = decisionsRes.data;
-  if (decisions && decisions.length > 0) {
-    const lines = decisions.map(
-      (d: Record<string, unknown>) => {
-        const lessons = d.lessons as { title: string; lesson_sequence: number }[] | { title: string; lesson_sequence: number } | null;
-        const lesson = Array.isArray(lessons) ? lessons[0] : lessons;
-        const label = lesson
-          ? `Lesson ${lesson.lesson_sequence}`
-          : "Lesson";
-        return `- ${label}: "${d.decision_text}"`;
-      }
-    );
-    sections.push(
-      `LESSON DECISIONS (key choices the student made — check for contradictions, reference naturally):\n${lines.join("\n")}`
     );
   }
 

@@ -230,16 +230,6 @@ export default async function ParentViewPage({
 
   const progress = (progressData ?? []) as StudentProgress[];
 
-  // Fetch decision journal entries for richer parent summaries
-  const { data: decisionsData } = await supabase
-    .from("lesson_decisions")
-    .select("lesson_id, decision_text")
-    .eq("student_id", typedStudent.id);
-  const decisionsByLesson = new Map<string, string>();
-  for (const d of decisionsData ?? []) {
-    decisionsByLesson.set(d.lesson_id, d.decision_text);
-  }
-
   // Build progress map
   const progressMap = new Map<string, StudentProgress>();
   for (const p of progress) {
@@ -303,8 +293,7 @@ export default async function ParentViewPage({
       );
       if (completedWithArtifacts.length > 0) {
         const last = completedWithArtifacts[completedWithArtifacts.length - 1];
-        const decisionText = decisionsByLesson.get(last.lesson.id);
-        summary = extractSummary(last.artifacts, last.lesson.title, decisionText);
+        summary = extractSummary(last.artifacts, last.lesson.title, undefined);
       } else {
         summary = `Completed! Your student explored ${def.name.toLowerCase()}.`;
       }

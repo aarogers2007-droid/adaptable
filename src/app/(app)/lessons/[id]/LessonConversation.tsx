@@ -62,8 +62,8 @@ function TypewriterText({ text, streaming }: { text: string; streaming: boolean 
 import Link from "next/link";
 import AppNav from "@/components/ui/AppNav";
 import InterviewSandbox from "@/components/interview/InterviewSandbox";
-import DecisionJournal from "@/components/lessons/DecisionJournal";
 import BusinessPitch from "@/components/lessons/BusinessPitch";
+import RatingWidget from "@/components/ui/RatingWidget";
 import { generatePersonas } from "@/lib/customer-personas";
 import { saveInterviewData } from "./interview-actions";
 import VoiceInput from "@/components/ui/VoiceInput";
@@ -135,7 +135,7 @@ export default function LessonConversation({
   const [learningStyle, setLearningStyle] = useState({ style: "detecting...", pace: "detecting...", detail: "detecting...", motivation: "detecting...", register: "detecting...", emotion: "detecting..." });
   const [showSandbox, setShowSandbox] = useState(false);
   const [showSandboxIntro, setShowSandboxIntro] = useState(false);
-  const [decisionDone, setDecisionDone] = useState(initialCompleted);
+  const decisionDone = true; // Decision journal removed, Founder's Log supersedes
   const [pitchDone, setPitchDone] = useState(initialCompleted);
   const [checkpointCelebration, setCheckpointCelebration] = useState(false);
   const prevCheckpointsRef = useRef(initialCheckpoints);
@@ -720,20 +720,8 @@ export default function LessonConversation({
       </div>
       )}
 
-      {/* Post-lesson engagement: Decision Journal -> Business Pitch -> Completion banner */}
-      {completed && !showSandbox && !decisionDone && (
-        <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
-          <DecisionJournal
-            lessonId={lessonId}
-            onComplete={() => {
-              setDecisionDone(true);
-              if (!isLastInModule) setPitchDone(true);
-            }}
-          />
-        </div>
-      )}
-
-      {completed && !showSandbox && decisionDone && isLastInModule && !pitchDone && (
+      {/* Post-lesson engagement: Business Pitch (if last in module) -> Completion banner */}
+      {completed && !showSandbox && isLastInModule && !pitchDone && (
         <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
           <BusinessPitch
             moduleSequence={moduleSequence}
@@ -801,6 +789,8 @@ export default function LessonConversation({
                 Your thinking is strong — it doesn&apos;t have to be perfect. Send what you have. You can always build on it later.
               </div>
             )}
+
+            <RatingWidget contextType="lesson" contextId={lessonId} />
 
             {/* Suggested responses (appear after 30s idle) */}
             {showSuggestions && suggestions.length > 0 && !nudge && (

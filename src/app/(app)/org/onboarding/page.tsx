@@ -73,12 +73,10 @@ export default function OrgOnboardingPage() {
   // ─── Cleanup file URLs on unmount ───
   useEffect(() => {
     return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- cleanup only on unmount
       if (logo) URL.revokeObjectURL(logo.url);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       if (favicon) URL.revokeObjectURL(favicon.url);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount-only cleanup
   }, []);
 
   // ─── Auto-derive subdomain from org name ───

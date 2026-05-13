@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendMessage } from "@/lib/ai";
 
 interface ExerciseFeedback {
   passed: boolean;

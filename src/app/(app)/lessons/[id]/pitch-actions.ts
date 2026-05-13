@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendMessage } from "@/lib/ai";
 import { moderateContent } from "@/lib/content-moderation";
 
 export async function savePitch(moduleSequence: number, pitchText: string) {

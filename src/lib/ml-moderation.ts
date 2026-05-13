@@ -16,8 +16,6 @@ import "server-only";
  * never blocks legitimate students from learning.
  */
 
-import { sendMessage } from "@/lib/ai";
-
 export interface MLModerationResult {
   safe: boolean;
   category?: "harassment" | "hate" | "self-harm" | "sexual" | "violence" | "other";

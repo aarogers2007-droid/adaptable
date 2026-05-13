@@ -97,14 +97,7 @@ export default async function DashboardPage() {
   }
 
   // Fetch all decisions for dashboard context
-  const { data: allDecisionsData } = await supabase
-    .from("lesson_decisions")
-    .select("decision_text, lesson_id")
-    .eq("student_id", user.id)
-    .order("created_at", { ascending: true });
-  const allDecisions = (allDecisionsData ?? []) as { decision_text: string; lesson_id: string }[];
-  const latestDecision = allDecisions.length > 0 ? allDecisions[allDecisions.length - 1] : undefined;
-  const latestDecisionLesson = latestDecision ? lessons.find((l) => l.id === latestDecision.lesson_id) : null;
+  // Decision journal removed — Founder's Log supersedes
 
   // Check and award achievements
   const admin = createAdminClient();
@@ -278,17 +271,6 @@ export default async function DashboardPage() {
           </Link>
         )}
 
-        {/* Last Decision — pull quote */}
-        {latestDecision && allDecisions.length === 1 && (
-          <div className="stagger-enter mt-4 rounded-xl border border-[var(--border)] border-l-4 border-l-[var(--primary)] bg-[var(--bg)] p-6" style={{ animationDelay: "50ms" }}>
-            <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">
-              {latestDecisionLesson ? latestDecisionLesson.title : "Your last decision"}
-            </p>
-            <p className="mt-2 text-xl font-semibold font-[family-name:var(--font-display)] text-[var(--text-primary)]">
-              &ldquo;{latestDecision.decision_text}&rdquo;
-            </p>
-          </div>
-        )}
 
         {/* Current Lesson CTA — first-time users (0 completed LESSONS,
             the wizard doesn't count) get a hero treatment with a
@@ -361,37 +343,6 @@ export default async function DashboardPage() {
           ) : null;
         })()}
 
-        {/* Decision Journal — only show list when 2+ decisions (1 decision shows as pull-quote above) */}
-        {allDecisions.length > 1 && (
-          <div className="stagger-enter mt-4" style={{ animationDelay: "250ms" }}>
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider">
-                  Your Decisions ({allDecisions.length})
-                </p>
-                <Link href="/plan" className="text-sm font-medium text-[var(--primary)] hover:underline">
-                  View Business Plan →
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {allDecisions.map((d, i) => {
-                  const lesson = lessons.find((l) => l.id === d.lesson_id);
-                  return (
-                    <div key={i} className="flex gap-3">
-                      <span className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/10 text-xs font-semibold text-[var(--primary)]">
-                        {i + 1}
-                      </span>
-                      <div>
-                        <p className="text-xs text-[var(--text-muted)]">{lesson?.title ?? "Lesson"}</p>
-                        <p className="text-base text-[var(--text-primary)]">{d.decision_text}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Secondary sections — Niche Resources only renders when populated
             (empty state was creating a dead card per Opus UX review). */}

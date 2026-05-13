@@ -129,17 +129,16 @@ export async function exportGradebookCSV(classId: string): Promise<{ csv?: strin
     .eq("class_id", classId);
 
   if (!enrollments || enrollments.length === 0) {
-    return { csv: "Student Name,Business Name,Niche,Lessons Completed,Total Lessons,Progress %,Last Active,Decisions,Pitch\n" };
+    return { csv: "Student Name,Business Name,Niche,Lessons Completed,Total Lessons,Progress %,Last Active,Pitch\n" };
   }
 
   const studentIds = enrollments.map((e) => e.student_id);
 
   // Batch fetch all needed data
-  const [profilesRes, lessonsRes, progressRes, decisionsRes, pitchesRes, activityRes] = await Promise.all([
+  const [profilesRes, lessonsRes, progressRes, pitchesRes, activityRes] = await Promise.all([
     supabase.from("profiles").select("id, full_name, business_idea").in("id", studentIds),
     supabase.from("lessons").select("id"),
     supabase.from("student_progress").select("student_id, lesson_id, status, completed_at").in("student_id", studentIds),
-    supabase.from("lesson_decisions").select("student_id, decision_text").in("student_id", studentIds),
     supabase.from("business_pitches").select("student_id, pitch_text").in("student_id", studentIds).order("created_at", { ascending: false }),
     supabase.from("ai_usage_log").select("student_id, created_at").in("student_id", studentIds).order("created_at", { ascending: false }),
   ]);
@@ -147,7 +146,6 @@ export async function exportGradebookCSV(classId: string): Promise<{ csv?: strin
   const profiles = (profilesRes.data ?? []) as { id: string; full_name: string | null; business_idea: { name?: string; niche?: string } | null }[];
   const totalLessons = lessonsRes.data?.length ?? 0;
   const allProgress = progressRes.data ?? [];
-  const allDecisions = (decisionsRes.data ?? []) as { student_id: string; decision_text: string }[];
   const allPitches = (pitchesRes.data ?? []) as { student_id: string; pitch_text: string }[];
   const allActivity = (activityRes.data ?? []) as { student_id: string; created_at: string }[];
 
@@ -180,7 +178,7 @@ export async function exportGradebookCSV(classId: string): Promise<{ csv?: strin
   rows.push([
     "Student Name", "Business Name", "Niche",
     "Lessons Completed", "Total Lessons", "Progress %",
-    "Last Active", "Decisions", "Pitch",
+    "Last Active", "Pitch",
   ].join(","));
 
   for (const p of profiles) {
@@ -188,7 +186,6 @@ export async function exportGradebookCSV(classId: string): Promise<{ csv?: strin
     const pct = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
     const lastActive = lastActiveMap.get(p.id);
     const lastActiveStr = lastActive ? new Date(lastActive).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Never";
-    const studentDecisions = allDecisions.filter((d) => d.student_id === p.id).map((d) => d.decision_text).join(" | ");
     const pitch = pitchMap.get(p.id) ?? "";
 
     rows.push([
@@ -199,7 +196,6 @@ export async function exportGradebookCSV(classId: string): Promise<{ csv?: strin
       escape(totalLessons),
       escape(pct),
       escape(lastActiveStr),
-      escape(studentDecisions),
       escape(pitch),
     ].join(","));
   }

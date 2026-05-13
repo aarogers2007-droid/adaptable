@@ -296,6 +296,7 @@ Start by orienting the student in the scenario and asking your first question. B
       input_tokens: 0,
       output_tokens: 0,
       estimated_cost_usd: 0,
+      student_response_time_ms: typeof studentResponseTimeMs === "number" ? studentResponseTimeMs : null,
     }).then(() => {});
 
     return new Response(readable, {
