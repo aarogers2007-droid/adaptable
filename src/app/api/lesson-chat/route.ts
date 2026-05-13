@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   const requestBody = await request.json();
-  const { message, lessonId, moduleSequence, lessonSequence, progressId } = requestBody;
+  const { message, lessonId, moduleSequence, lessonSequence, progressId, studentResponseTimeMs } = requestBody;
   console.log("[lesson-chat] req from", user.id, {
     msgLen: typeof message === "string" ? message.length : "(not string)",
     lessonId,
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
   // Validate progressId belongs to this user
   const { data: progressCheck, error: progressError } = await supabase
     .from("student_progress")
-    .select("id, lesson_id")
+    .select("id, lesson_id, created_at")
     .eq("id", progressId)
     .eq("student_id", user.id)
     .single();
@@ -576,10 +576,20 @@ CUSTOMER INTERVIEW FRAMEWORKS (this lesson covers talking to customers):
 When discussing customer conversations, explicitly reference the Mom Test principle — ask about their life, not your idea. Ask what they currently do, not what they would hypothetically buy. Reference Jobs-to-be-Done when discussing what customers actually want — people hire products to do a job, so ask what job they're trying to get done. These frameworks are in your knowledge context. Use them by name. Do NOT give generic "talk to people" advice when you have specific interview methodology available.` : ""}`;
 
   try {
+    // Build system prompt as content blocks for Anthropic prompt caching.
+    // The static lesson prompt is cached (same within a session).
+    // RAG knowledge context is NOT cached (changes per exchange due to semantic search).
+    const systemBlocks: import("@/lib/ai").CacheableTextBlock[] = [
+      {
+        type: "text",
+        text: systemPrompt,
+        cache_control: { type: "ephemeral" },
+      },
+    ];
     console.log("[lesson-chat] Starting stream, system prompt length:", systemPrompt.length, "messages:", messages.length);
     const stream = await streamMessage({
       feature: "guide",
-      systemPrompt,
+      systemPrompt: systemBlocks,
       messages,
     });
 
@@ -720,6 +730,14 @@ When discussing customer conversations, explicitly reference the Mom Test princi
             } catch {
               // Mirror generation failure should never block lesson completion
             }
+
+            // Fire-and-forget: capture business idea snapshot for flywheel
+            supabase.from("student_ideas").insert({
+              org_id: profile.org_id ?? "00000000-0000-0000-0000-000000000001",
+              student_id: user.id,
+              idea_title: profile.business_idea?.name ?? "Untitled",
+              idea_summary: (profile.business_idea?.niche ?? "").slice(0, 500),
+            }).then(() => {});
           }
 
           // Send completion, checkpoint, and mirror info to client
@@ -739,30 +757,42 @@ When discussing customer conversations, explicitly reference the Mom Test princi
             )
           );
 
-          // Log usage (update reservation or insert for admins)
+          // Log usage with cache metrics (update reservation or insert for admins)
           const finalMessage = await stream.finalMessage();
+          const cacheWrite = (finalMessage.usage as unknown as Record<string, number>).cache_creation_input_tokens ?? 0;
+          const cacheRead = (finalMessage.usage as unknown as Record<string, number>).cache_read_input_tokens ?? 0;
+          // Compute session duration from progress start
+          const sessionStart = progressCheck?.created_at ? new Date(progressCheck.created_at as string).getTime() : Date.now();
+          const sessionDuration = Math.floor((Date.now() - sessionStart) / 1000);
+
+          const usagePayload = {
+            model: "claude-sonnet-4-20250514",
+            input_tokens: finalMessage.usage.input_tokens,
+            output_tokens: finalMessage.usage.output_tokens,
+            estimated_cost_usd:
+              (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+            retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
+            cache_write_tokens: cacheWrite || null,
+            cache_read_tokens: cacheRead || null,
+            // Flywheel columns
+            response_length: fullResponse.length,
+            prompt_length: systemPrompt.length
+              + messages.reduce((s, m) => s + m.content.length, 0),
+            lesson_id: lessonId ?? null,
+            completion_flag: lessonComplete,
+            session_duration_seconds: sessionDuration,
+            student_response_time_ms: typeof studentResponseTimeMs === "number" ? studentResponseTimeMs : null,
+          };
           if (usageReservationId) {
             await supabase
               .from("ai_usage_log")
-              .update({
-                model: "claude-sonnet-4-20250514",
-                input_tokens: finalMessage.usage.input_tokens,
-                output_tokens: finalMessage.usage.output_tokens,
-                estimated_cost_usd:
-                  (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
-                retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
-              })
+              .update(usagePayload)
               .eq("id", usageReservationId);
           } else {
             await supabase.from("ai_usage_log").insert({
               student_id: user.id,
               feature: "guide",
-              model: "claude-sonnet-4-20250514",
-              input_tokens: finalMessage.usage.input_tokens,
-              output_tokens: finalMessage.usage.output_tokens,
-              estimated_cost_usd:
-                (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
-              retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
+              ...usagePayload,
             });
           }
 

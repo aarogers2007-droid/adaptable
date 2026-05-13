@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  const { message, scenarioId, sessionId } = await request.json();
+  const { message, scenarioId, sessionId, studentResponseTimeMs } = await request.json();
 
   if (!message || typeof message !== "string" || message.length > 5000) {
     return Response.json({ error: "Invalid message" }, { status: 400 });
@@ -157,7 +157,10 @@ export async function POST(request: Request) {
   // Build system prompt
   const gradeAdaptation = getMentorAdaptation(gradeTier);
 
-  const systemPrompt = `You are a Socratic business mentor guiding a student through a specific business challenge. Your job is to help the student think their way to sound decisions — not to give them the answers.
+  // Split system prompt for Anthropic prompt caching.
+  // Static prefix (cacheable): scenario context, role, rubric criteria
+  // Dynamic suffix (NOT cached): criteria state changes per exchange as criteria are satisfied
+  const staticPrompt = `You are a Socratic business mentor guiding a student through a specific business challenge. Your job is to help the student think their way to sound decisions — not to give them the answers.
 
 ${gradeAdaptation}
 
@@ -176,10 +179,33 @@ ${rubricCriteria}
 
 You are listening for the student to demonstrate each criterion through their own reasoning. When a criterion is clearly demonstrated, note it internally but do not announce it.
 
-${unsatisfiedCriteria.length === 0 ? "All criteria have been satisfied. Bring the conversation to a natural close with a brief synthesis of what the student figured out." : `Still evaluating: ${unsatisfiedCriteria.join(", ")}`}
+DECISION POINTS:
+At key junctures — when the student faces a concrete business decision — offer 3 to 4 specific options using this exact format:
+
+[OPTIONS]
+A. Option text here
+B. Option text here
+C. Option text here
+D. Option text here
+[/OPTIONS]
+
+Rules for decision points:
+- Use roughly every 3-4 exchanges. Never on the first exchange.
+- Never two exchanges in a row.
+- Options must be specific to this scenario, plausible, short (one sentence each).
+- Include one clearly better entrepreneurial choice, one partially correct, and one or two tempting but flawed choices.
+- After any MC choice, always follow up: "Walk me through why that felt right to you."
+- A student can satisfy a criterion through reasoning about a wrong choice.`;
+
+  const dynamicPrompt = `\n${unsatisfiedCriteria.length === 0 ? "All criteria have been satisfied. Bring the conversation to a natural close with a brief synthesis of what the student figured out." : `Still evaluating: ${unsatisfiedCriteria.join(", ")}`}
 ${replayContext}
 
 Start by orienting the student in the scenario and asking your first question. Be direct and specific — not generic.`;
+
+  const systemBlocks: import("@/lib/ai").CacheableTextBlock[] = [
+    { type: "text", text: staticPrompt, cache_control: { type: "ephemeral" } },
+    { type: "text", text: dynamicPrompt },
+  ];
 
   // Build messages
   const messages = [
@@ -192,8 +218,8 @@ Start by orienting the student in the scenario and asking your first question. B
 
   try {
     const stream = await streamMessage({
-      feature: "scenario_chat" as "guide", // Uses scenario_chat model from config
-      systemPrompt,
+      feature: "scenario_chat" as "guide",
+      systemPrompt: systemBlocks,
       messages,
     });
 
@@ -260,7 +286,9 @@ Start by orienting the student in the scenario and asking your first question. B
       },
     });
 
-    // Log AI usage (best-effort)
+    // Log AI usage with cache metrics (best-effort, after stream completes)
+    // Actual token counts are logged inside the ReadableStream after finalMessage()
+    // This placeholder ensures a row exists even if the stream errors
     supabase.from("ai_usage_log").insert({
       student_id: user.id,
       feature: "scenario",
@@ -318,6 +346,8 @@ async function evaluateCriteria(
     model: getModel("scenario_eval"),
     maxTokens: 200,
     systemPrompt: `You are evaluating whether a student has demonstrated business thinking criteria in a conversation. Be strict — the student must clearly demonstrate the criterion through their own reasoning, not just mention it in passing.
+
+When the student made a multiple choice selection (messages starting with "I choose:"), evaluate their REASONING in the follow-up response, not the choice itself. A student who picks a wrong option but demonstrates sound thinking in their explanation can still satisfy a criterion. A correct choice without reasoning does NOT satisfy any criterion.
 
 UNSATISFIED CRITERIA:
 ${criteriaDescriptions}

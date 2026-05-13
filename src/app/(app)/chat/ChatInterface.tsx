@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import AppNav from "@/components/ui/AppNav";
 
 function TypewriterText({ text, streaming }: { text: string; streaming: boolean }) {
@@ -72,6 +72,7 @@ export default function ChatInterface({
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const lastStreamEndRef = useRef<number | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,7 +92,13 @@ export default function ChatInterface({
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed, conversationId }),
+        body: JSON.stringify({
+          message: trimmed,
+          conversationId,
+          studentResponseTimeMs: lastStreamEndRef.current
+            ? Math.round(Date.now() - lastStreamEndRef.current)
+            : null,
+        }),
       });
 
       if (res.status === 429) {
@@ -151,6 +158,7 @@ export default function ChatInterface({
     }
 
     setLoading(false);
+    lastStreamEndRef.current = Date.now();
     inputRef.current?.focus();
   }
 

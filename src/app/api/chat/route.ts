@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { message, conversationId } = await request.json();
+  const { message, conversationId, studentResponseTimeMs } = await request.json();
 
   if (!message || typeof message !== "string" || message.length > 5000) {
     return new Response("Missing or invalid message (max 5000 characters)", { status: 400 });
@@ -450,9 +450,13 @@ export async function POST(request: Request) {
   ) + (engagementCtx ? `\n\n${engagementCtx}` : "");
 
   try {
+    // Wrap system prompt in cached content block for Anthropic prompt caching
+    const systemBlocks: import("@/lib/ai").CacheableTextBlock[] = [
+      { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+    ];
     const stream = await streamMessage({
       feature: "guide",
-      systemPrompt,
+      systemPrompt: systemBlocks,
       messages,
     });
 
@@ -519,28 +523,33 @@ export async function POST(request: Request) {
             }
           }
 
-          // Log usage (update reservation or insert for admins)
+          // Log usage with cache metrics
           const finalMessage = await stream.finalMessage();
+          const cacheWrite = (finalMessage.usage as unknown as Record<string, number>).cache_creation_input_tokens ?? 0;
+          const cacheRead = (finalMessage.usage as unknown as Record<string, number>).cache_read_input_tokens ?? 0;
+          const usagePayload = {
+            model: "claude-sonnet-4-20250514",
+            input_tokens: finalMessage.usage.input_tokens,
+            output_tokens: finalMessage.usage.output_tokens,
+            estimated_cost_usd:
+              (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+            cache_write_tokens: cacheWrite || null,
+            cache_read_tokens: cacheRead || null,
+            response_length: fullResponse.length,
+            prompt_length: systemPrompt.length
+              + messages.reduce((s, m) => s + m.content.length, 0),
+            student_response_time_ms: typeof studentResponseTimeMs === "number" ? studentResponseTimeMs : null,
+          };
           if (usageReservationId) {
             await supabase
               .from("ai_usage_log")
-              .update({
-                model: "claude-sonnet-4-20250514",
-                input_tokens: finalMessage.usage.input_tokens,
-                output_tokens: finalMessage.usage.output_tokens,
-                estimated_cost_usd:
-                  (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
-              })
+              .update(usagePayload)
               .eq("id", usageReservationId);
           } else {
             await supabase.from("ai_usage_log").insert({
               student_id: user.id,
               feature: "guide",
-              model: "claude-sonnet-4-20250514",
-              input_tokens: finalMessage.usage.input_tokens,
-              output_tokens: finalMessage.usage.output_tokens,
-              estimated_cost_usd:
-                (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+              ...usagePayload,
             });
           }
 

@@ -153,6 +153,7 @@ export default function LessonConversation({
   const [showMirror, setShowMirror] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const lastStreamEndRef = useRef<number | null>(null);
   const router = useRouter();
 
   // Lesson entrance sequence
@@ -375,8 +376,12 @@ export default function LessonConversation({
         body: JSON.stringify({
           message: trimmed,
           progressId,
+          lessonId,
           moduleSequence,
           lessonSequence,
+          studentResponseTimeMs: lastStreamEndRef.current
+            ? Math.round(Date.now() - lastStreamEndRef.current)
+            : null,
         }),
       });
 
@@ -494,6 +499,7 @@ export default function LessonConversation({
     }
 
     setLoading(false);
+    lastStreamEndRef.current = Date.now();
     inputRef.current?.focus();
   }
 
