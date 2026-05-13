@@ -587,21 +587,13 @@ When discussing customer conversations, explicitly reference the Mom Test princi
         cache_control: { type: "ephemeral" },
       },
     ];
-    // Check for per-lesson model override (14 lessons use gpt-4o-mini instead of Sonnet)
-    let lessonModel = "claude-sonnet-4-20250514";
-    if (lessonId) {
-      try {
-        lessonModel = await getLessonModel(lessonId);
-      } catch (modelErr) {
-        console.error("[lesson-chat] getLessonModel failed, defaulting to Sonnet:", modelErr);
-      }
-    }
-    console.log("[lesson-chat] Starting stream, model:", lessonModel, "system prompt length:", systemPrompt.length, "messages:", messages.length);
+    // Model routing temporarily using default to unblock production.
+    // Per-lesson gpt-4o-mini routing will be re-enabled after debugging.
+    console.log("[lesson-chat] Starting stream, system prompt length:", systemPrompt.length, "messages:", messages.length);
     const stream = await streamMessage({
       feature: "guide",
-      systemPrompt: lessonModel.startsWith("gpt-") ? systemPrompt : systemBlocks,
+      systemPrompt: systemBlocks,
       messages,
-      modelOverride: lessonModel,
     });
 
     const encoder = new TextEncoder();
@@ -777,12 +769,11 @@ When discussing customer conversations, explicitly reference the Mom Test princi
           const sessionDuration = Math.floor((Date.now() - sessionStart) / 1000);
 
           const usagePayload = {
-            model: lessonModel,
+            model: "claude-sonnet-4-20250514",
             input_tokens: finalMessage.usage.input_tokens,
             output_tokens: finalMessage.usage.output_tokens,
-            estimated_cost_usd: lessonModel.startsWith("gpt-")
-              ? (finalMessage.usage.input_tokens * 0.15 + finalMessage.usage.output_tokens * 0.6) / 1_000_000
-              : (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+            estimated_cost_usd:
+              (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
             retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
             cache_write_tokens: cacheWrite || null,
             cache_read_tokens: cacheRead || null,
