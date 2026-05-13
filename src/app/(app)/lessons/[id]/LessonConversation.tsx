@@ -203,6 +203,14 @@ export default function LessonConversation({
     const lastAiMessage = [...messages].reverse().find((m) => m.role === "assistant");
     if (!lastAiMessage || loading || completed) return;
 
+    // Beginning of lesson (3 or fewer messages = first AI response)
+    // Only show "Give me an example" — no other suggestions
+    const userMessageCount = messages.filter((m) => m.role === "user").length;
+    if (userMessageCount <= 1) {
+      setSuggestions(["Give me an example"]);
+      return;
+    }
+
     const content = lastAiMessage.content.toLowerCase();
 
     // Customer / audience questions

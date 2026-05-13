@@ -14,22 +14,15 @@ import { createBrowserClient } from "@supabase/ssr";
  */
 export default function GuestJoinPage() {
   const [code, setCode] = useState("");
-  const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
   const router = useRouter();
 
   async function handleJoin() {
     const trimmedCode = code.trim().toUpperCase();
-    const trimmedName = name.trim();
 
-    if (!trimmedCode || !trimmedName) {
-      setError("Enter both a class code and your first name.");
-      return;
-    }
-
-    if (trimmedName.length < 2) {
-      setError("Enter your full first name.");
+    if (!trimmedCode) {
+      setError("Enter a class code.");
       return;
     }
 
@@ -86,12 +79,11 @@ export default function GuestJoinPage() {
 
       const userId = authData.user.id;
 
-      // 4. Create/update profile with name and org
+      // 4. Create/update profile with org (name collected during onboarding)
       await supabase
         .from("profiles")
         .upsert({
           id: userId,
-          full_name: trimmedName,
           role: "student",
           org_id: classData.org_id,
         }, { onConflict: "id" });
@@ -149,24 +141,6 @@ export default function GuestJoinPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-              Your First Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value.slice(0, 50))}
-              maxLength={50}
-              className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-              placeholder="Your first name"
-              autoComplete="off"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleJoin();
-              }}
-            />
-          </div>
-
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
               {error}
@@ -176,7 +150,7 @@ export default function GuestJoinPage() {
           <button
             type="button"
             onClick={handleJoin}
-            disabled={joining || !code.trim() || !name.trim()}
+            disabled={joining || !code.trim()}
             className="w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
           >
             {joining ? "Joining..." : "Join"}
