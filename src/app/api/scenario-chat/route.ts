@@ -218,9 +218,10 @@ Start by orienting the student in the scenario and asking your first question. B
 
   try {
     const stream = await streamMessage({
-      feature: "scenario_chat" as "guide",
+      feature: "guide",
       systemPrompt: systemBlocks,
       messages,
+      modelOverride: getModel("scenario_chat"),
     });
 
     const encoder = new TextEncoder();
