@@ -203,6 +203,14 @@ export async function POST(request: Request) {
     }
   }
 
+  // Log support input as feedback (fire-and-forget)
+  supabase.from("feedback").insert({
+    user_id: user.id,
+    user_name: userName,
+    page: "/support-chat",
+    message: `[SUPPORT] ${message}`,
+  }).then(() => {});
+
   return Response.json({
     response: cleanResponse,
     conversationId: convoId,
