@@ -77,7 +77,8 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
   // Animation stepper (12 steps: title, portrait, edge, watch_out, divider, 5 insights, actions)
   useEffect(() => {
     if (animStep < 0 || animStep >= 12) return;
-    const delays = [0, 150, 300, 600, 850, 1050, 1200, 1350, 1500, 1650, 1800, 2000];
+    // Consistent 150ms spacing for smooth cascade
+    const delays = [0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650];
     const nextDelay = (delays[animStep + 1] ?? 2200) - (delays[animStep] ?? 0);
     const timer = setTimeout(() => setAnimStep((s) => s + 1), nextDelay);
     return () => clearTimeout(timer);
@@ -114,12 +115,12 @@ export default function ArchetypeCardReveal({ sessionId, groupNumber, groupRevea
   const fadeUp = (step: number, translateY = 8) => ({
     opacity: show(step) ? 1 : 0,
     transform: show(step) ? "translateY(0)" : `translateY(${translateY}px)`,
-    transition: "opacity 250ms ease-out, transform 300ms ease-out",
+    transition: "opacity 250ms ease-out, transform 250ms ease-out",
   });
   const slideLeft = (step: number) => ({
     opacity: show(step) ? 1 : 0,
     transform: show(step) ? "translateX(0)" : "translateX(-12px)",
-    transition: "opacity 200ms ease-out, transform 200ms ease-out",
+    transition: "opacity 250ms ease-out, transform 250ms ease-out",
   });
 
   return (

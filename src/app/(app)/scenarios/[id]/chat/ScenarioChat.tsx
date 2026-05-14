@@ -65,6 +65,8 @@ export default function ScenarioChat({
   const [attemptNumber, setAttemptNumber] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastStreamEndRef = useRef<number | null>(null);
+  const streamThrottleRef = useRef<number | null>(null);
+  const streamBufferRef = useRef("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
@@ -98,6 +100,7 @@ export default function ScenarioChat({
     if (!msg || streaming) return;
     if (!text) setInput("");
     setMcOptions(null); // clear MC options when sending
+    streamBufferRef.current = ""; // reset streaming buffer
 
     const userMessage = { role: "user", content: msg };
     setMessages((prev) => [...prev, userMessage]);
@@ -151,14 +154,22 @@ export default function ScenarioChat({
             const parsed = JSON.parse(data);
 
             if (parsed.text) {
-              setMessages((prev) => {
-                const updated = [...prev];
-                const last = updated[updated.length - 1];
-                if (last?.role === "assistant") {
-                  updated[updated.length - 1] = { ...last, content: last.content + parsed.text };
-                }
-                return updated;
-              });
+              streamBufferRef.current += parsed.text;
+              // Throttle UI updates to rAF (~16ms) to avoid choppy re-renders
+              if (!streamThrottleRef.current) {
+                streamThrottleRef.current = requestAnimationFrame(() => {
+                  streamThrottleRef.current = null;
+                  const buffered = streamBufferRef.current;
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    const last = updated[updated.length - 1];
+                    if (last?.role === "assistant") {
+                      updated[updated.length - 1] = { ...last, content: buffered };
+                    }
+                    return updated;
+                  });
+                });
+              }
             }
 
             if (parsed.criteria_update) {

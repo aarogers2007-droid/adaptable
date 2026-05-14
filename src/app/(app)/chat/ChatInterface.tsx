@@ -74,6 +74,7 @@ export default function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastStreamEndRef = useRef<number | null>(null);
+  const streamThrottleRef = useRef<number | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -137,11 +138,18 @@ export default function ChatInterface({
             const parsed = JSON.parse(data);
             if (parsed.text) {
               assistantMsg += parsed.text;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: assistantMsg };
-                return updated;
-              });
+              // Throttle UI updates to rAF to avoid choppy re-renders
+              if (!streamThrottleRef.current) {
+                const snapshot = assistantMsg;
+                streamThrottleRef.current = requestAnimationFrame(() => {
+                  streamThrottleRef.current = null;
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    updated[updated.length - 1] = { role: "assistant", content: snapshot };
+                    return updated;
+                  });
+                });
+              }
             }
             if (parsed.conversationId) {
               setConversationId(parsed.conversationId);
@@ -247,7 +255,7 @@ export default function ChatInterface({
 
       {/* Input */}
       <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
-        <form onSubmit={handleSend} className="mx-auto max-w-[700px] px-6 py-4">
+        <form onSubmit={handleSend} className="mx-auto max-w-[700px] px-4 sm:px-6 py-4">
           <RatingWidget contextType="guide" />
           <div className="flex gap-3">
             <textarea

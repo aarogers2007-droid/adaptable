@@ -126,8 +126,8 @@ export default function ContextPanel({
                 style={{
                   background: isSatisfied ? "rgba(13, 148, 136, 0.08)" : "var(--bg)",
                   border: `1px solid ${isSatisfied ? "rgba(13, 148, 136, 0.25)" : "var(--border)"}`,
-                  transform: isAnimatingNow ? "scale(1.03)" : "scale(1)",
-                  transition: "all 300ms ease-out",
+                  animation: isAnimatingNow ? "criteria-unlock 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards" : "none",
+                  transition: "background 300ms ease-out, border-color 300ms ease-out",
                 }}
               >
                 <span

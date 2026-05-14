@@ -154,6 +154,7 @@ export default function LessonConversation({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastStreamEndRef = useRef<number | null>(null);
+  const streamThrottleRef = useRef<number | null>(null);
   const router = useRouter();
 
   // Lesson entrance sequence
@@ -469,11 +470,18 @@ export default function LessonConversation({
                 .replace(/\[EMOTION:[^\]]+\]/g, "")
                 .replace(/\[(?:CHECKPOINT|LESSON_COMPLETE|STYLE|PACE|DETAIL|MOTIVATION|REGISTER|EMOTION)[^\]]*$/g, "")
                 .trim();
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: clean };
-                return updated;
-              });
+              // Throttle UI updates to every ~32ms (30fps) to avoid re-rendering
+              // the entire message list on every SSE chunk
+              if (!streamThrottleRef.current) {
+                streamThrottleRef.current = requestAnimationFrame(() => {
+                  streamThrottleRef.current = null;
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    updated[updated.length - 1] = { role: "assistant", content: clean };
+                    return updated;
+                  });
+                });
+              }
             }
             if (parsed.meta) {
               const reached = parsed.meta.checkpoints_reached ?? [];
@@ -666,7 +674,7 @@ export default function LessonConversation({
       {/* Messages — flowing conversation layout */}
       {!showSandbox && (
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-[700px] px-6 py-6 space-y-5">
+        <div className="mx-auto max-w-[700px] px-4 sm:px-6 py-6 space-y-5">
           {messages.map((msg, i) => {
             const isNew = i >= initialMessages.length;
             if (msg.role === "user") {
@@ -775,7 +783,7 @@ export default function LessonConversation({
       {/* Input */}
       {!completed && !showSandbox && (
         <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]">
-          <div className="mx-auto max-w-[700px] px-6 pt-4 pb-2">
+          <div className="mx-auto max-w-[700px] px-4 sm:px-6 pt-4 pb-2">
             {/* Low-effort nudge */}
             {nudge && (
               <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-700">

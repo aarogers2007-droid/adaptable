@@ -19,12 +19,13 @@ interface Props {
 export default function MCOptions({ options, onSelect, disabled }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 px-4 py-3">
-      {options.map((opt) => (
+      {options.map((opt, idx) => (
         <button
           key={opt.letter}
           onClick={() => onSelect(opt)}
           disabled={disabled}
-          className="flex items-start gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-left transition-all hover:border-[var(--primary)]/40 hover:bg-[var(--primary)]/5 active:scale-[0.98] disabled:opacity-50"
+          className="animate-scale-in flex items-start gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-left transition-all duration-200 hover:border-[var(--primary)]/40 hover:bg-[var(--primary)]/5 active:scale-[0.98] disabled:opacity-50"
+          style={{ animationDelay: `${idx * 60}ms` }}
         >
           <span
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"

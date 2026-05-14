@@ -60,7 +60,7 @@ export default function LeaderboardCard({
             return (
               <div
                 key={entry.studentId}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${
+                className={`flex items-center gap-3 rounded-lg px-3 sm:px-4 py-2.5 text-sm ${
                   entry.isCurrentStudent
                     ? "bg-[var(--primary)]/8"
                     : ""
