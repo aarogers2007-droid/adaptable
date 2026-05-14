@@ -132,14 +132,23 @@ export async function POST(request: Request) {
   ];
 
   // Call AI (non-streaming for simplicity in support chat)
-  const result = await sendMessageAuto({
-    model: getModel("support"),
-    maxTokens: 800,
-    systemPrompt: buildSupportPrompt(brandName) + `\n\nUser: ${userName} (${userRole})`,
-    messages,
-  });
-
-  const aiResponse = result.text;
+  let aiResponse: string;
+  try {
+    const result = await sendMessageAuto({
+      model: getModel("support"),
+      maxTokens: 800,
+      systemPrompt: buildSupportPrompt(brandName) + `\n\nUser: ${userName} (${userRole})`,
+      messages,
+    });
+    aiResponse = result.text;
+  } catch (aiErr) {
+    console.error("[support-chat] AI call failed:", aiErr);
+    return Response.json({
+      response: "I'm having trouble connecting right now. Try again in a moment, or ask your instructor for help.",
+      conversationId: convoId ?? null,
+      escalated: false,
+    });
+  }
   const shouldEscalate = aiResponse.includes("[ESCALATE]");
   const cleanResponse = aiResponse.replace(/\n?\[ESCALATE\]\n?/g, "").trim();
 
