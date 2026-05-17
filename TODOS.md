@@ -150,6 +150,38 @@ Effort: L (human: ~3-4 weeks for the platform / CC: ~3 hours)
 Priority: P1 — this is the differentiated revenue path. Don't skip it for SaaS-style
 per-school pricing.
 
+## P1 — Pilot blockers (new, from Phase 2)
+
+### Toggle anonymous sign-in OFF in Supabase
+Anonymous sign-in was enabled for the DEMO event (/go page). Must be disabled before
+pilot launch. Go to Supabase Dashboard → Authentication → Providers → Anonymous Sign-Ins → OFF.
+Effort: S (human: ~1 min)
+
+### OpenAI streaming token extraction returns 0/0
+`streamMessageOpenAI` currently doesn't pass `stream_options: { include_usage: true }` to
+the OpenAI API, so token counts in `ai_usage_log` show 0/0 for all mini-model lessons.
+Cost tracking for 14 of 22 lessons is blind.
+Effort: S (CC: ~15 min)
+
+### Upgrade Supabase to Pro plan
+Free tier limits (500MB storage, 50K monthly active users) will be exceeded at 10K students.
+$25/month. Required before pilot.
+Effort: S (human: ~5 min)
+
+### Email deliverability (SPF/DKIM on adaptable.one)
+Crisis alert emails currently use `onboarding@resend.dev`. Need to verify `adaptable.one`
+domain in Resend DNS settings for production delivery.
+Effort: S (human: ~15 min)
+
+### Legal: IP carve-out, licensing agreement, privacy policy, ToS
+Need: IP carve-out from VentureLab (AJ owns Adaptable IP), licensing agreement for
+per-student pricing, privacy policy and ToS for the platform, COPPA review for under-13 users.
+Effort: L (human: lawyer engagement)
+
+### Adaptable LLC formation
+Texas LLC, EIN, bank account. Required before receiving revenue from VentureLab pilot.
+Effort: M (human: ~1 week)
+
 ## P2 — Medium priority (v2)
 
 ### Founder's Mirror: Template-based prompts as cost/latency optimization

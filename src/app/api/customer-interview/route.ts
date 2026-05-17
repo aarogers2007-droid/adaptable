@@ -123,6 +123,8 @@ export async function POST(request: Request) {
 
     const encoder = new TextEncoder();
     let fullResponse = "";
+    const { createStreamScrubber } = await import("@/lib/output-moderation");
+    const scrubber = createStreamScrubber();
 
     const readable = new ReadableStream({
       async start(controller) {
@@ -130,8 +132,15 @@ export async function POST(request: Request) {
           for await (const event of stream) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
               fullResponse += event.delta.text;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`));
+              const safeChunk = scrubber.push(event.delta.text);
+              if (safeChunk) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: safeChunk })}\n\n`));
+              }
             }
+          }
+          const finalChunk = scrubber.flush();
+          if (finalChunk) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: finalChunk })}\n\n`));
           }
 
           // Output moderation

@@ -1,21 +1,21 @@
--- Per-lesson model assignments (approved 2026-05-08)
+-- Per-lesson model assignments (updated 2026-05-15)
 -- Sonnet lessons: model_override = NULL (use platform default)
 -- Haiku lessons: model_override = 'claude-haiku-4-5-20251001'
--- Mini lessons: model_override = 'gpt-4o-mini-2024-07-18'
+-- Mini removed: checkpoint marking unreliable (sim-all-lessons.ts, 0/3 across all personas)
 --
 -- Run against production after migration 00036 is confirmed live.
 
--- MINI (3 lessons)
-UPDATE lessons SET model_override = 'gpt-4o-mini-2024-07-18'
+-- FORMER MINI → NOW HAIKU (3 lessons, switched 2026-05-15)
+UPDATE lessons SET model_override = 'claude-haiku-4-5-20251001'
   WHERE module_sequence = 3 AND lesson_sequence = 3; -- Designing Your First Impression
 
-UPDATE lessons SET model_override = 'gpt-4o-mini-2024-07-18'
+UPDATE lessons SET model_override = 'claude-haiku-4-5-20251001'
   WHERE module_sequence = 4 AND lesson_sequence = 2; -- Social Media for Service Business
 
-UPDATE lessons SET model_override = 'gpt-4o-mini-2024-07-18'
+UPDATE lessons SET model_override = 'claude-haiku-4-5-20251001'
   WHERE module_sequence = 5 AND lesson_sequence = 3; -- Reading Simple Financials
 
--- HAIKU (11 lessons)
+-- HAIKU (14 lessons total, including 3 former Mini above)
 UPDATE lessons SET model_override = 'claude-haiku-4-5-20251001'
   WHERE module_sequence = 1 AND lesson_sequence = 1; -- Welcome to Adaptable
 

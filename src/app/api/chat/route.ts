@@ -463,6 +463,8 @@ export async function POST(request: Request) {
     // Log usage after stream completes (we estimate tokens)
     const encoder = new TextEncoder();
     let fullResponse = "";
+    const { createStreamScrubber, moderateOutput, OUTPUT_FALLBACK_MESSAGE } = await import("@/lib/output-moderation");
+    const scrubber = createStreamScrubber();
 
     const readable = new ReadableStream({
       async start(controller) {
@@ -471,12 +473,18 @@ export async function POST(request: Request) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
               const text = event.delta.text;
               fullResponse += text;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+              const safeChunk = scrubber.push(text);
+              if (safeChunk) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: safeChunk })}\n\n`));
+              }
             }
           }
+          const finalChunk = scrubber.flush();
+          if (finalChunk) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: finalChunk })}\n\n`));
+          }
 
-          // Output moderation — catch anything age-inappropriate in AI response
-          const { moderateOutput, OUTPUT_FALLBACK_MESSAGE } = await import("@/lib/output-moderation");
+          // Output moderation — catch anything else age-inappropriate in AI response
           const outputCheck = moderateOutput(fullResponse);
           if (!outputCheck.safe) {
             console.warn("[chat] Output flagged:", outputCheck.reason, outputCheck.flagged_content);

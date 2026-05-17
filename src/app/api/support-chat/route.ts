@@ -150,7 +150,14 @@ export async function POST(request: Request) {
     });
   }
   const shouldEscalate = aiResponse.includes("[ESCALATE]");
-  const cleanResponse = aiResponse.replace(/\n?\[ESCALATE\]\n?/g, "").trim();
+  const { scrubProfanity, moderateOutput } = await import("@/lib/output-moderation");
+  const cleanResponse = scrubProfanity(aiResponse.replace(/\n?\[ESCALATE\]\n?/g, "").trim());
+
+  // Flag if anything besides profanity was caught
+  const outputCheck = moderateOutput(aiResponse);
+  if (!outputCheck.safe && outputCheck.reason !== "profanity") {
+    console.warn("[support-chat] Output flagged:", outputCheck.reason, outputCheck.flagged_content);
+  }
 
   // Update conversation history
   const updatedHistory = [

@@ -507,13 +507,30 @@ LANGUAGE ADAPTATION:
 BREVITY vs VAGUENESS:
 - Short + conceptual = NOT vague. Acknowledge and move on.
 - Only push for elaboration when the CONCEPT is missing, not the explanation.
-- 2-5 word consistent style: Match their energy. Ask tight yes/no or choice questions.
 - Trailing ("I think it's... idk...") ≠ brief ("good nails, convenient, $20"). Trailing = re-engage with narrow question.
+
+DISENGAGED / MINIMAL-ANSWER STUDENTS (2-5 word answers, "idk", "i guess", "whatever"):
+If a student gives 3+ short/reluctant answers in a row, switch to NARROW question mode:
+- Replace open questions with A-or-B choices: "Is your customer more like a parent booking for their kid, or a teenager doing it themselves?"
+- Use fill-in-the-blank: "So your business is basically: I help ___ do ___ for $___. Fill that in."
+- Use yes/no confirmations to lock in progress: "So you'd charge around $20. Right?"
+- Reflect their own words back as a checkpoint: "You said 'they just wanna learn one song.' That IS your niche. Can I mark that down?"
+- Accept 5-word answers as mastery if the CONCEPT is there. "yeah the parents" IS an answer to "who pays?" Don't push for a paragraph.
+- NEVER say "tell me more" or "can you elaborate" to a minimal student. They won't. Ask something more specific instead.
+- If they say "idk" to an open question, immediately narrow it: "OK, pick one: do they find you on Instagram, through a friend, or at school?"
 
 === END STUDENT CARE ===
 
 CHECKPOINT STATUS:
 ${checkpointStatus}
+
+CHECKPOINT MARKING (CRITICAL — you MUST do this every response):
+After EACH student response, evaluate: did the student demonstrate understanding of a checkpoint?
+If YES: include [CHECKPOINT:checkpoint_id] on its own line in your response (use the exact id from the list above).
+If NO: keep working toward the next TODO checkpoint.
+When ALL checkpoints above show DONE: include [LESSON_COMPLETE] on its own line.
+NEVER include [LESSON_COMPLETE] while any checkpoint is still TODO.
+These markers are parsed out before the student sees them — the student never sees [CHECKPOINT:...] or [LESSON_COMPLETE].
 
 ${allCheckpointsDone ? "ALL CHECKPOINTS COMPLETE. Evaluate if the student has demonstrated mastery. If yes, end with exactly this marker on its own line: [LESSON_COMPLETE]" : `NEXT CHECKPOINT TO WORK TOWARD: ${nextCheckpoint ? personalize(nextCheckpoint.question) : "none"}`}
 
@@ -554,9 +571,7 @@ RULES:
 - 2-4 sentences max. ONE question at a time. ONE example per response.
 - Reference their business by name.
 - ALWAYS end on a question, never on praise or a declarative summary. (See SOCRATIC DISCIPLINE.)
-- When checkpoint mastery demonstrated: include [CHECKPOINT:checkpoint_id]
-- When all checkpoints done + mastery demonstrated through the student's own articulation: include [LESSON_COMPLETE]
-- Do NOT mark [LESSON_COMPLETE] with a checkpoint still unhit.
+- Remember to mark [CHECKPOINT:checkpoint_id] and [LESSON_COMPLETE] per the CHECKPOINT MARKING instructions above.
 
 LEARNING STYLE TAGS (hidden meta-tags, append after every response on a single line at the very end). These are PARSED OUT before the student sees them — the student NEVER sees this line. PICK ONE value from each bracket. Do NOT echo the pipe-separated placeholder. Example correct output:
 [STYLE:direct] [PACE:moderate] [DETAIL:concise] [MOTIVATION:challenge] [REGISTER:casual] [EMOTION:engaged]
@@ -606,6 +621,8 @@ When discussing customer conversations, explicitly reference the Mom Test princi
 
     const encoder = new TextEncoder();
     let fullResponse = "";
+    const { createStreamScrubber } = await import("@/lib/output-moderation");
+    const scrubber = createStreamScrubber();
 
     const readable = new ReadableStream({
       async start(controller) {
@@ -613,8 +630,17 @@ When discussing customer conversations, explicitly reference the Mom Test princi
           for await (const event of stream) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
               fullResponse += event.delta.text;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`));
+              // Scrub profanity in real-time before sending to student
+              const safeChunk = scrubber.push(event.delta.text);
+              if (safeChunk) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: safeChunk })}\n\n`));
+              }
             }
+          }
+          // Flush remaining buffered text
+          const finalChunk = scrubber.flush();
+          if (finalChunk) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: finalChunk })}\n\n`));
           }
 
           // Parse hidden tags from response

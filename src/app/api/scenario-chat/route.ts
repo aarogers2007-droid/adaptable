@@ -226,6 +226,8 @@ Start by orienting the student in the scenario and asking your first question. B
 
     const encoder = new TextEncoder();
     let fullResponse = "";
+    const { createStreamScrubber, moderateOutput, OUTPUT_FALLBACK_MESSAGE } = await import("@/lib/output-moderation");
+    const scrubber = createStreamScrubber();
 
     const readable = new ReadableStream({
       async start(controller) {
@@ -233,8 +235,26 @@ Start by orienting the student in the scenario and asking your first question. B
           for await (const event of stream) {
             if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
               fullResponse += event.delta.text;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`));
+              // Scrub profanity in real-time before sending to student
+              const safeChunk = scrubber.push(event.delta.text);
+              if (safeChunk) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: safeChunk })}\n\n`));
+              }
             }
+          }
+          // Flush remaining buffered text
+          const finalChunk = scrubber.flush();
+          if (finalChunk) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: finalChunk })}\n\n`));
+          }
+
+          // Post-stream moderation — flag and alert if anything else was caught
+          const outputCheck = moderateOutput(fullResponse);
+          if (!outputCheck.safe) {
+            console.warn("[scenario-chat] Output flagged:", outputCheck.reason, outputCheck.flagged_content);
+            import("@/lib/teacher-alerts").then(({ alertContentFlag }) =>
+              alertContentFlag(supabase, user.id, `AI output flagged (${outputCheck.reason}): ${outputCheck.flagged_content}`, "ai_output", "scenario-chat")
+            ).catch(() => {});
           }
 
           // Save conversation

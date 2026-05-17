@@ -87,6 +87,41 @@ cooking." The Valorant+drawing test case is explicit: produce EITHER Valorant co
 OR character art commissions, NOT "Valorant character art."
 Regression test: `scripts/eval-multi-interest-regression.ts`, baseline noHyb ≥ 4.5, insight ≥ 4.0.
 
+## Architecture — Key Patterns
+
+### Multi-Tenant Subdomain Routing
+Organizations get subdomains (e.g., `venturelab.adaptable.one`). Resolution flow:
+1. `src/lib/supabase/middleware.ts` extracts hostname, calls `resolveTenant()`
+2. `src/lib/tenant/resolve.ts` queries `organizations` with 60s TTL in-memory cache (service role key)
+3. Middleware injects `x-tenant-id` and `x-tenant-subdomain` headers
+4. **Server actions read org_id from `auth.uid()` → `profiles.org_id`** (unforgeable). Never trust x-tenant headers for authorization
+5. `src/lib/tenant/verify-access.ts` provides cross-tenant protection checks
+
+### Per-Lesson Model Routing
+14 of 22 lessons use GPT-4o-mini. 8 reasoning-heavy lessons use Claude Sonnet.
+- `lessons.model_override` column (migration 00036): `"gpt-4o-mini"` or null (defaults to Sonnet)
+- `src/lib/model-config.ts`: `getLessonModel(lessonId)` queries the column
+- `src/lib/ai.ts`: `streamMessageOpenAI()` is an OpenAI streaming shim matching Anthropic's `AIStream` interface
+- `src/app/api/lesson-chat/route.ts`: calls `streamMessage()` with `modelOverride` param
+
+### Prompt Caching
+System prompts use `cache_control: { type: "ephemeral" }` on `ContentBlockParam` arrays.
+Applied to: lesson-chat, scenario-chat, guide. Cache metrics returned in `AIResponse.usage`.
+Type workaround: Anthropic SDK doesn't expose cache fields in TS types, so usage is cast via `as unknown as Record<string, number>`.
+
+### Scenario System
+- `src/lib/scenario-rubric.ts`: 6 universal criteria (CUSTOMER_CLARITY, PROBLEM_VALIDATION, etc.)
+- `src/app/api/scenario-chat/route.ts`: SSE streaming with fire-and-forget criteria evaluation (gpt-4o-mini, non-blocking)
+- System prompt includes `[OPTIONS]` block instruction; `MCOptions.tsx` parses and renders clickable MC cards
+- Badge levels: bronze (3/6 criteria), silver (5/6), gold (6/6)
+
+### Data Flywheel
+6 instrumented columns on `ai_usage_log`: response_length, prompt_length, lesson_id, completion_flag, session_duration_seconds, student_response_time_ms.
+Views: `lesson_effectiveness` (avg completion, tokens, ratings per lesson), `at_risk_students` (inactive 3+ days with incomplete progress).
+
+### Streaming UX
+All chat interfaces (lesson, scenario, guide) throttle state updates to `requestAnimationFrame` to prevent choppy re-renders during SSE streaming. Buffer pattern: accumulate text in a ref, flush to state on rAF callback.
+
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
 All font choices, colors, spacing, and aesthetic direction are defined there.

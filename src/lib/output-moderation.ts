@@ -251,3 +251,86 @@ export function moderateOutput(text: string): OutputModerationResult {
 
   return { safe: true };
 }
+
+/**
+ * Scrub profanity from AI output text in real-time.
+ *
+ * Unlike moderateOutput (which flags and replaces the entire response),
+ * this function STRIPS profanity from the text and returns the cleaned
+ * version. Designed for streaming: call on the accumulated buffer after
+ * each chunk, then diff to get the safe chunk to send.
+ *
+ * Returns the cleaned text with profanity replaced by "***".
+ */
+export function scrubProfanity(text: string): string {
+  if (!text || typeof text !== "string") return text;
+  let cleaned = text;
+  for (const pattern of PROFANITY_PATTERNS) {
+    // Use a new regex with global flag for replace
+    const globalPattern = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
+    cleaned = cleaned.replace(globalPattern, "***");
+  }
+  return cleaned;
+}
+
+/**
+ * Create a streaming profanity scrubber.
+ *
+ * Accumulates text as chunks arrive. On each call to push(), returns
+ * the safe portion of text that can be sent to the client. Holds back
+ * a small buffer (last partial word) to avoid splitting a profanity
+ * across chunk boundaries.
+ *
+ * Usage:
+ *   const scrubber = createStreamScrubber();
+ *   for (const chunk of stream) {
+ *     const safe = scrubber.push(chunk);
+ *     if (safe) send(safe);
+ *   }
+ *   const final = scrubber.flush();
+ *   if (final) send(final);
+ */
+export function createStreamScrubber() {
+  let buffer = "";
+  let flushedUpTo = 0;
+
+  return {
+    push(chunk: string): string {
+      buffer += chunk;
+
+      // Find the last word boundary (space, newline, punctuation)
+      // Hold back the last partial word to avoid splitting profanity
+      const lastBoundary = Math.max(
+        buffer.lastIndexOf(" "),
+        buffer.lastIndexOf("\n"),
+        buffer.lastIndexOf("."),
+        buffer.lastIndexOf(","),
+        buffer.lastIndexOf("!"),
+        buffer.lastIndexOf("?"),
+      );
+
+      if (lastBoundary <= flushedUpTo) {
+        // No new word boundary — hold everything
+        return "";
+      }
+
+      // Scrub everything up to the last word boundary
+      const toScrub = buffer.slice(flushedUpTo, lastBoundary + 1);
+      const scrubbed = scrubProfanity(toScrub);
+      flushedUpTo = lastBoundary + 1;
+      return scrubbed;
+    },
+
+    flush(): string {
+      // Scrub and return whatever is left in the buffer
+      const remaining = buffer.slice(flushedUpTo);
+      flushedUpTo = buffer.length;
+      return scrubProfanity(remaining);
+    },
+
+    /** Get the full accumulated buffer (for post-stream moderation) */
+    getFullText(): string {
+      return buffer;
+    },
+  };
+}
