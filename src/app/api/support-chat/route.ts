@@ -153,9 +153,9 @@ export async function POST(request: Request) {
   const { scrubProfanity, moderateOutput } = await import("@/lib/output-moderation");
   const cleanResponse = scrubProfanity(aiResponse.replace(/\n?\[ESCALATE\]\n?/g, "").trim());
 
-  // Flag if anything besides profanity was caught
-  const outputCheck = moderateOutput(aiResponse);
-  if (!outputCheck.safe && outputCheck.reason !== "profanity") {
+  // Flag non-profanity issues on the cleaned response (profanity already scrubbed)
+  const outputCheck = moderateOutput(cleanResponse);
+  if (!outputCheck.safe) {
     console.warn("[support-chat] Output flagged:", outputCheck.reason, outputCheck.flagged_content);
   }
 

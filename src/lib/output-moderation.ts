@@ -298,26 +298,25 @@ export function createStreamScrubber() {
     push(chunk: string): string {
       buffer += chunk;
 
-      // Find the last word boundary (space, newline, punctuation)
-      // Hold back the last partial word to avoid splitting profanity
-      const lastBoundary = Math.max(
-        buffer.lastIndexOf(" "),
-        buffer.lastIndexOf("\n"),
-        buffer.lastIndexOf("."),
-        buffer.lastIndexOf(","),
-        buffer.lastIndexOf("!"),
-        buffer.lastIndexOf("?"),
-      );
+      // Find the last word boundary in the unflushed portion only
+      const unflushed = buffer.slice(flushedUpTo);
+      const boundaries = [" ", "\n", ".", ",", "!", "?"];
+      let lastRelative = -1;
+      for (const b of boundaries) {
+        const idx = unflushed.lastIndexOf(b);
+        if (idx > lastRelative) lastRelative = idx;
+      }
 
-      if (lastBoundary <= flushedUpTo) {
-        // No new word boundary — hold everything
+      if (lastRelative < 0) {
+        // No word boundary in new content — hold everything
         return "";
       }
 
       // Scrub everything up to the last word boundary
-      const toScrub = buffer.slice(flushedUpTo, lastBoundary + 1);
+      const absoluteIdx = flushedUpTo + lastRelative + 1;
+      const toScrub = buffer.slice(flushedUpTo, absoluteIdx);
       const scrubbed = scrubProfanity(toScrub);
-      flushedUpTo = lastBoundary + 1;
+      flushedUpTo = absoluteIdx;
       return scrubbed;
     },
 

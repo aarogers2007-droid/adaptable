@@ -248,9 +248,9 @@ Start by orienting the student in the scenario and asking your first question. B
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: finalChunk })}\n\n`));
           }
 
-          // Post-stream moderation — flag and alert if anything else was caught
+          // Post-stream moderation — flag non-profanity issues (profanity already scrubbed)
           const outputCheck = moderateOutput(fullResponse);
-          if (!outputCheck.safe) {
+          if (!outputCheck.safe && outputCheck.reason !== "profanity") {
             console.warn("[scenario-chat] Output flagged:", outputCheck.reason, outputCheck.flagged_content);
             import("@/lib/teacher-alerts").then(({ alertContentFlag }) =>
               alertContentFlag(supabase, user.id, `AI output flagged (${outputCheck.reason}): ${outputCheck.flagged_content}`, "ai_output", "scenario-chat")
