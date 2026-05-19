@@ -70,7 +70,7 @@ async function main() {
     const enrolled = new Date(e.enrolled_at).toLocaleString();
 
     console.log(`  ${profile?.full_name ?? "unnamed"}`);
-    console.log(`    Auth: ${authType} | Grade: ${(profile as any)?.grade_level ?? "?"}`);
+    console.log(`    Auth: ${authType} | Grade: ${(profile as Record<string, unknown>)?.grade_level ?? "?"}`);
     console.log(`    Enrolled: ${enrolled}`);
     console.log(`    Business: ${bi?.name ?? "not yet"}`);
     console.log(`    Lessons: ${completed} completed, ${inProgress} in progress`);

@@ -25,8 +25,8 @@ async function main() {
   if (!profile) { console.log("Profile not found"); return; }
 
   const studentId = profile.id;
-  const bi = profile.business_idea as any;
-  const ik = profile.ikigai_result as any;
+  const bi = profile.business_idea as Record<string, unknown> | null;
+  const ik = profile.ikigai_result as Record<string, unknown> | null;
 
   console.log("╔══════════════════════════════════════════════════╗");
   console.log("║         ADAPTABLE STUDENT DATA REPORT           ║");
@@ -35,7 +35,7 @@ async function main() {
   console.log("\n── PROFILE ──");
   console.log(`  Name: ${profile.full_name}`);
   console.log(`  Role: ${profile.role}`);
-  console.log(`  Grade Level: ${(profile as any).grade_level ?? "not set"}`);
+  console.log(`  Grade Level: ${(profile as Record<string, unknown>).grade_level ?? "not set"}`);
   console.log(`  Grade Tier: ${profile.grade_tier ?? "not set"}`);
   console.log(`  Account Created: ${new Date(profile.created_at!).toLocaleString()}`);
   console.log(`  Auth Type: ${profile.email ? "email" : "anonymous"}`);

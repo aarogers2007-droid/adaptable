@@ -41,7 +41,7 @@ async function main() {
 
   console.log("\nMost recent profiles:");
   for (const p of (profiles ?? [])) {
-    const bi = p.business_idea as any;
+    const bi = p.business_idea as Record<string, unknown> | null;
     console.log(`  ${p.full_name ?? "?"} | ${p.email ?? "anon"} | ${p.role} | biz: ${bi?.name ?? "none"} | ${p.created_at}`);
   }
 

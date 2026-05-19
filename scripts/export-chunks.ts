@@ -5,7 +5,7 @@
  * Run: npx tsx scripts/export-chunks.ts
  */
 
-import { readdirSync, readFileSync, statSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, relative } from "path";
 
 const ROOT = process.cwd();

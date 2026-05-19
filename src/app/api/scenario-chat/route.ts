@@ -226,7 +226,7 @@ Start by orienting the student in the scenario and asking your first question. B
 
     const encoder = new TextEncoder();
     let fullResponse = "";
-    const { createStreamScrubber, moderateOutput, OUTPUT_FALLBACK_MESSAGE } = await import("@/lib/output-moderation");
+    const { createStreamScrubber, moderateOutput } = await import("@/lib/output-moderation");
     const scrubber = createStreamScrubber();
 
     const readable = new ReadableStream({

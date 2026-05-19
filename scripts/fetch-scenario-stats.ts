@@ -46,7 +46,7 @@ async function main() {
 
     console.log(`\n── SESSION ──`);
     console.log(`  Student: ${profile?.full_name ?? s.student_id.slice(0, 8)}`);
-    console.log(`  Grade: ${(profile as any)?.grade_level ?? "?"}`);
+    console.log(`  Grade: ${(profile as Record<string, unknown>)?.grade_level ?? "?"}`);
     console.log(`  Scenario: ${scenario?.title ?? s.scenario_id.slice(0, 8)}`);
     console.log(`  Industry: ${scenario?.industry} | Difficulty: ${scenario?.difficulty}`);
     console.log(`  Attempt: ${s.attempt_number}`);

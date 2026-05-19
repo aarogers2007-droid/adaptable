@@ -195,7 +195,6 @@ async function main() {
 
     if (withArtifacts.length === 0) continue;
 
-    let totalCheckpoints = 0;
     let reachedCheckpoints = 0;
 
     for (const p of withArtifacts) {

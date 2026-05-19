@@ -50,7 +50,7 @@ async function main() {
   }
 
   // Business idea
-  const bi = profile.business_idea as any;
+  const bi = profile.business_idea as Record<string, unknown> | null;
   console.log(`\nBusiness: ${bi?.name ?? "none"}`);
   if (bi) {
     console.log(`  Niche: ${bi.niche}`);
@@ -59,7 +59,7 @@ async function main() {
   }
 
   // Ikigai
-  const ik = profile.ikigai_result as any;
+  const ik = profile.ikigai_result as Record<string, unknown> | null;
   if (ik) {
     console.log(`\nIkigai:`);
     console.log(`  Passions: ${JSON.stringify(ik.passions)}`);

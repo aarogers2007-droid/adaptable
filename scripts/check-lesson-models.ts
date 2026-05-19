@@ -21,7 +21,7 @@ async function main() {
 
   console.log("LESSON MODEL ASSIGNMENTS\n");
   for (const l of (lessons ?? [])) {
-    const model = l.model_override ?? "SONNET (default)";
+    const _model = l.model_override ?? "SONNET (default)";
     const tag = l.model_override?.includes("mini") ? "💰 MINI" : "🧠 SONNET";
     console.log(`  ${tag}  M${l.module_sequence}L${l.lesson_sequence} — ${l.title}`);
   }

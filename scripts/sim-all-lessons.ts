@@ -19,7 +19,7 @@
  *   bunx tsx scripts/sim-all-lessons.ts --clean    # wipe previous results and start fresh
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, unlinkSync } from "fs";
 import path from "path";
 import { homedir } from "os";
 
@@ -722,7 +722,7 @@ async function runLesson(p: Persona, idea: BusinessIdea, lesson: LessonDef): Pro
   let lessonComplete = false;
   let crisisFlags = 0;
   const safetyEvents: string[] = [];
-  let totalMentorUsage = { input_tokens: 0, output_tokens: 0 };
+  const totalMentorUsage = { input_tokens: 0, output_tokens: 0 };
   let fullMentorResponse = "";
   const lessonStartMs = Date.now();
 
@@ -1205,9 +1205,9 @@ async function main() {
 
   // Clean previous results if requested
   if (clean && existsSync(RESULTS_DIR)) {
-    const files = require("fs").readdirSync(RESULTS_DIR) as string[];
+    const files = readdirSync(RESULTS_DIR) as string[];
     for (const f of files) {
-      require("fs").unlinkSync(path.join(RESULTS_DIR, f));
+      unlinkSync(path.join(RESULTS_DIR, f));
     }
     process.stderr.write("Cleaned previous results.\n");
   }

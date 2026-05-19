@@ -24,7 +24,7 @@ async function main() {
   if (!profile) { console.log("Profile 'Test 3' not found"); return; }
 
   const studentId = profile.id;
-  const bi = profile.business_idea as any;
+  const bi = profile.business_idea as Record<string, unknown> | null;
 
   console.log("╔══════════════════════════════════════════════════╗");
   console.log("║         TEST 3 — STUDENT DATA REPORT            ║");
@@ -32,7 +32,7 @@ async function main() {
 
   console.log("\n── PROFILE ──");
   console.log(`  Name: ${profile.full_name}`);
-  console.log(`  Grade Level: ${(profile as any).grade_level ?? "not set"}`);
+  console.log(`  Grade Level: ${(profile as Record<string, unknown>).grade_level ?? "not set"}`);
   console.log(`  Grade Tier: ${profile.grade_tier ?? "not set"}`);
   console.log(`  Auth Type: ${profile.email ? "email" : "anonymous"}`);
   console.log(`  Created: ${new Date(profile.created_at!).toLocaleString()}`);

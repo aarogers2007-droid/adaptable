@@ -46,10 +46,10 @@ async function main() {
       .single();
 
     console.log(`\n── Student: ${profile?.full_name ?? profile?.email ?? studentId.slice(0, 8)} ──`);
-    console.log(`   Grade: ${(profile as any)?.grade_level ?? "?"} | Tier: ${profile?.grade_tier ?? "?"}`);
-    
+    console.log(`   Grade: ${(profile as Record<string, unknown>)?.grade_level ?? "?"} | Tier: ${profile?.grade_tier ?? "?"}`);
+
     if (profile?.business_idea) {
-      const bi = profile.business_idea as any;
+      const bi = profile.business_idea as Record<string, unknown>;
       console.log(`   Business: "${bi.name}" — ${bi.niche}`);
       console.log(`   Target: ${bi.target_customer} | Revenue: ${bi.revenue_model}`);
     }
