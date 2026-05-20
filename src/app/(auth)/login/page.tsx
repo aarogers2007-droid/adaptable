@@ -218,7 +218,7 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
             {activeSection === "admin" ? (
-              <>No account yet? <Link href="/teacher-signup" className="font-medium text-[var(--primary)] hover:underline">Sign up as a teacher</Link></>
+              <>No account yet? <Link href="/start" className="font-medium text-[var(--primary)] hover:underline">Start a program</Link></>
             ) : (
               <>Need to join a class? <Link href="/join" className="font-medium text-[var(--primary)] hover:underline">Enter your class code</Link></>
             )}

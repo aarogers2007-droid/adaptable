@@ -12,8 +12,14 @@ export default function Home() {
         </p>
         <div className="mt-8 flex gap-4 justify-center">
           <Link
-            href="/join"
+            href="/start"
             className="rounded-lg bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)]"
+          >
+            Start Your Program
+          </Link>
+          <Link
+            href="/join"
+            className="rounded-lg border border-[var(--border-strong)] px-6 py-3 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
           >
             Join a Class
           </Link>

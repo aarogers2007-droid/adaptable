@@ -29,7 +29,7 @@ export async function GET(request: Request) {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("business_idea, org_id, role, is_platform_owner")
+          .select("business_idea, org_id, role, is_platform_owner, onboarding_step")
           .eq("id", user.id)
           .single();
 
@@ -42,9 +42,12 @@ export async function GET(request: Request) {
         if ((profile as Record<string, unknown> | null)?.is_platform_owner) {
           return NextResponse.redirect(`${origin}/admin`);
         }
-        // org_admin without org_id needs org onboarding first
-        if (profile?.role === "org_admin" && !profile?.org_id) {
-          return NextResponse.redirect(`${origin}/org/onboarding`);
+        // Org admin with incomplete onboarding — resume wizard
+        if (profile?.role === "org_admin") {
+          const onboardingStep = (profile as Record<string, unknown>)?.onboarding_step as number ?? 0;
+          if (onboardingStep < 5) {
+            return NextResponse.redirect(`${origin}/start?step=${Math.max(onboardingStep, 1)}`);
+          }
         }
         if (profile?.role === "instructor" || profile?.role === "org_admin") {
           return NextResponse.redirect(`${origin}/instructor/dashboard`);

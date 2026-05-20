@@ -1,305 +1,295 @@
 # TODOS
 
-## P0 — Security (FIXED)
+## Completed (reference)
 
-### ~~TOCTOU Race on Daily Message Cap~~ ✓
-Fixed: `reserve_ai_usage` DB function uses `pg_advisory_xact_lock` to serialize concurrent
-rate limit checks per student. Reserves a placeholder row atomically before streaming,
-updated with real token counts after.
-Migration: supabase/migrations/00006_security_fixes.sql
+<details>
+<summary>Security fixes, safety layers, and infrastructure already shipped</summary>
 
-### ~~Race Condition on Invite Code Max Uses~~ ✓
-Fixed: `increment_invite_usage` now includes `WHERE current_uses < max_uses` and returns
-boolean. Join action rolls back enrollment if increment fails.
-Migration: supabase/migrations/00006_security_fixes.sql
+- ~~TOCTOU Race on Daily Message Cap~~ ✓ — `reserve_ai_usage` with `pg_advisory_xact_lock`
+- ~~Race Condition on Invite Code Max Uses~~ ✓ — `increment_invite_usage` with `WHERE current_uses < max_uses`
+- ~~Lesson Progress Insert Race Condition~~ ✓ — upsert with onConflict
+- ~~CSRF Protection on Chat Route Handlers~~ ✓ — Origin/Referer validation
+- ~~increment_invite_usage Security Definer Abuse~~ ✓ — auth.uid() null check
+- ~~Proactive Instructor Alerts~~ ✓ — inactive, stuck, emotional, content flags, class struggle
+- ~~Teacher Onboarding Flow~~ ✓ — WelcomeSlideshow (4 steps)
+- ~~Gamification Layer~~ ✓ — 18 achievements, 4-category leaderboard
+- ~~AI Content Safety~~ ✓ — regex output moderation + streaming profanity scrubber (10 languages) on all 5 AI routes
+- ~~Curriculum Alignment Documentation~~ ✓ — /standards page with NBEA, Jump$tart, Common Core, ISTE
+- ~~OpenAI lesson routing~~ — N/A, all Mini lessons moved to Haiku (2026-05-17)
+- ~~`organizations` table is FK-only~~ — confirmed correct architecture, do NOT drop
 
-## P0 — Pilot blockers (do before any school sees the product)
+</details>
 
-### Domain + Resend production sender
-We have the email pipeline scaffolded (`src/lib/email.ts`, Resend SDK installed,
-crisis alerts wire-up complete). Currently using `onboarding@resend.dev` which only
-delivers to the email used to sign up at Resend. Before any real teacher hears
-about a real crisis: register a domain (Cloudflare ~$10/yr), verify it in Resend
-DNS, swap `RESEND_FROM_ADDRESS` env var. ~15 min once you have the $10.
-Effort: S (human: ~15 min)
+---
 
-### Real-time crisis email failure surfacing in dashboard
-The `notification_failures` table is populated when a crisis email fails to deliver.
-A hard banner needs to be added at the top of `/instructor/dashboard` that loads
-unresolved failures and screams about them. Right now the failure path is silent
-to instructors — only visible if you query the table directly.
-Effort: S (human: ~30 min / CC: ~15 min)
+## P0 — Before VentureLab pilot launches
 
-### Multi-language crisis detection (LLM second opinion)
-Current `crisis-detection.ts` is regex, English-first with 4 Spanish patches. Admin
-reviewer flagged: "I don't want to be alive" misses, all non-English misses, indirect
-language misses ("everything hurts," "made a plan," "if I just disappeared," "unalive").
-The honest fix: Claude Haiku classifier running in parallel with the regex, OR-ing the
-result. Cost ~$0.0001 per message. Negligible.
-Effort: M (human: ~half day / CC: ~1 hour)
+### Commit baseline schema for dashboard-created tables
+**FOOTGUN.** `teacher_alerts` and `knowledge_base` exist in prod but have no committed
+migration. A fresh DB will explode. Run `supabase db dump --schema-only`, diff against
+existing migrations, commit the missing tables.
+Effort: S (human: ~20 min)
 
-### Commit a baseline schema for tables created via Supabase dashboard
-**FOOTGUN — P0 critical.** Two tables are referenced in code but never declared in
-any committed migration:
-
-1. **`teacher_alerts`** — referenced in 8 code files (alerts pipeline, dashboard,
-   types, crisis email path). Discovered when migration 00018 hit a check-constraint
-   error from data the code didn't know about.
-2. **`knowledge_base`** — referenced in `src/lib/knowledge-retrieval.ts` (RAG context
-   for the lesson chat AI). This one is sneakier than `teacher_alerts` because
-   `getRelevantKnowledge()` returns `""` on missing/empty table. The mentor silently
-   gets dumber with no error and no alarm. If you ever lose this table or rebuild
-   your DB, you might not notice for weeks.
-
-Both tables exist in your prod DB only because someone created them via the Supabase
-dashboard. **A fresh staging DB will explode** the moment any code touches them.
-
-**Exact fix (you need supabase CLI access):**
-```bash
-# From the project root, with supabase CLI logged in to the project:
-supabase db dump --schema-only > supabase/migrations/00000_baseline.sql
-
-# Or if you don't have the CLI configured, use psql directly:
-# pg_dump --schema-only --no-owner --no-acl "$DATABASE_URL" > supabase/migrations/00000_baseline.sql
-```
-
-Then diff the file against the existing numbered migrations and confirm the only
-NEW tables introduced are `teacher_alerts` and `knowledge_base`. Anything else
-that shows up is another silent footgun and should be promoted to a real migration.
-
-Effort: S (human: ~5 min for the dump + ~15 min for the audit)
-
-### Investigate `knowledge_base` is actually populated in prod
-Connected to the footgun above: `getRelevantKnowledge()` is the RAG context fed
-into the lesson chat AI. If this table is empty in prod, the AI mentor is operating
-without any of the curated entrepreneurship content the team thought it had. Sample
-query:
-```sql
-select count(*), array_agg(distinct lesson_tag) from knowledge_base;
-```
-If the count is 0 or the lesson_tags don't match what `lesson-chat/route.ts` is
-querying for, the mentor has been running blind. Check before any pilot.
+### Verify `knowledge_base` is populated in prod
+`getRelevantKnowledge()` returns `""` on empty table. The mentor silently gets dumber
+with no error. Check before pilot.
 Effort: S (human: ~5 min)
 
-### Note: `organizations` table is FK-only, not dead schema
-Investigated as part of the schema audit. `organizations` is referenced in code
-exclusively via FK joins (`profiles.org_id`, `classes.org_id`) — no `.from("organizations")`
-calls anywhere. This is correct architecture: it's a referential anchor for RLS
-scoping. **Do NOT drop it.** Logged here so future audits don't waste time on this.
+### Per-org email sender configuration
+Each org sends crisis alerts and notifications from their own domain (e.g.,
+`alerts@venturelab.org`), not from Adaptable. The org provides DNS records
+during onboarding. Resend supports multiple verified domains on one account.
+Add `sender_domain` and `sender_email` columns to `organizations`. Email pipeline
+reads from org config instead of env var.
+Effort: S (CC: ~30 min)
 
-### Lessons as gradeable artifacts + native gradebook integration
-Right now `exportGradebookCSV` returns a participation report (lessons completed,
-%, last active) — admin reviewer correctly called this "not a gradebook." For real
-classroom adoption, lessons need: a per-lesson rubric score, time-on-task, standards
-mastery indicators, and the ability to push grades to PowerSchool / Infinite Campus
-/ Skyward / Google Classroom / Canvas via LTI 1.3 + OneRoster + Assignments and
-Grade Services. Without this, teachers run the platform once and ask "where's the
-actual grade?"
-Effort: L (human: ~3 weeks / CC: ~2 hours per LMS provider)
-Priority: P1 — required for sustained classroom adoption beyond pilot
-
-## P1 — High priority (v1.1)
-
-### Clever/ClassLink SSO
-Add Clever and ClassLink SSO for schools that don't use Google Workspace. Many US school
-districts mandate these for app access. Without it, IT departments may block adoption.
-Depends on: Google SSO working in v1.
-Effort: M (human: ~1 week / CC: ~30 min per provider)
-
-### Full AI Mentor Guide
-Upgrade minimal Q&A AI guide to full mentor with personality, proactive suggestions, and
-deep contextual awareness of student's full journey. This is the 10x differentiator.
-Build after v1 usage data shows where students actually get stuck.
-Depends on: v1 student usage data.
-Effort: M (human: ~1-2 weeks / CC: ~1 hour)
-
-### Real-World Brand Challenges (the unicorn-track revenue play)
-Brands like Adidas, Spotify, Crayola, Roblox pay $5K-$25K to put a real product or
-marketing problem in front of 5K-50K teen Adaptable users for 2 weeks ("How would
-you redesign sneaker packaging for Gen Z?" / "Pitch a Roblox event for high
-schoolers"). The top 10 student ideas get $200-$500 each plus a Zoom call with the
-brand team. Adaptable takes a platform fee on the brand sponsorship.
-
-Why this matters more than any other revenue idea:
-- Real-world stakes the lessons can't fake
-- Brand gets actual teen insight (more honest than focus groups)
-- Teen gets a portfolio piece + cash + adult contact + something to put on a college app
-- Adaptable gets revenue from a third party WITHOUT charging students or schools
-- The 19yo founder is the most fundable demographic for "we sell teen insight to brands"
-
-The global brand-research market is ~$80B. Even 0.01% of that is $8M ARR. Becomes
-a category nobody else owns because nobody else has the audience embedded in a
-learning context where they're already producing high-quality structured thinking.
-
-Architecture sketch:
-- New `challenges` table: brand, prompt, deadline, prize_pool, sponsor_id
-- Student submits via existing lesson chat (one-shot mode, not full lesson flow)
-- AI judge ranks submissions on 5-dim rubric (creativity, executability, teen-truth,
-  brand-fit, articulation) — borrows the eval-confidence judge pattern
-- Brand sponsor reviews top 50 in a portal, picks 10 winners
-- Cash distributed via Stripe Connect (custodial under-18 flow — same scaffolding
-  the COPPA work needed)
-- Winners get a richly-designed certificate that auto-attaches to their Founder
-  Portfolio (when that ships)
-
-Depends on: Stripe Connect under-18 custodial flow + at least 1,000 active students
-(brands won't pay for an audience of 50). Build the data model + judge now, hold the
-sales motion until the audience is real.
-
-Effort: L (human: ~3-4 weeks for the platform / CC: ~3 hours)
-Priority: P1 — this is the differentiated revenue path. Don't skip it for SaaS-style
-per-school pricing.
-
-## P1 — Pilot blockers (new, from Phase 2)
-
-### Toggle anonymous sign-in OFF in Supabase
-Anonymous sign-in was enabled for the DEMO event (/go page). Must be disabled before
-pilot launch. Go to Supabase Dashboard → Authentication → Providers → Anonymous Sign-Ins → OFF.
-Effort: S (human: ~1 min)
-
-### OpenAI streaming token extraction returns 0/0
-`streamMessageOpenAI` currently doesn't pass `stream_options: { include_usage: true }` to
-the OpenAI API, so token counts in `ai_usage_log` show 0/0 for all mini-model lessons.
-Cost tracking for 14 of 22 lessons is blind.
+### Crisis email failure banner on org admin dashboard
+`notification_failures` table is populated when a crisis email fails. The org admin
+dashboard needs a hard banner that screams about unresolved failures. Currently silent.
 Effort: S (CC: ~15 min)
 
+### Multi-language crisis detection (LLM second opinion)
+Current `crisis-detection.ts` is regex, English-first. Misses: "I don't want to be
+alive," indirect language ("everything hurts," "made a plan," "unalive"), all
+non-English. Fix: Claude Haiku classifier in parallel with regex, OR-ing results.
+Cost: ~$0.0001 per message.
+Effort: M (CC: ~1 hour)
+
+### Toggle anonymous sign-in OFF in Supabase
+Was enabled for DEMO event. Supabase Dashboard → Auth → Providers → Anonymous → OFF.
+Effort: S (human: ~1 min)
+
 ### Upgrade Supabase to Pro plan
-Free tier limits (500MB storage, 50K monthly active users) will be exceeded at 10K students.
-$25/month. Required before pilot.
+Free tier limits hit at 10K students. $25/month.
 Effort: S (human: ~5 min)
 
-### Email deliverability (SPF/DKIM on adaptable.one)
-Crisis alert emails currently use `onboarding@resend.dev`. Need to verify `adaptable.one`
-domain in Resend DNS settings for production delivery.
-Effort: S (human: ~15 min)
-
-### Legal: IP carve-out, licensing agreement, privacy policy, ToS
-Need: IP carve-out from VentureLab (AJ owns Adaptable IP), licensing agreement for
-per-student pricing, privacy policy and ToS for the platform, COPPA review for under-13 users.
+### Legal
+- IP carve-out from VentureLab (AJ owns Adaptable IP)
+- Licensing agreement for per-student pricing
+- Privacy policy and ToS for the platform
+- COPPA review for under-13 users
 Effort: L (human: lawyer engagement)
 
 ### Adaptable LLC formation
-Texas LLC, EIN, bank account. Required before receiving revenue from VentureLab pilot.
+Texas LLC, EIN, bank account. Required before receiving revenue AND before
+Stripe account activation (Stripe requires a legal entity for payouts).
 Effort: M (human: ~1 week)
 
-## P2 — Medium priority (v2)
+### Set up Stripe account + add keys to Vercel
+**Blocked by: LLC formation** (Stripe requires a legal entity for live payouts).
+Can create account in test mode now, but can't go live until LLC + EIN + bank
+account are done.
 
-### Founder's Mirror: Template-based prompts as cost/latency optimization
-After pilot data shows which Mirror prompts students actually respond to, evaluate
-replacing AI generation with a curated template library for the most common patterns
-(e.g., "You completed [lesson] in [N] days. What was different this time?"). Templates
-would be deterministic, zero-latency, zero-cost for ~80% of triggers, with Haiku
-reserved for edge cases. Decision should be data-driven: analyze prompt-to-response
-correlation from the first 100+ founder_log_entries.
-Depends on: Phase 1 Founder's Mirror shipping + pilot data.
-Effort: S (human: ~1 day / CC: ~30 min)
+Steps (in order):
+1. Create Stripe account at dashboard.stripe.com (test mode)
+2. Create 3 products: Starter ($9.99/yr), Growth ($7.99/yr), Scale ($5.99/yr)
+3. Copy Secret key (sk_test_...) and 3 Price IDs (price_...)
+4. Install Stripe CLI: `brew install stripe/stripe-cli/stripe`
+5. Run `stripe login` then `stripe listen --forward-to localhost:3000/api/stripe/webhook`
+6. Copy webhook signing secret (whsec_...)
+7. Add all 5 keys to .env.local
+8. Test full onboarding flow locally
+9. After LLC: switch to live keys, add to Vercel env vars
+
+The onboarding wizard code is built and compiles clean. Just waiting on these keys
+to test it end-to-end.
+Effort: S (human: ~30 min for test mode, ~10 min for live after LLC)
+
+---
+
+## P1 — Org platform infrastructure (the product IS this)
+
+### Per-org isolated RAG
+The core differentiator. Each org gets their own knowledge base, isolated by org_id.
+When VentureLab uploads their curriculum, it goes into a `knowledge_base` partition
+scoped to their org. Students only see content from their org's RAG. Other orgs
+never see VentureLab's content. The AI mentor queries only the student's org's
+knowledge base.
+
+Infrastructure:
+- Add `org_id` column to `knowledge_base` table (FK to organizations)
+- RLS policy: students can only trigger retrieval from their own org's KB
+- `getRelevantKnowledge()` filters by org_id from the authenticated user's profile
+- Org admin UI for managing KB entries (CRUD + bulk upload)
+- Ingestion pipeline that processes uploaded curriculum into tagged chunks
+
+Effort: L (CC: ~2 hours)
+
+### Org onboarding flow (the money path)
+This is the most important flow in the entire product. When an org is ready to pay,
+the path from "yes" to "live and branded" must be frictionless. Most decision-makers
+want to be led. They want numbered steps. They want "click here, then here, done."
+
+The flow (one action per screen, progress bar at top):
+1. **Create account** — Google sign-in, one click
+2. **Pick your plan** — per-student pricing, estimated student count, Stripe Checkout inline
+3. **Name your organization** — one text field, auto-generates subdomain suggestion
+4. **Upload your logo** — drag and drop, instant preview
+5. **Pick your colors** — color picker with live preview of how the student UI looks
+6. **Upload curriculum** — drag and drop PDFs/docs/images/videos, progress bar per file
+7. **Review your knowledge base** — auto-chunked + auto-tagged, org admin confirms
+8. **You're live** — subdomain is active, share the link with your students
+
+Payment is step 2. They're ready to pay, let them pay. Don't make them configure
+for 20 minutes first — that's 20 minutes of potential distraction, tab-closing, and
+"I'll come back to this later" that kills conversions. Once they've paid, everything
+after is setup for something they already own. They'll finish because they're invested.
+
+Already partially built (subdomain routing, branding columns, 3-step wizard at
+/org/onboarding). Needs: curriculum upload, RAG ingestion, Stripe integration,
+expanded wizard, preview mode.
+Effort: L (CC: ~3 hours)
+
+### Curriculum ingestion pipeline
+Script that processes an org's uploaded curriculum files into their isolated RAG.
+
+Input: PDFs, docs, images, videos, slide decks dropped into Supabase Storage.
+Output: tagged, embedded knowledge_base rows scoped to the org.
+
+Pipeline steps:
+1. **Extract** — parse text from PDFs/docs (pdf-parse, mammoth for docx)
+2. **Chunk** — split into self-contained concepts (paragraph-level, ~200-400 tokens each)
+3. **Tag** — Haiku auto-suggests lesson_tags per chunk, org admin confirms
+4. **Embed** — generate vector embeddings for semantic search (pgvector)
+5. **Classify media** — images/diagrams get content_type + media_url, linked to parent chunk
+6. **Verify** — run Factual Floor eval on any chunk containing named claims or statistics
+7. **Insert** — write to knowledge_base with org_id, ready for retrieval
+
+Script: `scripts/ingest-curriculum.ts`
+Usage: `bunx tsx scripts/ingest-curriculum.ts --org venturelab --source ./curriculum/venturelab/`
+Effort: M (CC: ~2 hours)
+
+### Multimodal RAG (images, diagrams, videos in knowledge base)
+Platform is text-only in AI interactions. VentureLab's curriculum includes diagrams
+and videos. The AI mentor should surface these inline during conversations.
+
+Infrastructure:
+- Add `content_type` (text/image/video/diagram) and `media_url` to `knowledge_base`
+- Retrieval pipeline returns mixed content blocks
+- Chat UI renders inline images and video embeds in message stream
+- Org admin uploads visual content to Supabase Storage, tagged with lesson_tags
+- Chromebook constraint: native `<img>` and `<video>`/iframe only
+
+Core to Adaptable's thesis: not all students learn through text.
+Effort: L (CC: ~2 hours)
+
+### COPPA compliance and data management
+Data retention + deletion system. Students and org admins can request full deletion.
+Automatic purging for inactive accounts. Privacy policy page within the platform.
+Required before any org signs a contract.
+Effort: L (CC: ~1 hour)
+
+### Full AI Mentor Guide
+Upgrade the AI guide from Q&A to full mentor with proactive suggestions and deep
+awareness of the student's full journey. Build after pilot usage data shows where
+students actually get stuck.
+Depends on: pilot data.
+Effort: M (CC: ~1 hour)
+
+### Real-World Brand Challenges
+Brands pay $5K-$25K to put a real problem in front of teen users. Top student ideas
+get prizes + portfolio pieces. Adaptable takes a platform fee. This is the
+differentiated revenue path that doesn't charge students or orgs.
+
+Architecture: `challenges` table, AI judge on 5-dim rubric, brand sponsor portal,
+Stripe Connect for prize distribution. Hold sales motion until 1K+ active students.
+Effort: L (CC: ~3 hours)
+
+---
+
+## P2 — Post-pilot enhancements
+
+### Org analytics dashboard
+Monthly reports per org: active students, completion rates, session time, business
+ideas generated, module-level stats, top performers. Exportable as PDF. Designed
+for an org director, not a teacher.
+Effort: M (CC: ~30 min)
 
 ### Shareable Student Portfolio Page
-Public-facing page showing what each student built. Business concept, key decisions, pitch.
-Proof of impact for VentureLab fundraising. Tangible artifact for students to show colleges.
-Blocked by: Privacy/consent framework for minors (needs legal review).
-Effort: M (human: ~1 week / CC: ~30 min, plus legal review)
+Public page showing what each student built. Proof of impact for org fundraising.
+Tangible artifact for students.
+Blocked by: privacy/consent framework for minors (legal review).
+Effort: M (CC: ~30 min)
 
-### ~~Gamification Layer~~ ✓
-Built: 18 achievements across 5 categories (bronze/silver/gold tiers), 4-category leaderboard
-(Most Consistent, Most Engaged, Deepest Thinker, Most Improved), student profiles on leaderboard.
+### Identity Mirror (Founder's Mirror extension, high school only)
+Extend the Founder's Mirror into a two-layer identity system. High school students
+only (grade_tier === "high_school"). Too deep for younger students, and sometimes
+they don't want that level of honesty.
+
+**Layer 1: Their own words (AI silent).**
+The student's check-in timeline displayed chronologically. No AI interpretation, no
+summaries. Just their own reflections, dated. They see their growth because their
+words change over time. Week 1: "i dont really know what im doing." Week 6: "I just
+pitched my first customer and she said yes." The Mirror just shows them.
+
+**Layer 2: What the AI saw (recognition, not advice).**
+Across 22 lessons and 150+ exchanges, the AI observes patterns in how the student
+thinks. It surfaces these as identity observations, not guidance:
+- "You've pivoted your target customer three times. Each time you got more specific."
+- "Every time you talk about pricing, your answer is higher than the last one."
+- "You always start with who you're helping before what you're making. That's rare."
+
+These are stored as `identity_observations` generated after lesson completion by
+analyzing the student's full conversation history. Short. Specific. About THEM.
+AI restraint principle still applies: observations, not advice.
+
+Infrastructure:
+- `identity_observations` table (student_id, observation, lesson_id, created_at)
+- Generation via Haiku after lesson completion (async, non-blocking)
+- Gate on grade_tier === "high_school" — younger students see regular Founder's Mirror only
+- UI: tab or section within Founder's Mirror showing both layers
+Effort: M (CC: ~1 hour)
+
+### Streak visibility improvements
+Streak counter exists but is a small badge tucked into the dashboard hero. Make it
+more prominent:
+- Larger, more visible streak display on dashboard
+- Add "Longest Streak" category to leaderboard alongside existing four categories
+- Streak visible on student profile in leaderboard view
+Effort: S (CC: ~30 min)
+
+### Founder's Mirror template optimization
+Replace AI generation with curated templates for common patterns (~80% of triggers).
+Data-driven decision after 100+ founder_log_entries.
+Effort: S (CC: ~30 min)
 
 ### Quizzes
 Knowledge checks embedded in lessons.
 Effort: S
 
 ### Parent Accounts
-Upgrade from anonymous PIN access to real parent accounts with authentication.
-Enables: notifications, multi-child view, consent management.
+Real parent accounts with auth. Enables: notifications, multi-child view, consent.
 Effort: M
-
-### ~~Additional AI Content Safety Layer~~ ✓
-Built: regex-based output moderation (src/lib/output-moderation.ts) runs post-stream on every
-AI response. Checks for explicit content, age-inappropriate advice, PII requests, hallucinated
-URLs, prompt leakage. Fires teacher alert on flag. Applied to lesson-chat and guide routes.
 
 ### Accessibility Audit (WCAG 2.1 AA)
-Full accessibility audit and remediation. May be a procurement requirement for US schools.
+Full audit and remediation. May be procurement requirement for some orgs.
 Effort: M
 
-## Institutional Value — Teachers & Schools
+### Longitudinal Student Data
+Multi-year student journeys. Progress persists across program cycles. Portfolio
+view of full journey from first login forward.
+Effort: M (CC: ~30 min)
 
-> Note: Teacher experience items should be designed in collaboration with the first
-> pilot teacher based on what they actually ask for. Build the scaffolding now, but
-> validate priorities with real teacher feedback before polishing.
+---
 
-### P1 — Teacher Experience
+## P3 — Optional (org-requested features)
 
-#### ~~Proactive Instructor Alerts~~ ✓
-Built: inactive (3+ days), stuck (3+ days), emotional (3+ accumulated signals),
-content flags, class struggle patterns (30%+ stuck on same lesson), check-in quality
-flags. All surfaced in alert panel with resolve/dismiss/message actions.
+> These were designed for classroom use. Still available if an org wants them,
+> but not on the critical path for the white-label platform model.
 
-#### Teacher Agency Tools
-Add the ability for instructors to send a direct nudge message to a specific student
-from the dashboard, leave a comment on a student's business plan artifact that the
-student can see, and flag a student for personal follow-up. These actions should be
-logged so the teacher has a record of their interventions.
-Effort: M (human: ~1 week / CC: ~30 min)
+### Teacher agency tools
+Direct nudge messages, comments on artifacts, follow-up flags. Logged interventions.
+Effort: M (CC: ~30 min)
 
-#### Classroom Mode
-A teacher-facing view designed to be projected on a classroom screen. Shows the class
-working in real time, allows the teacher to spotlight a specific student's business
-idea or artifact for group discussion, and can display a live leaderboard of progress.
-Students see a simplified focused view when classroom mode is active.
-Effort: L (human: ~2 weeks / CC: ~1 hour)
+### Classroom mode
+Teacher projection view. Real-time class progress, student spotlight, live leaderboard.
+Effort: L (CC: ~1 hour)
 
-#### ~~Teacher Onboarding Flow~~ ✓
-Built: WelcomeSlideshow (4 steps), reopenable via "How it works" button.
-Missing: teacher preview mode (experience as student). Deferred to v1.1.
+### Gradebook integration (LMS)
+LTI 1.3 + OneRoster for PowerSchool / Infinite Campus / Canvas / Google Classroom.
+Only if an org specifically requests it for their schools.
+Effort: L (CC: ~2 hours per provider)
 
-### P1 — School & Administrator Value (pilot-ready)
-
-#### School Onboarding UI
-Replace manual database manipulation for adding new schools with a proper admin
-interface. An org_admin should be able to create classes, generate invite codes,
-manage enrollments, and view school-wide analytics without any developer involvement.
-Effort: L (human: ~2 weeks / CC: ~1 hour)
-Priority: P1 — blocks every new school onboarding
-
-#### COPPA Compliance and Data Management
-Build a data retention and deletion system. Students and administrators must be able
-to request full data deletion. Implement automatic data purging for inactive accounts
-after a configurable retention period. Document the full data handling story clearly
-in a privacy policy page within the platform. This is required before any public
-school can sign a contract.
-Effort: L (human: ~2 weeks / CC: ~1 hour)
-Priority: P1 — legal requirement for public school contracts
-
-### P2 — School & Administrator Value (post-pilot)
-
-#### Aggregate Reporting
-A monthly report generated automatically for each organization showing: total active
-students, average completion rate, average session time, number of business ideas
-generated, module-level completion rates, and top performing students. Exportable as
-PDF. Designed to be shown to a principal or superintendent without any explanation needed.
-Effort: M (human: ~1 week / CC: ~30 min)
-
-#### ~~Curriculum Alignment Documentation~~ ✓
-Built: /standards page mapping all 8 lessons to NBEA, Jump$tart, Common Core, ISTE
-standards. Printable. Linked from instructor dashboard.
-
-#### Longitudinal Student Data
-Design the data model to support multi-year student journeys. A student's business
-idea, decisions, artifacts, and progress should persist and be accessible across
-school years. Add a student portfolio view that shows their full entrepreneurship
-journey from first login forward.
-Effort: M (human: ~1 week / CC: ~30 min)
-
-## P3 — Security hardening (FIXED)
-
-### ~~Lesson Progress Insert Race Condition~~ ✓
-Fixed: uses upsert with onConflict + fallback fetch for concurrent tab safety.
-File: src/app/(app)/lessons/[id]/page.tsx
-
-### ~~CSRF Protection on Chat Route Handlers~~ ✓
-Fixed: Origin/Referer validation via src/lib/csrf.ts, applied to chat, lesson-chat, and transcribe routes.
-
-### ~~increment_invite_usage Security Definer Abuse~~ ✓
-Fixed: added auth.uid() null check inside the function. Unauthenticated callers get exception.
-Migration: supabase/migrations/00009_security_hardening.sql
+### Clever/ClassLink SSO
+School district SSO providers. Only if an org's schools mandate it.
+Effort: M (CC: ~30 min per provider)
