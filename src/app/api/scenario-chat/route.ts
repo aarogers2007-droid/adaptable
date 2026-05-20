@@ -32,6 +32,14 @@ export async function POST(request: Request) {
     return Response.json({ error: modCheck.reason }, { status: 400 });
   }
 
+  // Crisis detection (non-blocking for regex, awaits ML if regex misses)
+  const { detectCrisisUniversal } = await import("@/lib/crisis-detection");
+  detectCrisisUniversal(trimmedMessage).then(async (crisisCheck) => {
+    if (!crisisCheck.detected) return;
+    const { alertCrisis } = await import("@/lib/teacher-alerts");
+    await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", trimmedMessage, "scenario-chat");
+  }).catch(() => {});
+
   // Rate limit
   const { data: allowed, error: rpcError } = await supabase.rpc("reserve_ai_usage", {
     p_student_id: user.id,

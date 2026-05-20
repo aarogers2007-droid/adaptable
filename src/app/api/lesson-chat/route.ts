@@ -59,8 +59,8 @@ export async function POST(request: Request) {
   // If detected: fire URGENT teacher alert AND return a supportive
   // response with crisis resources. The lesson continues — we don't
   // abandon the student, but we make sure they hear "talk to someone".
-  const { detectCrisis, getCrisisResponse } = await import("@/lib/crisis-detection");
-  const crisisCheck = detectCrisis(message);
+  const { detectCrisisUniversal, getCrisisResponse } = await import("@/lib/crisis-detection");
+  const crisisCheck = await detectCrisisUniversal(message);
   if (crisisCheck.detected) {
     // Get student name for the response
     const { data: nameData } = await supabase
