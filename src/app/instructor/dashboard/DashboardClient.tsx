@@ -11,6 +11,7 @@ import CreateClassModal from "./CreateClassModal";
 import MessageComposer from "./MessageComposer";
 import WelcomeSlideshow from "./WelcomeSlideshow";
 import ImpactTab from "./ImpactTab";
+import ScenariosPanel from "./ScenariosPanel";
 import type { StudentRow } from "./StudentTable";
 import type { FeedItem } from "./LiveFeed";
 import type { AnalyticsData } from "./ClassAnalytics";
@@ -49,7 +50,7 @@ interface DashboardClientProps {
   orgId?: string | null;
 }
 
-type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics" | "impact" | "settings";
+type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics" | "scenarios" | "impact" | "settings";
 
 export default function DashboardClient({ classes, totalLessons, orgId }: DashboardClientProps) {
   const [activeClassIdx, setActiveClassIdx] = useState(0);
@@ -75,6 +76,7 @@ export default function DashboardClient({ classes, totalLessons, orgId }: Dashbo
     { key: "alerts", label: "Alerts", count: activeClass?.alerts.length },
     { key: "followups", label: "Follow-ups", count: activeFlags.length },
     { key: "analytics", label: "Analytics" },
+    { key: "scenarios", label: "Scenarios" },
     { key: "impact", label: "Impact" },
     { key: "settings", label: "Settings" },
   ];
@@ -281,6 +283,10 @@ export default function DashboardClient({ classes, totalLessons, orgId }: Dashbo
 
                 {activeSubTab === "analytics" && (
                   <ClassAnalytics data={activeClass.analytics} />
+                )}
+
+                {activeSubTab === "scenarios" && orgId && (
+                  <ScenariosPanel orgId={orgId} />
                 )}
 
                 {activeSubTab === "impact" && orgId && (
