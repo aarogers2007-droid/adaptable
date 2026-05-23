@@ -85,8 +85,8 @@ function toSubdomain(name: string): string {
 
 function validateFileUpload(file: File): string | null {
   const MAX_SIZE = 2 * 1024 * 1024;
-  const ALLOWED_TYPES = ["image/png", "image/svg+xml"];
-  if (!ALLOWED_TYPES.includes(file.type)) return "Only PNG and SVG files are allowed.";
+  const ALLOWED_TYPES = ["image/png", "image/svg+xml", "image/jpeg"];
+  if (!ALLOWED_TYPES.includes(file.type)) return "Only PNG, JPG, or SVG files are allowed.";
   if (file.size > MAX_SIZE) return "File must be under 2MB.";
   return null;
 }
@@ -724,6 +724,9 @@ export default function StartPage() {
                   </span>
                   <span className="font-mono text-sm text-[var(--text-muted)]">.adaptable.one</span>
                 </div>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">
+                  This is the web address your students will visit to access the program. You can change it later.
+                </p>
 
                 {/* Availability indicator */}
                 {subdomain.length >= 3 && (
@@ -827,14 +830,14 @@ export default function StartPage() {
                   <input
                     ref={logoInputRef}
                     type="file"
-                    accept="image/png,image/svg+xml"
+                    accept="image/png,image/svg+xml,image/jpeg"
                     className="hidden"
                     onChange={(e) => {
                       if (e.target.files?.[0]) handleFileSelect(e.target.files[0]);
                     }}
                   />
                   <div className="mt-1.5 flex items-center justify-between">
-                    <p className="text-xs text-[var(--text-muted)]">PNG or SVG, max 2MB</p>
+                    <p className="text-xs text-[var(--text-muted)]">PNG, JPG, or SVG, max 2MB</p>
                     {!logo && (
                       <button
                         type="button"
@@ -1097,6 +1100,22 @@ export default function StartPage() {
               >
                 {submitting ? "Redirecting to checkout..." : "Start 14-day free trial"}
               </button>
+            </div>
+
+            {/* Sales-assisted path for larger orgs */}
+            <div className="mt-6 pt-6 border-t border-[var(--border)] text-center">
+              <p className="text-sm text-[var(--text-secondary)]">
+                Need a custom quote for your board?
+              </p>
+              <a
+                href="mailto:aj@adaptable.one?subject=Custom%20Quote%20Request&body=Organization%20name:%0AEstimated%20students:%0AQuestions:"
+                className="mt-2 inline-block text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-dark)] transition-colors"
+              >
+                Contact us for a custom quote
+              </a>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                We&apos;ll send you a PDF quote you can share with your board or procurement team.
+              </p>
             </div>
           </div>
         )}

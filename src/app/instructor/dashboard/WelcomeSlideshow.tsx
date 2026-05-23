@@ -12,7 +12,7 @@ const SLIDES = [
   },
   {
     step: 2,
-    title: "8 conversational AI lessons",
+    title: "22 AI-guided lessons across 6 modules",
     description:
       "Every lesson is personalized to the student's actual business idea. AI-guided conversations help them build a real plan — not a classroom exercise.",
     icon: "💬",

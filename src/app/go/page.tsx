@@ -43,13 +43,13 @@ export default function GuestJoinPage() {
         .single();
 
       if (codeError || !inviteCode) {
-        setError("That code doesn't work. Check with your instructor.");
+        setError("That code doesn't work. Check with the person who gave it to you.");
         setJoining(false);
         return;
       }
 
       if (inviteCode.current_uses >= inviteCode.max_uses) {
-        setError("This class is full. Let your instructor know.");
+        setError("This program is full. Let your program coordinator know.");
         setJoining(false);
         return;
       }

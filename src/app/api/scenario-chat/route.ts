@@ -37,7 +37,29 @@ export async function POST(request: Request) {
   detectCrisisUniversal(trimmedMessage).then(async (crisisCheck) => {
     if (!crisisCheck.detected) return;
     const { alertCrisis } = await import("@/lib/teacher-alerts");
-    await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", trimmedMessage, "scenario-chat");
+    const result = await alertCrisis(supabase, user.id, crisisCheck.type ?? "hopelessness", crisisCheck.matchedPattern ?? "", trimmedMessage, "scenario-chat");
+    if (!result) return;
+    // Send crisis email to instructor + org admin
+    const recipients: string[] = [];
+    if (result.instructorId) {
+      const { data: instructor } = await supabase.from("profiles").select("email").eq("id", result.instructorId).single();
+      if (instructor?.email) recipients.push(instructor.email as string);
+    }
+    if (result.orgAdminEmail) recipients.push(result.orgAdminEmail);
+    if (recipients.length > 0) {
+      const { sendCrisisAlertEmail } = await import("@/lib/email");
+      const { data: studentProfile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+      await sendCrisisAlertEmail(supabase, {
+        alertId: result.alertId,
+        studentFirstName: (studentProfile?.full_name as string)?.split(" ")[0] ?? "A student",
+        crisisType: crisisCheck.type ?? "hopelessness",
+        matchedPatternHint: crisisCheck.matchedPattern ?? "",
+        to: recipients,
+        classId: result.classId,
+        timestamp: new Date().toISOString(),
+        region: result.region,
+      }).catch(() => {});
+    }
   }).catch(() => {});
 
   // Rate limit

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Org Admin Dashboard v2 — Data-First</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; background: #F9FAFB; color: #111827; }
+
+  .nav { background: #fff; border-bottom: 1px solid #E5E7EB; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-logo { font-weight: 700; font-size: 18px; color: #0D9488; display: flex; align-items: center; gap: 8px; }
+  .nav-logo img { height: 28px; }
+  .nav-right { display: flex; gap: 10px; align-items: center; }
+  .nav-btn { font-size: 12px; color: #4B5563; padding: 6px 12px; border: 1px solid #E5E7EB; border-radius: 6px; background: #fff; cursor: pointer; }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* Header */
+  .header { margin-bottom: 24px; }
+  .header h1 { font-size: 26px; font-weight: 700; }
+  .header-sub { font-size: 13px; color: #9CA3AF; margin-top: 4px; }
+  .header-row { display: flex; justify-content: space-between; align-items: center; }
+
+  /* Main tabs */
+  .main-tabs { display: flex; gap: 0; border-bottom: 2px solid #E5E7EB; margin-bottom: 24px; }
+  .main-tab { padding: 10px 20px; font-size: 14px; font-weight: 500; color: #9CA3AF; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 150ms; }
+  .main-tab.active { color: #0D9488; border-bottom-color: #0D9488; font-weight: 600; }
+  .main-tab:hover { color: #111827; }
+
+  /* Stats row */
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px; }
+  .stat-value { font-size: 32px; font-weight: 700; color: #111827; }
+  .stat-value.teal { color: #0D9488; }
+  .stat-label { font-size: 11px; color: #9CA3AF; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-delta { font-size: 11px; margin-top: 4px; }
+  .stat-delta.up { color: #059669; }
+  .stat-delta.down { color: #DC2626; }
+
+  /* Chart card */
+  .chart-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .chart-title { font-size: 15px; font-weight: 600; }
+  .chart-controls { display: flex; gap: 4px; }
+  .viz-btn { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid #E5E7EB; background: #fff; cursor: pointer; color: #4B5563; }
+  .viz-btn.active { background: #0D9488; color: #fff; border-color: #0D9488; }
+  .time-filter { display: flex; gap: 4px; margin-right: 12px; }
+  .time-btn { font-size: 11px; padding: 4px 8px; border-radius: 4px; border: none; background: transparent; cursor: pointer; color: #9CA3AF; }
+  .time-btn.active { background: #F3F4F6; color: #111827; font-weight: 500; }
+
+  /* Bar chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 200px; padding: 0 8px; border-bottom: 1px solid #E5E7EB; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 300ms ease; }
+  .bar.teal { background: #0D9488; }
+  .bar.amber { background: #F59E0B; }
+  .bar.blue { background: #3B82F6; }
+  .bar.light { background: #D1FAE5; }
+  .bar-x { font-size: 10px; color: #9CA3AF; margin-top: 6px; text-align: center; }
+
+  /* Line chart (CSS only) */
+  .line-chart { height: 200px; position: relative; border-bottom: 1px solid #E5E7EB; border-left: 1px solid #E5E7EB; margin: 0 8px; }
+  .line-chart svg { width: 100%; height: 100%; }
+  .y-labels { position: absolute; left: -36px; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+  .y-label { font-size: 10px; color: #9CA3AF; }
+
+  /* Pie/donut chart */
+  .donut-container { display: flex; align-items: center; gap: 40px; padding: 10px 0; }
+  .donut { width: 180px; height: 180px; position: relative; }
+  .donut svg { transform: rotate(-90deg); }
+  .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .donut-center-value { font-size: 28px; font-weight: 700; color: #111827; }
+  .donut-center-label { font-size: 11px; color: #9CA3AF; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-value { font-weight: 600; color: #111827; margin-left: auto; padding-left: 16px; }
+
+  /* Grid layouts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* Horizontal bar chart */
+  .h-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .h-bar-label { font-size: 12px; color: #4B5563; width: 160px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .h-bar-track { flex: 1; height: 20px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+  .h-bar-fill { height: 100%; border-radius: 4px; }
+  .h-bar-fill.teal { background: #0D9488; }
+  .h-bar-fill.amber { background: #F59E0B; }
+  .h-bar-fill.red { background: #DC2626; }
+  .h-bar-value { font-size: 12px; color: #111827; font-weight: 500; width: 50px; text-align: right; flex-shrink: 0; }
+
+  /* Alert summary */
+  .alert-summary { display: flex; gap: 12px; }
+  .alert-box { flex: 1; border-radius: 10px; padding: 16px; text-align: center; }
+  .alert-box.urgent { background: #FEF2F2; border: 1px solid #FECACA; }
+  .alert-box.warning { background: #FFFBEB; border: 1px solid #FDE68A; }
+  .alert-box.info { background: #EFF6FF; border: 1px solid #BFDBFE; }
+  .alert-count { font-size: 36px; font-weight: 700; }
+  .alert-box.urgent .alert-count { color: #DC2626; }
+  .alert-box.warning .alert-count { color: #D97706; }
+  .alert-box.info .alert-count { color: #3B82F6; }
+  .alert-type { font-size: 11px; color: #4B5563; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Export bar */
+  .export-bar { display: flex; gap: 8px; }
+  .export-btn { font-size: 12px; padding: 6px 14px; border-radius: 6px; border: 1px solid #D1D5DB; background: #fff; cursor: pointer; color: #4B5563; }
+  .export-btn:hover { background: #F3F4F6; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .donut-container { flex-direction: column; }
+    .alert-summary { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV (branded as VentureLab) -->
+<nav class="nav">
+  <div class="nav-left">
+    <span class="nav-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#0D9488"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">V</text></svg>
+      VentureLab
+    </span>
+  </div>
+  <div class="nav-right">
+    <div class="export-bar">
+      <button class="export-btn">Export PDF</button>
+      <button class="export-btn">Export CSV</button>
+    </div>
+    <button class="nav-btn">Settings</button>
+    <button class="nav-btn">Sign out</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1>Program Dashboard</h1>
+        <div class="header-sub">VentureLab · 10,247 students · Last updated 2 minutes ago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN TABS -->
+  <div class="main-tabs">
+    <div class="main-tab active">Overview</div>
+    <div class="main-tab">Engagement</div>
+    <div class="main-tab">Curriculum</div>
+    <div class="main-tab">Students</div>
+    <div class="main-tab">Alerts</div>
+    <div class="main-tab">Settings</div>
+  </div>
+
+  <!-- ═══════════ OVERVIEW TAB ═══════════ -->
+
+  <!-- Top stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value teal">10,247</div>
+      <div class="stat-label">Total Students</div>
+      <div class="stat-delta up">+342 this month</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">7,891</div>
+      <div class="stat-label">Active (30 days)</div>
+      <div class="stat-delta up">77% of total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">68%</div>
+      <div class="stat-label">Completion Rate</div>
+      <div class="stat-delta up">+4% from last month</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">142K</div>
+      <div class="stat-label">AI Exchanges</div>
+      <div class="stat-delta up">+23K this month</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">2.3d</div>
+      <div class="stat-label">Avg Time / Lesson</div>
+      <div class="stat-delta down">+0.2d from last month</div>
+    </div>
+  </div>
+
+  <!-- Alert summary -->
+  <div class="alert-summary" style="margin-bottom: 24px;">
+    <div class="alert-box urgent">
+      <div class="alert-count">7</div>
+      <div class="alert-type">Crisis / Urgent</div>
+    </div>
+    <div class="alert-box warning">
+      <div class="alert-count">43</div>
+      <div class="alert-type">Inactive / Stuck</div>
+    </div>
+    <div class="alert-box info">
+      <div class="alert-count">128</div>
+      <div class="alert-type">Info / Content Flag</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Student Engagement Over Time (line chart) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Student Engagement Over Time</div>
+        <div style="display:flex; align-items:center;">
+          <div class="time-filter">
+            <button class="time-btn">7d</button>
+            <button class="time-btn active">30d</button>
+            <button class="time-btn">90d</button>
+            <button class="time-btn">All</button>
+          </div>
+          <div class="chart-controls">
+            <button class="viz-btn active">Line</button>
+            <button class="viz-btn">Bar</button>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative; padding-left:40px;">
+        <div class="y-labels">
+          <span class="y-label">500</span>
+          <span class="y-label">375</span>
+          <span class="y-label">250</span>
+          <span class="y-label">125</span>
+          <span class="y-label">0</span>
+        </div>
+        <div class="line-chart">
+          <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+            <!-- Active students line -->
+            <polyline points="0,160 30,140 60,130 90,110 120,95 150,80 180,70 210,75 240,60 270,50 300,45 330,35 360,30 390,25" fill="none" stroke="#0D9488" stroke-width="2.5"/>
+            <!-- Lessons completed line -->
+            <polyline points="0,180 30,170 60,155 90,140 120,130 150,115 180,105 210,110 240,95 270,85 300,75 330,65 360,55 390,50" fill="none" stroke="#3B82F6" stroke-width="2" stroke-dasharray="4,3"/>
+            <!-- Subtle fill under active line -->
+            <polyline points="0,160 30,140 60,130 90,110 120,95 150,80 180,70 210,75 240,60 270,50 300,45 330,35 360,30 390,25 390,200 0,200" fill="#0D9488" fill-opacity="0.06"/>
+          </svg>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding: 6px 0 0; margin: 0 8px;">
+          <span style="font-size:10px; color:#9CA3AF;">Apr 18</span>
+          <span style="font-size:10px; color:#9CA3AF;">Apr 25</span>
+          <span style="font-size:10px; color:#9CA3AF;">May 2</span>
+          <span style="font-size:10px; color:#9CA3AF;">May 9</span>
+          <span style="font-size:10px; color:#9CA3AF;">May 16</span>
+        </div>
+        <div style="display:flex; gap:16px; margin-top:8px;">
+          <div class="legend-item"><span class="legend-dot" style="background:#0D9488"></span> Daily active students</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span> Lessons completed/day</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Distribution (donut) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Progress Distribution</div>
+        <div class="chart-controls">
+          <button class="viz-btn active">Donut</button>
+          <button class="viz-btn">Bar</button>
+          <button class="viz-btn">Table</button>
+        </div>
+      </div>
+      <div class="donut-container">
+        <div class="donut">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <!-- Completed: 32% -->
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#0D9488" stroke-width="20"
+              stroke-dasharray="140.7 439.8" stroke-dashoffset="0"/>
+            <!-- In Progress: 45% -->
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#3B82F6" stroke-width="20"
+              stroke-dasharray="197.9 439.8" stroke-dashoffset="-140.7"/>
+            <!-- Not Started: 15% -->
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#F59E0B" stroke-width="20"
+              stroke-dasharray="66.0 439.8" stroke-dashoffset="-338.6"/>
+            <!-- Dropped: 8% -->
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#EF4444" stroke-width="20"
+              stroke-dasharray="35.2 439.8" stroke-dashoffset="-404.6"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-center-value">10,247</div>
+            <div class="donut-center-label">students</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#0D9488"></span> Completed (all 22) <span class="legend-value">3,279 (32%)</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span> In Progress <span class="legend-value">4,611 (45%)</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span> Just Started (1-3) <span class="legend-value">1,537 (15%)</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#EF4444"></span> Inactive 14+ days <span class="legend-value">820 (8%)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Lesson Completion by Module (bar chart) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Lesson Completion by Module</div>
+        <div class="chart-controls">
+          <button class="viz-btn active">Bar</button>
+          <button class="viz-btn">Line</button>
+          <button class="viz-btn">Table</button>
+        </div>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-col"><div class="bar teal" style="height:92%"></div><div class="bar-x">M1</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:87%"></div><div class="bar-x">M1</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:83%"></div><div class="bar-x">M1</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:78%"></div><div class="bar-x">M1</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:75%"></div><div class="bar-x">M2</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:71%"></div><div class="bar-x">M2</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:68%"></div><div class="bar-x">M2</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:64%"></div><div class="bar-x">M2</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:61%"></div><div class="bar-x">M3</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:58%"></div><div class="bar-x">M3</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:55%"></div><div class="bar-x">M3</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:52%"></div><div class="bar-x">M4</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:48%"></div><div class="bar-x">M4</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:45%"></div><div class="bar-x">M4</div></div>
+        <div class="bar-col"><div class="bar teal" style="height:42%"></div><div class="bar-x">M4</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:39%"></div><div class="bar-x">M5</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:36%"></div><div class="bar-x">M5</div></div>
+        <div class="bar-col"><div class="bar blue" style="height:34%"></div><div class="bar-x">M5</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:32%"></div><div class="bar-x">M6</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:30%"></div><div class="bar-x">M6</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:28%"></div><div class="bar-x">M6</div></div>
+        <div class="bar-col"><div class="bar amber" style="height:26%"></div><div class="bar-x">M6</div></div>
+      </div>
+      <div style="display:flex; justify-content:space-around; margin-top:4px;">
+        <span style="font-size:10px; color:#9CA3AF;">Find Your Niche</span>
+        <span style="font-size:10px; color:#9CA3AF;">Know Customer</span>
+        <span style="font-size:10px; color:#9CA3AF;">Brand</span>
+        <span style="font-size:10px; color:#9CA3AF;">First Customer</span>
+        <span style="font-size:10px; color:#9CA3AF;">Numbers</span>
+        <span style="font-size:10px; color:#9CA3AF;">Launch</span>
+      </div>
+    </div>
+
+    <!-- Where Students Drop Off (horizontal bars) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Where Students Get Stuck</div>
+        <div class="chart-controls">
+          <button class="viz-btn active">Bar</button>
+          <button class="viz-btn">Pie</button>
+        </div>
+      </div>
+      <div class="h-bar-row"><span class="h-bar-label">M2L3: Set Your Price</span><div class="h-bar-track"><div class="h-bar-fill red" style="width:72%"></div></div><span class="h-bar-value" style="color:#DC2626; font-weight:600;">1,847</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">M4L4: First Pitch</span><div class="h-bar-track"><div class="h-bar-fill amber" style="width:58%"></div></div><span class="h-bar-value">1,491</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">M2L1: Customer Interview</span><div class="h-bar-track"><div class="h-bar-fill amber" style="width:45%"></div></div><span class="h-bar-value">1,156</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">M1L4: Target Customer</span><div class="h-bar-track"><div class="h-bar-fill teal" style="width:32%"></div></div><span class="h-bar-value">821</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">M5L2: Teen Pricing</span><div class="h-bar-track"><div class="h-bar-fill teal" style="width:24%"></div></div><span class="h-bar-value">616</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">M3L3: First Impression</span><div class="h-bar-track"><div class="h-bar-fill teal" style="width:18%"></div></div><span class="h-bar-value">462</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">M6L1: Ship Before Ready</span><div class="h-bar-track"><div class="h-bar-fill teal" style="width:12%"></div></div><span class="h-bar-value">308</span></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Grade Level Breakdown (donut) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Students by Grade Level</div>
+        <div class="chart-controls">
+          <button class="viz-btn active">Donut</button>
+          <button class="viz-btn">Bar</button>
+        </div>
+      </div>
+      <div class="donut-container">
+        <div class="donut">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#0D9488" stroke-width="20"
+              stroke-dasharray="175.9 439.8" stroke-dashoffset="0"/>
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#3B82F6" stroke-width="20"
+              stroke-dasharray="132.0 439.8" stroke-dashoffset="-175.9"/>
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#F59E0B" stroke-width="20"
+              stroke-dasharray="88.0 439.8" stroke-dashoffset="-307.8"/>
+            <circle cx="90" cy="90" r="70" fill="none" stroke="#8B5CF6" stroke-width="20"
+              stroke-dasharray="44.0 439.8" stroke-dashoffset="-395.8"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-center-value" style="font-size:22px;">10,247</div>
+            <div class="donut-center-label">students</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#0D9488"></span> High School (9-12) <span class="legend-value">4,099 (40%)</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span> Middle School (6-8) <span class="legend-value">3,074 (30%)</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span> Upper Elem (3-5) <span class="legend-value">2,049 (20%)</span></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#8B5CF6"></span> Lower Elem (K-2) <span class="legend-value">1,025 (10%)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Business Categories -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Top Business Categories</div>
+        <div class="chart-controls">
+          <button class="viz-btn active">Bar</button>
+          <button class="viz-btn">Pie</button>
+          <button class="viz-btn">Table</button>
+        </div>
+      </div>
+      <div class="h-bar-row"><span class="h-bar-label">Creative Services</span><div class="h-bar-track"><div class="h-bar-fill teal" style="width:80%"></div></div><span class="h-bar-value">2,461</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">Food & Baking</span><div class="h-bar-track"><div class="h-bar-fill teal" style="width:62%"></div></div><span class="h-bar-value">1,893</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">Tutoring & Coaching</span><div class="h-bar-track"><div class="h-bar-fill blue" style="width:48%"></div></div><span class="h-bar-value">1,472</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">Reselling & E-commerce</span><div class="h-bar-track"><div class="h-bar-fill blue" style="width:38%"></div></div><span class="h-bar-value">1,164</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">Content Creation</span><div class="h-bar-track"><div class="h-bar-fill amber" style="width:30%"></div></div><span class="h-bar-value">921</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">Pet Services</span><div class="h-bar-track"><div class="h-bar-fill amber" style="width:22%"></div></div><span class="h-bar-value">674</span></div>
+      <div class="h-bar-row"><span class="h-bar-label">Tech & Coding</span><div class="h-bar-track"><div class="h-bar-fill amber" style="width:16%"></div></div><span class="h-bar-value">492</span></div>
+    </div>
+  </div>
+
+  <!-- Engagement metrics row -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">Engagement Deep Dive</div>
+      <div style="display:flex; align-items:center;">
+        <div class="time-filter">
+          <button class="time-btn">7d</button>
+          <button class="time-btn active">30d</button>
+          <button class="time-btn">90d</button>
+          <button class="time-btn">All</button>
+        </div>
+        <div class="chart-controls">
+          <button class="viz-btn active">Bar</button>
+          <button class="viz-btn">Line</button>
+        </div>
+      </div>
+    </div>
+    <div class="stats" style="margin-bottom:0;">
+      <div class="stat" style="border:none; padding:12px;">
+        <div class="stat-value" style="font-size:24px;">14.2</div>
+        <div class="stat-label">Avg Lessons / Student</div>
+      </div>
+      <div class="stat" style="border:none; padding:12px;">
+        <div class="stat-value" style="font-size:24px;">8.4</div>
+        <div class="stat-label">Avg AI Exchanges / Lesson</div>
+      </div>
+      <div class="stat" style="border:none; padding:12px;">
+        <div class="stat-value" style="font-size:24px;">12.3s</div>
+        <div class="stat-label">Avg Response Time</div>
+      </div>
+      <div class="stat" style="border:none; padding:12px;">
+        <div class="stat-value" style="font-size:24px;">847</div>
+        <div class="stat-label">Scenarios Completed</div>
+      </div>
+      <div class="stat" style="border:none; padding:12px;">
+        <div class="stat-value" style="font-size:24px;">4.2</div>
+        <div class="stat-label">Avg Rating (out of 5)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sponsor-ready summary -->
+  <div class="chart-card" style="background: linear-gradient(135deg, #F0FDFA 0%, #F5F3FF 100%); border-color: #0D9488;">
+    <div class="chart-header">
+      <div class="chart-title" style="font-size:16px;">Sponsor-Ready Impact Summary</div>
+      <div class="export-bar">
+        <button class="export-btn" style="background:#0D9488; color:#fff; border-color:#0D9488;">Download Report PDF</button>
+        <button class="export-btn">Export Raw Data</button>
+      </div>
+    </div>
+    <div class="stats" style="margin-bottom:0;">
+      <div class="stat" style="background:transparent; border:none; text-align:left; padding:8px 16px;">
+        <div style="font-size:11px; color:#0D9488; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Students Reached</div>
+        <div style="font-size:28px; font-weight:700;">10,247</div>
+      </div>
+      <div class="stat" style="background:transparent; border:none; text-align:left; padding:8px 16px;">
+        <div style="font-size:11px; color:#0D9488; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Business Ideas Created</div>
+        <div style="font-size:28px; font-weight:700;">9,814</div>
+      </div>
+      <div class="stat" style="background:transparent; border:none; text-align:left; padding:8px 16px;">
+        <div style="font-size:11px; color:#0D9488; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Lessons Completed</div>
+        <div style="font-size:28px; font-weight:700;">145,507</div>
+      </div>
+      <div class="stat" style="background:transparent; border:none; text-align:left; padding:8px 16px;">
+        <div style="font-size:11px; color:#0D9488; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">AI Mentoring Hours</div>
+        <div style="font-size:28px; font-weight:700;">4,218</div>
+      </div>
+      <div class="stat" style="background:transparent; border:none; text-align:left; padding:8px 16px;">
+        <div style="font-size:11px; color:#0D9488; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Program Completion</div>
+        <div style="font-size:28px; font-weight:700;">68%</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

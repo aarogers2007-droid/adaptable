@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Org Admin Dashboard — Current State</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; background: #F9FAFB; color: #111827; }
+
+  /* Nav */
+  .nav { background: #fff; border-bottom: 1px solid #E5E7EB; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-logo { font-weight: 700; font-size: 18px; color: #0D9488; }
+  .nav-label { font-size: 13px; color: #9CA3AF; border-left: 1px solid #E5E7EB; padding-left: 12px; }
+  .nav-right { display: flex; gap: 12px; }
+  .nav-btn { font-size: 12px; color: #4B5563; padding: 6px 12px; border: 1px solid #E5E7EB; border-radius: 6px; background: #fff; cursor: pointer; }
+
+  /* Page */
+  .page { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+  /* Header */
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header-sub { font-size: 13px; color: #9CA3AF; margin-top: 2px; }
+  .btn-primary { background: #0D9488; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+  /* Invite banner */
+  .invite { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .invite-code { font-family: monospace; font-size: 20px; font-weight: 700; color: #0D9488; letter-spacing: 2px; }
+  .invite-label { font-size: 13px; color: #4B5563; }
+  .invite-right { display: flex; align-items: center; gap: 12px; }
+  .copy-btn { background: #F3F4F6; border: 1px solid #D1D5DB; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+  .student-count { font-size: 13px; color: #9CA3AF; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid #E5E7EB; background: #fff; color: #4B5563; display: flex; align-items: center; gap: 6px; }
+  .tab.active { background: #0D9488; color: #fff; border-color: #0D9488; }
+  .tab-badge { background: rgba(255,255,255,0.3); padding: 1px 6px; border-radius: 10px; font-size: 10px; }
+  .tab.active .tab-badge { background: rgba(255,255,255,0.3); }
+  .tab:not(.active) .tab-badge { background: #F3F4F6; color: #4B5563; }
+  .alert-badge { background: #DC2626; color: #fff; padding: 1px 6px; border-radius: 10px; font-size: 10px; }
+
+  /* Card */
+  .card { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 12px; }
+
+  /* Stats row */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat { background: #fff; border: 1px solid #E5E7EB; border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 28px; font-weight: 700; color: #0D9488; }
+  .stat-label { font-size: 11px; color: #9CA3AF; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; border-bottom: 1px solid #E5E7EB; }
+  td { padding: 10px 12px; border-bottom: 1px solid #F3F4F6; font-size: 13px; }
+  .student-name { font-weight: 600; color: #0D9488; cursor: pointer; }
+  .student-email { font-size: 11px; color: #9CA3AF; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .dot-green { background: #059669; }
+  .dot-orange { background: #D97706; }
+  .dot-gray { background: #D1D5DB; }
+  .progress-bar { background: #F3F4F6; border-radius: 4px; height: 6px; width: 120px; display: inline-block; vertical-align: middle; margin-right: 8px; }
+  .progress-fill { background: #0D9488; height: 100%; border-radius: 4px; }
+  .msg-btn { font-size: 11px; color: #0D9488; border: 1px solid #0D9488; padding: 4px 10px; border-radius: 6px; background: transparent; cursor: pointer; }
+
+  /* Alerts */
+  .alert-card { border-left: 3px solid #DC2626; background: #FEF2F2; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+  .alert-card.warning { border-left-color: #D97706; background: #FFFBEB; }
+  .alert-card.info { border-left-color: #3B82F6; background: #EFF6FF; }
+  .alert-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .alert-student { font-weight: 600; font-size: 13px; }
+  .severity-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+  .sev-urgent { background: #FEE2E2; color: #DC2626; }
+  .sev-warning { background: #FEF3C7; color: #D97706; }
+  .type-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #F3F4F6; color: #4B5563; }
+  .alert-msg { font-size: 13px; color: #4B5563; margin-bottom: 8px; }
+  .alert-actions { display: flex; gap: 8px; }
+  .alert-btn { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid #D1D5DB; background: #fff; cursor: pointer; }
+  .alert-btn.resolve { color: #059669; border-color: #059669; }
+
+  /* Feed */
+  .feed-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F3F4F6; }
+  .feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .feed-dot.blue { background: #3B82F6; }
+  .feed-dot.green { background: #059669; }
+  .feed-dot.cyan { background: #06B6D4; }
+  .feed-text { font-size: 13px; color: #4B5563; flex: 1; }
+  .feed-text strong { color: #111827; }
+  .feed-time { font-size: 11px; color: #9CA3AF; flex-shrink: 0; }
+  .feed-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #F3F4F6; color: #4B5563; flex-shrink: 0; }
+
+  /* Bar chart */
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .bar-label { font-size: 12px; color: #4B5563; width: 180px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar { height: 18px; background: #0D9488; border-radius: 4px; min-width: 2px; }
+  .bar-value { font-size: 11px; color: #9CA3AF; flex-shrink: 0; }
+  .bar-stuck { background: #F59E0B; }
+
+  /* Impact stats */
+  .impact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+
+  /* Section label */
+  .section-label { font-size: 10px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; margin-top: 20px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .impact-grid { grid-template-columns: repeat(2, 1fr); }
+    .invite { flex-direction: column; gap: 10px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <span class="nav-logo">Adaptable</span>
+    <span class="nav-label">Instructor Dashboard</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn">Curriculum Standards</button>
+    <button class="nav-btn">How it works</button>
+    <button class="nav-btn">Sign out</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h1>Your Classes</h1>
+      <div class="header-sub">47 students across 2 classes · 3 alerts need attention</div>
+    </div>
+    <button class="btn-primary">+ New class</button>
+  </div>
+
+  <!-- CLASS TABS -->
+  <div class="tabs" style="margin-bottom: 12px;">
+    <div class="tab active">Entrepreneurship 101 <span class="alert-badge">2</span></div>
+    <div class="tab">Summer Cohort 2026 <span class="alert-badge">1</span></div>
+  </div>
+
+  <!-- INVITE CODE -->
+  <div class="invite">
+    <div>
+      <div class="invite-label">Invite code for Entrepreneurship 101:</div>
+      <div class="invite-code">VLAB26</div>
+    </div>
+    <div class="invite-right">
+      <button class="copy-btn">Copy</button>
+      <button class="copy-btn">QR Code</button>
+      <span class="student-count">32 students enrolled</span>
+    </div>
+  </div>
+
+  <!-- SUB TABS -->
+  <div class="tabs">
+    <div class="tab active">Students <span class="tab-badge">32</span></div>
+    <div class="tab">Live Feed</div>
+    <div class="tab">Alerts <span class="alert-badge">2</span></div>
+    <div class="tab">Follow-ups <span class="tab-badge">3</span></div>
+    <div class="tab">Analytics</div>
+    <div class="tab">Impact</div>
+    <div class="tab">Settings</div>
+  </div>
+
+  <!-- ═══════════ STUDENTS TAB ═══════════ -->
+  <div class="card" id="students-tab">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <span class="card-title" style="margin-bottom: 0;">32 Students</span>
+      <button class="msg-btn">Send announcement</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Business</th>
+          <th>Progress</th>
+          <th>Last Active</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="status-dot dot-green"></span><span class="student-name">Sofia Martinez</span><br><span class="student-email">sofia.m@school.edu</span></td>
+          <td>Sweet Celebrations</td>
+          <td><span class="progress-bar"><span class="progress-fill" style="width:82%"></span></span> 18/22</td>
+          <td>2 hours ago</td>
+          <td><button class="msg-btn">Message</button></td>
+        </tr>
+        <tr>
+          <td><span class="status-dot dot-green"></span><span class="student-name">Marcus Johnson</span><br><span class="student-email">marcus.j@school.edu</span></td>
+          <td>Heat Check</td>
+          <td><span class="progress-bar"><span class="progress-fill" style="width:68%"></span></span> 15/22</td>
+          <td>5 hours ago</td>
+          <td><button class="msg-btn">Message</button></td>
+        </tr>
+        <tr>
+          <td><span class="status-dot dot-orange"></span><span class="student-name">Mateo Rivera</span><br><span class="student-email">mateo.r@school.edu</span></td>
+          <td>Dribble Academy</td>
+          <td><span class="progress-bar"><span class="progress-fill" style="width:45%"></span></span> 10/22</td>
+          <td>Yesterday</td>
+          <td><button class="msg-btn">Message</button></td>
+        </tr>
+        <tr>
+          <td><span class="status-dot dot-gray"></span><span class="student-name">Quinn Davis</span><br><span class="student-email">quinn.d@school.edu</span></td>
+          <td>First Song Guitar</td>
+          <td><span class="progress-bar"><span class="progress-fill" style="width:23%"></span></span> 5/22</td>
+          <td>4 days ago</td>
+          <td><button class="msg-btn">Message</button></td>
+        </tr>
+        <tr>
+          <td><span class="status-dot dot-gray"></span><span class="student-name">Sage Parker</span><br><span class="student-email">sage.p@school.edu</span></td>
+          <td>Portrait Sage</td>
+          <td><span class="progress-bar"><span class="progress-fill" style="width:14%"></span></span> 3/22</td>
+          <td>6 days ago</td>
+          <td><button class="msg-btn">Message</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ ANALYTICS (shown below for reference) ═══════════ -->
+  <div class="section-label">Analytics Preview</div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-value">73%</div><div class="stat-label">Completion Rate</div></div>
+    <div class="stat"><div class="stat-value">14.2</div><div class="stat-label">Avg Lessons Done</div></div>
+    <div class="stat"><div class="stat-value">2.1d</div><div class="stat-label">Avg Time / Lesson</div></div>
+    <div class="stat"><div class="stat-value">28</div><div class="stat-label">Active This Week</div></div>
+  </div>
+
+  <!-- Where students get stuck -->
+  <div class="card">
+    <div class="card-title">Where Students Get Stuck</div>
+    <div class="bar-row"><span class="bar-label">M2L3: Set Your Price</span><span class="bar bar-stuck" style="width:180px"></span><span class="bar-value" style="color:#D97706; font-weight:600;">38% stuck</span></div>
+    <div class="bar-row"><span class="bar-label">M1L4: Target Customer</span><span class="bar" style="width:120px"></span><span class="bar-value">5 students</span></div>
+    <div class="bar-row"><span class="bar-label">M4L4: First Pitch</span><span class="bar" style="width:100px"></span><span class="bar-value">4 students</span></div>
+    <div class="bar-row"><span class="bar-label">M2L1: Customer Interview</span><span class="bar" style="width:75px"></span><span class="bar-value">3 students</span></div>
+    <div class="bar-row"><span class="bar-label">M5L2: Teen Pricing</span><span class="bar" style="width:50px"></span><span class="bar-value">2 students</span></div>
+  </div>
+
+  <!-- ═══════════ ALERTS (shown below for reference) ═══════════ -->
+  <div class="section-label">Active Alerts</div>
+
+  <div class="alert-card">
+    <div class="alert-header">
+      <span class="alert-student">Sage Parker</span>
+      <span class="severity-badge sev-urgent">Urgent</span>
+      <span class="type-badge">emotional</span>
+    </div>
+    <div class="alert-msg">Student expressed feelings of hopelessness: "nobody cares about anything i do anyway"</div>
+    <div class="alert-actions">
+      <button class="alert-btn">Message</button>
+      <button class="alert-btn resolve">Resolve</button>
+      <button class="alert-btn">Dismiss</button>
+    </div>
+  </div>
+
+  <div class="alert-card warning">
+    <div class="alert-header">
+      <span class="alert-student">Quinn Davis</span>
+      <span class="severity-badge sev-warning">Warning</span>
+      <span class="type-badge">inactive</span>
+    </div>
+    <div class="alert-msg">Student has been inactive for 4 days. Last completed: Lesson 5 (Zero-Budget Marketing).</div>
+    <div class="alert-actions">
+      <button class="alert-btn">Message</button>
+      <button class="alert-btn resolve">Resolve</button>
+      <button class="alert-btn">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ LIVE FEED (shown below for reference) ═══════════ -->
+  <div class="section-label">Live Feed (Last 24 hours)</div>
+
+  <div class="card">
+    <div class="feed-item"><span class="feed-dot green"></span><span class="feed-text"><strong>Sofia Martinez</strong> completed M5L1: Understanding Your Costs</span><span class="feed-badge">Completed</span><span class="feed-time">2h ago</span></div>
+    <div class="feed-item"><span class="feed-dot cyan"></span><span class="feed-text"><strong>Marcus Johnson</strong> asked 4 questions in AI Guide about pricing strategy</span><span class="feed-badge">Chat</span><span class="feed-time">3h ago</span></div>
+    <div class="feed-item"><span class="feed-dot blue"></span><span class="feed-text"><strong>Mateo Rivera</strong> started M3L1: Brand Identity and Voice</span><span class="feed-badge">Started</span><span class="feed-time">5h ago</span></div>
+    <div class="feed-item"><span class="feed-dot green"></span><span class="feed-text"><strong>Riley Chen</strong> completed M4L4: Writing Your First Pitch</span><span class="feed-badge">Completed</span><span class="feed-time">8h ago</span></div>
+    <div class="feed-item"><span class="feed-dot green"></span><span class="feed-text"><strong>Aiden Brooks</strong> completed Scenario: The Pop-Up Shop (Gold badge)</span><span class="feed-badge">Completed</span><span class="feed-time">12h ago</span></div>
+    <div class="feed-item"><span class="feed-dot blue"></span><span class="feed-text"><strong>Jordan Kim</strong> started M2L3: Set Your Price</span><span class="feed-badge">Started</span><span class="feed-time">18h ago</span></div>
+  </div>
+
+  <!-- ═══════════ IMPACT (shown below for reference) ═══════════ -->
+  <div class="section-label">Impact (Org-Wide)</div>
+
+  <div class="impact-grid">
+    <div class="stat"><div class="stat-value">47</div><div class="stat-label">Active Students (30d)</div></div>
+    <div class="stat"><div class="stat-value">683</div><div class="stat-label">Lessons Completed</div></div>
+    <div class="stat"><div class="stat-value">14.5</div><div class="stat-label">Avg Lessons / Student</div></div>
+    <div class="stat"><div class="stat-value">89</div><div class="stat-label">Scenarios Completed</div></div>
+    <div class="stat"><div class="stat-value">4,217</div><div class="stat-label">Total AI Exchanges</div></div>
+    <div class="stat"><div class="stat-value">M1L1</div><div class="stat-label">Most Completed Lesson</div></div>
+  </div>
+
+  <!-- Settings preview -->
+  <div class="section-label">Settings</div>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div>
+        <div style="font-size:14px; font-weight:600;">Gradebook Export</div>
+        <div style="font-size:12px; color:#9CA3AF; margin-top:2px;">Download CSV with progress, business ideas, and pitches</div>
+      </div>
+      <button class="btn-primary" style="font-size:12px;">Download CSV</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-top:14px; border-top:1px solid #F3F4F6;">
+      <div>
+        <div style="font-size:14px; font-weight:600;">Streak Tracking</div>
+        <div style="font-size:12px; color:#9CA3AF; margin-top:2px;">Show fire emoji and day-streak count. Currently: Enabled</div>
+      </div>
+      <div style="width:44px; height:24px; background:#0D9488; border-radius:12px; position:relative; cursor:pointer;"><div style="width:20px; height:20px; background:#fff; border-radius:50%; position:absolute; top:2px; right:2px;"></div></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:14px; border-top:1px solid #F3F4F6;">
+      <div>
+        <div style="font-size:14px; font-weight:600;">Voice Input</div>
+        <div style="font-size:12px; color:#9CA3AF; margin-top:2px;">Allow students to dictate answers via microphone. Currently: Disabled</div>
+      </div>
+      <div style="width:44px; height:24px; background:#D1D5DB; border-radius:12px; position:relative; cursor:pointer;"><div style="width:20px; height:20px; background:#fff; border-radius:50%; position:absolute; top:2px; left:2px;"></div></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Handbook</title>
+<style>
+  /* ── Branding (auto-replaced per org) ── */
+  :root {
+    --org-name: "VentureLab";
+    --org-primary: #0D9488;
+    --org-secondary: #C084FC;
+    --org-logo: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="%230D9488"/><text x="20" y="26" text-anchor="middle" fill="white" font-size="18" font-weight="bold">V</text></svg>');
+  }
+
+  /* ── Base ── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', -apple-system, sans-serif; color: #111827; line-height: 1.7; }
+
+  /* ── Print / PDF ── */
+  @media print {
+    .no-print { display: none; }
+    .page-break { page-break-before: always; }
+    body { font-size: 11pt; }
+    section { page-break-inside: avoid; }
+  }
+
+  /* ── Cover ── */
+  .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #F0FDFA 0%, #F5F3FF 100%); padding: 60px 40px; }
+  .cover-logo { width: 80px; height: 80px; background: var(--org-logo) center/contain no-repeat; margin-bottom: 24px; }
+  .cover h1 { font-size: 42px; font-weight: 700; color: #111827; letter-spacing: -0.5px; }
+  .cover h2 { font-size: 20px; font-weight: 400; color: #4B5563; margin-top: 8px; }
+  .cover .roi { max-width: 520px; margin: 40px auto 0; padding: 24px 32px; background: #fff; border-left: 4px solid var(--org-primary); border-radius: 0 8px 8px 0; text-align: left; font-size: 14px; color: #374151; line-height: 1.8; font-style: italic; }
+  .cover-footer { margin-top: 48px; font-size: 12px; color: #9CA3AF; }
+
+  /* ── Page layout ── */
+  .content { max-width: 720px; margin: 0 auto; padding: 40px 32px; }
+
+  /* ── Section headers ── */
+  h2 { font-size: 28px; font-weight: 700; color: #111827; margin-top: 48px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid var(--org-primary); }
+  h3 { font-size: 18px; font-weight: 600; color: #111827; margin-top: 32px; margin-bottom: 8px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--org-primary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 24px; margin-bottom: 6px; }
+
+  /* ── Body text ── */
+  p { font-size: 14px; color: #374151; margin-bottom: 12px; }
+  .data-callout { background: #F0FDFA; border: 1px solid #99F6E4; border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 13px; color: #0F766E; }
+  .data-callout strong { color: #0D9488; }
+
+  /* ── Lists ── */
+  ol, ul { padding-left: 24px; margin-bottom: 12px; }
+  li { font-size: 14px; color: #374151; margin-bottom: 6px; }
+
+  /* ── Numbered steps ── */
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li { counter-increment: step; padding: 12px 16px 12px 48px; position: relative; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 8px; }
+  .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; background: var(--org-primary); color: #fff; border-radius: 50%; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  /* ── FAQ ── */
+  .faq-item { margin-bottom: 20px; }
+  .faq-q { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+  .faq-a { font-size: 14px; color: #4B5563; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: #F3F4F6; color: #4B5563; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #E5E7EB; }
+  td { padding: 8px 12px; border-bottom: 1px solid #F3F4F6; color: #374151; }
+
+  /* ── TOC ── */
+  .toc { list-style: none; padding: 0; }
+  .toc li { padding: 8px 0; border-bottom: 1px solid #F3F4F6; font-size: 14px; }
+  .toc li a { color: #111827; text-decoration: none; }
+  .toc li span { color: #9CA3AF; float: right; font-size: 12px; }
+
+  /* ── Footer on each page ── */
+  .page-footer { text-align: center; font-size: 10px; color: #9CA3AF; padding-top: 24px; margin-top: 48px; border-top: 1px solid #E5E7EB; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- COVER PAGE                                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo"></div>
+  <h1>Program Handbook</h1>
+  <h2>Your Complete Guide to the VentureLab Learning Platform</h2>
+  <div class="roi">
+    "Before this platform, you had no engagement data. After it, you have all of it. What that data is worth to your sponsors and grant applications is something only you can answer, because you know your funders. We give you the proof. You decide what to do with it."
+  </div>
+  <div class="cover-footer">Confidential · Prepared for VentureLab · 2026</div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE OF CONTENTS                                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>Table of Contents</h2>
+<ol class="toc">
+  <li><a href="#what">What Is This Platform?</a> <span>3</span></li>
+  <li><a href="#data">The Data You Get</a> <span>4</span></li>
+  <li><a href="#student">What Students Experience</a> <span>5</span></li>
+  <li><a href="#onboarding">Getting Started (Step by Step)</a> <span>6</span></li>
+  <li><a href="#dashboard">Reading Your Dashboard</a> <span>7</span></li>
+  <li><a href="#reports">Impact Reports for Sponsors</a> <span>8</span></li>
+  <li><a href="#safety">Student Safety</a> <span>9</span></li>
+  <li><a href="#faq">Frequently Asked Questions</a> <span>10</span></li>
+  <li><a href="#support">Getting Help</a> <span>11</span></li>
+</ol>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 1. WHAT IS THIS PLATFORM?                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="what">1. What Is This Platform?</h2>
+
+<p>Your organization now has a personalized AI learning platform, fully branded as yours. Students visit your website, see your logo and colors, and go through a curriculum guided by an AI mentor that adapts to each student individually.</p>
+
+<p>Every interaction a student has with the platform produces engagement data that your organization has never had before.</p>
+
+<div class="data-callout">
+  <strong>What this means for you:</strong> Every lesson completed, every minute spent, every business idea generated is tracked and exportable. This is the data you put in grant applications, sponsor reports, and board presentations.
+</div>
+
+<h3>How It Works</h3>
+<p>Students go through a structured curriculum of 22 lessons across 6 modules. Each lesson is a conversation with an AI mentor that knows the student's interests, their business idea, and where they are in the program. The AI teaches by asking questions, not by lecturing. Students build a real business concept from scratch.</p>
+
+<p>The platform adapts to every grade level (K-12) and every type of learner. A 7-year-old gets simple language and neighborhood-scale ideas. A 16-year-old gets real business vocabulary and online-ready concepts.</p>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 2. THE DATA YOU GET                                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="data">2. The Data You Get</h2>
+
+<p>This is the reason the platform exists. Your organization gets measurable proof of student engagement and learning outcomes.</p>
+
+<table>
+  <thead>
+    <tr><th>Data Point</th><th>What It Tells You</th><th>Where Sponsors See It</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Completion Rate</td><td>What percentage of students finished the full program</td><td>Impact Report, Dashboard</td></tr>
+    <tr><td>Lessons Completed</td><td>Exact count per student and across the program</td><td>Impact Report, CSV Export</td></tr>
+    <tr><td>Time on Platform</td><td>How many hours students spent learning</td><td>Impact Report, Dashboard</td></tr>
+    <tr><td>AI Interactions</td><td>Total conversations between students and the AI mentor</td><td>Impact Report</td></tr>
+    <tr><td>Business Ideas Created</td><td>Every student generates a real business concept</td><td>Impact Report, CSV Export</td></tr>
+    <tr><td>Where Students Struggle</td><td>Which lessons have the highest drop-off</td><td>Dashboard Analytics</td></tr>
+    <tr><td>Student Response Time</td><td>How quickly students engage with the AI</td><td>Dashboard Analytics</td></tr>
+    <tr><td>Grade Level Breakdown</td><td>Demographics of your student population</td><td>Impact Report, Dashboard</td></tr>
+    <tr><td>Crisis Alerts</td><td>Students who expressed distress (flagged for follow-up)</td><td>Alert Panel</td></tr>
+  </tbody>
+</table>
+
+<div class="data-callout">
+  <strong>Before this platform:</strong> You ran programs and could not prove what happened. You had anecdotes.<br>
+  <strong>After:</strong> You have exact numbers. Every one of these data points is exportable as a PDF report or CSV spreadsheet.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 3. WHAT STUDENTS EXPERIENCE                             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="student">3. What Students Experience</h2>
+
+<p>Students never see behind the curtain. They see your brand, your logo, your colors. The experience feels like your organization's product.</p>
+
+<h3>The Student Journey</h3>
+
+<h4>Step 1: Discovery (Ikigai Wizard)</h4>
+<p>Students answer questions about what they love, what they're good at, what the world needs, and how they could get paid. The AI synthesizes these into a personalized business idea. This takes about 10 minutes.</p>
+<div class="data-callout"><strong>Data produced:</strong> Business idea (niche, name, target customer, revenue model) for every student. Searchable and exportable.</div>
+
+<h4>Step 2: Learning (22 AI-Guided Lessons)</h4>
+<p>Each lesson is a one-on-one conversation with an AI mentor. The mentor asks questions, builds on the student's answers, and guides them through concepts like finding customers, setting prices, building a brand, and launching. The AI adapts its language and complexity to the student's grade level.</p>
+<div class="data-callout"><strong>Data produced:</strong> Per-lesson completion status, time spent, number of AI exchanges, checkpoint mastery. All tracked per student and in aggregate.</div>
+
+<h4>Step 3: Simulation (Scenario Challenges)</h4>
+<p>Students role-play real business situations: handling a difficult customer, running a pop-up shop, managing a budget crisis. The AI plays different characters and evaluates the student's decisions against a rubric.</p>
+<div class="data-callout"><strong>Data produced:</strong> Scenario completion rates, badge levels earned (bronze/silver/gold), criteria met per scenario.</div>
+
+<h4>Step 4: Identity (Archetype Card)</h4>
+<p>After completing the initial discovery, each student receives an AI-generated "thinker profile" card that describes who they are as a builder. Students can download it as a PDF or share it via a unique link.</p>
+<div class="data-callout"><strong>Data produced:</strong> Archetype distribution across your student population. How many Architects vs. Catalysts vs. Navigators.</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 4. GETTING STARTED                                      -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="onboarding">4. Getting Started (Step by Step)</h2>
+
+<h3>For You (Program Administrator)</h3>
+<ol class="steps">
+  <li><strong>Sign in</strong> at your program URL. Use Google sign-in or the email and password you set up during onboarding.</li>
+  <li><strong>Review your dashboard.</strong> You'll see an overview of your program with zero students. This is normal. The charts will populate as students join.</li>
+  <li><strong>Copy your invite code.</strong> Your dashboard shows a code (e.g., "VLAB26"). This is what students use to join. You can also copy a direct link.</li>
+  <li><strong>Share the invite code</strong> through your channels: email lists, program announcements, events, social media. Students go to your program URL and enter the code.</li>
+  <li><strong>Watch the data come in.</strong> As students complete lessons, your dashboard updates in real time. You'll see completion rates, engagement metrics, and alerts.</li>
+</ol>
+
+<h3>For Students</h3>
+<ol class="steps">
+  <li><strong>Visit the program URL</strong> (e.g., [your-program-url]/go).</li>
+  <li><strong>Enter the invite code</strong> provided by your organization.</li>
+  <li><strong>Create an account</strong> using Google or email.</li>
+  <li><strong>Complete the discovery wizard</strong> (about 10 minutes). The AI asks about their interests and generates a business idea.</li>
+  <li><strong>Start lessons.</strong> Students work through lessons at their own pace. Each lesson is a conversation that takes 10-20 minutes.</li>
+</ol>
+
+<div class="data-callout"><strong>What you see:</strong> As each student joins and progresses, your dashboard shows their status in real time. You don't need to check in with individual students unless the system flags one for you.</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 5. READING YOUR DASHBOARD                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="dashboard">5. Reading Your Dashboard</h2>
+
+<p>Your dashboard is designed to answer one question: "What is the data telling me?" Everything is organized around the engagement data that matters for your reports.</p>
+
+<h3>Overview Tab</h3>
+<p>The first thing you see. Five numbers at the top: total students, active students (last 30 days), completion rate, total AI exchanges, and average time per lesson. Below that: charts showing engagement trends, progress distribution, and where students get stuck.</p>
+
+<div class="data-callout"><strong>Sponsor tip:</strong> The Overview tab is designed to be screenshot-friendly. Every chart and stat can go directly into a board presentation or grant report.</div>
+
+<h3>Engagement Tab</h3>
+<p>Deeper analytics: weekly trend graphs, engagement health score (is engagement going up or down?), student response time averages, and lesson-by-lesson completion funnels.</p>
+
+<h3>Students Tab</h3>
+<p>Searchable list of all students. Click any student to see their full journey: lessons completed, business idea, AI conversations, scenarios attempted, and check-in history.</p>
+
+<h3>Alerts Tab</h3>
+<p>The system automatically detects three things:</p>
+<ul>
+  <li><strong>Crisis signals:</strong> A student expressed hopelessness or distress. Flagged as urgent.</li>
+  <li><strong>Inactive students:</strong> A student hasn't been active in 3+ days.</li>
+  <li><strong>Stuck students:</strong> A student has been on the same lesson for 3+ days without progress.</li>
+</ul>
+<p>Each alert has action buttons: message the student, resolve the alert, or dismiss it.</p>
+
+<h3>Settings Tab</h3>
+<p>Configure your program: toggle streak tracking, export gradebook CSV, manage invite codes.</p>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 6. IMPACT REPORTS                                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="reports">6. Impact Reports for Sponsors</h2>
+
+<p>This is why the data matters. The platform generates a one-click Impact Report you can send to sponsors, include in grant applications, or present to your board.</p>
+
+<h3>What the Report Includes</h3>
+<ul>
+  <li>Your organization's logo and branding on every page</li>
+  <li>Total students reached</li>
+  <li>Program completion rate</li>
+  <li>Total lessons completed across all students</li>
+  <li>Total hours of AI mentoring</li>
+  <li>Business ideas created by students</li>
+  <li>Grade level and demographic breakdown</li>
+  <li>Engagement trends over time</li>
+</ul>
+
+<h3>How to Generate a Report</h3>
+<ol class="steps">
+  <li>Go to your Dashboard.</li>
+  <li>Click <strong>"Export PDF"</strong> in the top right corner.</li>
+  <li>The report downloads with your branding. Email it, print it, or upload it to a grant portal.</li>
+</ol>
+
+<h3>Using Data for Grant Applications</h3>
+<p>Grant applications ask for measurable outcomes. The Impact Report gives you exact numbers to fill in:</p>
+<ul>
+  <li>"We reached [X] students across [Y] grade levels."</li>
+  <li>"[Z]% completed the full 22-lesson program."</li>
+  <li>"Students spent [N] total hours in AI-guided mentoring."</li>
+  <li>"[M] unique business ideas were generated by students."</li>
+</ul>
+<p>Every number comes directly from the platform. None of it is estimated or self-reported.</p>
+
+<h3>How Sponsor Partnerships Work (Example: H-E-B)</h3>
+
+<p>Sponsors don't just write checks. The best sponsor relationships give the sponsor something they can't get anywhere else. Here's how that works with the platform, using H-E-B as an example.</p>
+
+<h4>Step 1: The Pitch to H-E-B</h4>
+<p>You approach H-E-B's community investment team with your Impact Report showing 10,000 students actively learning entrepreneurship. You say: "We have 10,000 students building real business ideas right now. What if your brand was part of that experience?"</p>
+
+<h4>Step 2: H-E-B Creates a Branded Scenario</h4>
+<p>H-E-B works with your team to create a custom scenario challenge on the platform. For example: "H-E-B is launching a new line of healthy snacks for teens. You've been hired as the marketing consultant. How would you get teens in your school to try these snacks? Design a launch plan."</p>
+
+<p>This scenario lives on the platform alongside your existing curriculum. Students opt in to the challenge.</p>
+
+<h4>Step 3: Students Produce Real Insight</h4>
+<p>Students work through the scenario using the same AI-guided Socratic method as every other lesson. They think through target audience, pricing perception, distribution channels, and marketing tactics. The AI doesn't give them answers. It asks them questions until they think it through themselves.</p>
+
+<h4>Step 4: H-E-B Gets Data They Can't Get Anywhere Else</h4>
+<p>H-E-B receives:</p>
+<ul>
+  <li>How many students participated</li>
+  <li>The actual marketing ideas students came up with (in their own words)</li>
+  <li>How students think about food brands, pricing, and what makes them try something new</li>
+  <li>Demographic breakdown: what age groups said what</li>
+</ul>
+
+<p>This is not a focus group with 12 kids in a room. This is structured insight from hundreds or thousands of real teenagers, generated through a learning experience they chose to participate in. H-E-B gets authentic teen perspective. Students get a real-world challenge with a real brand. Your organization gets sponsor revenue.</p>
+
+<h4>Step 5: The Numbers</h4>
+<p>Sponsor partnerships are priced based on the number of students who participate. Your organization sets the price and keeps the revenue. The platform provides the infrastructure: the branded scenario, the AI evaluation, the data export, and the student participation tracking.</p>
+
+<div class="data-callout"><strong>Why sponsors pay for this:</strong> Traditional teen focus groups cost $15,000-50,000 for 20-50 participants. A branded scenario on your platform reaches hundreds of students at a fraction of that cost, and the data is richer because students are thinking deeply, not just answering survey questions. Your engagement data proves you have the audience. The sponsor scenario proves that audience produces value.</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 7. STUDENT SAFETY                                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="safety">7. Student Safety</h2>
+
+<p>The platform serves minors. Safety is not a feature, it is the foundation.</p>
+
+<h3>What the Platform Does Automatically</h3>
+<table>
+  <thead>
+    <tr><th>Protection</th><th>How It Works</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Crisis Detection</td><td>Every student message is scanned for signs of self-harm, suicidal ideation, abuse, or severe distress. Works in any language. If detected, an urgent alert is sent to your admin dashboard immediately.</td></tr>
+    <tr><td>Content Moderation</td><td>Student inputs are scanned for inappropriate content before reaching the AI. Flagged content is blocked and an alert is created.</td></tr>
+    <tr><td>AI Output Filtering</td><td>Every word the AI sends to a student is filtered for profanity (in 10 languages), age-inappropriate content, personal information requests, and hallucinated URLs. Filtered content never reaches the student.</td></tr>
+    <tr><td>Age Adaptation</td><td>The AI adapts its language, examples, and business scope based on the student's grade level. A 7-year-old gets lemonade-stand ideas. A 16-year-old gets e-commerce concepts.</td></tr>
+    <tr><td>Data Encryption</td><td>All student data is encrypted in transit and at rest. Student data is isolated to your organization and never shared with other organizations.</td></tr>
+  </tbody>
+</table>
+
+<h3>What You Need to Do</h3>
+<ul>
+  <li><strong>Check your Alerts tab regularly.</strong> Crisis alerts require human follow-up. The AI pauses the lesson and suggests the student talk to a trusted adult, but a real person needs to close the loop.</li>
+  <li><strong>Have a point person.</strong> Designate someone on your team who monitors alerts and responds within 24 hours.</li>
+</ul>
+
+<div class="data-callout"><strong>Why this matters for sponsors:</strong> You can tell funders: "Our platform includes automatic crisis detection in every language, content moderation on all AI outputs, and age-appropriate adaptation for every grade level." That's a sentence most edtech companies cannot say.</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 8. FAQ                                                  -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="faq">8. Frequently Asked Questions</h2>
+
+<div class="faq-item">
+  <div class="faq-q">How long does it take a student to complete the program?</div>
+  <div class="faq-a">The full 22-lesson curriculum takes most students 4-6 weeks at their own pace. Each lesson is a 10-20 minute conversation. Students can pause and resume anytime.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Can students use this on Chromebooks?</div>
+  <div class="faq-a">Yes. The platform is built for school Chromebooks. It works in any modern web browser with no downloads, no apps, and no special software. No microphone or camera required.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Is student data private?</div>
+  <div class="faq-a">Yes. Student data is encrypted, isolated to your organization, and never shared with other organizations or third parties. You can request full data deletion at any time.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">What if a student says something concerning?</div>
+  <div class="faq-a">The platform automatically detects crisis language in any language and creates an urgent alert on your dashboard. The AI pauses the lesson and encourages the student to talk to a trusted adult. Crisis hotline information is provided to the student automatically.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Can the AI give students bad advice?</div>
+  <div class="faq-a">The AI teaches by asking questions, not by giving advice. It guides students to think through their own business decisions. Every AI response is filtered for age-inappropriate content, profanity, and personal information requests before the student sees it. The AI is also tested: we simulate 198 lesson conversations across 9 different student types before any update ships.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Can I customize the curriculum?</div>
+  <div class="faq-a">The platform comes with a 22-lesson entrepreneurship curriculum. You can upload your own supplementary materials (PDFs, documents, videos) that the AI will reference during lessons. The core lesson structure stays consistent across all students.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">How do I share the data with sponsors?</div>
+  <div class="faq-a">Click "Export PDF" on your dashboard to generate a branded Impact Report. It includes your logo, key stats, and charts. You can also export raw data as a CSV spreadsheet for custom analysis.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">What if my students speak different languages?</div>
+  <div class="faq-a">The AI mentor adapts to the student's language register. Crisis detection works in any language. The interface is currently in English. Full multilingual support is on our roadmap.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">What does it cost?</div>
+  <div class="faq-a">Pricing is per student, per year. The exact rate depends on your program size. Contact your account representative for your organization's pricing.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">Do students see your company name?</div>
+  <div class="faq-a">No. Students see your organization's name, logo, and colors. The platform is fully branded to your organization. Students experience it as your product.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- 9. GETTING HELP                                         -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 id="support">9. Getting Help</h2>
+
+<h3>For Students</h3>
+<p>Students can access a support chat bubble on any page. It answers common questions about the platform, lessons, and technical issues. If the support chat can't resolve the issue, it flags it for manual review.</p>
+
+<h3>For Program Administrators</h3>
+<p>Contact your account representative directly for:</p>
+<ul>
+  <li>Dashboard questions or training</li>
+  <li>Technical issues</li>
+  <li>Billing and subscription changes</li>
+  <li>Custom report requests</li>
+  <li>Curriculum uploads and configuration</li>
+</ul>
+
+<div class="data-callout"><strong>Response time:</strong> We respond to all admin inquiries within 24 hours. Crisis-related issues are prioritized.</div>
+
+<div class="page-footer">
+  Confidential · Prepared for VentureLab · 2026<br>
+  This handbook is auto-generated for your organization and reflects your current program configuration.
+</div>
+
+</div>
+</body>
+</html>
