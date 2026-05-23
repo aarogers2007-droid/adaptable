@@ -104,6 +104,7 @@ export async function POST(request: Request) {
           programType: "Lesson Chat",
           region: result.region,
           alertRecipients: recipients,
+          fromEmail: result.senderEmail ?? undefined,
         });
       } else {
         // No teacher or org admin — log CRITICAL
@@ -113,7 +114,7 @@ export async function POST(request: Request) {
       // Send parent alert (separate warmer template)
       if (result.parentEmail) {
         const { sendParentCrisisEmail } = await import("@/lib/email");
-        await sendParentCrisisEmail({ to: result.parentEmail, studentFirstName: firstName, region: result.region });
+        await sendParentCrisisEmail({ to: result.parentEmail, studentFirstName: firstName, region: result.region, fromEmail: result.senderEmail ?? undefined });
       }
     }).catch((err) => console.error("[crisis] alert pipeline failed:", err));
 

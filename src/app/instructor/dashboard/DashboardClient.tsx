@@ -17,6 +17,7 @@ import type { FeedItem } from "./LiveFeed";
 import type { AnalyticsData } from "./ClassAnalytics";
 import FollowUpPanel from "./FollowUpPanel";
 import ClassSettings from "./ClassSettings";
+import OrgEmailSettings from "./OrgEmailSettings";
 import type { TeacherAlert } from "@/lib/types";
 
 export interface ClassFlag {
@@ -329,12 +330,15 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
                 )}
 
                 {activeSubTab === "settings" && (
-                  <ClassSettings
-                    classId={activeClass.id}
-                    className={activeClass.name}
-                    initialStreaksEnabled={activeClass.streaksEnabled}
-                    initialVoiceEnabled={activeClass.voiceEnabled}
-                  />
+                  <>
+                    <ClassSettings
+                      classId={activeClass.id}
+                      className={activeClass.name}
+                      initialStreaksEnabled={activeClass.streaksEnabled}
+                      initialVoiceEnabled={activeClass.voiceEnabled}
+                    />
+                    {orgId && <OrgEmailSettings orgId={orgId} />}
+                  </>
                 )}
               </div>
             )}

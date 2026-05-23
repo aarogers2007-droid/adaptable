@@ -58,6 +58,7 @@ export async function POST(request: Request) {
         classId: result.classId,
         timestamp: new Date().toISOString(),
         region: result.region,
+        fromEmail: result.senderEmail ?? undefined,
       }).catch(() => {});
     }
   }).catch(() => {});

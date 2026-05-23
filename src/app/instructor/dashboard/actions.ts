@@ -394,3 +394,79 @@ function generateInviteCode(): string {
   }
   return code;
 }
+
+/**
+ * Update per-org email sender configuration.
+ * Only org_admins can change this. When set, crisis alert emails
+ * are sent from the org's verified domain instead of the platform default.
+ */
+export async function updateOrgEmailConfig(
+  orgId: string,
+  senderEmail: string | null,
+  senderDomain: string | null
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, org_id")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "org_admin") {
+    return { error: "Only organization admins can change email settings." };
+  }
+
+  // Verify the user belongs to this org (unforgeable via profiles.org_id)
+  if (profile.org_id !== orgId) {
+    return { error: "Not authorized for this organization." };
+  }
+
+  const { error } = await supabase
+    .from("organizations")
+    .update({
+      sender_email: senderEmail || null,
+      sender_domain: senderDomain || null,
+    })
+    .eq("id", orgId);
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+/**
+ * Fetch the current org email config. Used by the settings UI.
+ */
+export async function getOrgEmailConfig(orgId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, org_id")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || (profile.role !== "instructor" && profile.role !== "org_admin")) {
+    return { error: "Not authorized" };
+  }
+
+  if (profile.org_id !== orgId) {
+    return { error: "Not authorized for this organization." };
+  }
+
+  const { data: org, error } = await supabase
+    .from("organizations")
+    .select("sender_email, sender_domain")
+    .eq("id", orgId)
+    .single();
+
+  if (error) return { error: error.message };
+  return {
+    senderEmail: (org as Record<string, unknown>).sender_email as string | null,
+    senderDomain: (org as Record<string, unknown>).sender_domain as string | null,
+  };
+}

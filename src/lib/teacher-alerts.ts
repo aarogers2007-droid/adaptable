@@ -123,7 +123,7 @@ export async function alertCrisis(
   matchedText: string,
   flaggedMessage: string,
   feature: string,
-): Promise<{ alertId: string; classId: string; instructorId: string | null; orgAdminEmail: string | null; parentEmail: string | null; region: string } | null> {
+): Promise<{ alertId: string; classId: string; instructorId: string | null; orgAdminEmail: string | null; parentEmail: string | null; region: string; senderEmail: string | null } | null> {
   // Find the student's class + instructor
   const { data: enrollment } = await supabase
     .from("class_enrollments")
@@ -140,6 +140,7 @@ export async function alertCrisis(
   let region = "US";
   let orgAdminEmail: string | null = null;
   let orgName = "the program";
+  let senderEmail: string | null = null;
 
   const profileOrgId = orgId ?? await supabase
     .from("profiles")
@@ -151,13 +152,14 @@ export async function alertCrisis(
   if (profileOrgId) {
     const { data: org } = await supabase
       .from("organizations")
-      .select("region, org_admin_alert_email, name")
+      .select("region, org_admin_alert_email, name, sender_email")
       .eq("id", profileOrgId)
       .single();
     if (org) {
       region = (org as Record<string, unknown>).region as string ?? "US";
       orgAdminEmail = (org as Record<string, unknown>).org_admin_alert_email as string ?? null;
       orgName = org.name ?? "the program";
+      senderEmail = (org as Record<string, unknown>).sender_email as string ?? null;
     }
   }
 
@@ -212,7 +214,7 @@ export async function alertCrisis(
     return null;
   }
 
-  return { alertId: inserted.id, classId, instructorId, orgAdminEmail, parentEmail, region };
+  return { alertId: inserted.id, classId, instructorId, orgAdminEmail, parentEmail, region, senderEmail };
 }
 
 /**

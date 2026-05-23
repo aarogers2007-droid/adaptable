@@ -44,6 +44,8 @@ export interface CrisisEmailParams {
   region?: string;
   alertRecipients?: string[];
   studentCrisisMessage?: string; // the message shown to the student (resources), NOT their input
+  /** Per-org sender override. When set, emails come from the org's verified domain. */
+  fromEmail?: string;
 }
 
 /**
@@ -129,7 +131,7 @@ This message is confidential and should not be forwarded outside your safeguardi
 
   try {
     const result = await resendClient.emails.send({
-      from: FROM_ADDRESS,
+      from: params.fromEmail ?? FROM_ADDRESS,
       to: params.to,
       subject,
       text,
@@ -189,6 +191,8 @@ export async function sendCardReadyEmail(params: {
   to: string;
   studentFirstName: string;
   shareableUrl: string;
+  /** Per-org sender override. */
+  fromEmail?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   if (!resendClient) {
     return { ok: false, error: "RESEND_API_KEY not set" };
@@ -203,7 +207,7 @@ This link can be saved and shared with anyone.`;
 
   try {
     const result = await resendClient.emails.send({
-      from: FROM_ADDRESS,
+      from: params.fromEmail ?? FROM_ADDRESS,
       to: params.to,
       subject,
       text,
@@ -232,6 +236,8 @@ export async function sendParentCrisisEmail(params: {
   studentFirstName: string;
   region?: string;
   platformName?: string;
+  /** Per-org sender override. */
+  fromEmail?: string;
 }): Promise<{ ok: boolean; error?: string }> {
   if (!resendClient) {
     return { ok: false, error: "RESEND_API_KEY not set" };
@@ -259,7 +265,7 @@ If you have questions, reply to this email.`;
 
   try {
     const result = await resendClient.emails.send({
-      from: FROM_ADDRESS,
+      from: params.fromEmail ?? FROM_ADDRESS,
       to: params.to,
       subject,
       text,

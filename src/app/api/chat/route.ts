@@ -171,6 +171,7 @@ export async function POST(request: Request) {
           matchedPatternHint: (crisisCheck.matchedPattern ?? "").slice(0, 60),
           alertId: result.alertId, classId: result.classId, timestamp: new Date().toISOString(),
           programType: "AI Guide", region: result.region, alertRecipients: recipients,
+          fromEmail: result.senderEmail ?? undefined,
         });
       } else {
         console.error("[crisis] CRITICAL: no alert recipients for guide-chat", { studentId: user.id });
@@ -178,7 +179,7 @@ export async function POST(request: Request) {
 
       if (result.parentEmail) {
         const { sendParentCrisisEmail } = await import("@/lib/email");
-        await sendParentCrisisEmail({ to: result.parentEmail, studentFirstName: firstName, region: result.region });
+        await sendParentCrisisEmail({ to: result.parentEmail, studentFirstName: firstName, region: result.region, fromEmail: result.senderEmail ?? undefined });
       }
     }).catch((err) => console.error("[crisis] guide-chat alert failed:", err));
 
