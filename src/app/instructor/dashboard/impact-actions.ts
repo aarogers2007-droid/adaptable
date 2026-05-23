@@ -188,3 +188,168 @@ export async function getAtRiskStudents(orgId: string): Promise<AtRiskStudent[]>
 
   return (data ?? []) as AtRiskStudent[];
 }
+
+/**
+ * Export org-wide impact data as CSV.
+ * Includes per-student: name, email, grade, business idea, lessons completed,
+ * scenarios completed, AI exchanges, and last active date.
+ */
+export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string; filename?: string; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, org_id, is_platform_owner")
+    .eq("id", user.id)
+    .single();
+
+  const isPlatformOwner = (profile as Record<string, unknown>)?.is_platform_owner === true;
+  if (!isPlatformOwner && (profile?.role !== "org_admin" || profile?.org_id !== orgId)) {
+    return { error: "Not authorized" };
+  }
+
+  const admin = createAdminClient();
+
+  // Get org name for filename
+  const { data: org } = await admin
+    .from("organizations")
+    .select("name")
+    .eq("id", orgId)
+    .single();
+  const orgName = org?.name ?? "org";
+
+  // Get all students in the org
+  const { data: students } = await admin
+    .from("profiles")
+    .select("id, full_name, email, grade_tier, business_idea")
+    .eq("org_id", orgId)
+    .eq("role", "student");
+
+  if (!students || students.length === 0) {
+    const headers = "Full Name,Email,Grade Tier,Business Name,Niche,Lessons Completed,Scenarios Completed,Total AI Exchanges,Last Active\n";
+    const safeOrg = orgName.replace(/[^a-z0-9]/gi, "-").toLowerCase();
+    const date = new Date().toISOString().split("T")[0];
+    return { csv: headers, filename: `${safeOrg}-impact-report-${date}.csv` };
+  }
+
+  const studentIds = students.map((s) => s.id);
+
+  // Batch fetch all needed data
+  const [progressRes, scenariosRes, aiUsageRes, activityRes] = await Promise.all([
+    // Lessons completed
+    admin.from("student_progress")
+      .select("student_id, status")
+      .in("student_id", studentIds)
+      .eq("status", "completed"),
+
+    // Scenarios completed
+    admin.from("student_scenario_sessions")
+      .select("student_id, status")
+      .in("student_id", studentIds)
+      .eq("status", "completed"),
+
+    // Total AI exchanges per student
+    admin.from("ai_usage_log")
+      .select("student_id")
+      .in("student_id", studentIds),
+
+    // Last active (most recent ai_usage_log or student_progress timestamp)
+    admin.from("ai_usage_log")
+      .select("student_id, created_at")
+      .in("student_id", studentIds)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const allProgress = progressRes.data ?? [];
+  const allScenarios = scenariosRes.data ?? [];
+  const allAiUsage = aiUsageRes.data ?? [];
+  const allActivity = activityRes.data ?? [];
+
+  // Also get last progress timestamps for last_active fallback
+  const { data: progressTimestamps } = await admin
+    .from("student_progress")
+    .select("student_id, completed_at")
+    .in("student_id", studentIds)
+    .not("completed_at", "is", null)
+    .order("completed_at", { ascending: false });
+
+  // Build per-student maps
+  const lessonsMap = new Map<string, number>();
+  for (const p of allProgress) {
+    lessonsMap.set(p.student_id, (lessonsMap.get(p.student_id) ?? 0) + 1);
+  }
+
+  const scenariosMap = new Map<string, number>();
+  for (const s of allScenarios) {
+    scenariosMap.set(s.student_id, (scenariosMap.get(s.student_id) ?? 0) + 1);
+  }
+
+  const aiExchangesMap = new Map<string, number>();
+  for (const a of allAiUsage) {
+    aiExchangesMap.set(a.student_id, (aiExchangesMap.get(a.student_id) ?? 0) + 1);
+  }
+
+  const lastActiveMap = new Map<string, string>();
+  for (const log of allActivity) {
+    if (!lastActiveMap.has(log.student_id)) {
+      lastActiveMap.set(log.student_id, log.created_at);
+    }
+  }
+  // Merge progress timestamps (take the more recent of the two)
+  for (const p of (progressTimestamps ?? [])) {
+    if (!p.completed_at) continue;
+    const existing = lastActiveMap.get(p.student_id);
+    if (!existing || new Date(p.completed_at) > new Date(existing)) {
+      lastActiveMap.set(p.student_id, p.completed_at);
+    }
+  }
+
+  // CSV helpers
+  const escape = (val: string | number | null | undefined): string => {
+    if (val === null || val === undefined) return "";
+    const s = String(val);
+    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  };
+
+  const rows: string[] = [];
+  rows.push([
+    "Full Name", "Email", "Grade Tier", "Business Name", "Niche",
+    "Lessons Completed", "Scenarios Completed", "Total AI Exchanges", "Last Active",
+  ].join(","));
+
+  type StudentProfile = {
+    id: string;
+    full_name: string | null;
+    email: string | null;
+    grade_tier: string | null;
+    business_idea: { name?: string; niche?: string } | null;
+  };
+
+  for (const s of students as StudentProfile[]) {
+    const lastActive = lastActiveMap.get(s.id);
+    const lastActiveStr = lastActive
+      ? new Date(lastActive).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      : "Never";
+
+    rows.push([
+      escape(s.full_name),
+      escape(s.email),
+      escape(s.grade_tier),
+      escape((s.business_idea as { name?: string })?.name),
+      escape((s.business_idea as { niche?: string })?.niche),
+      escape(lessonsMap.get(s.id) ?? 0),
+      escape(scenariosMap.get(s.id) ?? 0),
+      escape(aiExchangesMap.get(s.id) ?? 0),
+      escape(lastActiveStr),
+    ].join(","));
+  }
+
+  const safeOrg = orgName.replace(/[^a-z0-9]/gi, "-").toLowerCase();
+  const date = new Date().toISOString().split("T")[0];
+  return { csv: rows.join("\n"), filename: `${safeOrg}-impact-report-${date}.csv` };
+}

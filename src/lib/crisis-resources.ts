@@ -14,7 +14,7 @@ export interface CrisisResource {
 
 const CRISIS_RESOURCES: Record<string, CrisisResource[]> = {
   US: [
-    { service_name: "988 Suicide and Crisis Lifeline", contact: "Call or text 988", availability: "24/7", age_note: "", url: "https://988lifeline.org" },
+    { service_name: "988 Suicide and Crisis Lifeline", contact: "Call or text 988 (presiona 2 para español)", availability: "24/7", age_note: "", url: "https://988lifeline.org" },
     { service_name: "Crisis Text Line", contact: "Text HOME to 741741", availability: "24/7", age_note: "", url: "https://www.crisistextline.org" },
     { service_name: "Trevor Project", contact: "1-866-488-7386", availability: "24/7", age_note: "LGBTQ+ youth", url: "https://www.thetrevorproject.org" },
   ],

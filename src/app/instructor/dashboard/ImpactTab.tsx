@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getOrgImpactReport, getAtRiskStudents, type OrgImpactReport, type AtRiskStudent } from "./impact-actions";
+import { getOrgImpactReport, getAtRiskStudents, exportOrgImpactCSV, type OrgImpactReport, type AtRiskStudent } from "./impact-actions";
 
 interface Props {
   orgId: string;
@@ -28,6 +28,7 @@ export default function ImpactTab({ orgId }: Props) {
   const [report, setReport] = useState<OrgImpactReport | null>(null);
   const [atRisk, setAtRisk] = useState<AtRiskStudent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exportStatus, setExportStatus] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -40,6 +41,26 @@ export default function ImpactTab({ orgId }: Props) {
     }).catch(() => setLoading(false));
   }, [orgId]);
 
+  async function handleExportCSV() {
+    setExportStatus("Generating...");
+    const result = await exportOrgImpactCSV(orgId);
+    if (result.error || !result.csv) {
+      setExportStatus(result.error ?? "Export failed");
+      setTimeout(() => setExportStatus(null), 3000);
+      return;
+    }
+    const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = result.filename ?? "impact-report.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setExportStatus(null);
+  }
+
   if (loading) {
     return <p className="text-sm text-[var(--text-muted)] py-8">Loading impact data...</p>;
   }
@@ -47,7 +68,7 @@ export default function ImpactTab({ orgId }: Props) {
   return (
     <div>
       {/* Sub-tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 items-center">
         <button
           onClick={() => setTab("impact")}
           className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -64,6 +85,15 @@ export default function ImpactTab({ orgId }: Props) {
         >
           Students to Check In With {atRisk.length > 0 && `(${atRisk.length})`}
         </button>
+        <div className="ml-auto">
+          <button
+            onClick={handleExportCSV}
+            disabled={exportStatus === "Generating..."}
+            className="rounded-lg px-3 py-1.5 text-sm font-medium border border-[var(--border)] bg-[var(--bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] transition-colors disabled:opacity-50"
+          >
+            {exportStatus ?? "Export CSV"}
+          </button>
+        </div>
       </div>
 
       {/* Impact tab */}

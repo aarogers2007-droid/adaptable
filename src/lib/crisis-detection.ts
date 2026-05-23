@@ -168,10 +168,34 @@ export async function detectCrisisUniversal(text: string): Promise<UniversalCris
 }
 
 /**
+ * Spanish version of the crisis response message.
+ * Warm, direct, age-appropriate for a teenager.
+ */
+function getCrisisResponseSpanish(studentName: string, region?: string): string {
+  const resources = getRegionalResources(region ?? "US");
+  const resourceText = formatCrisisResourcesForStudent(resources);
+
+  return `${studentName}, quiero pausar un momento. Lo que acabas de decir importa, y quiero asegurarme de que tengas a alguien real con quien hablar — no solo yo.
+
+Alguien que se preocupa por ti ha sido notificado. También puedes comunicarte con:
+
+${resourceText}
+
+No tienes que resolver nada solo/sola. Las personas en estas líneas están ahí porque quieren escucharte, sin juzgar.
+
+Aquí sigo cuando quieras continuar — sin prisa.`;
+}
+
+/**
  * The supportive message to inject into the AI's response when crisis is detected.
  * Uses regional crisis resources based on the org's configured region.
+ * Supports language parameter for Spanish-speaking students.
  */
-export function getCrisisResponse(studentName: string, region?: string): string {
+export function getCrisisResponse(studentName: string, region?: string, language?: string): string {
+  if (language === "Spanish" || language === "es") {
+    return getCrisisResponseSpanish(studentName, region);
+  }
+
   const resources = getRegionalResources(region ?? "US");
   const resourceText = formatCrisisResourcesForStudent(resources);
 
