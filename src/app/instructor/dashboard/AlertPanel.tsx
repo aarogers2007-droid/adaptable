@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { acknowledgeAlert, acknowledgeAllAlerts, resolveAlert } from "./actions";
 import NudgeTemplates from "./NudgeTemplates";
+import CrisisPlaybook from "./CrisisPlaybook";
 import type { TeacherAlert } from "@/lib/types";
 
 const ALERT_ICONS: Record<string, string> = {
@@ -88,6 +89,9 @@ export default function AlertPanel({
 
   const urgentCount = alerts.filter((a) => a.severity === "urgent").length;
   const warningCount = alerts.filter((a) => a.severity === "warning").length;
+  const hasCrisisAlerts = alerts.some(
+    (a) => a.severity === "urgent" || a.alert_type === "content_flag" || a.alert_type === "emotional"
+  );
 
   return (
     <div>
@@ -227,6 +231,8 @@ export default function AlertPanel({
           </div>
         ))}
       </div>
+
+      {hasCrisisAlerts && <CrisisPlaybook />}
     </div>
   );
 }

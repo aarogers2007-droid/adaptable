@@ -31,6 +31,13 @@ export default async function InstructorDashboardPage() {
     redirect("/dashboard");
   }
 
+  // Check for failed crisis email notifications
+  const { data: failedNotifications } = await supabase
+    .from("notification_failures")
+    .select("id, alert_id, failure_reason, created_at")
+    .order("created_at", { ascending: false })
+    .limit(10);
+
   // Get classes: org_admins see all classes in their org, instructors see their own
   let classQuery = supabase
     .from("classes")
@@ -480,7 +487,7 @@ export default async function InstructorDashboardPage() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id} />
+      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id} failedNotifications={failedNotifications ?? []} />
     </main>
   );
 }

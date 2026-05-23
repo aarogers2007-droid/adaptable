@@ -44,19 +44,28 @@ export interface ClassData {
   sessionType?: string;
 }
 
+export interface NotificationFailure {
+  id: string;
+  alert_id: string;
+  failure_reason: string;
+  created_at: string;
+}
+
 interface DashboardClientProps {
   classes: ClassData[];
   totalLessons: number;
   orgId?: string | null;
+  failedNotifications: NotificationFailure[];
 }
 
 type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics" | "scenarios" | "impact" | "settings";
 
-export default function DashboardClient({ classes, totalLessons, orgId }: DashboardClientProps) {
+export default function DashboardClient({ classes, totalLessons, orgId, failedNotifications }: DashboardClientProps) {
   const [activeClassIdx, setActiveClassIdx] = useState(0);
   const [activeSubTab, setActiveSubTab] = useState<SubTab>("students");
   const [showCreateClass, setShowCreateClass] = useState(false);
   const [welcomeKey, setWelcomeKey] = useState(0); // increment to trigger reopen
+  const [failureBannerDismissed, setFailureBannerDismissed] = useState(false);
   const [messageTarget, setMessageTarget] = useState<{
     classId: string;
     className: string;
@@ -83,6 +92,32 @@ export default function DashboardClient({ classes, totalLessons, orgId }: Dashbo
 
   return (
     <>
+      {/* Crisis email failure banner */}
+      {failedNotifications.length > 0 && !failureBannerDismissed && (
+        <div className="w-full bg-[var(--error)] text-white px-6 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-sm font-bold" aria-hidden="true">
+              !!
+            </span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">
+                Crisis alert emails failed to deliver. {failedNotifications.length} notification{failedNotifications.length !== 1 ? "s" : ""} could not reach staff.
+              </p>
+              <p className="text-xs text-white/80 mt-0.5">
+                Check your email configuration in Settings or contact support.
+              </p>
+            </div>
+            <button
+              onClick={() => setFailureBannerDismissed(true)}
+              className="shrink-0 rounded-md bg-white/20 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/30 transition-colors"
+              aria-label="Dismiss notification failure banner"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <WelcomeSlideshow key={welcomeKey} />
 
       {/* Nav */}
