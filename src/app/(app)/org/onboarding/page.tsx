@@ -293,7 +293,7 @@ export default function OrgOnboardingPage() {
             </div>
 
             {error && step === 1 && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
               </div>
             )}
@@ -483,7 +483,7 @@ export default function OrgOnboardingPage() {
             </div>
 
             {error && step === 2 && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
               </div>
             )}
@@ -575,7 +575,7 @@ export default function OrgOnboardingPage() {
             </div>
 
             {error && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
               </div>
             )}

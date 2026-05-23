@@ -124,7 +124,7 @@ export default function DashboardClient({ classes, totalLessons, orgId }: Dashbo
         {/* Page header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+            <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
               Your Classes
             </h1>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">
@@ -139,7 +139,7 @@ export default function DashboardClient({ classes, totalLessons, orgId }: Dashbo
           </div>
           <button
             onClick={() => setShowCreateClass(true)}
-            className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] transition-colors"
+            className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-dark)] transition-colors"
           >
             + New class
           </button>
@@ -156,7 +156,7 @@ export default function DashboardClient({ classes, totalLessons, orgId }: Dashbo
             </p>
             <button
               onClick={() => setShowCreateClass(true)}
-              className="mt-4 rounded-lg bg-[var(--primary)] px-5 py-2 text-sm font-medium text-white hover:bg-[var(--primary-light)] transition-colors"
+              className="mt-4 rounded-lg bg-[var(--primary)] px-5 py-2 text-sm font-medium text-white hover:bg-[var(--primary-dark)] transition-colors"
             >
               Create your first class
             </button>

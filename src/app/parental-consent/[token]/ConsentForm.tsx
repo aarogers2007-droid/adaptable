@@ -56,7 +56,7 @@ export default function ConsentForm({ token }: { token: string }) {
 
   if (outcome === "error") {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+      <div className="rounded-2xl border border-[var(--error)]/20 bg-[var(--error)]/5 p-8 text-center">
         <h1 className="text-xl font-bold text-red-900">Link problem</h1>
         <p className="mt-3 text-sm text-red-800">{errorMsg}</p>
         <p className="mt-4 text-xs text-red-700">

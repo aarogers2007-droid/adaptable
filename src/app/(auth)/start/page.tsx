@@ -206,7 +206,7 @@ export default function StartPage() {
   // Step 3: Brand
   const [logo, setLogo] = useState<FilePreview | null>(null);
   const [primaryColor, setPrimaryColor] = useState("#0D9488");
-  const [secondaryColor, setSecondaryColor] = useState("#C084FC");
+  const [secondaryColor, setSecondaryColor] = useState("#F59E0B");
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Step 4: Plan
@@ -572,7 +572,7 @@ export default function StartPage() {
         {step === 1 && (
           <div className="mx-auto max-w-md">
             <div className="text-center">
-              <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+              <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
                 Start your program
               </h1>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -653,7 +653,7 @@ export default function StartPage() {
                 </div>
 
                 {error && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+                  <div className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                     {error}
                   </div>
                 )}
@@ -689,7 +689,7 @@ export default function StartPage() {
         {/* ═══════════════════════════════════ */}
         {step === 2 && (
           <div className="mx-auto max-w-md">
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+            <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
               Name your program
             </h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -734,7 +734,7 @@ export default function StartPage() {
                     {subdomainChecking ? (
                       <span className="text-xs text-[var(--text-muted)]">Checking...</span>
                     ) : subdomainAvailable === true ? (
-                      <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+                      <span className="text-xs text-[#059669] font-medium flex items-center gap-1">
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
@@ -758,7 +758,7 @@ export default function StartPage() {
             </div>
 
             {error && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
               </div>
             )}
@@ -780,7 +780,7 @@ export default function StartPage() {
         {/* ═══════════════════════════════════ */}
         {step === 3 && (
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+            <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
               Make it yours
             </h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -957,7 +957,7 @@ export default function StartPage() {
             </div>
 
             {error && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
               </div>
             )}
@@ -989,7 +989,7 @@ export default function StartPage() {
         {/* ═══════════════════════════════════ */}
         {step === 4 && (
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+            <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
               Choose your plan
             </h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -1077,7 +1077,7 @@ export default function StartPage() {
             </div>
 
             {error && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                 {error}
               </div>
             )}
@@ -1150,7 +1150,7 @@ export default function StartPage() {
                   Your bank requires additional verification. Check your email from Stripe.
                 </p>
                 {error && (
-                  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+                  <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                     {error}
                   </div>
                 )}
@@ -1161,7 +1161,7 @@ export default function StartPage() {
             {!submitting && subscriptionStatus !== "incomplete" && (
               <>
                 <div className="text-center">
-                  <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+                  <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
                     Your program is ready
                   </h1>
                   <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -1267,7 +1267,7 @@ export default function StartPage() {
                 </div>
 
                 {error && (
-                  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+                  <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
                     {error}
                   </div>
                 )}

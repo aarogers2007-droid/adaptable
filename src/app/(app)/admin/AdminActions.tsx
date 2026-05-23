@@ -46,7 +46,7 @@ export default function AdminActions({
             handleAction(resetAllProgress, "Reset all lesson progress")
           }
           disabled={loading !== null}
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors"
+          className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors"
         >
           {loading === "Reset all lesson progress"
             ? "Resetting..."
@@ -57,7 +57,7 @@ export default function AdminActions({
           <button
             onClick={() => handleAction(resetIkigai, "Reset Ikigai + business idea")}
             disabled={loading !== null}
-            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors"
+            className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors"
           >
             {loading === "Reset Ikigai + business idea"
               ? "Resetting..."

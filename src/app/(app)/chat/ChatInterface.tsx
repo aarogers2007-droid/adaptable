@@ -248,7 +248,7 @@ export default function ChatInterface({
 
       {/* Error */}
       {error && (
-        <div className="shrink-0 border-t border-red-200 bg-red-50 px-6 py-2 text-center text-sm text-[var(--error)]">
+        <div className="shrink-0 border-t border-[var(--error)]/20 bg-[var(--error)]/5 px-6 py-2 text-center text-sm text-[var(--error)]">
           {error}
         </div>
       )}

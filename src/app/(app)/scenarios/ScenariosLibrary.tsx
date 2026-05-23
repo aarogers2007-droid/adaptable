@@ -127,7 +127,7 @@ export default function ScenariosLibrary({ scenarios }: { scenarios: ScenarioCar
           <button
             key={ind}
             onClick={() => toggleIndustry(ind)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors capitalize ${
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors capitalize ${
               industryFilter.has(ind)
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg)]"
@@ -142,7 +142,7 @@ export default function ScenariosLibrary({ scenarios }: { scenarios: ScenarioCar
           <button
             key={d}
             onClick={() => setDifficultyFilter(difficultyFilter === d ? null : d)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
               difficultyFilter === d
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg)]"
@@ -157,7 +157,7 @@ export default function ScenariosLibrary({ scenarios }: { scenarios: ScenarioCar
           <button
             key={s}
             onClick={() => setStatusFilter(s)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
               statusFilter === s
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg)]"
@@ -185,7 +185,7 @@ export default function ScenariosLibrary({ scenarios }: { scenarios: ScenarioCar
                     {scenario.title}
                   </h3>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <span className="rounded-full bg-[var(--bg-muted)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)] capitalize">
+                    <span className="rounded-full bg-[var(--bg-muted)] px-2 py-0.5 text-xs font-medium text-[var(--text-secondary)] capitalize">
                       {scenario.industry}
                     </span>
                     <DifficultyStars level={scenario.difficulty} />

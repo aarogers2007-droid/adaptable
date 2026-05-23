@@ -43,3 +43,5 @@ next-env.d.ts
 .gstack/
 exports/
 previews/
+previews/
+.gstack-screenshots/

@@ -106,7 +106,7 @@ export default function LoginPage() {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="w-full max-w-lg">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-center text-[var(--text-primary)]">
+          <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-center text-[var(--text-primary)]">
             Sign in to {branding.platform_name}
           </h1>
           <p className="mt-2 text-center text-sm text-[var(--text-secondary)]">
@@ -160,7 +160,7 @@ export default function LoginPage() {
           &larr; Back
         </button>
 
-        <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+        <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
           {activeSection === "admin" ? "Admin / Teacher Login" : "Student Login"}
         </h1>
 
@@ -189,7 +189,7 @@ export default function LoginPage() {
               <input
                 id="email" type="email" required value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                 placeholder="you@school.edu"
               />
             </div>
@@ -198,13 +198,13 @@ export default function LoginPage() {
               <input
                 id="password" type="password" required value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                 placeholder="Your password"
               />
             </div>
 
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">{error}</div>
+              <div className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">{error}</div>
             )}
 
             <button

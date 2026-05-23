@@ -140,7 +140,7 @@ export default function AJAnalytics() {
           </p>
           <div className="space-y-2">
             {data.crisisAlerts.map((alert) => (
-              <div key={alert.id} className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm">
+              <div key={alert.id} className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-red-700">{alert.studentName}</span>
                   <span className="text-[10px] text-red-400">{new Date(alert.createdAt).toLocaleString()}</span>

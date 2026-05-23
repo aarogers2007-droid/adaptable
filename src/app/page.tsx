@@ -33,30 +33,36 @@ export default function Home() {
       {/* What it does */}
       <section className="border-t border-[var(--border)] bg-[var(--bg-subtle)] px-6 py-20">
         <div className="mx-auto max-w-4xl">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)] text-center">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--text-primary)] text-left">
             How it works
           </h2>
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-3xl mb-3">1</div>
-              <h3 className="font-semibold text-[var(--text-primary)]">Students learn through AI</h3>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                22 lessons guided by an AI mentor that adapts to every student&apos;s interests, grade level, and pace. Each student builds a real business concept.
-              </p>
+          <div className="mt-12 flex flex-col gap-8 text-left">
+            <div className="flex items-start gap-5">
+              <div className="text-3xl font-semibold text-[var(--primary)] shrink-0 w-10">1</div>
+              <div>
+                <h3 className="font-semibold text-[var(--text-primary)]">Students learn through AI</h3>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  22 lessons guided by an AI mentor that adapts to every student&apos;s interests, grade level, and pace. Each student builds a real business concept.
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl mb-3">2</div>
-              <h3 className="font-semibold text-[var(--text-primary)]">Every interaction produces data</h3>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Completion rates, time on platform, lesson-by-lesson progress, business ideas created, and crisis detection. All tracked, all exportable.
-              </p>
+            <div className="flex items-start gap-5">
+              <div className="text-3xl font-semibold text-[var(--primary)] shrink-0 w-10">2</div>
+              <div>
+                <h3 className="font-semibold text-[var(--text-primary)]">Every interaction produces data</h3>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  Completion rates, time on platform, lesson-by-lesson progress, business ideas created, and crisis detection. All tracked, all exportable.
+                </p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl mb-3">3</div>
-              <h3 className="font-semibold text-[var(--text-primary)]">You get proof of impact</h3>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                One-click reports for sponsors and grant applications. Your logo, your data, your story. Before this platform, you had anecdotes. After, you have numbers.
-              </p>
+            <div className="flex items-start gap-5">
+              <div className="text-3xl font-semibold text-[var(--primary)] shrink-0 w-10">3</div>
+              <div>
+                <h3 className="font-semibold text-[var(--text-primary)]">You get proof of impact</h3>
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  One-click reports for sponsors and grant applications. Your logo, your data, your story. Before this platform, you had anecdotes. After, you have numbers.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -87,7 +93,7 @@ export default function Home() {
       {/* ROI */}
       <section className="border-t border-[var(--border)] bg-[var(--bg-subtle)] px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--text-primary)]">
             Built for organizations that need to prove impact
           </h2>
           <p className="mt-6 text-[var(--text-secondary)] leading-relaxed">
@@ -114,11 +120,11 @@ export default function Home() {
       <footer className="border-t border-[var(--border)] px-6 py-8">
         <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6 text-sm text-[var(--text-muted)]">
-            <Link href="/go" className="hover:text-[var(--text-primary)] transition-colors">Join a Program</Link>
-            <Link href="/login" className="hover:text-[var(--text-primary)] transition-colors">Sign In</Link>
-            <Link href="/demo" className="hover:text-[var(--text-primary)] transition-colors">Demo</Link>
-            <Link href="/standards" className="hover:text-[var(--text-primary)] transition-colors">Standards</Link>
-            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors">Privacy</Link>
+            <Link href="/go" className="py-2 hover:text-[var(--text-primary)] transition-colors">Join a Program</Link>
+            <Link href="/login" className="py-2 hover:text-[var(--text-primary)] transition-colors">Sign In</Link>
+            <Link href="/demo" className="py-2 hover:text-[var(--text-primary)] transition-colors">Demo</Link>
+            <Link href="/standards" className="py-2 hover:text-[var(--text-primary)] transition-colors">Standards</Link>
+            <Link href="/privacy" className="py-2 hover:text-[var(--text-primary)] transition-colors">Privacy</Link>
           </div>
           <div className="text-xs text-[var(--text-muted)]">
             Adaptable &copy; {new Date().getFullYear()}

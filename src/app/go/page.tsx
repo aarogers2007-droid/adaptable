@@ -116,7 +116,7 @@ export default function GuestJoinPage() {
     <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)]">
+          <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
             Adaptable
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -142,7 +142,7 @@ export default function GuestJoinPage() {
           </div>
 
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-[var(--error)]">
+            <div className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
               {error}
             </div>
           )}

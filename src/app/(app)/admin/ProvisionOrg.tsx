@@ -120,7 +120,7 @@ export default function ProvisionOrg() {
         <div className={`rounded-lg px-3 py-2 text-sm ${
           result.success
             ? "border border-green-200 bg-green-50 text-green-700"
-            : "border border-red-200 bg-red-50 text-[var(--error)]"
+            : "border border-[var(--error)]/20 bg-[var(--error)]/5 text-[var(--error)]"
         }`}>
           {result.success
             ? `Organization created (ID: ${result.orgId?.slice(0, 8)}...)`
