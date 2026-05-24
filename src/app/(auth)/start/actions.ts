@@ -348,6 +348,19 @@ export async function saveBranding(
   const existingConfig = (orgData?.branding_config as Record<string, unknown>) ?? {};
   let logoUrl = (existingConfig.logo_url as string) ?? "";
 
+  // Server-side file validation
+  if (logoFile && logoFile.size > 0) {
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+    const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/svg+xml"];
+
+    if (logoFile.size > MAX_FILE_SIZE) {
+      return { error: "Logo file must be under 2MB." };
+    }
+    if (!ALLOWED_TYPES.includes(logoFile.type)) {
+      return { error: "Logo must be PNG, JPG, or SVG." };
+    }
+  }
+
   // Upload logo if provided
   if (logoFile && logoFile.size > 0) {
     const ext = logoFile.type === "image/svg+xml" ? "svg"

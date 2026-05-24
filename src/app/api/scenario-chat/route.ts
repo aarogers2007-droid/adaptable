@@ -4,12 +4,17 @@ import { RUBRIC_MAP } from "@/lib/scenario-rubric";
 import { getModel } from "@/lib/model-config";
 import { getMentorAdaptation } from "@/lib/grade-adaptation";
 import { moderateContent } from "@/lib/content-moderation";
+import { validateOrigin } from "@/lib/csrf";
 import type { GradeTier } from "@/lib/types";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+
+  if (!validateOrigin(request)) {
+    return new Response("Forbidden", { status: 403 });
+  }
 
   const { message, scenarioId, sessionId, studentResponseTimeMs } = await request.json();
 

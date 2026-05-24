@@ -76,11 +76,11 @@ export async function fetchPlatformAnalytics(): Promise<PlatformAnalytics> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("email")
+    .select("is_platform_owner")
     .eq("id", user.id)
     .single();
 
-  if (profile?.email !== "aarogers2007@gmail.com") {
+  if (!profile?.is_platform_owner) {
     throw new Error("Not authorized");
   }
 

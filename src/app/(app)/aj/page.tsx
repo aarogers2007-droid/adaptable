@@ -14,7 +14,6 @@ export const dynamic = "force-dynamic";
  * no redirects, no friction. Click and go.
  */
 
-const AJ_EMAIL = "aarogers2007@gmail.com";
 const VENTURE_CLASS_ID = "c0000000-0000-0000-0000-000000000c01";
 
 export default async function AJDashboard() {
@@ -25,12 +24,12 @@ export default async function AJDashboard() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("email")
+    .select("is_platform_owner")
     .eq("id", user.id)
     .single();
 
-  // Hard gate: only AJ's email. Nobody else. Ever.
-  if (profile?.email !== AJ_EMAIL) {
+  // Hard gate: platform owners only
+  if (!profile?.is_platform_owner) {
     redirect("/dashboard");
   }
 

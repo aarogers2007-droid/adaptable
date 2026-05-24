@@ -6,6 +6,7 @@ import { learningProfilePrompt, type LearningProfile, DEFAULT_LEARNING_PROFILE }
 import { getRelevantKnowledgeWithMeta, type RetrievedChunkMeta, type StudentContext } from "@/lib/knowledge-retrieval";
 import type { Profile, GradeTier } from "@/lib/types";
 import { getMentorAdaptation } from "@/lib/grade-adaptation";
+import { validateOrigin } from "@/lib/csrf";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -13,6 +14,10 @@ export async function POST(request: Request) {
   if (!user) {
     console.error("[lesson-chat] 401 — no user");
     return new Response("Unauthorized", { status: 401 });
+  }
+
+  if (!validateOrigin(request)) {
+    return new Response("Forbidden", { status: 403 });
   }
 
   const requestBody = await request.json();
@@ -190,11 +195,8 @@ export async function POST(request: Request) {
     });
 
     if (rpcError) {
-      // Log the RPC error so we don't silently swallow rate-limit failures.
-      // We still proceed (fail-open) — better to let the student through
-      // than to block them on a Supabase function bug — but this gives us
-      // visibility in Vercel logs.
-      console.error("[lesson-chat] reserve_ai_usage RPC error:", rpcError.message, rpcError.code);
+      console.error("[lesson-chat] reserve_ai_usage RPC error:", rpcError.message);
+      return Response.json({ error: "Service temporarily unavailable. Try again in a moment." }, { status: 503 });
     }
 
     // Boolean shape (current): true = ok, false = limit hit

@@ -233,10 +233,15 @@ export async function POST(request: Request) {
   // Atomic rate limit: reserve a usage slot before streaming. Admins bypass.
   let usageReservationId: string | null = null;
   if (!isAdminUser) {
-    const { data: reservation } = await supabase.rpc("reserve_ai_usage", {
+    const { data: reservation, error: rpcError } = await supabase.rpc("reserve_ai_usage", {
       p_student_id: user.id,
       p_feature: "guide",
     });
+
+    if (rpcError) {
+      console.error("[chat] reserve_ai_usage RPC error:", rpcError.message);
+      return Response.json({ error: "Service temporarily unavailable. Try again in a moment." }, { status: 503 });
+    }
 
     const result = reservation?.[0] ?? { status: "ok", reservation_id: null };
 

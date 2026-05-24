@@ -165,6 +165,28 @@ export async function provisionOrganization(formData: FormData): Promise<{
 
   const orgId = org.id;
 
+  // Server-side file validation
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+  const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/svg+xml"];
+
+  if (logoFile && logoFile.size > 0) {
+    if (logoFile.size > MAX_FILE_SIZE) {
+      return { error: "Logo file must be under 2MB." };
+    }
+    if (!ALLOWED_TYPES.includes(logoFile.type)) {
+      return { error: "Logo must be PNG, JPG, or SVG." };
+    }
+  }
+
+  if (faviconFile && faviconFile.size > 0) {
+    if (faviconFile.size > MAX_FILE_SIZE) {
+      return { error: "Favicon file must be under 2MB." };
+    }
+    if (!ALLOWED_TYPES.includes(faviconFile.type)) {
+      return { error: "Favicon must be PNG, JPG, or SVG." };
+    }
+  }
+
   // Step 2: Upload logo and favicon if provided
   let logoUrl = "";
   let faviconUrl = "";

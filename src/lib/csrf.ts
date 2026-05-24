@@ -25,14 +25,14 @@ export function validateOrigin(request: Request): boolean {
     const normalizedOrigin = origin.replace(/\/$/, "");
     if (normalizedOrigin === allowedOrigin) return true;
     // Also allow Vercel preview deployments (same project)
-    if (normalizedOrigin.endsWith(".vercel.app")) return true;
+    if (normalizedOrigin.endsWith(".vercel.app") && normalizedOrigin.includes("adaptable")) return true;
     console.warn("[csrf] Origin mismatch:", { origin, allowedOrigin });
     return false;
   }
 
   if (referer) {
     if (referer.startsWith(allowedOrigin)) return true;
-    if (referer.includes(".vercel.app")) return true;
+    if (referer.includes(".vercel.app") && referer.includes("adaptable")) return true;
     console.warn("[csrf] Referer mismatch:", { referer, allowedOrigin });
     return false;
   }

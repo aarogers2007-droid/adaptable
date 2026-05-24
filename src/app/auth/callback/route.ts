@@ -39,13 +39,8 @@ export async function GET(request: Request) {
           return NextResponse.redirect(`${origin}${destination}`);
         }
 
-        // ── AJ's direct route ──
-        if (user.email === "aarogers2007@gmail.com") {
-          return NextResponse.redirect(`${origin}/aj`);
-        }
-
-        // ── ADMIN ROUTING — admins don't need onboarding ──
-        if ((profile as Record<string, unknown> | null)?.is_platform_owner) {
+        // ── ADMIN ROUTING — platform owners don't need onboarding ──
+        if (profile?.is_platform_owner === true) {
           return NextResponse.redirect(`${origin}/admin`);
         }
         // Org admin with incomplete onboarding — resume wizard

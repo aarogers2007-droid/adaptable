@@ -37,12 +37,6 @@ export default function LoginPage() {
         .eq("id", user.id)
         .single();
 
-      // AJ → direct to AJ's dashboard
-      if (user.email === "aarogers2007@gmail.com") {
-        router.push("/aj");
-        return;
-      }
-
       if ((profile as Record<string, unknown> | null)?.is_platform_owner) {
         router.push("/admin");
         return;

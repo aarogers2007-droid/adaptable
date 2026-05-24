@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sendMessageAuto } from "@/lib/ai";
 import { getModel } from "@/lib/model-config";
 import { moderateContent } from "@/lib/content-moderation";
+import { validateOrigin } from "@/lib/csrf";
 
 function buildSupportPrompt(brandName: string) {
   return `You are the ${brandName} support assistant. You help students and teachers resolve issues with the platform quickly and clearly.
@@ -51,6 +52,10 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "Not authenticated" }, { status: 401 });
+
+  if (!validateOrigin(request)) {
+    return new Response("Forbidden", { status: 403 });
+  }
 
   const { message, conversationId } = await request.json();
 
