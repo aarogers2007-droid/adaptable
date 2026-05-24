@@ -106,6 +106,54 @@ function formatCurrency(amount: number): string {
 
 // ─── Progress Bar ───
 
+// ─── Premium Animation Styles (CSS-only, Chromebook-safe) ───
+
+const ANIMATION_STYLES = `
+@keyframes stepFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes stepFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes staggerChild {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes progressFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes summaryReveal {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+.step-enter {
+  animation: stepFadeIn 500ms ease-out both;
+}
+.step-enter > * {
+  animation: staggerChild 450ms ease-out both;
+}
+.step-enter > *:nth-child(1) { animation-delay: 80ms; }
+.step-enter > *:nth-child(2) { animation-delay: 160ms; }
+.step-enter > *:nth-child(3) { animation-delay: 240ms; }
+.step-enter > *:nth-child(4) { animation-delay: 320ms; }
+.step-enter > *:nth-child(5) { animation-delay: 400ms; }
+.step-enter > *:nth-child(6) { animation-delay: 480ms; }
+.step-enter > *:nth-child(7) { animation-delay: 560ms; }
+.step-enter > *:nth-child(8) { animation-delay: 640ms; }
+.summary-enter {
+  animation: summaryReveal 500ms ease-out both;
+  animation-delay: 150ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .step-enter, .step-enter > *, .summary-enter {
+    animation: none !important;
+  }
+}
+`;
+
 function ProgressBar({ step }: { step: number }) {
   return (
     <div className="mb-8">
@@ -119,10 +167,11 @@ function ProgressBar({ step }: { step: number }) {
             <div key={label} className="flex items-center gap-2 flex-1 last:flex-none">
               <div className="flex items-center gap-2 shrink-0">
                 <div
-                  className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors"
+                  className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
                     background: completed || current ? "var(--primary)" : "var(--bg-muted)",
                     color: completed || current ? "#fff" : "var(--text-muted)",
+                    transition: "background 400ms ease-out, color 400ms ease-out",
                   }}
                 >
                   {completed ? (
@@ -146,7 +195,10 @@ function ProgressBar({ step }: { step: number }) {
               {i < STEP_LABELS.length - 1 && (
                 <div
                   className="flex-1 h-px mx-2"
-                  style={{ background: step > stepNum ? "var(--primary)" : "var(--border)" }}
+                  style={{
+                    background: step > stepNum ? "var(--primary)" : "var(--border)",
+                    transition: "background 600ms ease-out",
+                  }}
                 />
               )}
             </div>
@@ -574,6 +626,7 @@ export default function StartPage() {
 
   return (
     <main className="flex min-h-screen items-start justify-center px-4 py-8 sm:py-12">
+      <style dangerouslySetInnerHTML={{ __html: ANIMATION_STYLES }} />
       <div className="w-full max-w-2xl">
         <ProgressBar step={step} />
 
@@ -581,7 +634,7 @@ export default function StartPage() {
         {/* STEP 1: Create Account              */}
         {/* ═══════════════════════════════════ */}
         {step === 1 && (
-          <div className="mx-auto max-w-md">
+          <div key="step1" className="mx-auto max-w-md step-enter">
             <div className="text-center">
               <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
                 Start your program
@@ -699,7 +752,7 @@ export default function StartPage() {
         {/* STEP 2: Set Up Your Program         */}
         {/* ═══════════════════════════════════ */}
         {step === 2 && (
-          <div className="mx-auto max-w-md">
+          <div key="step2" className="mx-auto max-w-md step-enter">
             <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
               Name your program
             </h1>
@@ -790,7 +843,7 @@ export default function StartPage() {
         {/* STEP 3: Brand It                    */}
         {/* ═══════════════════════════════════ */}
         {step === 3 && (
-          <div>
+          <div key="step3" className="step-enter">
             <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
               Make it yours
             </h1>
@@ -999,7 +1052,7 @@ export default function StartPage() {
         {/* STEP 4: Pricing                     */}
         {/* ═══════════════════════════════════ */}
         {step === 4 && (
-          <div>
+          <div key="step4" className="step-enter">
             <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
               How many students will use the program?
             </h1>
@@ -1078,7 +1131,7 @@ export default function StartPage() {
 
             {/* Total cost summary */}
             {studentCount > 0 && studentCount <= 50000 && (
-              <div className="mt-6 rounded-xl border-2 border-[rgba(13,148,136,0.2)] bg-[rgba(13,148,136,0.05)] p-5">
+              <div className="mt-6 rounded-xl border-2 border-[rgba(13,148,136,0.2)] bg-[rgba(13,148,136,0.05)] p-5 summary-enter">
                 <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
                   <div>
                     <p className="text-sm text-[var(--text-secondary)]">
@@ -1192,7 +1245,7 @@ export default function StartPage() {
         {/* STEP 5: Launchpad                   */}
         {/* ═══════════════════════════════════ */}
         {step === 5 && (
-          <div className="mx-auto max-w-lg">
+          <div key="step5" className="mx-auto max-w-lg step-enter">
             {/* Loading / verifying payment */}
             {submitting && (
               <div className="text-center py-12">
