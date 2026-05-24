@@ -300,14 +300,20 @@ Start by orienting the student in the scenario and asking your first question. B
             .update({ conversation: updatedConversation })
             .eq("id", session.id);
 
-          // Log AI usage now that we have the actual response length
+          // Log AI usage with real token counts from the stream
+          const finalMsg = await stream.finalMessage();
+          const scenarioModel = getModel("scenario_chat");
+          const sUsage = finalMsg.usage;
+          const sCacheRead = (sUsage as unknown as Record<string, number>).cache_read_input_tokens ?? 0;
+          const sCacheCreate = (sUsage as unknown as Record<string, number>).cache_creation_input_tokens ?? 0;
+          const sFreshInput = sUsage.input_tokens - sCacheRead - sCacheCreate;
           supabase.from("ai_usage_log").insert({
             student_id: user.id,
             feature: "scenario",
-            model: getModel("scenario_chat"),
-            input_tokens: 0,
-            output_tokens: 0,
-            estimated_cost_usd: 0,
+            model: scenarioModel,
+            input_tokens: sUsage.input_tokens,
+            output_tokens: sUsage.output_tokens,
+            estimated_cost_usd: (sFreshInput * 3 + sCacheRead * 0.3 + sCacheCreate * 3.75 + sUsage.output_tokens * 15) / 1_000_000,
             response_length: fullResponse.length,
             prompt_length: trimmedMessage.length,
             student_response_time_ms: typeof studentResponseTimeMs === "number" ? studentResponseTimeMs : null,
@@ -395,8 +401,9 @@ async function evaluateCriteria(
     .map((m) => `${m.role === "user" ? "Student" : "Mentor"}: ${m.content}`)
     .join("\n");
 
+  const evalModel = getModel("scenario_eval");
   const evalResult = await sendMessageAuto({
-    model: getModel("scenario_eval"),
+    model: evalModel,
     maxTokens: 200,
     systemPrompt: `You are evaluating whether a student has demonstrated business thinking criteria in a conversation. Be strict — the student must clearly demonstrate the criterion through their own reasoning, not just mention it in passing.
 
@@ -408,6 +415,16 @@ ${criteriaDescriptions}
 Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_satisfied": []} if none are newly satisfied.`,
     messages: [{ role: "user", content: `Recent conversation:\n${conversationText}\n\nWhich criteria, if any, has the student's reasoning newly satisfied?` }],
   });
+
+  // Log eval usage
+  supabase.from("ai_usage_log").insert({
+    student_id: userId,
+    feature: "scenario_eval",
+    model: evalModel,
+    input_tokens: evalResult.usage?.input_tokens ?? 0,
+    output_tokens: evalResult.usage?.output_tokens ?? 0,
+    estimated_cost_usd: ((evalResult.usage?.input_tokens ?? 0) * 0.15 + (evalResult.usage?.output_tokens ?? 0) * 0.6) / 1_000_000,
+  }).then(() => {}, (err: unknown) => console.error("[scenario-chat] eval usage log failed:", err));
 
   let newlySatisfied: string[] = [];
   try {
@@ -436,7 +453,7 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
   if (allSatisfied) {
     // Generate approach summary
     const summaryResult = await sendMessageAuto({
-      model: getModel("scenario_eval"),
+      model: evalModel,
       maxTokens: 300,
       systemPrompt: "Summarize how the student satisfied each criterion in one sentence per criterion. Return valid JSON: { \"CRITERION_ID\": \"one sentence summary\" }",
       messages: [{
@@ -444,6 +461,16 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
         content: `Criteria: ${allCriteria.join(", ")}\n\nFull conversation:\n${conversation.map((m) => `${m.role}: ${m.content}`).join("\n")}`,
       }],
     });
+
+    // Log summary eval usage
+    supabase.from("ai_usage_log").insert({
+      student_id: userId,
+      feature: "scenario_eval",
+      model: evalModel,
+      input_tokens: summaryResult.usage?.input_tokens ?? 0,
+      output_tokens: summaryResult.usage?.output_tokens ?? 0,
+      estimated_cost_usd: ((summaryResult.usage?.input_tokens ?? 0) * 0.15 + (summaryResult.usage?.output_tokens ?? 0) * 0.6) / 1_000_000,
+    }).then(() => {}, (err: unknown) => console.error("[scenario-chat] summary eval usage log failed:", err));
 
     let approachSummary: Record<string, string> = {};
     try {
@@ -455,7 +482,7 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
 
     // Generate synthesis paragraph for completion screen
     const synthesisResult = await sendMessageAuto({
-      model: getModel("scenario_eval"),
+      model: evalModel,
       maxTokens: 150,
       systemPrompt: "Write a brief paragraph (3-4 sentences) synthesizing what the student figured out in this scenario. Be specific to what they actually argued. Address them directly.",
       messages: [{
@@ -464,6 +491,16 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
       }],
     });
     synthesis = synthesisResult.text;
+
+    // Log synthesis eval usage
+    supabase.from("ai_usage_log").insert({
+      student_id: userId,
+      feature: "scenario_eval",
+      model: evalModel,
+      input_tokens: synthesisResult.usage?.input_tokens ?? 0,
+      output_tokens: synthesisResult.usage?.output_tokens ?? 0,
+      estimated_cost_usd: ((synthesisResult.usage?.input_tokens ?? 0) * 0.15 + (synthesisResult.usage?.output_tokens ?? 0) * 0.6) / 1_000_000,
+    }).then(() => {}, (err: unknown) => console.error("[scenario-chat] synthesis eval usage log failed:", err));
 
     badgeLevel = Math.min(attemptNumber, 3);
 

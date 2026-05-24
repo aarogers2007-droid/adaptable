@@ -210,7 +210,7 @@ export default function AJAnalytics() {
           <Stat label="Avg Response Time" value={`${(data.engagementStats.avgResponseTimeMs / 1000).toFixed(1)}s`} />
           <Stat label="Median Response Time" value={`${(data.engagementStats.medianResponseTimeMs / 1000).toFixed(1)}s`} />
           <Stat label="Avg Session Duration" value={`${Math.round(data.engagementStats.avgSessionDurationS / 60)}min`} />
-          <Stat label="Avg Exchanges / Session" value={data.engagementStats.avgExchangesPerSession.toFixed(1)} />
+          <Stat label="Avg Exchanges / Student" value={data.engagementStats.avgExchangesPerStudent.toFixed(1)} />
         </div>
       )}
     </div>

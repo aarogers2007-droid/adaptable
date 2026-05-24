@@ -64,7 +64,7 @@ export interface PlatformAnalytics {
     avgResponseTimeMs: number;
     medianResponseTimeMs: number;
     avgSessionDurationS: number;
-    avgExchangesPerSession: number;
+    avgExchangesPerStudent: number;
   };
 }
 
@@ -264,7 +264,7 @@ export async function fetchPlatformAnalytics(): Promise<PlatformAnalytics> {
       avgResponseTimeMs: avgRT,
       medianResponseTimeMs: medianRT,
       avgSessionDurationS: avgDur,
-      avgExchangesPerSession: totalStudents > 0 ? totalExchanges / totalStudents : 0,
+      avgExchangesPerStudent: totalStudents > 0 ? totalExchanges / totalStudents : 0,
     },
   };
 }

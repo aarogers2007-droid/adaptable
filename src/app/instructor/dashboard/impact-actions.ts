@@ -49,13 +49,12 @@ export async function getOrgImpactReport(orgId: string): Promise<OrgImpactReport
     admin.from("ai_usage_log").select("student_id")
       .eq("org_id", orgId).gte("created_at", thirtyDaysAgo),
 
-    // Total lessons completed (completion_flag = true)
-    admin.from("ai_usage_log").select("id", { count: "exact", head: true })
-      .eq("org_id", orgId).eq("completion_flag", true),
+    // Total lessons completed (from student_progress — one row per student-lesson, no double-counting)
+    // Placeholder — resolved below after orgStudentIds are fetched
+    Promise.resolve({ count: null }),
 
-    // Lessons completed last 30 days
-    admin.from("ai_usage_log").select("id", { count: "exact", head: true })
-      .eq("org_id", orgId).eq("completion_flag", true).gte("created_at", thirtyDaysAgo),
+    // Lessons completed last 30 days — placeholder, resolved below
+    Promise.resolve({ count: null }),
 
     // Scenarios completed — placeholder, computed below with org filter
     Promise.resolve({ count: null }),
@@ -70,19 +69,32 @@ export async function getOrgImpactReport(orgId: string): Promise<OrgImpactReport
   ]);
 
   const activeStudents = new Set((activeStudentsRes.data ?? []).map(r => r.student_id)).size;
-  const lessonsCompletedTotal = lessonsCompletedTotalRes.count ?? 0;
-  const lessonsCompleted30 = lessonsCompleted30Res.count ?? 0;
   const totalExchanges = totalExchangesRes.count ?? 0;
+  void lessonsCompletedTotalRes; // placeholder — resolved below from student_progress
+  void lessonsCompleted30Res; // placeholder — resolved below from student_progress
   void scenariosRes; // placeholder resolved above
 
-  // Scenarios completed — org-scoped via student profile join
-  // student_scenario_sessions has no org_id column, so we get org students first
+  // Get org student IDs for cross-table queries (student_progress, scenarios)
   const { data: orgStudentIds } = await admin
     .from("profiles")
     .select("id")
     .eq("org_id", orgId)
     .eq("role", "student");
   const studentIds = (orgStudentIds ?? []).map((s) => s.id);
+
+  // Lessons completed from student_progress (one row per student-lesson, no double-counting)
+  let lessonsCompletedTotal = 0;
+  let lessonsCompleted30 = 0;
+  if (studentIds.length > 0) {
+    const [totalRes, last30Res] = await Promise.all([
+      admin.from("student_progress").select("id", { count: "exact", head: true })
+        .in("student_id", studentIds).eq("status", "completed"),
+      admin.from("student_progress").select("id", { count: "exact", head: true })
+        .in("student_id", studentIds).eq("status", "completed").gte("completed_at", thirtyDaysAgo),
+    ]);
+    lessonsCompletedTotal = totalRes.count ?? 0;
+    lessonsCompleted30 = last30Res.count ?? 0;
+  }
   let scenariosTotal = 0;
   if (studentIds.length > 0) {
     const { count } = await admin

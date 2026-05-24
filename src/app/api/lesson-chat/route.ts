@@ -824,7 +824,15 @@ When discussing customer conversations, explicitly reference the Mom Test princi
             output_tokens: finalMessage.usage.output_tokens,
             estimated_cost_usd: lessonModel.startsWith("gpt-")
               ? (finalMessage.usage.input_tokens * 0.15 + finalMessage.usage.output_tokens * 0.6) / 1_000_000
-              : (finalMessage.usage.input_tokens * 3 + finalMessage.usage.output_tokens * 15) / 1_000_000,
+              : (() => {
+                  const usage = finalMessage.usage;
+                  const cacheReadTokens = (usage as unknown as Record<string, number>).cache_read_input_tokens ?? 0;
+                  const cacheCreateTokens = (usage as unknown as Record<string, number>).cache_creation_input_tokens ?? 0;
+                  const freshInputTokens = usage.input_tokens - cacheReadTokens - cacheCreateTokens;
+                  return lessonModel.includes("haiku")
+                    ? (freshInputTokens * 0.8 + cacheReadTokens * 0.08 + cacheCreateTokens * 1.0 + usage.output_tokens * 4) / 1_000_000
+                    : (freshInputTokens * 3 + cacheReadTokens * 0.3 + cacheCreateTokens * 3.75 + usage.output_tokens * 15) / 1_000_000;
+                })(),
             retrieved_chunks: retrievedChunks.length > 0 ? retrievedChunks : [],
             cache_write_tokens: cacheWrite || null,
             cache_read_tokens: cacheRead || null,
