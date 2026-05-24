@@ -32,42 +32,47 @@ interface TierInfo {
 
 // ─── Constants ───
 
+// Volume-based pricing — all features included at every level.
+// Price drops as student count increases. No gated features.
+const VOLUME_TIERS = [
+  { min: 1, max: 500, price: 14.99, label: "1 – 500 students" },
+  { min: 501, max: 2500, price: 12.99, label: "501 – 2,500 students" },
+  { min: 2501, max: 10000, price: 9.99, label: "2,501 – 10,000 students" },
+  { min: 10001, max: 50000, price: 7.99, label: "10,001 – 50,000 students" },
+] as const;
+
+const IMPLEMENTATION_FEE = 2500;
+
+function getPriceForCount(count: number): number {
+  for (const tier of VOLUME_TIERS) {
+    if (count >= tier.min && count <= tier.max) return tier.price;
+  }
+  return 5.99; // 50,000+ floor
+}
+
+// Legacy TIERS array for backward compat with Stripe checkout (maps to price IDs)
 const TIERS: TierInfo[] = [
   {
     id: "starter",
-    name: "Starter",
-    range: "Up to 1,000 students",
-    price: 9.99,
-    features: [
-      "All 22 AI lessons",
-      "Scenario simulations",
-      "Student progress tracking",
-      "Crisis detection",
-      "Your branding",
-    ],
+    name: "Up to 500",
+    range: "1 – 500 students",
+    price: 14.99,
+    features: [],
   },
   {
     id: "growth",
-    name: "Growth",
-    range: "1,001 - 10,000 students",
-    price: 7.99,
-    features: [
-      "Everything in Starter",
-      "Priority support",
-      "Advanced analytics",
-    ],
+    name: "Up to 10,000",
+    range: "501 – 10,000 students",
+    price: 9.99,
+    features: [],
     recommended: true,
   },
   {
     id: "scale",
-    name: "Scale",
-    range: "10,001 - 50,000 students",
-    price: 5.99,
-    features: [
-      "Everything in Growth",
-      "Dedicated account manager",
-      "Custom integrations",
-    ],
+    name: "10,000+",
+    range: "10,001 – 50,000 students",
+    price: 7.99,
+    features: [],
   },
 ];
 
@@ -210,7 +215,7 @@ export default function StartPage() {
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Step 4: Plan
-  const [selectedTier, setSelectedTier] = useState<"starter" | "growth" | "scale">("growth");
+  // selectedTier removed — pricing is now volume-based, tier auto-detected from student count
   const [studentCount, setStudentCount] = useState(250);
 
   // Step 5: Launch
@@ -484,7 +489,7 @@ export default function StartPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tier: selectedTier,
+          tier: activeTier.id,
           quantity: studentCount,
           orgId,
         }),
@@ -546,8 +551,9 @@ export default function StartPage() {
     subdomain.length >= 3 &&
     subdomainAvailable === true;
 
-  const activeTier = TIERS.find((t) => t.id === selectedTier)!;
-  const totalPrice = studentCount * activeTier.price;
+  // Map student count to the correct Stripe tier for checkout
+  const activeTier = studentCount <= 500 ? TIERS[0]! : studentCount <= 10000 ? TIERS[1]! : TIERS[2]!;
+  // perStudentPrice computed inline via getPriceForCount(studentCount) in JSX
 
   // ─── Loading ───
 
@@ -985,95 +991,135 @@ export default function StartPage() {
         )}
 
         {/* ═══════════════════════════════════ */}
-        {/* STEP 4: Choose Your Plan            */}
+        {/* STEP 4: Pricing                     */}
         {/* ═══════════════════════════════════ */}
         {step === 4 && (
           <div>
             <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
-              Choose your plan
+              How many students will use the program?
             </h1>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Every plan includes all features. Pick based on your program size.
+              Every feature is included at every level. The more students you bring, the less each one costs.
             </p>
 
-            {/* Tier cards */}
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {TIERS.map((tier) => {
-                const isSelected = selectedTier === tier.id;
-                return (
-                  <button
-                    key={tier.id}
-                    type="button"
-                    onClick={() => setSelectedTier(tier.id)}
-                    className="relative rounded-xl border-2 p-5 text-left transition-all"
-                    style={{
-                      borderColor: isSelected ? "var(--primary)" : "var(--border)",
-                      background: isSelected ? "var(--primary)" + "08" : "var(--bg)",
-                    }}
-                  >
-                    {tier.recommended && (
-                      <span
-                        className="absolute -top-2.5 left-4 rounded-full px-2.5 py-0.5 text-[10px] font-semibold text-white"
-                        style={{ background: "var(--primary)" }}
-                      >
-                        Recommended
-                      </span>
-                    )}
-                    <p className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
-                      {tier.name}
-                    </p>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{tier.range}</p>
-                    <p className="mt-3 text-2xl font-bold text-[var(--text-primary)]">
-                      ${tier.price}
-                      <span className="text-sm font-normal text-[var(--text-muted)]">/student/year</span>
-                    </p>
-                    <ul className="mt-4 space-y-2">
-                      {tier.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                          <svg
-                            className="h-4 w-4 shrink-0 mt-0.5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            style={{ color: isSelected ? "var(--primary)" : "var(--text-muted)" }}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Student count + total */}
-            <div className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-5">
+            {/* Student count input */}
+            <div className="mt-8">
               <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                How many students?
+                Estimated student count
               </label>
               <input
                 type="number"
                 min={1}
-                max={50000}
+                max={100000}
                 value={studentCount}
                 onChange={(e) => {
                   const v = parseInt(e.target.value, 10);
-                  if (!isNaN(v) && v >= 0) setStudentCount(Math.min(v, 50000));
+                  if (!isNaN(v) && v >= 0) setStudentCount(Math.min(v, 100000));
                 }}
-                className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-mono"
+                className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-lg outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-mono"
+                autoFocus
               />
-              <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                <span className="font-mono">{studentCount.toLocaleString()}</span> students{" "}
-                <span className="text-[var(--text-muted)]">x</span>{" "}
-                <span className="font-mono">${activeTier.price}</span>{" "}
-                <span className="text-[var(--text-muted)]">=</span>{" "}
-                <span className="font-semibold text-[var(--text-primary)]">
-                  {formatCurrency(totalPrice)}/year
-                </span>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">
+                You commit to this number annually. If you exceed it by more than 10%, overage is billed at your rate.
               </p>
+            </div>
+
+            {/* Volume pricing table */}
+            <div className="mt-6 rounded-xl border border-[var(--border)] overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[var(--bg-subtle)]">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Students</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Per Student / Year</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {VOLUME_TIERS.map((tier) => {
+                    const isActive = studentCount >= tier.min && studentCount <= tier.max;
+                    return (
+                      <tr
+                        key={tier.min}
+                        className="border-t border-[var(--border)]"
+                        style={{
+                          background: isActive ? "rgba(13,148,136,0.05)" : "transparent",
+                        }}
+                      >
+                        <td className="px-4 py-3 text-[var(--text-primary)]" style={{ fontWeight: isActive ? 600 : 400 }}>
+                          {tier.label}
+                          {isActive && (
+                            <span className="ml-2 text-xs font-medium text-[var(--primary)]">Your rate</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono" style={{ color: isActive ? "var(--primary)" : "var(--text-secondary)", fontWeight: isActive ? 700 : 400 }}>
+                          ${tier.price}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  <tr className="border-t border-[var(--border)]">
+                    <td className="px-4 py-3 text-[var(--text-primary)]" style={{ fontWeight: studentCount > 50000 ? 600 : 400 }}>
+                      50,000+ students
+                      {studentCount > 50000 && (
+                        <span className="ml-2 text-xs font-medium text-[var(--primary)]">Your rate</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right text-[var(--text-secondary)]" style={{ fontWeight: studentCount > 50000 ? 700 : 400 }}>
+                      Custom
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Total cost summary */}
+            {studentCount > 0 && studentCount <= 50000 && (
+              <div className="mt-6 rounded-xl border-2 border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <p className="text-sm text-[var(--text-secondary)]">
+                      <span className="font-mono font-medium text-[var(--text-primary)]">{studentCount.toLocaleString()}</span> students
+                      {" "}<span className="text-[var(--text-muted)]">×</span>{" "}
+                      <span className="font-mono font-medium text-[var(--text-primary)]">${getPriceForCount(studentCount)}</span>/student
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-[var(--text-primary)]">
+                      {formatCurrency(studentCount * getPriceForCount(studentCount))}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">per year</p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-[var(--primary)]/10 flex items-baseline justify-between">
+                  <p className="text-xs text-[var(--text-muted)]">One-time implementation fee</p>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">{formatCurrency(IMPLEMENTATION_FEE)}</p>
+                </div>
+              </div>
+            )}
+
+            {/* What's included */}
+            <div className="mt-6">
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                Every plan includes
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  "All 22 AI-guided lessons",
+                  "Scenario simulations",
+                  "Crisis detection (10+ languages)",
+                  "Student progress tracking",
+                  "Your branding on everything",
+                  "Impact reporting + CSV export",
+                  "Sponsor-ready scenario builder",
+                  "Email support (48hr response)",
+                ].map((f) => (
+                  <div key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                    <svg className="h-4 w-4 shrink-0 mt-0.5 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {f}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {error && (
@@ -1094,18 +1140,18 @@ export default function StartPage() {
               <button
                 type="button"
                 onClick={handleStartTrial}
-                disabled={submitting || studentCount < 1}
+                disabled={submitting || studentCount < 1 || studentCount > 50000}
                 className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
                 style={{ minHeight: 48 }}
               >
-                {submitting ? "Redirecting to checkout..." : "Start 14-day free trial"}
+                {submitting ? "Redirecting to checkout..." : "Continue to Payment"}
               </button>
             </div>
 
-            {/* Sales-assisted path for larger orgs */}
+            {/* Sales-assisted path */}
             <div className="mt-6 pt-6 border-t border-[var(--border)] text-center">
               <p className="text-sm text-[var(--text-secondary)]">
-                Need a custom quote for your board?
+                Need a custom quote for your board? Have more than 50,000 students?
               </p>
               <a
                 href="mailto:aj@adaptable.one?subject=Custom%20Quote%20Request&body=Organization%20name:%0AEstimated%20students:%0AQuestions:"
@@ -1114,7 +1160,7 @@ export default function StartPage() {
                 Contact us for a custom quote
               </a>
               <p className="mt-1 text-xs text-[var(--text-muted)]">
-                We&apos;ll send you a PDF quote you can share with your board or procurement team.
+                We&apos;ll send you a one-page PDF you can share with your board or procurement team.
               </p>
             </div>
           </div>
