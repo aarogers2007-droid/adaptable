@@ -120,6 +120,21 @@ export async function POST(request: Request) {
 
     // Return the supportive response immediately as a complete SSE stream
     const supportiveText = getCrisisResponse(firstName);
+
+    // Log crisis interaction to ai_usage_log (don't lose engagement data)
+    supabase.from("ai_usage_log").insert({
+      student_id: user.id,
+      feature: "lesson",
+      model: "crisis-response",
+      input_tokens: 0,
+      output_tokens: 0,
+      estimated_cost_usd: 0,
+      response_length: supportiveText.length,
+      prompt_length: message.length,
+      lesson_id: lessonId ?? null,
+      completion_flag: false,
+    }).then(() => {}, (err: unknown) => console.error("[lesson-chat] crisis usage log failed:", err));
+
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
@@ -775,7 +790,7 @@ When discussing customer conversations, explicitly reference the Mom Test princi
               student_id: user.id,
               idea_title: profile.business_idea?.name ?? "Untitled",
               idea_summary: (profile.business_idea?.niche ?? "").slice(0, 500),
-            }).then(() => {});
+            }).then(() => {}, (err: unknown) => console.error("[lesson-chat] student_ideas insert failed:", err));
           }
 
           // Send completion, checkpoint, and mirror info to client

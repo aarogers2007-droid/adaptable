@@ -185,6 +185,21 @@ export async function POST(request: Request) {
 
     // Return supportive response with crisis resources
     const supportiveText = getCrisisResponse(firstName);
+
+    // Log crisis interaction to ai_usage_log (don't lose engagement data)
+    supabase.from("ai_usage_log").insert({
+      student_id: user.id,
+      feature: "guide",
+      model: "crisis-response",
+      input_tokens: 0,
+      output_tokens: 0,
+      estimated_cost_usd: 0,
+      response_length: supportiveText.length,
+      prompt_length: message.length,
+      lesson_id: null,
+      completion_flag: false,
+    }).then(() => {}, (err: unknown) => console.error("[chat] crisis usage log failed:", err));
+
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {

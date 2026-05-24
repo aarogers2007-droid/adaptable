@@ -31,7 +31,13 @@ export async function GET(request: Request) {
           .from("profiles")
           .select("business_idea, org_id, role, is_platform_owner, onboarding_step")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
+
+        // New user with no profile — route based on intent
+        if (!profile) {
+          const destination = next.includes("/start") ? "/start" : "/onboarding";
+          return NextResponse.redirect(`${origin}${destination}`);
+        }
 
         // ── AJ's direct route ──
         if (user.email === "aarogers2007@gmail.com") {
@@ -101,9 +107,11 @@ export async function GET(request: Request) {
           .select("class_id, classes(session_type)")
           .eq("student_id", user.id)
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        const sessionType = (enrollment?.classes as unknown as { session_type: string } | null)?.session_type;
+        const sessionType = enrollment
+          ? (enrollment.classes as unknown as { session_type: string } | null)?.session_type
+          : null;
         if (sessionType === "invention") {
           return NextResponse.redirect(`${origin}/invention`);
         }

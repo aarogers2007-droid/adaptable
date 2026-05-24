@@ -300,6 +300,19 @@ Start by orienting the student in the scenario and asking your first question. B
             .update({ conversation: updatedConversation })
             .eq("id", session.id);
 
+          // Log AI usage now that we have the actual response length
+          supabase.from("ai_usage_log").insert({
+            student_id: user.id,
+            feature: "scenario",
+            model: getModel("scenario_chat"),
+            input_tokens: 0,
+            output_tokens: 0,
+            estimated_cost_usd: 0,
+            response_length: fullResponse.length,
+            prompt_length: trimmedMessage.length,
+            student_response_time_ms: typeof studentResponseTimeMs === "number" ? studentResponseTimeMs : null,
+          }).then(() => {}, (err: unknown) => console.error("[scenario-chat] usage log failed:", err));
+
           // Fire-and-forget criteria evaluation
           // Wrapped in try/catch — failures are logged, never surface to student
           evaluateCriteria(
@@ -337,19 +350,6 @@ Start by orienting the student in the scenario and asking your first question. B
         }
       },
     });
-
-    // Log AI usage with cache metrics (best-effort, after stream completes)
-    // Actual token counts are logged inside the ReadableStream after finalMessage()
-    // This placeholder ensures a row exists even if the stream errors
-    supabase.from("ai_usage_log").insert({
-      student_id: user.id,
-      feature: "scenario",
-      model: getModel("scenario_chat"),
-      input_tokens: 0,
-      output_tokens: 0,
-      estimated_cost_usd: 0,
-      student_response_time_ms: typeof studentResponseTimeMs === "number" ? studentResponseTimeMs : null,
-    }).then(() => {});
 
     return new Response(readable, {
       headers: {

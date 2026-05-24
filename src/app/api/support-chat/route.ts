@@ -133,14 +133,17 @@ export async function POST(request: Request) {
 
   // Call AI (non-streaming for simplicity in support chat)
   let aiResponse: string;
+  let aiUsage: { input_tokens: number; output_tokens: number } = { input_tokens: 0, output_tokens: 0 };
+  const supportModel = getModel("support");
   try {
     const result = await sendMessageAuto({
-      model: getModel("support"),
+      model: supportModel,
       maxTokens: 800,
       systemPrompt: buildSupportPrompt(brandName) + `\n\nUser: ${userName} (${userRole})`,
       messages,
     });
     aiResponse = result.text;
+    aiUsage = result.usage;
   } catch (aiErr) {
     console.error("[support-chat] AI call failed:", aiErr);
     return Response.json({
@@ -158,6 +161,18 @@ export async function POST(request: Request) {
   if (!outputCheck.safe) {
     console.warn("[support-chat] Output flagged:", outputCheck.reason, outputCheck.flagged_content);
   }
+
+  // Log support chat usage (fire-and-forget)
+  supabase.from("ai_usage_log").insert({
+    student_id: user.id,
+    feature: "support",
+    model: supportModel,
+    input_tokens: aiUsage.input_tokens,
+    output_tokens: aiUsage.output_tokens,
+    estimated_cost_usd: 0, // Mini cost is negligible
+    response_length: cleanResponse.length,
+    prompt_length: message.length,
+  }).then(() => {}, (err: unknown) => console.error("[support-chat] usage log failed:", err));
 
   // Update conversation history
   const updatedHistory = [
@@ -225,7 +240,7 @@ export async function POST(request: Request) {
     user_name: userName,
     page: "/support-chat",
     message: `[SUPPORT] ${message}`,
-  }).then(() => {});
+  }).then(() => {}, (err: unknown) => console.error("[support-chat] feedback insert failed:", err));
 
   return Response.json({
     response: cleanResponse,

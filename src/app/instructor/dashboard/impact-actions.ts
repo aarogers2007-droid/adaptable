@@ -44,8 +44,9 @@ export async function getOrgImpactReport(orgId: string): Promise<OrgImpactReport
     totalExchangesRes,
     gradeRes,
   ] = await Promise.all([
-    // Active students last 30 days
-    admin.from("ai_usage_log").select("student_id", { count: "exact", head: true })
+    // Active students last 30 days (fetch IDs and deduplicate in JS)
+    // TODO: Replace with a SQL view using COUNT(DISTINCT student_id) for efficiency at scale
+    admin.from("ai_usage_log").select("student_id")
       .eq("org_id", orgId).gte("created_at", thirtyDaysAgo),
 
     // Total lessons completed (completion_flag = true)
@@ -68,7 +69,7 @@ export async function getOrgImpactReport(orgId: string): Promise<OrgImpactReport
       .eq("org_id", orgId).eq("role", "student"),
   ]);
 
-  const activeStudents = activeStudentsRes.count ?? 0;
+  const activeStudents = new Set((activeStudentsRes.data ?? []).map(r => r.student_id)).size;
   const lessonsCompletedTotal = lessonsCompletedTotalRes.count ?? 0;
   const lessonsCompleted30 = lessonsCompleted30Res.count ?? 0;
   const totalExchanges = totalExchangesRes.count ?? 0;
@@ -223,12 +224,12 @@ export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string;
   // Get all students in the org
   const { data: students } = await admin
     .from("profiles")
-    .select("id, full_name, email, grade_tier, business_idea")
+    .select("id, full_name, email, grade_level, business_idea")
     .eq("org_id", orgId)
     .eq("role", "student");
 
   if (!students || students.length === 0) {
-    const headers = "Full Name,Email,Grade Tier,Business Name,Niche,Lessons Completed,Scenarios Completed,Total AI Exchanges,Last Active\n";
+    const headers = "Full Name,Email,Grade Level,Business Name,Niche,Lessons Completed,Scenarios Completed,Total AI Exchanges,Last Active\n";
     const safeOrg = orgName.replace(/[^a-z0-9]/gi, "-").toLowerCase();
     const date = new Date().toISOString().split("T")[0];
     return { csv: headers, filename: `${safeOrg}-impact-report-${date}.csv` };
@@ -318,7 +319,7 @@ export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string;
 
   const rows: string[] = [];
   rows.push([
-    "Full Name", "Email", "Grade Tier", "Business Name", "Niche",
+    "Full Name", "Email", "Grade Level", "Business Name", "Niche",
     "Lessons Completed", "Scenarios Completed", "Total AI Exchanges", "Last Active",
   ].join(","));
 
@@ -326,7 +327,7 @@ export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string;
     id: string;
     full_name: string | null;
     email: string | null;
-    grade_tier: string | null;
+    grade_level: string | null;
     business_idea: { name?: string; niche?: string } | null;
   };
 
@@ -339,7 +340,7 @@ export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string;
     rows.push([
       escape(s.full_name),
       escape(s.email),
-      escape(s.grade_tier),
+      escape(s.grade_level),
       escape((s.business_idea as { name?: string })?.name),
       escape((s.business_idea as { niche?: string })?.niche),
       escape(lessonsMap.get(s.id) ?? 0),
