@@ -130,22 +130,31 @@ const ANIMATION_STYLES = `
   to { opacity: 1; transform: scale(1); }
 }
 .step-enter {
-  animation: stepFadeIn 500ms ease-out both;
+  animation: stepFadeIn 350ms ease-out both;
 }
 .step-enter > * {
-  animation: staggerChild 450ms ease-out both;
+  animation: staggerChild 300ms ease-out both;
 }
-.step-enter > *:nth-child(1) { animation-delay: 80ms; }
-.step-enter > *:nth-child(2) { animation-delay: 160ms; }
-.step-enter > *:nth-child(3) { animation-delay: 240ms; }
-.step-enter > *:nth-child(4) { animation-delay: 320ms; }
-.step-enter > *:nth-child(5) { animation-delay: 400ms; }
-.step-enter > *:nth-child(6) { animation-delay: 480ms; }
-.step-enter > *:nth-child(7) { animation-delay: 560ms; }
-.step-enter > *:nth-child(8) { animation-delay: 640ms; }
+.step-enter > *:nth-child(1) { animation-delay: 60ms; }
+.step-enter > *:nth-child(2) { animation-delay: 120ms; }
+.step-enter > *:nth-child(3) { animation-delay: 180ms; }
+.step-enter > *:nth-child(4) { animation-delay: 240ms; }
+.step-enter > *:nth-child(5) { animation-delay: 300ms; }
 .summary-enter {
   animation: summaryReveal 500ms ease-out both;
   animation-delay: 150ms;
+}
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 3px;
+}
+input[type="color"]::-webkit-color-swatch {
+  border-radius: 6px;
+  border: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .step-enter, .step-enter > *, .summary-enter {
@@ -167,15 +176,15 @@ function ProgressBar({ step }: { step: number }) {
             <div key={label} className="flex items-center gap-2 flex-1 last:flex-none">
               <div className="flex items-center gap-2 shrink-0">
                 <div
-                  className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold"
+                  className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
                     background: completed || current ? "var(--primary)" : "var(--bg-muted)",
                     color: completed || current ? "#fff" : "var(--text-muted)",
-                    transition: "background 400ms ease-out, color 400ms ease-out",
+                    transition: "background 500ms ease-out, color 500ms ease-out",
                   }}
                 >
                   {completed ? (
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
@@ -194,10 +203,10 @@ function ProgressBar({ step }: { step: number }) {
               </div>
               {i < STEP_LABELS.length - 1 && (
                 <div
-                  className="flex-1 h-px mx-2"
+                  className="flex-1 h-[2px] rounded-full mx-2"
                   style={{
                     background: step > stepNum ? "var(--primary)" : "var(--border)",
-                    transition: "background 600ms ease-out",
+                    transition: "background 500ms ease-out",
                   }}
                 />
               )}
@@ -625,7 +634,7 @@ export default function StartPage() {
   // ─── Render ───
 
   return (
-    <main className="flex min-h-screen items-start justify-center px-4 py-8 sm:py-12">
+    <main className="flex min-h-screen items-start justify-center px-4 py-12 sm:py-20">
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_STYLES }} />
       <div className="w-full max-w-2xl">
         <ProgressBar step={step} />
@@ -636,10 +645,10 @@ export default function StartPage() {
         {step === 1 && (
           <div key="step1" className="mx-auto max-w-md step-enter">
             <div className="text-center">
-              <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
+              <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
                 Start your program
               </h1>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              <p className="mt-3 text-sm text-[var(--text-secondary)]">
                 Setup takes about 3 minutes
               </p>
             </div>
@@ -649,7 +658,8 @@ export default function StartPage() {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={authMode === "google"}
-                className="flex w-full items-center justify-center gap-3 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-3 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#fff" fillOpacity={0.8} />
@@ -682,7 +692,7 @@ export default function StartPage() {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                    className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                     placeholder="Your name"
                   />
                 </div>
@@ -696,7 +706,7 @@ export default function StartPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                    className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                     placeholder="you@school.edu"
                   />
                 </div>
@@ -711,7 +721,7 @@ export default function StartPage() {
                     minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                    className="mt-1 block w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                     placeholder="Min. 8 characters"
                   />
                 </div>
@@ -725,7 +735,7 @@ export default function StartPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)] disabled:opacity-50"
+                  className="w-full rounded-lg bg-[#111827] text-white hover:bg-[#1f2937] border-none px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
                 >
                   {submitting ? "Creating account..." : "Create Account"}
                 </button>
@@ -753,10 +763,10 @@ export default function StartPage() {
         {/* ═══════════════════════════════════ */}
         {step === 2 && (
           <div key="step2" className="mx-auto max-w-md step-enter">
-            <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
+            <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
               Name your program
             </h1>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            <p className="mt-3 text-sm text-[var(--text-secondary)]">
               This is how your organization will appear to students
             </p>
 
@@ -815,9 +825,6 @@ export default function StartPage() {
                   </div>
                 )}
 
-                <p className="mt-2 text-xs text-[var(--text-muted)]">
-                  You can change this later
-                </p>
               </div>
             </div>
 
@@ -831,8 +838,8 @@ export default function StartPage() {
               type="button"
               onClick={handleCreateOrg}
               disabled={!step2Valid || submitting}
-              className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-              style={{ minHeight: 44 }}
+              className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
+              style={{ minHeight: 44, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
             >
               {submitting ? "Creating..." : "Continue"}
             </button>
@@ -843,11 +850,11 @@ export default function StartPage() {
         {/* STEP 3: Brand It                    */}
         {/* ═══════════════════════════════════ */}
         {step === 3 && (
-          <div key="step3" className="step-enter">
-            <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
+          <div key="step3" className="max-w-xl mx-auto step-enter">
+            <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
               Make it yours
             </h1>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            <p className="mt-3 text-sm text-[var(--text-secondary)]">
               Add your logo and colors. Students will see your brand, not ours.
             </p>
 
@@ -924,7 +931,8 @@ export default function StartPage() {
                       type="color"
                       value={primaryColor}
                       onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="h-10 w-10 cursor-pointer rounded-lg border border-[var(--border)] p-0.5"
+                      className="h-11 w-11 cursor-pointer rounded-xl border border-[var(--border)] p-0 overflow-hidden"
+                      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}
                     />
                     <input
                       type="text"
@@ -949,7 +957,8 @@ export default function StartPage() {
                       type="color"
                       value={secondaryColor}
                       onChange={(e) => setSecondaryColor(e.target.value)}
-                      className="h-10 w-10 cursor-pointer rounded-lg border border-[var(--border)] p-0.5"
+                      className="h-11 w-11 cursor-pointer rounded-xl border border-[var(--border)] p-0 overflow-hidden"
+                      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}
                     />
                     <input
                       type="text"
@@ -1039,8 +1048,8 @@ export default function StartPage() {
                 type="button"
                 onClick={handleSaveBranding}
                 disabled={submitting}
-                className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-                style={{ minHeight: 44 }}
+                className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                style={{ minHeight: 44, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
               >
                 {submitting ? "Saving..." : "Continue"}
               </button>
@@ -1052,11 +1061,11 @@ export default function StartPage() {
         {/* STEP 4: Pricing                     */}
         {/* ═══════════════════════════════════ */}
         {step === 4 && (
-          <div key="step4" className="step-enter">
-            <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
+          <div key="step4" className="max-w-xl mx-auto step-enter">
+            <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
               How many students will use the program?
             </h1>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            <p className="mt-3 text-sm text-[var(--text-secondary)]">
               Every feature is included at every level. The more students you bring, the less each one costs.
             </p>
 
@@ -1131,7 +1140,7 @@ export default function StartPage() {
 
             {/* Total cost summary */}
             {studentCount > 0 && studentCount <= 50000 && (
-              <div className="mt-6 rounded-xl border-2 border-[rgba(13,148,136,0.2)] bg-[rgba(13,148,136,0.05)] p-5 summary-enter">
+              <div className="mt-6 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-subtle)] p-5 summary-enter">
                 <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
                   <div>
                     <p className="text-sm text-[var(--text-secondary)]">
@@ -1231,8 +1240,8 @@ export default function StartPage() {
                 type="button"
                 onClick={handleContinueToPayment}
                 disabled={submitting || studentCount < 1 || studentCount > 50000}
-                className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-                style={{ minHeight: 48 }}
+                className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                style={{ minHeight: 48, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
               >
                 {submitting ? "Redirecting to checkout..." : "Continue to Payment"}
               </button>
@@ -1282,17 +1291,17 @@ export default function StartPage() {
             {!submitting && subscriptionStatus !== "incomplete" && (
               <>
                 <div className="text-center">
-                  <h1 className="font-[family-name:var(--font-display)] text-[28px] font-semibold text-[var(--text-primary)]">
+                  <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
                     Your program is ready
                   </h1>
-                  <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  <p className="mt-3 text-sm text-[var(--text-secondary)]">
                     Preview everything before going live. Students won&apos;t see anything until you launch.
                   </p>
                 </div>
 
                 <div className="mt-8 space-y-4">
                   {/* Card 1: Preview */}
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="text-sm font-semibold text-[var(--text-primary)]">
@@ -1347,7 +1356,7 @@ export default function StartPage() {
                   </div>
 
                   {/* Card 2: Invite code */}
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">
                       Your invite code
                     </p>
@@ -1376,15 +1385,6 @@ export default function StartPage() {
                     </div>
                   </div>
 
-                  {/* Card 3: Invite team */}
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5">
-                    <p className="text-sm font-semibold text-[var(--text-primary)]">
-                      Invite your team
-                    </p>
-                    <p className="mt-1 text-xs text-[var(--text-muted)]">
-                      Coming soon. You can manage your team from the dashboard.
-                    </p>
-                  </div>
                 </div>
 
                 {error && (
@@ -1398,8 +1398,8 @@ export default function StartPage() {
                   <button
                     type="button"
                     onClick={() => setLaunchConfirming(true)}
-                    className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-4 text-base font-semibold text-white transition-colors hover:bg-[var(--primary-dark)]"
-                    style={{ minHeight: 48 }}
+                    className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-4 text-base font-semibold text-white transition-all hover:bg-[var(--primary-dark)]"
+                    style={{ minHeight: 48, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
                   >
                     Launch Program
                   </button>
