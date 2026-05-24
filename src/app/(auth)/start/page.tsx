@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -244,7 +244,7 @@ function ProgressBar({ step }: { step: number }) {
 
 // ─── Main Component ───
 
-export default function StartPage() {
+function StartPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -287,6 +287,13 @@ export default function StartPage() {
   const [codeCopied, setCodeCopied] = useState(false);
   const [launchConfirming, setLaunchConfirming] = useState(false);
   const [featuresExpanded, setFeaturesExpanded] = useState(false);
+
+  // ─── Step navigation helper (clears stale error/submitting state) ───
+  function goToStep(n: number) {
+    setError(null);
+    setSubmitting(false);
+    setStep(n);
+  }
 
   // ─── On mount: check context ───
   useEffect(() => {
@@ -396,6 +403,8 @@ export default function StartPage() {
       async (event, session) => {
         if (event === "SIGNED_IN" && session?.user && !user) {
           const u = session.user;
+          setEmail("");
+          setPassword("");
           setUser({
             id: u.id,
             email: u.email ?? "",
@@ -410,9 +419,9 @@ export default function StartPage() {
             setSubdomainAvailable(true);
             if (ctx.inviteCode) setInviteCode(ctx.inviteCode);
             const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
-            setStep(nextStep);
+            goToStep(nextStep);
           } else {
-            setStep(2);
+            goToStep(2);
           }
         }
       }
@@ -468,13 +477,17 @@ export default function StartPage() {
   async function handleEmailSignUp(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    const trimmedName = fullName.trim();
+    if (!trimmedName) { setError("Please enter your name."); return; }
+
     setSubmitting(true);
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: trimmedName },
       },
     });
 
@@ -488,9 +501,9 @@ export default function StartPage() {
       setUser({
         id: data.user.id,
         email: data.user.email ?? "",
-        fullName,
+        fullName: trimmedName,
       });
-      setStep(2);
+      goToStep(2);
     }
     setSubmitting(false);
   }
@@ -511,8 +524,7 @@ export default function StartPage() {
 
     setOrgId(result.orgId);
     setInviteCode(result.inviteCode);
-    setStep(3);
-    setSubmitting(false);
+    goToStep(3);
   }
 
   // ─── Step 3: Save branding ───
@@ -535,8 +547,7 @@ export default function StartPage() {
       return;
     }
 
-    setStep(4);
-    setSubmitting(false);
+    goToStep(4);
   }
 
   // ─── Step 4: Stripe checkout ───
@@ -603,7 +614,11 @@ export default function StartPage() {
       return;
     }
 
-    router.push("/instructor/dashboard");
+    try {
+      router.push("/instructor/dashboard");
+    } catch {
+      setSubmitting(false);
+    }
   }
 
   // ─── Computed values ───
@@ -613,10 +628,18 @@ export default function StartPage() {
     subdomain.length >= 3 &&
     subdomainAvailable === true;
 
-  // Map student count to the correct Stripe tier for checkout
-  // NOTE: Stripe has 3 price IDs. The 501-2500 tier uses the starter price ID with adjusted quantity. This will need a 4th Stripe product when Stripe keys are configured.
-  const activeTier = studentCount <= 500 ? TIERS[0]!
-    : studentCount <= 2500 ? TIERS[0]! // maps to starter price ID for now
+  // Volume pricing has 4 tiers but Stripe only has 3 price IDs.
+  // Until a 4th Stripe price is created, 501-2500 students use the
+  // starter price ID. The actual per-student amount is controlled by
+  // Stripe's unit pricing, so the charge will match what the user sees
+  // as long as the Stripe prices are set correctly.
+  // TODO: Create 4th Stripe price when Stripe keys are configured.
+  if (studentCount > 500 && studentCount <= 2500) {
+    console.warn(
+      `[start] Student count ${studentCount} falls in the 501-2500 tier which maps to the starter Stripe price ID. Verify Stripe unit pricing is correct.`
+    );
+  }
+  const activeTier = studentCount <= 2500 ? TIERS[0]!
     : studentCount <= 10000 ? TIERS[1]!
     : TIERS[2]!;
   // perStudentPrice computed inline via getPriceForCount(studentCount) in JSX
@@ -1038,7 +1061,7 @@ export default function StartPage() {
             <div className="mt-8 flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep(2)}
+                onClick={() => goToStep(2)}
                 className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
                 style={{ minHeight: 44 }}
               >
@@ -1081,7 +1104,7 @@ export default function StartPage() {
                 value={studentCount}
                 onChange={(e) => {
                   const v = parseInt(e.target.value, 10);
-                  if (!isNaN(v) && v >= 0) setStudentCount(Math.min(v, 100000));
+                  if (!isNaN(v) && v >= 1) setStudentCount(Math.min(v, 100000));
                 }}
                 className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-lg outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-mono"
                 autoFocus
@@ -1230,7 +1253,7 @@ export default function StartPage() {
             <div className="mt-8 flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep(3)}
+                onClick={() => goToStep(3)}
                 className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
                 style={{ minHeight: 44 }}
               >
@@ -1450,5 +1473,17 @@ export default function StartPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function StartPage() {
+  return (
+    <Suspense fallback={
+      <main className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
+      </main>
+    }>
+      <StartPageInner />
+    </Suspense>
   );
 }

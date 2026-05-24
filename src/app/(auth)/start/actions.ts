@@ -350,7 +350,8 @@ export async function saveBranding(
 
   // Upload logo if provided
   if (logoFile && logoFile.size > 0) {
-    const ext = logoFile.type === "image/svg+xml" ? "svg" : "png";
+    const ext = logoFile.type === "image/svg+xml" ? "svg"
+      : logoFile.type === "image/jpeg" ? "jpg" : "png";
     const { error: uploadError } = await supabase.storage
       .from("branding-assets")
       .upload(`${orgId}/logo.${ext}`, logoFile, {
