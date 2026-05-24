@@ -76,7 +76,7 @@ const TIERS: TierInfo[] = [
   },
 ];
 
-const STEP_LABELS = ["Account", "Program", "Brand", "Plan", "Launch"];
+const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
 // ─── Helpers ───
 
@@ -225,6 +225,7 @@ export default function StartPage() {
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
   const [launchConfirming, setLaunchConfirming] = useState(false);
+  const [featuresExpanded, setFeaturesExpanded] = useState(false);
 
   // ─── On mount: check context ───
   useEffect(() => {
@@ -479,7 +480,7 @@ export default function StartPage() {
 
   // ─── Step 4: Stripe checkout ───
 
-  async function handleStartTrial() {
+  async function handleContinueToPayment() {
     if (!orgId) return;
     setError(null);
     setSubmitting(true);
@@ -552,7 +553,11 @@ export default function StartPage() {
     subdomainAvailable === true;
 
   // Map student count to the correct Stripe tier for checkout
-  const activeTier = studentCount <= 500 ? TIERS[0]! : studentCount <= 10000 ? TIERS[1]! : TIERS[2]!;
+  // NOTE: Stripe has 3 price IDs. The 501-2500 tier uses the starter price ID with adjusted quantity. This will need a 4th Stripe product when Stripe keys are configured.
+  const activeTier = studentCount <= 500 ? TIERS[0]!
+    : studentCount <= 2500 ? TIERS[0]! // maps to starter price ID for now
+    : studentCount <= 10000 ? TIERS[1]!
+    : TIERS[2]!;
   // perStudentPrice computed inline via getPriceForCount(studentCount) in JSX
 
   // ─── Loading ───
@@ -1020,13 +1025,13 @@ export default function StartPage() {
                 autoFocus
               />
               <p className="mt-1 text-xs text-[var(--text-muted)]">
-                You commit to this number annually. If you exceed it by more than 10%, overage is billed at your rate.
+                You commit to this number annually. If enrollment exceeds your estimate by more than 10%, we&apos;ll invoice the difference at your per-student rate at the end of the contract year.
               </p>
             </div>
 
             {/* Volume pricing table */}
             <div className="mt-6 rounded-xl border border-[var(--border)] overflow-hidden">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
                 <thead>
                   <tr className="bg-[var(--bg-subtle)]">
                     <th className="text-left px-4 py-2.5 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Students</th>
@@ -1073,8 +1078,8 @@ export default function StartPage() {
 
             {/* Total cost summary */}
             {studentCount > 0 && studentCount <= 50000 && (
-              <div className="mt-6 rounded-xl border-2 border-[var(--primary)]/20 bg-[var(--primary)]/5 p-5">
-                <div className="flex items-baseline justify-between">
+              <div className="mt-6 rounded-xl border-2 border-[rgba(13,148,136,0.2)] bg-[rgba(13,148,136,0.05)] p-5">
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
                   <div>
                     <p className="text-sm text-[var(--text-secondary)]">
                       <span className="font-mono font-medium text-[var(--text-primary)]">{studentCount.toLocaleString()}</span> students
@@ -1086,40 +1091,56 @@ export default function StartPage() {
                     <p className="text-2xl font-bold text-[var(--text-primary)]">
                       {formatCurrency(studentCount * getPriceForCount(studentCount))}
                     </p>
-                    <p className="text-xs text-[var(--text-muted)]">per year</p>
+                    <p className="text-xs text-[var(--text-muted)]">per year (USD)</p>
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-[var(--primary)]/10 flex items-baseline justify-between">
-                  <p className="text-xs text-[var(--text-muted)]">One-time implementation fee</p>
+                <div className="mt-3 pt-3 border-t border-[rgba(13,148,136,0.1)] flex items-baseline justify-between">
+                  <p className="text-xs text-[var(--text-muted)]">One-time setup (branding, onboarding, training)</p>
                   <p className="text-sm font-medium text-[var(--text-primary)]">{formatCurrency(IMPLEMENTATION_FEE)}</p>
                 </div>
+                <div className="mt-3 pt-3 border-t border-[rgba(13,148,136,0.1)] flex items-baseline justify-between">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">Year 1 total</p>
+                  <p className="text-lg font-bold text-[var(--text-primary)]">
+                    {formatCurrency(studentCount * getPriceForCount(studentCount) + IMPLEMENTATION_FEE)}
+                  </p>
+                </div>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">Annual contract, billed upfront. 90-day cancellation notice. Student data exported within 30 days of cancellation.</p>
               </div>
             )}
 
             {/* What's included */}
             <div className="mt-6">
-              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
-                Every plan includes
+              <p className="text-sm text-[var(--text-secondary)]">
+                All features included: 22 AI lessons, scenarios, crisis detection, progress tracking, branding, impact reporting, and email support.{" "}
+                <button
+                  type="button"
+                  onClick={() => setFeaturesExpanded(!featuresExpanded)}
+                  className="text-[var(--primary)] font-medium hover:underline"
+                >
+                  {featuresExpanded ? "Hide details" : "See details"}
+                </button>
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  "All 22 AI-guided lessons",
-                  "Scenario simulations",
-                  "Crisis detection (10+ languages)",
-                  "Student progress tracking",
-                  "Your branding on everything",
-                  "Impact reporting + CSV export",
-                  "Sponsor-ready scenario builder",
-                  "Email support (48hr response)",
-                ].map((f) => (
-                  <div key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                    <svg className="h-4 w-4 shrink-0 mt-0.5 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {f}
-                  </div>
-                ))}
-              </div>
+              {featuresExpanded && (
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {[
+                    "All 22 AI-guided lessons",
+                    "Scenario simulations",
+                    "Crisis detection (10+ languages)",
+                    "Student progress tracking",
+                    "Your branding on everything",
+                    "Impact reporting + CSV export",
+                    "Sponsor-ready scenario builder",
+                    "Email support (48hr response)",
+                  ].map((f) => (
+                    <div key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                      <svg className="h-4 w-4 shrink-0 mt-0.5 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {f}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {error && (
@@ -1127,26 +1148,6 @@ export default function StartPage() {
                 {error}
               </div>
             )}
-
-            <div className="mt-8 flex gap-3">
-              <button
-                type="button"
-                onClick={() => setStep(3)}
-                className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
-                style={{ minHeight: 44 }}
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleStartTrial}
-                disabled={submitting || studentCount < 1 || studentCount > 50000}
-                className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-                style={{ minHeight: 48 }}
-              >
-                {submitting ? "Redirecting to checkout..." : "Continue to Payment"}
-              </button>
-            </div>
 
             {/* Sales-assisted path */}
             <div className="mt-6 pt-6 border-t border-[var(--border)] text-center">
@@ -1163,6 +1164,27 @@ export default function StartPage() {
                 We&apos;ll send you a one-page PDF you can share with your board or procurement team.
               </p>
             </div>
+
+            <div className="mt-8 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
+                style={{ minHeight: 44 }}
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={handleContinueToPayment}
+                disabled={submitting || studentCount < 1 || studentCount > 50000}
+                className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                style={{ minHeight: 48 }}
+              >
+                {submitting ? "Redirecting to checkout..." : "Continue to Payment"}
+              </button>
+            </div>
+            <p className="mt-2 text-center text-xs text-[var(--text-muted)]">Secure payment powered by Stripe</p>
           </div>
         )}
 
