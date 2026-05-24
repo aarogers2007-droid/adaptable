@@ -95,6 +95,37 @@ for Delta-sponsored scenarios only. Need per-sponsor filtered export.
 Source: Marcus walkthrough.
 Effort: M (CC: ~1 hour)
 
+### Immutable audit trail for engagement data
+The engagement data IS the product. If a sponsor can't verify it, it's no better
+than anecdotes. Right now, anyone with the service role key can insert, update, or
+delete rows in `ai_usage_log`. That makes the data theoretically fabricable.
+
+**Foundation (build now, before pilot):**
+- Add `DELETE` restriction on `ai_usage_log` (RLS policy denying all deletes, even service role)
+- Add `UPDATE` restriction on key columns (student_id, created_at, input_tokens,
+  output_tokens, feature, model) — these should be write-once
+- Add a `record_hash` column: SHA-256 of (student_id + created_at + feature + tokens).
+  Generated at INSERT time by a database trigger, not application code. Proves the row
+  hasn't been tampered with after creation.
+- Add `immutable_at` timestamp set by the trigger, not the application
+
+**Verification layer (build when a sponsor asks):**
+- Read-only audit API endpoint: sponsor gets a token, queries anonymized aggregate
+  data, verifies record hashes match
+- Signed export: Impact Report PDF includes a checksum tied to the underlying data.
+  If the PDF is modified, the checksum breaks.
+- Student artifacts as proof: anonymized student work (business ideas, scenario
+  responses) browsable behind the aggregate numbers. You can't fake 10,000 unique
+  business concepts.
+
+**What this does NOT solve (and shouldn't yet):**
+- Blockchain/ledger (overkill for current scale)
+- Third-party audit attestation (expensive, premature)
+- Independent database hosting (Supabase is the vendor, trust is implicit)
+
+The foundation costs almost nothing and makes the data defensible from day one.
+Effort: S for foundation (CC: ~30 min), M for verification layer (CC: ~2 hours)
+
 ### REST API for data export
 Server actions are React-only. Data analysts need REST endpoints to feed Salesforce,
 run custom reports, or automate quarterly exports. At minimum: GET /api/impact with
