@@ -57,11 +57,12 @@ interface DashboardClientProps {
   totalLessons: number;
   orgId?: string | null;
   failedNotifications: NotificationFailure[];
+  studentLimit?: number | null;
 }
 
 type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics" | "scenarios" | "impact" | "settings";
 
-export default function DashboardClient({ classes, totalLessons, orgId, failedNotifications }: DashboardClientProps) {
+export default function DashboardClient({ classes, totalLessons, orgId, failedNotifications, studentLimit }: DashboardClientProps) {
   const [activeClassIdx, setActiveClassIdx] = useState(0);
   const [activeSubTab, setActiveSubTab] = useState<SubTab>("students");
   const [showCreateClass, setShowCreateClass] = useState(false);
@@ -115,6 +116,31 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
             >
               Dismiss
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Student overage banner */}
+      {studentLimit != null && totalStudents > studentLimit && (
+        <div className="w-full bg-[#D97706] text-white px-6 py-3">
+          <div className="mx-auto flex max-w-[1200px] items-center gap-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-sm font-bold" aria-hidden="true">
+              !
+            </span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">
+                You have {totalStudents.toLocaleString()} active students but your plan covers {studentLimit.toLocaleString()}.
+              </p>
+              <p className="text-xs text-white/80 mt-0.5">
+                The {(totalStudents - studentLimit).toLocaleString()} additional student{totalStudents - studentLimit !== 1 ? "s" : ""} will be invoiced at your per-student rate at the end of the contract year.
+              </p>
+            </div>
+            <a
+              href="mailto:aj@adaptable.one?subject=Update%20Student%20Count"
+              className="shrink-0 rounded-md bg-white/20 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/30 transition-colors"
+            >
+              Update plan
+            </a>
           </div>
         </div>
       )}

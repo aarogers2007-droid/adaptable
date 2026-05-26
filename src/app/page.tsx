@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Adaptable — Turn Curriculum into Measurable Student Outcomes",
+  description:
+    "Adaptable gives organizations engagement data they've never had. Students learn through AI-guided lessons. You get proof of impact for sponsors and grants.",
+  openGraph: {
+    title: "Adaptable — Turn Curriculum into Measurable Student Outcomes",
+    description:
+      "Adaptable gives organizations engagement data they've never had. Students learn through AI-guided lessons. You get proof of impact for sponsors and grants.",
+    url: "https://adaptable.one",
+    siteName: "Adaptable",
+    type: "website",
+  },
+};
 
 export default function Home() {
   return (
@@ -42,7 +57,7 @@ export default function Home() {
               <div>
                 <h3 className="font-semibold text-[var(--text-primary)]">Students learn through AI</h3>
                 <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                  22 lessons guided by an AI mentor that adapts to every student&apos;s interests, grade level, and pace. Each student builds a real business concept.
+                  AI-guided lessons led by an AI mentor that adapts to every student&apos;s interests, grade level, and pace. Each student builds a real business concept.
                 </p>
               </div>
             </div>
@@ -72,7 +87,7 @@ export default function Home() {
       <section className="border-t border-[var(--border)] px-6 py-16">
         <div className="mx-auto max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
           <div>
-            <div className="text-3xl font-bold text-[var(--primary)]">22</div>
+            <div className="text-3xl font-bold text-[var(--primary)]">20+</div>
             <div className="mt-1 text-xs text-[var(--text-muted)] uppercase tracking-wide">AI-guided lessons</div>
           </div>
           <div>

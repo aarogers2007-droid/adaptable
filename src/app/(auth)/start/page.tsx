@@ -11,23 +11,14 @@ import {
   saveBranding,
   activateSubscription,
   launchProgram,
-  ONBOARDING_STEP,
 } from "./actions";
+import { ONBOARDING_STEP } from "./constants";
 
 // ─── Types ───
 
 interface FilePreview {
   file: File;
   url: string;
-}
-
-interface TierInfo {
-  id: "starter" | "growth" | "scale";
-  name: string;
-  range: string;
-  price: number;
-  features: string[];
-  recommended?: boolean;
 }
 
 // ─── Constants ───
@@ -50,31 +41,6 @@ function getPriceForCount(count: number): number {
   return 5.99; // 50,000+ floor
 }
 
-// Legacy TIERS array for backward compat with Stripe checkout (maps to price IDs)
-const TIERS: TierInfo[] = [
-  {
-    id: "starter",
-    name: "Up to 500",
-    range: "1 – 500 students",
-    price: 14.99,
-    features: [],
-  },
-  {
-    id: "growth",
-    name: "Up to 10,000",
-    range: "501 – 10,000 students",
-    price: 9.99,
-    features: [],
-    recommended: true,
-  },
-  {
-    id: "scale",
-    name: "10,000+",
-    range: "10,001 – 50,000 students",
-    price: 7.99,
-    features: [],
-  },
-];
 
 const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
@@ -163,7 +129,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 `;
 
-function ProgressBar({ step }: { step: number }) {
+function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: number) => void }) {
   return (
     <div className="mb-8">
       {/* Desktop: full labels */}
@@ -174,7 +140,13 @@ function ProgressBar({ step }: { step: number }) {
           const current = step === stepNum;
           return (
             <div key={label} className="flex items-center gap-2 flex-1 last:flex-none">
-              <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                className="flex items-center gap-2 shrink-0"
+                style={{ cursor: completed ? "pointer" : "default" }}
+                onClick={() => completed && onStepClick?.(stepNum)}
+                disabled={!completed}
+              >
                 <div
                   className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
@@ -200,7 +172,7 @@ function ProgressBar({ step }: { step: number }) {
                 >
                   {label}
                 </span>
-              </div>
+              </button>
               {i < STEP_LABELS.length - 1 && (
                 <div
                   className="flex-1 h-[2px] rounded-full mx-2"
@@ -222,7 +194,14 @@ function ProgressBar({ step }: { step: number }) {
           const completed = step > stepNum;
           const current = step === stepNum;
           return (
-            <div key={label} className="flex flex-col items-center gap-1">
+            <button
+              key={label}
+              type="button"
+              className="flex flex-col items-center gap-1"
+              style={{ cursor: completed ? "pointer" : "default" }}
+              onClick={() => completed && onStepClick?.(stepNum)}
+              disabled={!completed}
+            >
               <div
                 className="h-2.5 w-2.5 rounded-full transition-colors"
                 style={{
@@ -234,7 +213,7 @@ function ProgressBar({ step }: { step: number }) {
                   {label}
                 </span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -278,10 +257,10 @@ function StartPageInner() {
   // Step 4: Plan
   // selectedTier removed — pricing is now volume-based, tier auto-detected from student count
   const [studentCount, setStudentCount] = useState(250);
+  const [studentCountInput, setStudentCountInput] = useState("250");
 
   // Step 5: Launch
   const [orgId, setOrgId] = useState<string | null>(null);
-  const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
@@ -320,8 +299,6 @@ function StartPageInner() {
         if (bc.primary_color) setPrimaryColor(bc.primary_color as string);
         if (bc.secondary_color) setSecondaryColor(bc.secondary_color as string);
       }
-
-      if (ctx.inviteCode) setInviteCode(ctx.inviteCode);
 
       // Determine which step to show
       if (ctx.user && ctx.onboardingStep >= ONBOARDING_STEP.COMPLETE) {
@@ -368,13 +345,6 @@ function StartPageInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Auto-derive subdomain from org name ───
-  useEffect(() => {
-    if (orgName.trim().length >= 2) {
-      setSubdomain(toSubdomain(orgName));
-    }
-  }, [orgName]);
-
   // ─── Debounced subdomain availability check ───
   useEffect(() => {
     if (subdomain.length < 3) {
@@ -417,7 +387,6 @@ function StartPageInner() {
             setOrgName(ctx.org.name);
             setSubdomain(ctx.org.subdomain);
             setSubdomainAvailable(true);
-            if (ctx.inviteCode) setInviteCode(ctx.inviteCode);
             const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
             goToStep(nextStep);
           } else {
@@ -523,7 +492,6 @@ function StartPageInner() {
     }
 
     setOrgId(result.orgId);
-    setInviteCode(result.inviteCode);
     goToStep(3);
   }
 
@@ -562,7 +530,6 @@ function StartPageInner() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tier: activeTier.id,
           quantity: studentCount,
           orgId,
         }),
@@ -628,21 +595,8 @@ function StartPageInner() {
     subdomain.length >= 3 &&
     subdomainAvailable === true;
 
-  // Volume pricing has 4 tiers but Stripe only has 3 price IDs.
-  // Until a 4th Stripe price is created, 501-2500 students use the
-  // starter price ID. The actual per-student amount is controlled by
-  // Stripe's unit pricing, so the charge will match what the user sees
-  // as long as the Stripe prices are set correctly.
-  // TODO: Create 4th Stripe price when Stripe keys are configured.
-  if (studentCount > 500 && studentCount <= 2500) {
-    console.warn(
-      `[start] Student count ${studentCount} falls in the 501-2500 tier which maps to the starter Stripe price ID. Verify Stripe unit pricing is correct.`
-    );
-  }
-  const activeTier = studentCount <= 2500 ? TIERS[0]!
-    : studentCount <= 10000 ? TIERS[1]!
-    : TIERS[2]!;
-  // perStudentPrice computed inline via getPriceForCount(studentCount) in JSX
+  // Stripe handles volume pricing natively — single price ID, tiers configured in Stripe Dashboard.
+  // getPriceForCount() mirrors the same tiers for display purposes only.
 
   // ─── Loading ───
 
@@ -660,7 +614,7 @@ function StartPageInner() {
     <main className="flex min-h-screen items-start justify-center px-4 py-12 sm:py-20">
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_STYLES }} />
       <div className="w-full max-w-2xl">
-        <ProgressBar step={step} />
+        <ProgressBar step={step} onStepClick={goToStep} />
 
         {/* ═══════════════════════════════════ */}
         {/* STEP 1: Create Account              */}
@@ -810,20 +764,29 @@ function StartPageInner() {
                 />
               </div>
 
-              {/* Subdomain preview */}
+              {/* Program URL */}
               <div>
                 <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                  Your URL
+                  Choose your program link
                 </label>
-                <div className="flex items-center rounded-lg border border-[var(--border-strong)] bg-[var(--bg-subtle)] px-4 py-3">
-                  <span className="font-mono text-sm text-[var(--text-primary)] font-medium">
-                    {subdomain || "your-org"}
-                  </span>
-                  <span className="font-mono text-sm text-[var(--text-muted)]">.adaptable.one</span>
-                </div>
-                <p className="mt-2 text-xs text-[var(--text-muted)]">
-                  This is the web address your students will visit to access the program. You can change it later.
+                <p className="text-xs text-[var(--text-muted)] mb-2">
+                  This is the link you&apos;ll share with students and staff to access your program. Pick a short word like &quot;learn&quot;, &quot;start&quot;, or &quot;app&quot;.
                 </p>
+                <div className="flex items-stretch rounded-lg border border-[var(--border-strong)] overflow-hidden focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[var(--primary)]/15 transition-all">
+                  <input
+                    type="text"
+                    value={subdomain}
+                    onChange={(e) => {
+                      const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 32);
+                      setSubdomain(val);
+                    }}
+                    className="flex-1 px-4 py-3 text-sm font-mono outline-none bg-transparent min-w-0"
+                    placeholder="learn"
+                  />
+                  <div className="flex items-center px-4 bg-[var(--bg-muted)] border-l border-[var(--border)] text-sm font-mono text-[var(--text-muted)] select-none whitespace-nowrap">
+                    .{toSubdomain(orgName) || "yourorg"}.org
+                  </div>
+                </div>
 
                 {/* Availability indicator */}
                 {subdomain.length >= 3 && (
@@ -847,7 +810,6 @@ function StartPageInner() {
                     ) : null}
                   </div>
                 )}
-
               </div>
             </div>
 
@@ -1098,13 +1060,16 @@ function StartPageInner() {
                 Estimated student count
               </label>
               <input
-                type="number"
-                min={1}
-                max={100000}
-                value={studentCount}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={studentCountInput}
                 onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
+                  const raw = e.target.value.replace(/[^0-9]/g, "");
+                  setStudentCountInput(raw);
+                  const v = parseInt(raw, 10);
                   if (!isNaN(v) && v >= 1) setStudentCount(Math.min(v, 100000));
+                  else if (raw === "") setStudentCount(0);
                 }}
                 className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-lg outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-mono"
                 autoFocus
@@ -1196,7 +1161,7 @@ function StartPageInner() {
             {/* What's included */}
             <div className="mt-6">
               <p className="text-sm text-[var(--text-secondary)]">
-                All features included: 22 AI lessons, scenarios, crisis detection, progress tracking, branding, impact reporting, and email support.{" "}
+                All features included: AI-guided lessons, scenarios, progress tracking, branding, impact reporting, and email support.{" "}
                 <button
                   type="button"
                   onClick={() => setFeaturesExpanded(!featuresExpanded)}
@@ -1208,9 +1173,8 @@ function StartPageInner() {
               {featuresExpanded && (
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
-                    "All 22 AI-guided lessons",
+                    "AI-guided lessons (your curriculum)",
                     "Scenario simulations",
-                    "Crisis detection (10+ languages)",
                     "Student progress tracking",
                     "Your branding on everything",
                     "Impact reporting + CSV export",
@@ -1378,27 +1342,22 @@ function StartPageInner() {
                     )}
                   </div>
 
-                  {/* Card 2: Invite code */}
+                  {/* Card 2: Program URL */}
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">
-                      Your invite code
-                    </p>
-                    <p className="mt-1 text-xs text-[var(--text-muted)]">
-                      Share this code with your students. They&apos;ll enter it at{" "}
-                      <span className="font-mono font-medium">{subdomain}.adaptable.one/go</span>
+                      Your program is live at
                     </p>
                     <div className="mt-3 flex items-center gap-3">
-                      <code className="flex-1 rounded-lg bg-[var(--bg-muted)] border border-[var(--border)] px-4 py-3 font-mono text-xl font-bold text-[var(--text-primary)] tracking-wider text-center">
-                        {inviteCode || "---"}
+                      <code className="flex-1 rounded-lg bg-[var(--bg-muted)] border border-[var(--border)] px-4 py-3 font-mono text-sm font-semibold text-[var(--text-primary)] text-center">
+                        {subdomain}.{toSubdomain(orgName)}.org
                       </code>
                       <button
                         type="button"
                         onClick={() => {
-                          if (inviteCode) {
-                            navigator.clipboard.writeText(inviteCode);
-                            setCodeCopied(true);
-                            setTimeout(() => setCodeCopied(false), 2000);
-                          }
+                          const url = `${subdomain}.${toSubdomain(orgName)}.org`;
+                          navigator.clipboard.writeText(url);
+                          setCodeCopied(true);
+                          setTimeout(() => setCodeCopied(false), 2000);
                         }}
                         className="rounded-lg border border-[var(--border-strong)] px-3 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors shrink-0"
                         style={{ minHeight: 44 }}
@@ -1406,6 +1365,9 @@ function StartPageInner() {
                         {codeCopied ? "Copied" : "Copy"}
                       </button>
                     </div>
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      Share this link with your students and staff. Anyone who visits can sign up and start the program.
+                    </p>
                   </div>
 
                 </div>
@@ -1431,7 +1393,7 @@ function StartPageInner() {
                     <p className="text-sm text-[var(--text-secondary)]">
                       Once you launch, students can access your program at{" "}
                       <span className="font-mono font-semibold text-[var(--text-primary)]">
-                        {subdomain}.adaptable.one
+                        {subdomain}.{toSubdomain(orgName)}.org
                       </span>
                     </p>
                     <div className="mt-4 flex gap-3">
@@ -1457,14 +1419,12 @@ function StartPageInner() {
                 )}
 
                 <p className="mt-6 text-center text-xs text-[var(--text-muted)]">
-                  Need help?{" "}
+                  Need help? Email{" "}
                   <a
-                    href="https://calendly.com/adaptable/setup"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="mailto:aj@adaptable.one"
                     className="text-[var(--primary)] hover:underline"
                   >
-                    Book a 15-minute setup call
+                    aj@adaptable.one
                   </a>
                 </p>
               </>

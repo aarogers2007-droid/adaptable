@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   org_id uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   stripe_customer_id text NOT NULL,
   stripe_subscription_id text UNIQUE NOT NULL,
-  plan_tier text NOT NULL CHECK (plan_tier IN ('starter', 'growth', 'scale')),
+  plan_tier text NOT NULL CHECK (plan_tier IN ('standard', 'founding')),
   student_quantity int NOT NULL DEFAULT 0,
   status text NOT NULL DEFAULT 'active'
     CHECK (status IN ('active', 'past_due', 'canceled', 'incomplete', 'trialing')),
@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 
 CREATE INDEX IF NOT EXISTS idx_subscriptions_org ON subscriptions(org_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe ON subscriptions(stripe_subscription_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_subscriptions_org_active ON subscriptions(org_id) WHERE status IN ('active', 'trialing');
 
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 
@@ -42,7 +43,7 @@ ALTER TABLE organizations ADD COLUMN IF NOT EXISTS stripe_customer_id text UNIQU
 -- Update subscription_tier CHECK to include new tier values
 ALTER TABLE organizations DROP CONSTRAINT IF EXISTS organizations_subscription_tier_check;
 ALTER TABLE organizations ADD CONSTRAINT organizations_subscription_tier_check
-  CHECK (subscription_tier IN ('starter', 'growth', 'scale', 'standard', 'enterprise', 'internal'));
+  CHECK (subscription_tier IN ('standard', 'founding', 'starter', 'enterprise', 'internal'));
 
 -- Add onboarding_step to profiles (tracks wizard progress for resume)
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS onboarding_step int DEFAULT 0;

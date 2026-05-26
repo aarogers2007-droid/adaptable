@@ -187,8 +187,11 @@ export async function POST(request: Request) {
     const supportiveText = getCrisisResponse(firstName);
 
     // Log crisis interaction to ai_usage_log (don't lose engagement data)
+    // Fetch org_id for the crisis log — profile may not be loaded yet at this point
+    const { data: crisisProfile } = await supabase.from("profiles").select("org_id").eq("id", user.id).single();
     supabase.from("ai_usage_log").insert({
       student_id: user.id,
+      org_id: (crisisProfile as Record<string, unknown>)?.org_id ?? null,
       feature: "guide",
       model: "crisis-response",
       input_tokens: 0,
@@ -263,11 +266,15 @@ export async function POST(request: Request) {
   // Get profile for context
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name, ikigai_result, grade_tier")
+    .select("business_idea, full_name, ikigai_result, grade_tier, org_id")
     .eq("id", user.id)
     .single();
 
-  const profile = profileData as unknown as Pick<Profile, "business_idea" | "full_name"> & { ikigai_result?: { passions?: string[]; skills?: string[]; needs?: string[]; monetization?: string } } | null;
+  const profile = profileData as unknown as Pick<Profile, "business_idea" | "full_name"> & { ikigai_result?: { passions?: string[]; skills?: string[]; needs?: string[]; monetization?: string }; org_id?: string | null } | null;
+
+  if (!profileData?.org_id) {
+    return new Response("Account not configured", { status: 403 });
+  }
 
   // Build context — business + ikigai
   let businessContext = "";
@@ -577,11 +584,12 @@ export async function POST(request: Request) {
           if (usageReservationId) {
             await supabase
               .from("ai_usage_log")
-              .update(usagePayload)
+              .update({ org_id: (profileData as Record<string, unknown>)?.org_id ?? null, ...usagePayload })
               .eq("id", usageReservationId);
           } else {
             await supabase.from("ai_usage_log").insert({
               student_id: user.id,
+              org_id: (profileData as Record<string, unknown>)?.org_id ?? null,
               feature: "guide",
               ...usagePayload,
             });

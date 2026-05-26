@@ -15,10 +15,11 @@ export function validateOrigin(request: Request): boolean {
   const referer = request.headers.get("referer");
   const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
 
-  // If NEXT_PUBLIC_SITE_URL is not set, allow the request.
-  // Auth is the real gate — CSRF is secondary protection.
+  // If NEXT_PUBLIC_SITE_URL is not set, fail closed.
+  // This should never happen in production — deploy will fail without it.
   if (!allowedOrigin) {
-    return true;
+    console.error("[csrf] NEXT_PUBLIC_SITE_URL is not set — blocking request (fail closed)");
+    return false;
   }
 
   if (origin) {

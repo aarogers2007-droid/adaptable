@@ -74,6 +74,11 @@ dedicated in-app guide accessible from the Alerts tab.
 Source: Linda (rural Texas director) walkthrough.
 Effort: S (CC: ~30 min for in-app guide)
 
+### Calendly setup call integration
+Set up Calendly account with 15-minute "Adaptable Setup Call" event type.
+Add link to onboarding step 5 launchpad and post-signup emails.
+Effort: S (human: ~10 min)
+
 ---
 
 ## P1 — Before second org signs (scale readiness)

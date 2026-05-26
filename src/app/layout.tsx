@@ -36,6 +36,21 @@ export const metadata: Metadata = {
   title: "Adaptable — Design Your Venture",
   description:
     "An AI-native venture studio where students design, plan, and prepare to launch real businesses.",
+  openGraph: {
+    title: "Adaptable — Design Your Venture",
+    description:
+      "An AI-native venture studio where students design, plan, and prepare to launch real businesses.",
+    url: "https://adaptable.one",
+    siteName: "Adaptable",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Adaptable — Design Your Venture",
+    description:
+      "An AI-native venture studio where students design, plan, and prepare to launch real businesses.",
+  },
 };
 
 export default async function RootLayout({

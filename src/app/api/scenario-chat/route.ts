@@ -95,9 +95,13 @@ export async function POST(request: Request) {
   // Load student profile for grade level
   const { data: profile } = await supabase
     .from("profiles")
-    .select("grade_tier, grade_level")
+    .select("grade_tier, grade_level, org_id")
     .eq("id", user.id)
     .single();
+
+  if (!profile?.org_id) {
+    return new Response("Account not configured", { status: 403 });
+  }
 
   const gradeTier = ((profile as Record<string, unknown>)?.grade_tier as GradeTier) ?? "high_school";
 
@@ -314,6 +318,7 @@ Start by orienting the student in the scenario and asking your first question. B
           const sFreshInput = sUsage.input_tokens - sCacheRead - sCacheCreate;
           supabase.from("ai_usage_log").insert({
             student_id: user.id,
+            org_id: (profile as Record<string, unknown>)?.org_id ?? null,
             feature: "scenario",
             model: scenarioModel,
             input_tokens: sUsage.input_tokens,
@@ -332,6 +337,7 @@ Start by orienting the student in the scenario and asking your first question. B
             session.criteria_satisfied,
             session.attempt_number,
             updatedConversation,
+            (profile as Record<string, unknown>)?.org_id as string | null ?? null,
           ).then((result) => {
             if (result) {
               // Send criteria update to client
@@ -386,6 +392,7 @@ async function evaluateCriteria(
   currentlySatisfied: string[],
   attemptNumber: number,
   conversation: { role: string; content: string }[],
+  orgId: string | null,
 ): Promise<{
   newlySatisfied: string[];
   allSatisfied: boolean;
@@ -424,6 +431,7 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
   // Log eval usage
   supabase.from("ai_usage_log").insert({
     student_id: userId,
+    org_id: orgId,
     feature: "scenario_eval",
     model: evalModel,
     input_tokens: evalResult.usage?.input_tokens ?? 0,
@@ -470,6 +478,7 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
     // Log summary eval usage
     supabase.from("ai_usage_log").insert({
       student_id: userId,
+      org_id: orgId,
       feature: "scenario_eval",
       model: evalModel,
       input_tokens: summaryResult.usage?.input_tokens ?? 0,
@@ -500,6 +509,7 @@ Respond with ONLY valid JSON: {"newly_satisfied": ["CRITERION_ID"]} or {"newly_s
     // Log synthesis eval usage
     supabase.from("ai_usage_log").insert({
       student_id: userId,
+      org_id: orgId,
       feature: "scenario_eval",
       model: evalModel,
       input_tokens: synthesisResult.usage?.input_tokens ?? 0,

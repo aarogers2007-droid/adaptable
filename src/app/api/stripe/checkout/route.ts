@@ -2,14 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 
-function getTierPriceIds(): Record<string, string> {
-  return {
-    starter: process.env.STRIPE_STARTER_PRICE_ID ?? "",
-    growth: process.env.STRIPE_GROWTH_PRICE_ID ?? "",
-    scale: process.env.STRIPE_SCALE_PRICE_ID ?? "",
-  };
-}
-
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -21,22 +13,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { tier, quantity, orgId } = (await req.json()) as {
-      tier: "starter" | "growth" | "scale";
+    const { quantity, orgId, foundingPartner } = (await req.json()) as {
       quantity: number;
       orgId: string;
+      foundingPartner?: boolean;
     };
 
-    if (!tier || !quantity || !orgId) {
+    if (!quantity || !orgId) {
       return NextResponse.json(
-        { error: "Missing required fields: tier, quantity, orgId" },
+        { error: "Missing required fields: quantity, orgId" },
         { status: 400 }
       );
     }
 
-    const priceId = getTierPriceIds()[tier];
+    // Pick the right price: founding partner ($4.99 flat) or default (volume tiers)
+    const priceId = foundingPartner
+      ? process.env.STRIPE_FOUNDING_PRICE_ID
+      : process.env.STRIPE_PRICE_ID;
+
     if (!priceId) {
-      return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
+      console.error("[stripe/checkout] Missing price ID env var");
+      return NextResponse.json(
+        { error: "Payment not configured. Contact support." },
+        { status: 500 }
+      );
     }
 
     // Verify the authenticated user is the org_admin of the specified org
@@ -69,7 +69,6 @@ export async function POST(req: NextRequest) {
       cancel_url: `${origin}/start?step=4`,
       metadata: { org_id: orgId, user_id: user.id },
       subscription_data: {
-        trial_period_days: 14,
         metadata: { org_id: orgId },
       },
       allow_promotion_codes: true,

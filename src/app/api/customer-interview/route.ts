@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   if (!isAdmin) {
     const { data: allowed } = await supabase.rpc("reserve_ai_usage", {
       p_student_id: user.id,
-      p_feature: "guide",
+      p_feature: "customer_interview",
     });
     if (!allowed) {
       return Response.json(
@@ -73,11 +73,14 @@ export async function POST(request: Request) {
   // Get profile
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name")
+    .select("business_idea, full_name, org_id")
     .eq("id", user.id)
     .single();
 
   const profile = profileData as unknown as Pick<Profile, "business_idea" | "full_name"> | null;
+  if (!profileData?.org_id) {
+    return new Response("Account not configured", { status: 403 });
+  }
   if (!profile?.business_idea) {
     return new Response("Complete onboarding first", { status: 400 });
   }
@@ -158,6 +161,7 @@ export async function POST(request: Request) {
           try {
             await supabase.from("ai_usage_log").insert({
               student_id: user.id,
+              org_id: (profileData as Record<string, unknown>)?.org_id ?? null,
               feature: "customer_interview",
               model: "claude-sonnet-4-20250514",
               input_tokens: finalMessage.usage.input_tokens,

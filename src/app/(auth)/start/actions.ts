@@ -4,16 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 import type Stripe from "stripe";
-
-// ─── Onboarding step enum ───
-
-export const ONBOARDING_STEP = {
-  ACCOUNT_CREATED: 1,
-  ORG_NAMED: 2,
-  BRANDED: 3,
-  PAID: 4,
-  COMPLETE: 5,
-} as const;
+import { ONBOARDING_STEP } from "./constants";
 
 // ─── Reserved subdomains ───
 
@@ -202,7 +193,7 @@ export async function createOrgStub(
     favicon_url: "",
     welcome_message: "",
     support_email: "",
-    domain: `${normalizedSubdomain}.adaptable.one`,
+    domain: `${normalizedSubdomain}.${slug}.org`,
   };
 
   // Create the organization
@@ -428,11 +419,13 @@ export async function activateSubscription(
 
   // Verify the session belongs to this user (prevent session_id theft)
   if (session.metadata?.user_id !== user.id) {
+    console.error("[start/actions] User mismatch:", session.metadata?.user_id, "!==", user.id);
     return { error: "This payment session does not belong to your account." };
   }
 
   // Verify payment
   const subscription = session.subscription as Stripe.Subscription | null;
+
   if (
     session.payment_status !== "paid" &&
     !(subscription && subscription.status === "trialing")
@@ -444,14 +437,15 @@ export async function activateSubscription(
     return { error: "No subscription found on this session." };
   }
 
-  // Map price ID to plan tier (lazy lookup, safe if env vars missing)
-  const priceId = subscription.items.data[0]?.price?.id ?? "";
-  const priceToTier: Record<string, string> = {
-    [process.env.STRIPE_STARTER_PRICE_ID ?? ""]: "starter",
-    [process.env.STRIPE_GROWTH_PRICE_ID ?? ""]: "growth",
-    [process.env.STRIPE_SCALE_PRICE_ID ?? ""]: "scale",
-  };
-  const planTier = priceToTier[priceId] ?? "starter";
+  // Map price ID to plan tier
+  const firstItem = subscription.items.data[0];
+  if (!firstItem) {
+    return { error: "No line items found on subscription." };
+  }
+  const priceId = firstItem.price?.id ?? "";
+  const planTier = priceId === process.env.STRIPE_FOUNDING_PRICE_ID
+    ? "founding"
+    : "standard";
 
   // Get org_id from profile
   const { data: profile } = await supabase
@@ -466,7 +460,6 @@ export async function activateSubscription(
 
   // Upsert subscription record
   // In the Dahlia API, current_period_start/end live on subscription items
-  const firstItem = subscription.items.data[0];
   const subscriptionData = {
     org_id: profile.org_id,
     stripe_subscription_id: subscription.id,

@@ -16,9 +16,15 @@ export default function GuestJoinPage() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
+  const [attempts, setAttempts] = useState(0);
   const router = useRouter();
 
   async function handleJoin() {
+    if (attempts >= 10) {
+      setError("Too many attempts. Please wait a few minutes and refresh the page.");
+      return;
+    }
+
     const trimmedCode = code.trim().toUpperCase();
 
     if (!trimmedCode) {
@@ -26,6 +32,7 @@ export default function GuestJoinPage() {
       return;
     }
 
+    setAttempts((prev) => prev + 1);
     setJoining(true);
     setError(null);
 
@@ -117,7 +124,7 @@ export default function GuestJoinPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
-            Adaptable
+            Welcome
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
             Enter your class code to get started.
@@ -158,7 +165,7 @@ export default function GuestJoinPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-[var(--text-muted)]">
-          adaptable.one
+          Student data is encrypted and never shared.
         </p>
       </div>
     </main>

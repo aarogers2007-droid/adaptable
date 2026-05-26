@@ -485,9 +485,26 @@ export default async function InstructorDashboardPage() {
     });
   }
 
+  // Get student limit from subscription (for overage banner)
+  let studentLimit: number | null = null;
+  if (profile.role === "org_admin" && profile.org_id) {
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("student_quantity, status")
+      .eq("org_id", profile.org_id)
+      .in("status", ["active", "trialing"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (sub?.student_quantity) {
+      studentLimit = sub.student_quantity;
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id} failedNotifications={failedNotifications ?? []} />
+      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id} failedNotifications={failedNotifications ?? []} studentLimit={studentLimit} />
     </main>
   );
 }

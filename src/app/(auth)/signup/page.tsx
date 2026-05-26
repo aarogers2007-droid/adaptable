@@ -55,7 +55,7 @@ export default function SignupPage() {
     if (tooYoung) {
       setError(inventionMode
         ? "This event is for students age 11 and older."
-        : "${branding.platform_name} is for students age 12 and older. If you're younger, please come back when you're 12.");
+        : `${branding.platform_name} is for students age 12 and older. If you're younger, please come back when you're 12!`);
       return;
     }
 
@@ -269,7 +269,7 @@ export default function SignupPage() {
 
             {tooYoung && (
               <div className="rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-3 text-xs text-red-900">
-                ${branding.platform_name} is for students age 12 and older. Come back when you&apos;re 12!
+                {branding.platform_name} is for students age 12 and older. Come back when you&apos;re 12!
               </div>
             )}
 

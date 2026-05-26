@@ -127,8 +127,11 @@ export async function POST(request: Request) {
     const supportiveText = getCrisisResponse(firstName);
 
     // Log crisis interaction to ai_usage_log (don't lose engagement data)
+    // Fetch org_id for the crisis log — profile may not be loaded yet at this point
+    const { data: crisisProfile } = await supabase.from("profiles").select("org_id").eq("id", user.id).single();
     supabase.from("ai_usage_log").insert({
       student_id: user.id,
+      org_id: (crisisProfile as Record<string, unknown>)?.org_id ?? null,
       feature: "lesson",
       model: "crisis-response",
       input_tokens: 0,
@@ -229,11 +232,14 @@ export async function POST(request: Request) {
   // Get profile + learning profile
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("business_idea, full_name, ikigai_result, grade_tier")
+    .select("business_idea, full_name, ikigai_result, grade_tier, org_id")
     .eq("id", user.id)
     .single();
 
-  const profile = profileData as unknown as Profile | null;
+  const profile = profileData as unknown as (Profile & { org_id: string | null }) | null;
+  if (!profile?.org_id) {
+    return new Response("Account not configured", { status: 403 });
+  }
   if (!profile?.business_idea) {
     console.error("[lesson-chat] 400 — no business_idea on profile", { userId: user.id, hasProfile: !!profile });
     return new Response("Complete onboarding first", { status: 400 });
@@ -850,11 +856,12 @@ When discussing customer conversations, explicitly reference the Mom Test princi
           if (usageReservationId) {
             await supabase
               .from("ai_usage_log")
-              .update(usagePayload)
+              .update({ org_id: profile.org_id ?? null, ...usagePayload })
               .eq("id", usageReservationId);
           } else {
             await supabase.from("ai_usage_log").insert({
               student_id: user.id,
+              org_id: profile.org_id ?? null,
               feature: "guide",
               ...usagePayload,
             });

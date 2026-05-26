@@ -104,6 +104,10 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .single();
 
+  if (!profile?.org_id) {
+    return new Response("Account not configured", { status: 403 });
+  }
+
   const userName = profile?.full_name ?? "User";
   const userRole = profile?.role ?? "student";
 
@@ -168,13 +172,15 @@ export async function POST(request: Request) {
   }
 
   // Log support chat usage (fire-and-forget)
+  // Haiku pricing: $0.25/1M input, $1.25/1M output
   supabase.from("ai_usage_log").insert({
     student_id: user.id,
+    org_id: (profile as Record<string, unknown>)?.org_id ?? null,
     feature: "support",
     model: supportModel,
     input_tokens: aiUsage.input_tokens,
     output_tokens: aiUsage.output_tokens,
-    estimated_cost_usd: 0, // Mini cost is negligible
+    estimated_cost_usd: (aiUsage.input_tokens * 0.25 + aiUsage.output_tokens * 1.25) / 1_000_000,
     response_length: cleanResponse.length,
     prompt_length: message.length,
   }).then(() => {}, (err: unknown) => console.error("[support-chat] usage log failed:", err));

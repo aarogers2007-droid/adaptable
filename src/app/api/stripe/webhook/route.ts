@@ -5,12 +5,10 @@ import Stripe from "stripe";
 
 export const runtime = "nodejs";
 
-function getPriceToTier(): Record<string, string> {
-  return {
-    [process.env.STRIPE_STARTER_PRICE_ID ?? ""]: "starter",
-    [process.env.STRIPE_GROWTH_PRICE_ID ?? ""]: "growth",
-    [process.env.STRIPE_SCALE_PRICE_ID ?? ""]: "scale",
-  };
+function getTierFromPriceId(priceId: string): string {
+  if (priceId === process.env.STRIPE_FOUNDING_PRICE_ID) return "founding";
+  if (priceId === process.env.STRIPE_PRICE_ID) return "standard";
+  return "unknown";
 }
 
 const adminDb = createClient(
@@ -58,8 +56,12 @@ export async function POST(req: NextRequest) {
         const subscription =
           await stripe.subscriptions.retrieve(subscriptionId);
         const item = subscription.items.data[0];
+        if (!item) {
+          console.error("No line items on subscription", subscriptionId);
+          break;
+        }
         const priceId = item.price.id;
-        const tier = getPriceToTier()[priceId] ?? "unknown";
+        const tier = getTierFromPriceId(priceId);
 
         await adminDb.from("subscriptions").upsert(
           {
@@ -93,8 +95,12 @@ export async function POST(req: NextRequest) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const item = subscription.items.data[0];
+        if (!item) {
+          console.error("No line items on subscription.updated", subscription.id);
+          break;
+        }
         const priceId = item.price.id;
-        const tier = getPriceToTier()[priceId] ?? "unknown";
+        const tier = getTierFromPriceId(priceId);
 
         await adminDb
           .from("subscriptions")
@@ -145,11 +151,13 @@ export async function POST(req: NextRequest) {
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
-        // Dahlia API: subscription info is in invoice.parent
-        const subscriptionId = invoice.parent?.type === "subscription_details"
-          ? (invoice.parent as { subscription_details?: { subscription?: string } })
-              ?.subscription_details?.subscription ?? null
-          : null;
+        // Try legacy field first, fall back to Dahlia API parent structure
+        const subscriptionId =
+          (invoice as any).subscription as string | null ??
+          (invoice.parent?.type === "subscription_details"
+            ? (invoice.parent as { subscription_details?: { subscription?: string } })
+                ?.subscription_details?.subscription ?? null
+            : null);
 
         if (subscriptionId) {
           await adminDb
@@ -165,7 +173,7 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        // Unhandled event type — ignore
+        console.log(`Unhandled webhook event type: ${event.type}`);
         break;
     }
   } catch (err) {
