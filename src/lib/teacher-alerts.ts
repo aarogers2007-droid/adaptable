@@ -188,12 +188,20 @@ export async function alertCrisis(
       message: `URGENT: Student may be in crisis. Type: ${crisisType}. Please check in immediately.`,
       context: {
         crisis_type: crisisType,
-        matched_phrase: matchedText.slice(0, 100),
+        matched_phrase: matchedText.slice(0, 100), // kept in DB for audit; stripped from email below
         feature,
         timestamp: new Date().toISOString(),
         requires_immediate_attention: true,
         org_name: orgName,
         region,
+        // Email-safe copy: omit raw student text, surface only the crisis type
+        email_context: {
+          crisis_type: crisisType,
+          feature,
+          requires_immediate_attention: true,
+          org_name: orgName,
+          region,
+        },
       },
       crisis_type: crisisType,
       severity_at_creation: "urgent",

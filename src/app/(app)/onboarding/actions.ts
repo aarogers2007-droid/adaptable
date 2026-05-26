@@ -140,28 +140,28 @@ export async function synthesizeBusinessIdea(
       const { createAdminClient } = await import("@/lib/supabase/admin");
       const admin = createAdminClient();
 
-      // Per-IP: max 5 demo syntheses per hour
+      // Per-IP: max 2 demo syntheses per hour
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
       const { count: ipCount } = await admin
         .from("parent_pin_attempts")
         .select("id", { count: "exact", head: true })
         .eq("token_hash", ipHash)
         .gte("attempted_at", oneHourAgo);
-      if ((ipCount ?? 0) >= 5) {
+      if ((ipCount ?? 0) >= 2) {
         return {
           idea: null,
           error: "You've tried the demo a few times — sign up to keep going for real.",
         };
       }
 
-      // Global: max 200 demo syntheses per day (cost cap)
+      // Global: max 50 demo syntheses per day (cost cap)
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { count: globalCount } = await admin
         .from("parent_pin_attempts")
         .select("id", { count: "exact", head: true })
         .like("token_hash", "demo_synth_%")
         .gte("attempted_at", oneDayAgo);
-      if ((globalCount ?? 0) >= 200) {
+      if ((globalCount ?? 0) >= 50) {
         return {
           idea: null,
           error: "The demo wizard is rate-limited for today. Sign up to use the real one — same prompt, no limits.",

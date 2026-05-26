@@ -38,6 +38,7 @@ export function validateOrigin(request: Request): boolean {
     return false;
   }
 
-  // No origin or referer — allow it. Auth is the real protection.
-  return true;
+  // No origin or referer — fail closed (defense-in-depth).
+  console.warn("[csrf] No Origin or Referer header — blocking request");
+  return false;
 }

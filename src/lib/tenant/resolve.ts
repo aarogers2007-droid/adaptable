@@ -68,6 +68,17 @@ export async function resolveTenant(hostname: string): Promise<TenantInfo> {
       for (const [key, entry] of tenantCache) {
         if (entry.expiresAt < now) tenantCache.delete(key);
       }
+
+      // Hard cap: if still over 100 after expiry eviction, remove oldest entries
+      if (tenantCache.size > 100) {
+        const sorted = [...tenantCache.entries()].sort(
+          (a, b) => a[1].expiresAt - b[1].expiresAt
+        );
+        const toRemove = sorted.slice(0, tenantCache.size - 100);
+        for (const [key] of toRemove) {
+          tenantCache.delete(key);
+        }
+      }
     }
 
     return tenant;
