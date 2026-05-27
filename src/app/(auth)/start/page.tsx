@@ -7,6 +7,7 @@ import { activateSubscription } from "./stripe-actions";
 import { ONBOARDING_STEP } from "./constants";
 import { useAuthListener } from "./use-auth-listener";
 import Step1Auth from "./Step1Auth";
+import Step2Program from "./Step2Program";
 
 const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
@@ -168,10 +169,16 @@ function StartPageInner() {
         )}
 
         {step === 2 && (
-          <div className="mx-auto max-w-md">
-            <h1 className="text-2xl font-bold text-center">Step 2: Program</h1>
-            <p className="mt-2 text-sm text-gray-500 text-center">Org: {orgName || "not set"}, Subdomain: {subdomain || "not set"}</p>
-          </div>
+          <Step2Program
+            error={error}
+            setError={setError}
+            onComplete={(id, name, sub) => {
+              setOrgId(id);
+              setOrgName(name);
+              setSubdomain(sub);
+              goToStep(3);
+            }}
+          />
         )}
 
         {step === 3 && <div className="text-center"><h1 className="text-2xl font-bold">Step 3: Brand</h1></div>}
