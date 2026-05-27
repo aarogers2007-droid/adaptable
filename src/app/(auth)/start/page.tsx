@@ -340,8 +340,8 @@ function StartPageInner() {
       }
 
       if (sessionId && ctx.user) {
-        // Returning from Stripe checkout
-        setStep(6);
+        // Returning from Stripe checkout — activate subscription, then go to curriculum step
+        setStep(5);
         setLoading(false);
         handleStripeReturn(sessionId);
         return;
