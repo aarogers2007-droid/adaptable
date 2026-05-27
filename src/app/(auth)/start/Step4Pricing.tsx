@@ -24,16 +24,38 @@ function formatCurrency(amount: number): string {
 
 interface Step4Props {
   orgId: string;
+  userEmail: string;
   onBack: () => void;
   error: string | null;
   setError: (e: string | null) => void;
 }
 
-export default function Step4Pricing({ orgId, onBack, error, setError }: Step4Props) {
+export default function Step4Pricing({ orgId, userEmail, onBack, error, setError }: Step4Props) {
   const [studentCount, setStudentCount] = useState(250);
   const [studentCountInput, setStudentCountInput] = useState("250");
   const [submitting, setSubmitting] = useState(false);
   const [featuresExpanded, setFeaturesExpanded] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+
+  const isFoundingPartner = discountApplied;
+  const foundingPrice = 4.99;
+
+  function handleApplyDiscount() {
+    setDiscountError(null);
+    if (discountCode.trim().toLowerCase() !== "vl26") {
+      setDiscountError("Invalid code.");
+      setDiscountApplied(false);
+      return;
+    }
+    if (!userEmail.endsWith("@venturelab.org")) {
+      setDiscountError("This code is only valid for VentureLab accounts.");
+      setDiscountApplied(false);
+      return;
+    }
+    setDiscountApplied(true);
+  }
 
   async function handleContinueToPayment() {
     if (!orgId) return;
@@ -42,7 +64,7 @@ export default function Step4Pricing({ orgId, onBack, error, setError }: Step4Pr
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity: studentCount, orgId }),
+        body: JSON.stringify({ quantity: studentCount, orgId, foundingPartner: isFoundingPartner }),
       });
       const data = await res.json();
       if (!res.ok || data.error) { setError(data.error || "Failed to create checkout session."); setSubmitting(false); return; }
@@ -117,6 +139,37 @@ export default function Step4Pricing({ orgId, onBack, error, setError }: Step4Pr
         </table>
       </div>
 
+      {/* Discount code */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Partner code</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={discountCode}
+            onChange={(e) => { setDiscountCode(e.target.value); setDiscountApplied(false); setDiscountError(null); }}
+            placeholder="Enter code"
+            className="flex-1 rounded-lg border border-[var(--border-strong)] px-4 py-2.5 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-mono"
+          />
+          <button
+            type="button"
+            onClick={handleApplyDiscount}
+            disabled={!discountCode.trim()}
+            className="rounded-lg border border-[var(--border-strong)] px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors disabled:opacity-50"
+          >
+            Apply
+          </button>
+        </div>
+        {discountError && <p className="mt-1.5 text-xs text-[var(--error)]">{discountError}</p>}
+        {discountApplied && (
+          <p className="mt-1.5 text-xs text-[#059669] font-medium flex items-center gap-1">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            Founding Partner rate applied: ${foundingPrice}/student
+          </p>
+        )}
+      </div>
+
       {/* Total cost summary */}
       {studentCount > 0 && studentCount <= 50000 && (
         <div className="mt-6 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-subtle)] p-5">
@@ -124,20 +177,23 @@ export default function Step4Pricing({ orgId, onBack, error, setError }: Step4Pr
             <p className="text-sm text-[var(--text-secondary)]">
               <span className="font-mono font-medium text-[var(--text-primary)]">{studentCount.toLocaleString()}</span> students
               {" "}<span className="text-[var(--text-muted)]">&times;</span>{" "}
-              <span className="font-mono font-medium text-[var(--text-primary)]">${getPriceForCount(studentCount)}</span>/student
+              <span className="font-mono font-medium text-[var(--text-primary)]">${isFoundingPartner ? foundingPrice : getPriceForCount(studentCount)}</span>/student
+              {isFoundingPartner && <span className="ml-2 text-xs text-[#059669] font-medium">Founding Partner</span>}
             </p>
             <div className="text-right">
-              <p className="text-2xl font-bold text-[var(--text-primary)]">{formatCurrency(studentCount * getPriceForCount(studentCount))}</p>
+              <p className="text-2xl font-bold text-[var(--text-primary)]">{formatCurrency(studentCount * (isFoundingPartner ? foundingPrice : getPriceForCount(studentCount)))}</p>
               <p className="text-xs text-[var(--text-muted)]">per year (USD)</p>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-[rgba(13,148,136,0.1)] flex items-baseline justify-between">
-            <p className="text-xs text-[var(--text-muted)]">One-time setup (branding, onboarding, training)</p>
-            <p className="text-sm font-medium text-[var(--text-primary)]">{formatCurrency(IMPLEMENTATION_FEE)}</p>
-          </div>
+          {!isFoundingPartner && (
+            <div className="mt-3 pt-3 border-t border-[rgba(13,148,136,0.1)] flex items-baseline justify-between">
+              <p className="text-xs text-[var(--text-muted)]">One-time setup (branding, onboarding, training)</p>
+              <p className="text-sm font-medium text-[var(--text-primary)]">{formatCurrency(IMPLEMENTATION_FEE)}</p>
+            </div>
+          )}
           <div className="mt-3 pt-3 border-t border-[rgba(13,148,136,0.1)] flex items-baseline justify-between">
             <p className="text-sm font-semibold text-[var(--text-primary)]">Year 1 total</p>
-            <p className="text-lg font-bold text-[var(--text-primary)]">{formatCurrency(studentCount * getPriceForCount(studentCount) + IMPLEMENTATION_FEE)}</p>
+            <p className="text-lg font-bold text-[var(--text-primary)]">{formatCurrency(studentCount * (isFoundingPartner ? foundingPrice : getPriceForCount(studentCount)) + (isFoundingPartner ? 0 : IMPLEMENTATION_FEE))}</p>
           </div>
           <p className="mt-2 text-xs text-[var(--text-muted)]">Annual contract, billed upfront. 90-day cancellation notice.</p>
         </div>

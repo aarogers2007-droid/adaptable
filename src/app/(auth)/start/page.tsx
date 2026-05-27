@@ -201,6 +201,7 @@ function StartPageInner() {
         {step === 4 && orgId && (
           <Step4Pricing
             orgId={orgId}
+            userEmail={user?.email ?? ""}
             error={error}
             setError={setError}
             onBack={() => goToStep(3)}
