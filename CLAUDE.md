@@ -163,6 +163,31 @@ before considering the task complete:
 If generating an HTML preview, include a mobile viewport toggle so the user can
 verify both desktop and mobile in one view.
 
+## Page Building: Layer-by-Layer Deployment
+
+Never ship a full page in one commit. Build and deploy in layers, verifying
+each one works in production before adding the next. This catches
+production-only crashes early instead of debugging 1500 lines blind.
+
+**The layers, in order:**
+
+1. **Skeleton** — Bare page with just a heading. Deploy. Verify it loads on Vercel.
+2. **Data layer** — Add hooks, state, server action calls. Display raw data as text.
+   Deploy. Verify data flows correctly in production.
+3. **Structure** — Add the layout, sections, conditional rendering, early returns.
+   Deploy. Verify routing and step logic work.
+4. **Full JSX** — Add all UI components, forms, inputs, cards. Deploy. Verify
+   everything renders without crashes.
+5. **Polish** — Animations, transitions, responsive tweaks, mobile verification.
+   Deploy. Final check on phone and desktop.
+
+**Rules:**
+- Each layer is a separate commit and deploy.
+- Do NOT proceed to the next layer until the user confirms the current one works
+  in production.
+- If a layer crashes, the diff is small enough to find the bug in minutes.
+- This applies to any page >100 lines of JSX. Simple pages can ship in one go.
+
 ## Build and Commit Discipline
 
 1. **Always verify `npx next build` passes before committing.** No exceptions.
