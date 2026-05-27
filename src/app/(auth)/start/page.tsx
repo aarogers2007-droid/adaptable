@@ -9,13 +9,13 @@ import {
   createOrgStub,
   checkSubdomainAvailability,
   saveBranding,
-  activateSubscription,
   launchProgram,
   uploadCurriculumFiles,
   approveDraftLessons,
   skipCurriculum,
   getDraftLessons,
 } from "./actions";
+import { activateSubscription } from "./stripe-actions";
 import { ONBOARDING_STEP } from "./constants";
 
 // ─── Types ───
@@ -313,8 +313,8 @@ function StartPageInner() {
       const ctx = await getOnboardingContext();
 
       // Check URL for step param
-      const urlStep = searchParams.get("step");
-      const sessionId = searchParams.get("session_id");
+      const urlStep = searchParams?.get("step") ?? null;
+      const sessionId = searchParams?.get("session_id") ?? null;
 
       if (ctx.user) {
         setUser(ctx.user);
