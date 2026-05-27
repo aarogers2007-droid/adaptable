@@ -6,6 +6,7 @@ import { getOnboardingContext } from "./actions";
 import { activateSubscription } from "./stripe-actions";
 import { ONBOARDING_STEP } from "./constants";
 import { useAuthListener } from "./use-auth-listener";
+import Step1Auth from "./Step1Auth";
 
 const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
@@ -156,18 +157,14 @@ function StartPageInner() {
         <ProgressBar step={step} onStepClick={goToStep} />
 
         {step === 1 && (
-          <div className="mx-auto max-w-md">
-            <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)] text-center">
-              Start your program
-            </h1>
-            <p className="mt-3 text-sm text-[var(--text-secondary)] text-center">
-              Setup takes about 3 minutes
-            </p>
-            {error && <p className="mt-4 text-red-500 text-sm text-center">{error}</p>}
-            <p className="mt-8 text-xs text-gray-400 text-center">
-              Rebuilt: parent + auth hook. User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
-            </p>
-          </div>
+          <Step1Auth
+            error={error}
+            setError={setError}
+            onSignedUp={(u) => {
+              setUser(u);
+              goToStep(2);
+            }}
+          />
         )}
 
         {step === 2 && (
