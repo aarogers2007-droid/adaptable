@@ -10,10 +10,6 @@ import {
   checkSubdomainAvailability,
   saveBranding,
   launchProgram,
-  uploadCurriculumFiles,
-  approveDraftLessons,
-  skipCurriculum,
-  getDraftLessons,
 } from "./actions";
 import { activateSubscription } from "./stripe-actions";
 import { ONBOARDING_STEP } from "./constants";
@@ -23,6 +19,15 @@ import { ONBOARDING_STEP } from "./constants";
 interface FilePreview {
   file: File;
   url: string;
+}
+
+interface TierInfo {
+  id: "starter" | "growth" | "scale";
+  name: string;
+  range: string;
+  price: number;
+  features: string[];
+  recommended?: boolean;
 }
 
 // ─── Constants ───
@@ -45,8 +50,33 @@ function getPriceForCount(count: number): number {
   return 5.99; // 50,000+ floor
 }
 
+// Legacy TIERS array for backward compat with Stripe checkout (maps to price IDs)
+const TIERS: TierInfo[] = [
+  {
+    id: "starter",
+    name: "Up to 500",
+    range: "1 – 500 students",
+    price: 14.99,
+    features: [],
+  },
+  {
+    id: "growth",
+    name: "Up to 10,000",
+    range: "501 – 10,000 students",
+    price: 9.99,
+    features: [],
+    recommended: true,
+  },
+  {
+    id: "scale",
+    name: "10,000+",
+    range: "10,001 – 50,000 students",
+    price: 7.99,
+    features: [],
+  },
+];
 
-const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Curriculum", "Launch"];
+const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
 // ─── Helpers ───
 
@@ -110,14 +140,6 @@ const ANIMATION_STYLES = `
 .step-enter > *:nth-child(3) { animation-delay: 180ms; }
 .step-enter > *:nth-child(4) { animation-delay: 240ms; }
 .step-enter > *:nth-child(5) { animation-delay: 300ms; }
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
-}
 .summary-enter {
   animation: summaryReveal 500ms ease-out both;
   animation-delay: 150ms;
@@ -141,7 +163,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 `;
 
-function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: number) => void }) {
+function ProgressBar({ step }: { step: number }) {
   return (
     <div className="mb-8">
       {/* Desktop: full labels */}
@@ -152,13 +174,7 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
           const current = step === stepNum;
           return (
             <div key={label} className="flex items-center gap-2 flex-1 last:flex-none">
-              <button
-                type="button"
-                className="flex items-center gap-2 shrink-0"
-                style={{ cursor: completed ? "pointer" : "default" }}
-                onClick={() => completed && onStepClick?.(stepNum)}
-                disabled={!completed}
-              >
+              <div className="flex items-center gap-2 shrink-0">
                 <div
                   className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-semibold"
                   style={{
@@ -184,7 +200,7 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
                 >
                   {label}
                 </span>
-              </button>
+              </div>
               {i < STEP_LABELS.length - 1 && (
                 <div
                   className="flex-1 h-[2px] rounded-full mx-2"
@@ -206,14 +222,7 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
           const completed = step > stepNum;
           const current = step === stepNum;
           return (
-            <button
-              key={label}
-              type="button"
-              className="flex flex-col items-center gap-1"
-              style={{ cursor: completed ? "pointer" : "default" }}
-              onClick={() => completed && onStepClick?.(stepNum)}
-              disabled={!completed}
-            >
+            <div key={label} className="flex flex-col items-center gap-1">
               <div
                 className="h-2.5 w-2.5 rounded-full transition-colors"
                 style={{
@@ -225,7 +234,7 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
                   {label}
                 </span>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -238,16 +247,13 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
 function StartPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [supabase] = useState(() => createClient());
+  const supabase = createClient();
 
   // ─── State ───
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
-  // Welcome modal
-  const [showWelcome, setShowWelcome] = useState(false);
 
   // Auth
   const [user, setUser] = useState<{ id: string; email: string; fullName: string } | null>(null);
@@ -272,28 +278,10 @@ function StartPageInner() {
   // Step 4: Plan
   // selectedTier removed — pricing is now volume-based, tier auto-detected from student count
   const [studentCount, setStudentCount] = useState(250);
-  const [studentCountInput, setStudentCountInput] = useState("250");
 
-  // Step 5: Curriculum
-  const [ipConsent, setIpConsent] = useState(false);
-  const [curriculumFiles, setCurriculumFiles] = useState<File[]>([]);
-  const [processing, setProcessing] = useState(false);
-  const [processProgress, setProcessProgress] = useState(0);
-  const [processMessage, setProcessMessage] = useState("");
-  const [draftLessons, setDraftLessons] = useState<Array<{
-    id: string;
-    title: string;
-    objective: string;
-    module_name: string;
-    module_sequence: number;
-    lesson_sequence: number;
-    status: string;
-  }>>([]);
-  const [editingLesson, setEditingLesson] = useState<string | null>(null);
-  const [lessonEdits, setLessonEdits] = useState<Record<string, { title?: string; objective?: string }>>({});
-
-  // Step 6: Launch
+  // Step 5: Launch
   const [orgId, setOrgId] = useState<string | null>(null);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
@@ -313,8 +301,8 @@ function StartPageInner() {
       const ctx = await getOnboardingContext();
 
       // Check URL for step param
-      const urlStep = searchParams?.get("step") ?? null;
-      const sessionId = searchParams?.get("session_id") ?? null;
+      const urlStep = searchParams.get("step");
+      const sessionId = searchParams.get("session_id");
 
       if (ctx.user) {
         setUser(ctx.user);
@@ -333,6 +321,8 @@ function StartPageInner() {
         if (bc.secondary_color) setSecondaryColor(bc.secondary_color as string);
       }
 
+      if (ctx.inviteCode) setInviteCode(ctx.inviteCode);
+
       // Determine which step to show
       if (ctx.user && ctx.onboardingStep >= ONBOARDING_STEP.COMPLETE) {
         router.push("/instructor/dashboard");
@@ -340,7 +330,7 @@ function StartPageInner() {
       }
 
       if (sessionId && ctx.user) {
-        // Returning from Stripe checkout — activate subscription, then go to curriculum step
+        // Returning from Stripe checkout
         setStep(5);
         setLoading(false);
         handleStripeReturn(sessionId);
@@ -349,7 +339,7 @@ function StartPageInner() {
 
       if (urlStep) {
         const parsed = parseInt(urlStep, 10);
-        if (parsed >= 1 && parsed <= 7) {
+        if (parsed >= 1 && parsed <= 5) {
           // Only allow jumping to step if user has reached it
           if (ctx.user && parsed <= (ctx.onboardingStep ?? 0) + 1) {
             setStep(parsed);
@@ -359,7 +349,7 @@ function StartPageInner() {
         }
       } else if (ctx.user) {
         // Auto-advance to next step
-        const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 6);
+        const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
         setStep(nextStep);
       }
 
@@ -377,6 +367,13 @@ function StartPageInner() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ─── Auto-derive subdomain from org name ───
+  useEffect(() => {
+    if (orgName.trim().length >= 2) {
+      setSubdomain(toSubdomain(orgName));
+    }
+  }, [orgName]);
 
   // ─── Debounced subdomain availability check ───
   useEffect(() => {
@@ -420,10 +417,11 @@ function StartPageInner() {
             setOrgName(ctx.org.name);
             setSubdomain(ctx.org.subdomain);
             setSubdomainAvailable(true);
-            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 6);
+            if (ctx.inviteCode) setInviteCode(ctx.inviteCode);
+            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
             goToStep(nextStep);
           } else {
-            setShowWelcome(true);
+            goToStep(2);
           }
         }
       }
@@ -525,6 +523,7 @@ function StartPageInner() {
     }
 
     setOrgId(result.orgId);
+    setInviteCode(result.inviteCode);
     goToStep(3);
   }
 
@@ -563,6 +562,7 @@ function StartPageInner() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          tier: activeTier.id,
           quantity: studentCount,
           orgId,
         }),
@@ -584,7 +584,7 @@ function StartPageInner() {
     }
   }
 
-  // ─── Step 6: Handle Stripe return ───
+  // ─── Step 5: Handle Stripe return ───
 
   async function handleStripeReturn(sessionId: string) {
     setSubmitting(true);
@@ -599,7 +599,7 @@ function StartPageInner() {
     setSubmitting(false);
   }
 
-  // ─── Step 6: Launch ───
+  // ─── Step 5: Launch ───
 
   async function handleLaunch() {
     if (!orgId) return;
@@ -621,160 +621,6 @@ function StartPageInner() {
     }
   }
 
-  // ─── Step 5: Curriculum handlers ───
-
-  const curriculumFileInputRef = useRef<HTMLInputElement>(null);
-
-  async function handleCurriculumUpload() {
-    if (!orgId || !ipConsent || curriculumFiles.length === 0) return;
-    setError(null);
-    setProcessing(true);
-    setProcessProgress(0);
-    setProcessMessage("Uploading files...");
-
-    try {
-      const formData = new FormData();
-      curriculumFiles.forEach((f) => formData.append("files", f));
-
-      const uploadResult = await uploadCurriculumFiles(orgId, formData);
-
-      if ("error" in uploadResult) {
-        setError(uploadResult.error);
-        setProcessing(false);
-        return;
-      }
-
-      // Start SSE connection for processing progress
-      setProcessMessage("Analyzing curriculum...");
-      const eventSource = new EventSource(`/api/curriculum/process?orgId=${orgId}`);
-
-      eventSource.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.progress !== undefined) setProcessProgress(data.progress);
-          if (data.message) setProcessMessage(data.message);
-
-          if (data.status === "complete") {
-            eventSource.close();
-            // Fetch generated lessons
-            getDraftLessons(orgId).then((lessons) => {
-              setDraftLessons(lessons.map((l) => ({
-                ...l,
-                objective: l.objective ?? "",
-                module_name: l.module_name ?? "Module",
-                module_sequence: l.module_sequence ?? 0,
-                lesson_sequence: l.lesson_sequence ?? 0,
-              })));
-              setProcessing(false);
-            });
-          }
-
-          if (data.status === "error") {
-            eventSource.close();
-            setError(data.message || "Processing failed. Please try again.");
-            setProcessing(false);
-          }
-        } catch {
-          // ignore parse errors on partial chunks
-        }
-      };
-
-      eventSource.onerror = () => {
-        eventSource.close();
-        setError("Connection lost during processing. Please try again.");
-        setProcessing(false);
-      };
-    } catch {
-      setError("Failed to upload curriculum files.");
-      setProcessing(false);
-    }
-  }
-
-  async function handleApproveLessons() {
-    if (!orgId) return;
-    setError(null);
-    setSubmitting(true);
-
-    const approvedIds = draftLessons
-      .filter((l) => l.status !== "rejected")
-      .map((l) => l.id);
-
-    const result = await approveDraftLessons(orgId, approvedIds, lessonEdits);
-
-    if ("error" in result) {
-      setError(result.error);
-      setSubmitting(false);
-      return;
-    }
-
-    goToStep(6);
-  }
-
-  async function handleSkipCurriculum() {
-    if (!orgId) return;
-    setError(null);
-    setSubmitting(true);
-
-    const result = await skipCurriculum(orgId);
-
-    if ("error" in result) {
-      setError(result.error);
-      setSubmitting(false);
-      return;
-    }
-
-    goToStep(6);
-  }
-
-  function handleCurriculumDrop(e: React.DragEvent) {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files).filter((f) =>
-      [".pdf", ".docx", ".pptx", ".txt"].some((ext) => f.name.toLowerCase().endsWith(ext))
-    );
-    setCurriculumFiles((prev) => [...prev, ...files]);
-  }
-
-  function removeCurriculumFile(index: number) {
-    setCurriculumFiles((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function toggleLessonRemove(lessonId: string) {
-    setDraftLessons((prev) =>
-      prev.map((l) =>
-        l.id === lessonId
-          ? { ...l, status: l.status === "rejected" ? "draft" : "rejected" }
-          : l
-      )
-    );
-  }
-
-  function saveLessonEdit(lessonId: string) {
-    setEditingLesson(null);
-  }
-
-  // Group draft lessons by module for rendering
-  const curriculumModules = draftLessons.length > 0
-    ? Object.values(
-        draftLessons.reduce((acc, lesson) => {
-          const key = lesson.module_name;
-          if (!acc[key]) {
-            acc[key] = {
-              name: lesson.module_name,
-              sequence: lesson.module_sequence,
-              lessons: [],
-            };
-          }
-          acc[key].lessons.push(lesson);
-          return acc;
-        }, {} as Record<string, { name: string; sequence: number; lessons: typeof draftLessons }>)
-      )
-        .sort((a, b) => a.sequence - b.sequence)
-        .map((mod) => ({
-          ...mod,
-          lessons: mod.lessons.sort((a, b) => a.lesson_sequence - b.lesson_sequence),
-        }))
-    : [];
-
   // ─── Computed values ───
 
   const step2Valid =
@@ -782,10 +628,23 @@ function StartPageInner() {
     subdomain.length >= 3 &&
     subdomainAvailable === true;
 
-  // Stripe handles volume pricing natively — single price ID, tiers configured in Stripe Dashboard.
-  // getPriceForCount() mirrors the same tiers for display purposes only.
+  // Volume pricing has 4 tiers but Stripe only has 3 price IDs.
+  // Until a 4th Stripe price is created, 501-2500 students use the
+  // starter price ID. The actual per-student amount is controlled by
+  // Stripe's unit pricing, so the charge will match what the user sees
+  // as long as the Stripe prices are set correctly.
+  // TODO: Create 4th Stripe price when Stripe keys are configured.
+  if (studentCount > 500 && studentCount <= 2500) {
+    console.warn(
+      `[start] Student count ${studentCount} falls in the 501-2500 tier which maps to the starter Stripe price ID. Verify Stripe unit pricing is correct.`
+    );
+  }
+  const activeTier = studentCount <= 2500 ? TIERS[0]!
+    : studentCount <= 10000 ? TIERS[1]!
+    : TIERS[2]!;
+  // perStudentPrice computed inline via getPriceForCount(studentCount) in JSX
 
-  // ─── Render ───
+  // ─── Loading ───
 
   if (loading) {
     return (
@@ -795,60 +654,13 @@ function StartPageInner() {
     );
   }
 
+  // ─── Render ───
+
   return (
     <main className="flex min-h-screen items-start justify-center px-4 py-12 sm:py-20">
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_STYLES }} />
       <div className="w-full max-w-2xl">
-        <ProgressBar step={step} onStepClick={goToStep} />
-
-        {/* ═══════════════════════════════════ */}
-        {/* Welcome Modal                       */}
-        {/* ═══════════════════════════════════ */}
-        {showWelcome && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" style={{ animation: "fadeIn 300ms ease" }}>
-            <div
-              className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl"
-              style={{ animation: "scaleIn 350ms cubic-bezier(0.16, 1, 0.3, 1)" }}
-            >
-              <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)]/10">
-                  <svg className="h-7 w-7 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
-                  </svg>
-                </div>
-                <h2 className="mt-5 font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
-                  Welcome to Adaptable
-                </h2>
-                <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
-                  You upload your curriculum. We turn it into AI-guided lessons your students interact with one-on-one. Every student gets a personalized experience with your content, your branding, your name on it.
-                </p>
-              </div>
-
-              <div className="mt-6 space-y-3">
-                <div className="flex items-start gap-3 rounded-lg bg-[var(--bg-subtle)] p-3">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">1</span>
-                  <p className="text-sm text-[var(--text-secondary)]"><span className="font-medium text-[var(--text-primary)]">You bring the content.</span> Upload your existing curriculum files.</p>
-                </div>
-                <div className="flex items-start gap-3 rounded-lg bg-[var(--bg-subtle)] p-3">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">2</span>
-                  <p className="text-sm text-[var(--text-secondary)]"><span className="font-medium text-[var(--text-primary)]">We build the lessons.</span> AI creates interactive lessons from your materials.</p>
-                </div>
-                <div className="flex items-start gap-3 rounded-lg bg-[var(--bg-subtle)] p-3">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">3</span>
-                  <p className="text-sm text-[var(--text-secondary)]"><span className="font-medium text-[var(--text-primary)]">Students learn by doing.</span> Each student gets a 1-on-1 AI mentor guided by your curriculum.</p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => { setShowWelcome(false); goToStep(2); }}
-                className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)]"
-                style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
-              >
-                Let&apos;s get started
-              </button>
-            </div>
-          </div>
-        )}
+        <ProgressBar step={step} />
 
         {/* ═══════════════════════════════════ */}
         {/* STEP 1: Create Account              */}
@@ -998,29 +810,20 @@ function StartPageInner() {
                 />
               </div>
 
-              {/* Program URL */}
+              {/* Subdomain preview */}
               <div>
                 <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                  Choose your program link
+                  Your URL
                 </label>
-                <p className="text-xs text-[var(--text-muted)] mb-2">
-                  This is the link you&apos;ll share with students and staff to access your program. Pick a short word like &quot;learn&quot;, &quot;start&quot;, or &quot;app&quot;.
-                </p>
-                <div className="flex items-stretch rounded-lg border border-[var(--border-strong)] overflow-hidden focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[var(--primary)]/15 transition-all">
-                  <input
-                    type="text"
-                    value={subdomain}
-                    onChange={(e) => {
-                      const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 32);
-                      setSubdomain(val);
-                    }}
-                    className="flex-1 px-4 py-3 text-sm font-mono outline-none bg-transparent min-w-0"
-                    placeholder="learn"
-                  />
-                  <div className="flex items-center px-4 bg-[var(--bg-muted)] border-l border-[var(--border)] text-sm font-mono text-[var(--text-muted)] select-none whitespace-nowrap">
-                    .{toSubdomain(orgName) || "yourorg"}.org
-                  </div>
+                <div className="flex items-center rounded-lg border border-[var(--border-strong)] bg-[var(--bg-subtle)] px-4 py-3">
+                  <span className="font-mono text-sm text-[var(--text-primary)] font-medium">
+                    {subdomain || "your-org"}
+                  </span>
+                  <span className="font-mono text-sm text-[var(--text-muted)]">.adaptable.one</span>
                 </div>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">
+                  This is the web address your students will visit to access the program. You can change it later.
+                </p>
 
                 {/* Availability indicator */}
                 {subdomain.length >= 3 && (
@@ -1044,6 +847,7 @@ function StartPageInner() {
                     ) : null}
                   </div>
                 )}
+
               </div>
             </div>
 
@@ -1294,16 +1098,13 @@ function StartPageInner() {
                 Estimated student count
               </label>
               <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={studentCountInput}
+                type="number"
+                min={1}
+                max={100000}
+                value={studentCount}
                 onChange={(e) => {
-                  const raw = e.target.value.replace(/[^0-9]/g, "");
-                  setStudentCountInput(raw);
-                  const v = parseInt(raw, 10);
+                  const v = parseInt(e.target.value, 10);
                   if (!isNaN(v) && v >= 1) setStudentCount(Math.min(v, 100000));
-                  else if (raw === "") setStudentCount(0);
                 }}
                 className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-lg outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 font-mono"
                 autoFocus
@@ -1395,7 +1196,7 @@ function StartPageInner() {
             {/* What's included */}
             <div className="mt-6">
               <p className="text-sm text-[var(--text-secondary)]">
-                All features included: AI-guided lessons, scenarios, progress tracking, branding, impact reporting, and email support.{" "}
+                All features included: 22 AI lessons, scenarios, crisis detection, progress tracking, branding, impact reporting, and email support.{" "}
                 <button
                   type="button"
                   onClick={() => setFeaturesExpanded(!featuresExpanded)}
@@ -1407,8 +1208,9 @@ function StartPageInner() {
               {featuresExpanded && (
                 <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
-                    "AI-guided lessons (your curriculum)",
+                    "All 22 AI-guided lessons",
                     "Scenario simulations",
+                    "Crisis detection (10+ languages)",
                     "Student progress tracking",
                     "Your branding on everything",
                     "Impact reporting + CSV export",
@@ -1472,302 +1274,10 @@ function StartPageInner() {
         )}
 
         {/* ═══════════════════════════════════ */}
-        {/* STEP 5: Curriculum                   */}
+        {/* STEP 5: Launchpad                   */}
         {/* ═══════════════════════════════════ */}
         {step === 5 && (
-          <div key="step5" className="mx-auto max-w-xl step-enter">
-            {/* Phase A: Upload */}
-            {draftLessons.length === 0 && !processing && (
-              <div className="step-enter">
-                <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
-                  Upload your curriculum
-                </h1>
-                <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                  Lessons will be built exclusively from content you provide.
-                </p>
-
-                {/* IP consent checkbox */}
-                <label className="mt-6 flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={ipConsent}
-                    onChange={(e) => setIpConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/20"
-                  />
-                  <span className="text-sm text-[var(--text-secondary)]">
-                    I confirm my organization owns or has the right to use all uploaded materials
-                  </span>
-                </label>
-
-                {/* Drag-drop zone */}
-                <div
-                  onDrop={handleCurriculumDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  onClick={() => curriculumFileInputRef.current?.click()}
-                  className="mt-6 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-subtle)] px-6 py-10 cursor-pointer hover:border-[var(--primary)]/40 transition-colors"
-                >
-                  <svg className="h-8 w-8 text-[var(--text-muted)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                  </svg>
-                  <p className="text-sm text-[var(--text-muted)]">
-                    Drop PDF, DOCX, PPTX, or TXT files here, or{" "}
-                    <span className="text-[var(--primary)] font-medium">browse</span>
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--text-muted)]">
-                    Supported formats: PDF, DOCX, PPTX, TXT
-                  </p>
-                </div>
-                <input
-                  ref={curriculumFileInputRef}
-                  type="file"
-                  multiple
-                  accept=".pdf,.docx,.pptx,.txt"
-                  className="hidden"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      setCurriculumFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
-                    }
-                  }}
-                />
-
-                {/* File list */}
-                {curriculumFiles.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    {curriculumFiles.map((f, i) => (
-                      <div
-                        key={`${f.name}-${i}`}
-                        className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <svg className="h-4 w-4 text-[var(--text-muted)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                          </svg>
-                          <span className="text-sm text-[var(--text-primary)] truncate">{f.name}</span>
-                          <span className="text-xs text-[var(--text-muted)] shrink-0">
-                            {(f.size / 1024 / 1024).toFixed(1)}MB
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeCurriculumFile(i);
-                          }}
-                          className="text-xs text-[var(--error)] hover:underline shrink-0 ml-3"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {error && (
-                  <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
-                    {error}
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="mt-8 flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => goToStep(4)}
-                    className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
-                    style={{ minHeight: 44 }}
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!ipConsent || curriculumFiles.length === 0}
-                    onClick={handleCurriculumUpload}
-                    className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
-                    style={{ minHeight: 44, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
-                  >
-                    Process Curriculum
-                  </button>
-                </div>
-
-                <div className="mt-4 text-center">
-                  <button
-                    type="button"
-                    onClick={handleSkipCurriculum}
-                    disabled={submitting}
-                    className="text-sm text-[var(--primary)] font-medium hover:underline transition-colors disabled:opacity-50"
-                  >
-                    Skip — use default curriculum
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Phase B: Processing */}
-            {processing && (
-              <div className="step-enter text-center py-12">
-                <h2 className="font-[family-name:var(--font-display)] text-xl font-bold text-[var(--text-primary)]">
-                  Building your lessons...
-                </h2>
-                <div className="mt-6 mx-auto max-w-sm">
-                  <div className="h-3 w-full rounded-full bg-[var(--bg-muted)] overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500 ease-out"
-                      style={{
-                        width: `${processProgress}%`,
-                        background: "var(--primary)",
-                      }}
-                    />
-                  </div>
-                  <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                    {processMessage}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Phase C: Review */}
-            {draftLessons.length > 0 && !processing && (
-              <div className="step-enter">
-                <h2 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
-                  Your lessons are ready
-                </h2>
-                <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                  Review, edit, or remove lessons before launching.
-                </p>
-
-                <div className="mt-6 space-y-6">
-                  {curriculumModules.map((mod) => (
-                    <div key={mod.name}>
-                      <h3 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider mb-3">
-                        {mod.name}
-                      </h3>
-                      <div className="space-y-2">
-                        {mod.lessons.map((lesson) => (
-                          <div
-                            key={lesson.id}
-                            className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4 transition-opacity"
-                            style={{
-                              opacity: lesson.status === "rejected" ? 0.4 : 1,
-                              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-                            }}
-                          >
-                            {editingLesson === lesson.id ? (
-                              <div className="space-y-3">
-                                <div>
-                                  <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Title</label>
-                                  <input
-                                    type="text"
-                                    value={lessonEdits[lesson.id]?.title ?? lesson.title}
-                                    onChange={(e) =>
-                                      setLessonEdits((prev) => ({
-                                        ...prev,
-                                        [lesson.id]: { ...prev[lesson.id], title: e.target.value },
-                                      }))
-                                    }
-                                    className="w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Objective</label>
-                                  <input
-                                    type="text"
-                                    value={lessonEdits[lesson.id]?.objective ?? lesson.objective}
-                                    onChange={(e) =>
-                                      setLessonEdits((prev) => ({
-                                        ...prev,
-                                        [lesson.id]: { ...prev[lesson.id], objective: e.target.value },
-                                      }))
-                                    }
-                                    className="w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-                                  />
-                                </div>
-                                <div className="flex gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => saveLessonEdit(lesson.id)}
-                                    className="rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--primary-dark)] transition-colors"
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setEditingLesson(null);
-                                      setLessonEdits((prev) => {
-                                        const next = { ...prev };
-                                        delete next[lesson.id];
-                                        return next;
-                                      });
-                                    }}
-                                    className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                  <p className="text-sm font-medium text-[var(--text-primary)]">
-                                    {lessonEdits[lesson.id]?.title ?? lesson.title}
-                                  </p>
-                                  <p className="mt-1 text-xs text-[var(--text-muted)]">
-                                    {lessonEdits[lesson.id]?.objective ?? lesson.objective}
-                                  </p>
-                                </div>
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditingLesson(lesson.id)}
-                                    className="text-xs text-[var(--primary)] font-medium hover:underline"
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleLessonRemove(lesson.id)}
-                                    className="text-xs font-medium hover:underline"
-                                    style={{
-                                      color: lesson.status === "rejected" ? "var(--primary)" : "var(--error)",
-                                    }}
-                                  >
-                                    {lesson.status === "rejected" ? "Restore" : "Remove"}
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {error && (
-                  <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleApproveLessons}
-                  disabled={submitting || draftLessons.filter((l) => l.status !== "rejected").length === 0}
-                  className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
-                  style={{ minHeight: 44, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
-                >
-                  {submitting ? "Saving..." : `Approve ${draftLessons.filter((l) => l.status !== "rejected").length} Lessons & Continue`}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ═══════════════════════════════════ */}
-        {/* STEP 6: Launchpad                   */}
-        {/* ═══════════════════════════════════ */}
-        {step === 6 && (
-          <div key="step6" className="mx-auto max-w-lg step-enter">
+          <div key="step5" className="mx-auto max-w-lg step-enter">
             {/* Loading / verifying payment */}
             {submitting && (
               <div className="text-center py-12">
@@ -1868,22 +1378,27 @@ function StartPageInner() {
                     )}
                   </div>
 
-                  {/* Card 2: Program URL */}
+                  {/* Card 2: Invite code */}
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">
-                      Your program is live at
+                      Your invite code
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--text-muted)]">
+                      Share this code with your students. They&apos;ll enter it at{" "}
+                      <span className="font-mono font-medium">{subdomain}.adaptable.one/go</span>
                     </p>
                     <div className="mt-3 flex items-center gap-3">
-                      <code className="flex-1 rounded-lg bg-[var(--bg-muted)] border border-[var(--border)] px-4 py-3 font-mono text-sm font-semibold text-[var(--text-primary)] text-center">
-                        {subdomain}.{toSubdomain(orgName)}.org
+                      <code className="flex-1 rounded-lg bg-[var(--bg-muted)] border border-[var(--border)] px-4 py-3 font-mono text-xl font-bold text-[var(--text-primary)] tracking-wider text-center">
+                        {inviteCode || "---"}
                       </code>
                       <button
                         type="button"
                         onClick={() => {
-                          const url = `${subdomain}.${toSubdomain(orgName)}.org`;
-                          navigator.clipboard.writeText(url);
-                          setCodeCopied(true);
-                          setTimeout(() => setCodeCopied(false), 2000);
+                          if (inviteCode) {
+                            navigator.clipboard.writeText(inviteCode);
+                            setCodeCopied(true);
+                            setTimeout(() => setCodeCopied(false), 2000);
+                          }
                         }}
                         className="rounded-lg border border-[var(--border-strong)] px-3 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors shrink-0"
                         style={{ minHeight: 44 }}
@@ -1891,9 +1406,6 @@ function StartPageInner() {
                         {codeCopied ? "Copied" : "Copy"}
                       </button>
                     </div>
-                    <p className="mt-2 text-xs text-[var(--text-muted)]">
-                      Share this link with your students and staff. Anyone who visits can sign up and start the program.
-                    </p>
                   </div>
 
                 </div>
@@ -1919,7 +1431,7 @@ function StartPageInner() {
                     <p className="text-sm text-[var(--text-secondary)]">
                       Once you launch, students can access your program at{" "}
                       <span className="font-mono font-semibold text-[var(--text-primary)]">
-                        {subdomain}.{toSubdomain(orgName)}.org
+                        {subdomain}.adaptable.one
                       </span>
                     </p>
                     <div className="mt-4 flex gap-3">
@@ -1945,12 +1457,14 @@ function StartPageInner() {
                 )}
 
                 <p className="mt-6 text-center text-xs text-[var(--text-muted)]">
-                  Need help? Email{" "}
+                  Need help?{" "}
                   <a
-                    href="mailto:aj@adaptable.one"
+                    href="https://calendly.com/adaptable/setup"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-[var(--primary)] hover:underline"
                   >
-                    aj@adaptable.one
+                    Book a 15-minute setup call
                   </a>
                 </p>
               </>
