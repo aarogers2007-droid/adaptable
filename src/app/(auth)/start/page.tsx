@@ -9,6 +9,7 @@ import { useAuthListener } from "./use-auth-listener";
 import Step1Auth from "./Step1Auth";
 import Step2Program from "./Step2Program";
 import Step3Brand from "./Step3Brand";
+import Step4Pricing from "./Step4Pricing";
 
 const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
@@ -197,7 +198,14 @@ function StartPageInner() {
             onBack={() => goToStep(2)}
           />
         )}
-        {step === 4 && <div className="text-center"><h1 className="text-2xl font-bold">Step 4: Pricing</h1></div>}
+        {step === 4 && orgId && (
+          <Step4Pricing
+            orgId={orgId}
+            error={error}
+            setError={setError}
+            onBack={() => goToStep(3)}
+          />
+        )}
         {step === 5 && <div className="text-center"><h1 className="text-2xl font-bold">Step 5: Launch</h1></div>}
       </div>
     </main>
