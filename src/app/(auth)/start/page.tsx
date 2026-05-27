@@ -117,8 +117,13 @@ function StartPageInner() {
         }
 
         if (ctx.user) {
-          const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
-          setStep(nextStep);
+          // Only advance if the prerequisites are met
+          if (!ctx.org) {
+            setStep(2); // No org yet, go to program setup
+          } else {
+            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
+            setStep(nextStep);
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong");
