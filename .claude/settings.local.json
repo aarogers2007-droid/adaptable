@@ -69,7 +69,8 @@
       "Bash($B cleanup:*)",
       "Bash($B stop:*)",
       "Bash($B url:*)",
-      "Bash($B snapshot:*)"
+      "Bash($B snapshot:*)",
+      "Bash(ls ~/sim-results/all-lessons/*.json)"
     ]
   }
 }

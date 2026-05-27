@@ -122,7 +122,8 @@ const RERANK_RETURN_LIMIT = 3; // Return top 3 after re-ranking
  */
 export async function getRelevantKnowledgeWithMeta(
   lessonTag: string,
-  studentCtx?: StudentContext
+  studentCtx?: StudentContext,
+  orgId?: string
 ): Promise<KnowledgeResult> {
   const supabase = await createClient();
 
@@ -130,19 +131,25 @@ export async function getRelevantKnowledgeWithMeta(
 
   const selectFields = "id, title, verified, key_principles, concrete_examples, quotes, student_friendly_summary, challenge_qa";
 
-  let { data: candidates } = await supabase
+  let verifiedQuery = supabase
     .from("knowledge_base")
     .select(selectFields)
     .contains("lesson_tags", [lessonTag])
     .eq("verified", true)
     .limit(TAG_CANDIDATE_LIMIT);
+  if (orgId) verifiedQuery = verifiedQuery.eq("org_id", orgId);
+
+  let { data: candidates } = await verifiedQuery;
 
   if (!candidates || candidates.length === 0) {
-    const { data: fallback } = await supabase
+    let fallbackQuery = supabase
       .from("knowledge_base")
       .select(selectFields)
       .contains("lesson_tags", [lessonTag])
       .limit(TAG_CANDIDATE_LIMIT);
+    if (orgId) fallbackQuery = fallbackQuery.eq("org_id", orgId);
+
+    const { data: fallback } = await fallbackQuery;
     candidates = fallback;
   }
 
@@ -168,6 +175,7 @@ export async function getRelevantKnowledgeWithMeta(
           query_embedding: JSON.stringify(queryEmbedding),
           candidate_ids: candidateIds,
           match_count: RERANK_RETURN_LIMIT,
+          ...(orgId ? { filter_org_id: orgId } : {}),
         }
       );
 
@@ -206,8 +214,9 @@ export async function getRelevantKnowledgeWithMeta(
  */
 export async function getRelevantKnowledge(
   lessonTag: string,
-  _limit = 3
+  _limit = 3,
+  orgId?: string
 ): Promise<string> {
-  const result = await getRelevantKnowledgeWithMeta(lessonTag);
+  const result = await getRelevantKnowledgeWithMeta(lessonTag, undefined, orgId);
   return result.formatted;
 }

@@ -10,14 +10,30 @@ export default async function LessonsListPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [profileRes, lessonsRes, progressRes] = await Promise.all([
-    supabase.from("profiles").select("business_idea, full_name, role").eq("id", user.id).single(),
-    supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
+  const [profileRes, progressRes] = await Promise.all([
+    supabase.from("profiles").select("business_idea, full_name, role, org_id").eq("id", user.id).single(),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
   ]);
 
-  const profile = profileRes.data as unknown as Profile | null;
+  const profile = profileRes.data as unknown as (Profile & { org_id: string | null }) | null;
   if (!profile?.business_idea) redirect("/onboarding");
+
+  // Determine curriculum source for this org
+  let lessonsQuery = supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence");
+
+  if (profile.org_id) {
+    const { data: org } = await supabase
+      .from("organizations")
+      .select("curriculum_source")
+      .eq("id", profile.org_id)
+      .single();
+
+    if (org?.curriculum_source === "custom") {
+      lessonsQuery = lessonsQuery.eq("org_id", profile.org_id);
+    }
+  }
+
+  const lessonsRes = await lessonsQuery;
 
   const lessons = (lessonsRes.data ?? []) as unknown as Lesson[];
   const progress = (progressRes.data ?? []) as unknown as StudentProgress[];

@@ -384,7 +384,7 @@ export async function POST(request: Request) {
     };
     const tags = plan.lesson_tags ?? [];
     for (const tag of tags) {
-      const result = await getRelevantKnowledgeWithMeta(tag, studentCtx);
+      const result = await getRelevantKnowledgeWithMeta(tag, studentCtx, profile.org_id ?? undefined);
       if (result.formatted) {
         knowledgeContext = `\n\nKNOWLEDGE (weave in naturally, don't dump):\n${result.formatted}`;
         retrievedChunks = result.chunks;

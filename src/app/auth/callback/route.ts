@@ -46,7 +46,7 @@ export async function GET(request: Request) {
         // Org admin with incomplete onboarding — resume wizard
         if (profile?.role === "org_admin") {
           const onboardingStep = (profile as Record<string, unknown>)?.onboarding_step as number ?? 0;
-          if (onboardingStep < 5) {
+          if (onboardingStep < 6) {
             return NextResponse.redirect(`${origin}/start?step=${Math.max(onboardingStep, 1)}`);
           }
         }

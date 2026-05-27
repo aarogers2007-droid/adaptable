@@ -3,5 +3,6 @@ export const ONBOARDING_STEP = {
   ORG_NAMED: 2,
   BRANDED: 3,
   PAID: 4,
-  COMPLETE: 5,
+  CURRICULUM: 5,
+  COMPLETE: 6,
 } as const;

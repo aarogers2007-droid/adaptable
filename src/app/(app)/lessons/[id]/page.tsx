@@ -12,7 +12,7 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   if (!user) redirect("/login");
 
   const [profileRes, lessonRes, allLessonsRes, allProgressRes, classRes] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase.from("profiles").select("*, org_id").eq("id", user.id).single(),
     supabase.from("lessons").select("*").eq("id", id).single(),
     supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
@@ -31,8 +31,26 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
   const profile = profileRes.data as unknown as Profile | null;
   if (!profile?.business_idea) redirect("/onboarding");
 
-  const lesson = lessonRes.data as unknown as Lesson | null;
+  const lesson = lessonRes.data as unknown as (Lesson & { org_id?: string | null }) | null;
   if (!lesson) notFound();
+
+  // Verify lesson belongs to student's org (considering default fallback)
+  const studentOrgId = (profileRes.data as Record<string, unknown>)?.org_id as string | null;
+  if (studentOrgId) {
+    const { data: org } = await supabase
+      .from("organizations")
+      .select("curriculum_source")
+      .eq("id", studentOrgId)
+      .single();
+
+    if (org?.curriculum_source === "custom") {
+      // Custom curriculum: lesson must belong to this org
+      if (lesson.org_id && lesson.org_id !== studentOrgId) {
+        notFound();
+      }
+    }
+    // Default curriculum: any lesson without an org_id (or matching org) is accessible
+  }
 
   const allLessons = (allLessonsRes.data ?? []) as unknown as Lesson[];
   const allProgress = (allProgressRes.data ?? []) as unknown as StudentProgress[];

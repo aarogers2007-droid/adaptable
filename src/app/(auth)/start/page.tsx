@@ -11,6 +11,10 @@ import {
   saveBranding,
   activateSubscription,
   launchProgram,
+  uploadCurriculumFiles,
+  approveDraftLessons,
+  skipCurriculum,
+  getDraftLessons,
 } from "./actions";
 import { ONBOARDING_STEP } from "./constants";
 
@@ -42,7 +46,7 @@ function getPriceForCount(count: number): number {
 }
 
 
-const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
+const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Curriculum", "Launch"];
 
 // ─── Helpers ───
 
@@ -259,7 +263,25 @@ function StartPageInner() {
   const [studentCount, setStudentCount] = useState(250);
   const [studentCountInput, setStudentCountInput] = useState("250");
 
-  // Step 5: Launch
+  // Step 5: Curriculum
+  const [ipConsent, setIpConsent] = useState(false);
+  const [curriculumFiles, setCurriculumFiles] = useState<File[]>([]);
+  const [processing, setProcessing] = useState(false);
+  const [processProgress, setProcessProgress] = useState(0);
+  const [processMessage, setProcessMessage] = useState("");
+  const [draftLessons, setDraftLessons] = useState<Array<{
+    id: string;
+    title: string;
+    objective: string;
+    module_name: string;
+    module_sequence: number;
+    lesson_sequence: number;
+    status: string;
+  }>>([]);
+  const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [lessonEdits, setLessonEdits] = useState<Record<string, { title?: string; objective?: string }>>({});
+
+  // Step 6: Launch
   const [orgId, setOrgId] = useState<string | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [previewExpanded, setPreviewExpanded] = useState(false);
@@ -308,7 +330,7 @@ function StartPageInner() {
 
       if (sessionId && ctx.user) {
         // Returning from Stripe checkout
-        setStep(5);
+        setStep(6);
         setLoading(false);
         handleStripeReturn(sessionId);
         return;
@@ -316,7 +338,7 @@ function StartPageInner() {
 
       if (urlStep) {
         const parsed = parseInt(urlStep, 10);
-        if (parsed >= 1 && parsed <= 5) {
+        if (parsed >= 1 && parsed <= 7) {
           // Only allow jumping to step if user has reached it
           if (ctx.user && parsed <= (ctx.onboardingStep ?? 0) + 1) {
             setStep(parsed);
@@ -326,7 +348,7 @@ function StartPageInner() {
         }
       } else if (ctx.user) {
         // Auto-advance to next step
-        const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
+        const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 6);
         setStep(nextStep);
       }
 
@@ -387,7 +409,7 @@ function StartPageInner() {
             setOrgName(ctx.org.name);
             setSubdomain(ctx.org.subdomain);
             setSubdomainAvailable(true);
-            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
+            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 6);
             goToStep(nextStep);
           } else {
             goToStep(2);
@@ -551,7 +573,7 @@ function StartPageInner() {
     }
   }
 
-  // ─── Step 5: Handle Stripe return ───
+  // ─── Step 6: Handle Stripe return ───
 
   async function handleStripeReturn(sessionId: string) {
     setSubmitting(true);
@@ -566,7 +588,7 @@ function StartPageInner() {
     setSubmitting(false);
   }
 
-  // ─── Step 5: Launch ───
+  // ─── Step 6: Launch ───
 
   async function handleLaunch() {
     if (!orgId) return;
@@ -587,6 +609,160 @@ function StartPageInner() {
       setSubmitting(false);
     }
   }
+
+  // ─── Step 5: Curriculum handlers ───
+
+  const curriculumFileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleCurriculumUpload() {
+    if (!orgId || !ipConsent || curriculumFiles.length === 0) return;
+    setError(null);
+    setProcessing(true);
+    setProcessProgress(0);
+    setProcessMessage("Uploading files...");
+
+    try {
+      const formData = new FormData();
+      curriculumFiles.forEach((f) => formData.append("files", f));
+
+      const uploadResult = await uploadCurriculumFiles(orgId, formData);
+
+      if ("error" in uploadResult) {
+        setError(uploadResult.error);
+        setProcessing(false);
+        return;
+      }
+
+      // Start SSE connection for processing progress
+      setProcessMessage("Analyzing curriculum...");
+      const eventSource = new EventSource(`/api/curriculum/process?orgId=${orgId}`);
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.progress !== undefined) setProcessProgress(data.progress);
+          if (data.message) setProcessMessage(data.message);
+
+          if (data.status === "complete") {
+            eventSource.close();
+            // Fetch generated lessons
+            getDraftLessons(orgId).then((lessons) => {
+              setDraftLessons(lessons.map((l) => ({
+                ...l,
+                objective: l.objective ?? "",
+                module_name: l.module_name ?? "Module",
+                module_sequence: l.module_sequence ?? 0,
+                lesson_sequence: l.lesson_sequence ?? 0,
+              })));
+              setProcessing(false);
+            });
+          }
+
+          if (data.status === "error") {
+            eventSource.close();
+            setError(data.message || "Processing failed. Please try again.");
+            setProcessing(false);
+          }
+        } catch {
+          // ignore parse errors on partial chunks
+        }
+      };
+
+      eventSource.onerror = () => {
+        eventSource.close();
+        setError("Connection lost during processing. Please try again.");
+        setProcessing(false);
+      };
+    } catch {
+      setError("Failed to upload curriculum files.");
+      setProcessing(false);
+    }
+  }
+
+  async function handleApproveLessons() {
+    if (!orgId) return;
+    setError(null);
+    setSubmitting(true);
+
+    const approvedIds = draftLessons
+      .filter((l) => l.status !== "rejected")
+      .map((l) => l.id);
+
+    const result = await approveDraftLessons(orgId, approvedIds, lessonEdits);
+
+    if ("error" in result) {
+      setError(result.error);
+      setSubmitting(false);
+      return;
+    }
+
+    goToStep(6);
+  }
+
+  async function handleSkipCurriculum() {
+    if (!orgId) return;
+    setError(null);
+    setSubmitting(true);
+
+    const result = await skipCurriculum(orgId);
+
+    if ("error" in result) {
+      setError(result.error);
+      setSubmitting(false);
+      return;
+    }
+
+    goToStep(6);
+  }
+
+  function handleCurriculumDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      [".pdf", ".docx", ".pptx", ".txt"].some((ext) => f.name.toLowerCase().endsWith(ext))
+    );
+    setCurriculumFiles((prev) => [...prev, ...files]);
+  }
+
+  function removeCurriculumFile(index: number) {
+    setCurriculumFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function toggleLessonRemove(lessonId: string) {
+    setDraftLessons((prev) =>
+      prev.map((l) =>
+        l.id === lessonId
+          ? { ...l, status: l.status === "rejected" ? "draft" : "rejected" }
+          : l
+      )
+    );
+  }
+
+  function saveLessonEdit(lessonId: string) {
+    setEditingLesson(null);
+  }
+
+  // Group draft lessons by module for rendering
+  const curriculumModules = draftLessons.length > 0
+    ? Object.values(
+        draftLessons.reduce((acc, lesson) => {
+          const key = lesson.module_name;
+          if (!acc[key]) {
+            acc[key] = {
+              name: lesson.module_name,
+              sequence: lesson.module_sequence,
+              lessons: [],
+            };
+          }
+          acc[key].lessons.push(lesson);
+          return acc;
+        }, {} as Record<string, { name: string; sequence: number; lessons: typeof draftLessons }>)
+      )
+        .sort((a, b) => a.sequence - b.sequence)
+        .map((mod) => ({
+          ...mod,
+          lessons: mod.lessons.sort((a, b) => a.lesson_sequence - b.lesson_sequence),
+        }))
+    : [];
 
   // ─── Computed values ───
 
@@ -1238,10 +1414,302 @@ function StartPageInner() {
         )}
 
         {/* ═══════════════════════════════════ */}
-        {/* STEP 5: Launchpad                   */}
+        {/* STEP 5: Curriculum                   */}
         {/* ═══════════════════════════════════ */}
         {step === 5 && (
-          <div key="step5" className="mx-auto max-w-lg step-enter">
+          <div key="step5" className="mx-auto max-w-xl step-enter">
+            {/* Phase A: Upload */}
+            {draftLessons.length === 0 && !processing && (
+              <div className="step-enter">
+                <h1 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
+                  Upload your curriculum
+                </h1>
+                <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                  Lessons will be built exclusively from content you provide.
+                </p>
+
+                {/* IP consent checkbox */}
+                <label className="mt-6 flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={ipConsent}
+                    onChange={(e) => setIpConsent(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/20"
+                  />
+                  <span className="text-sm text-[var(--text-secondary)]">
+                    I confirm my organization owns or has the right to use all uploaded materials
+                  </span>
+                </label>
+
+                {/* Drag-drop zone */}
+                <div
+                  onDrop={handleCurriculumDrop}
+                  onDragOver={(e) => e.preventDefault()}
+                  onClick={() => curriculumFileInputRef.current?.click()}
+                  className="mt-6 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--bg-subtle)] px-6 py-10 cursor-pointer hover:border-[var(--primary)]/40 transition-colors"
+                >
+                  <svg className="h-8 w-8 text-[var(--text-muted)] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                  </svg>
+                  <p className="text-sm text-[var(--text-muted)]">
+                    Drop PDF, DOCX, PPTX, or TXT files here, or{" "}
+                    <span className="text-[var(--primary)] font-medium">browse</span>
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    Supported formats: PDF, DOCX, PPTX, TXT
+                  </p>
+                </div>
+                <input
+                  ref={curriculumFileInputRef}
+                  type="file"
+                  multiple
+                  accept=".pdf,.docx,.pptx,.txt"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setCurriculumFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+                    }
+                  }}
+                />
+
+                {/* File list */}
+                {curriculumFiles.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {curriculumFiles.map((f, i) => (
+                      <div
+                        key={`${f.name}-${i}`}
+                        className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-2.5"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <svg className="h-4 w-4 text-[var(--text-muted)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                          </svg>
+                          <span className="text-sm text-[var(--text-primary)] truncate">{f.name}</span>
+                          <span className="text-xs text-[var(--text-muted)] shrink-0">
+                            {(f.size / 1024 / 1024).toFixed(1)}MB
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeCurriculumFile(i);
+                          }}
+                          className="text-xs text-[var(--error)] hover:underline shrink-0 ml-3"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {error && (
+                  <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
+                    {error}
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="mt-8 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => goToStep(4)}
+                    className="rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
+                    style={{ minHeight: 44 }}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!ipConsent || curriculumFiles.length === 0}
+                    onClick={handleCurriculumUpload}
+                    className="flex-1 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                    style={{ minHeight: 44, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
+                  >
+                    Process Curriculum
+                  </button>
+                </div>
+
+                <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={handleSkipCurriculum}
+                    disabled={submitting}
+                    className="text-sm text-[var(--primary)] font-medium hover:underline transition-colors disabled:opacity-50"
+                  >
+                    Skip — use default curriculum
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Phase B: Processing */}
+            {processing && (
+              <div className="step-enter text-center py-12">
+                <h2 className="font-[family-name:var(--font-display)] text-xl font-bold text-[var(--text-primary)]">
+                  Building your lessons...
+                </h2>
+                <div className="mt-6 mx-auto max-w-sm">
+                  <div className="h-3 w-full rounded-full bg-[var(--bg-muted)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500 ease-out"
+                      style={{
+                        width: `${processProgress}%`,
+                        background: "var(--primary)",
+                      }}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                    {processMessage}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Phase C: Review */}
+            {draftLessons.length > 0 && !processing && (
+              <div className="step-enter">
+                <h2 className="font-[family-name:var(--font-display)] text-[32px] leading-[1.2] font-semibold text-[var(--text-primary)]">
+                  Your lessons are ready
+                </h2>
+                <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                  Review, edit, or remove lessons before launching.
+                </p>
+
+                <div className="mt-6 space-y-6">
+                  {curriculumModules.map((mod) => (
+                    <div key={mod.name}>
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider mb-3">
+                        {mod.name}
+                      </h3>
+                      <div className="space-y-2">
+                        {mod.lessons.map((lesson) => (
+                          <div
+                            key={lesson.id}
+                            className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4 transition-opacity"
+                            style={{
+                              opacity: lesson.status === "rejected" ? 0.4 : 1,
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                            }}
+                          >
+                            {editingLesson === lesson.id ? (
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Title</label>
+                                  <input
+                                    type="text"
+                                    value={lessonEdits[lesson.id]?.title ?? lesson.title}
+                                    onChange={(e) =>
+                                      setLessonEdits((prev) => ({
+                                        ...prev,
+                                        [lesson.id]: { ...prev[lesson.id], title: e.target.value },
+                                      }))
+                                    }
+                                    className="w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Objective</label>
+                                  <input
+                                    type="text"
+                                    value={lessonEdits[lesson.id]?.objective ?? lesson.objective}
+                                    onChange={(e) =>
+                                      setLessonEdits((prev) => ({
+                                        ...prev,
+                                        [lesson.id]: { ...prev[lesson.id], objective: e.target.value },
+                                      }))
+                                    }
+                                    className="w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => saveLessonEdit(lesson.id)}
+                                    className="rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--primary-dark)] transition-colors"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingLesson(null);
+                                      setLessonEdits((prev) => {
+                                        const next = { ...prev };
+                                        delete next[lesson.id];
+                                        return next;
+                                      });
+                                    }}
+                                    className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium text-[var(--text-primary)]">
+                                    {lessonEdits[lesson.id]?.title ?? lesson.title}
+                                  </p>
+                                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                                    {lessonEdits[lesson.id]?.objective ?? lesson.objective}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingLesson(lesson.id)}
+                                    className="text-xs text-[var(--primary)] font-medium hover:underline"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleLessonRemove(lesson.id)}
+                                    className="text-xs font-medium hover:underline"
+                                    style={{
+                                      color: lesson.status === "rejected" ? "var(--primary)" : "var(--error)",
+                                    }}
+                                  >
+                                    {lesson.status === "rejected" ? "Restore" : "Remove"}
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {error && (
+                  <div className="mt-4 rounded-lg border border-[var(--error)]/20 bg-[var(--error)]/5 px-3 py-2 text-sm text-[var(--error)]">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleApproveLessons}
+                  disabled={submitting || draftLessons.filter((l) => l.status !== "rejected").length === 0}
+                  className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)] disabled:opacity-50"
+                  style={{ minHeight: 44, boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
+                >
+                  {submitting ? "Saving..." : `Approve ${draftLessons.filter((l) => l.status !== "rejected").length} Lessons & Continue`}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════ */}
+        {/* STEP 6: Launchpad                   */}
+        {/* ═══════════════════════════════════ */}
+        {step === 6 && (
+          <div key="step6" className="mx-auto max-w-lg step-enter">
             {/* Loading / verifying payment */}
             {submitting && (
               <div className="text-center py-12">

@@ -424,7 +424,7 @@ export async function POST(request: Request) {
     // Try multiple tags to cast a wider net for the guide
     const tags = ["general", "niche", "customer-interviews", "marketing", "pricing", "competition"];
     for (const tag of tags) {
-      const result = await getRelevantKnowledgeWithMeta(tag, studentCtx);
+      const result = await getRelevantKnowledgeWithMeta(tag, studentCtx, (profileData as Record<string, unknown>)?.org_id as string | undefined);
       if (result.formatted) {
         knowledgeContext = "\n\nKNOWLEDGE (weave in naturally, don't dump):\n" + result.formatted;
         break;

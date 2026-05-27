@@ -492,7 +492,283 @@ export async function activateSubscription(
   return { success: true, status: subscription.status };
 }
 
-// ─── Action 6: Launch program (final step) ───
+// ─── Action 6: Upload curriculum files ───
+
+const MAX_CURRICULUM_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_CURRICULUM_FILES = 20;
+const ALLOWED_CURRICULUM_TYPES: Record<string, string> = {
+  "application/pdf": "pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+  "text/plain": "txt",
+};
+
+export async function uploadCurriculumFiles(
+  orgId: string,
+  formData: FormData
+): Promise<{ success: true; uploadIds: string[] } | { error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  // Verify user is org_admin of this org
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("org_id, role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") {
+    return { error: "Unauthorized: you are not the admin of this organization." };
+  }
+
+  const files = formData.getAll("files") as File[];
+  if (!files.length) return { error: "No files provided." };
+  if (files.length > MAX_CURRICULUM_FILES) {
+    return { error: `Maximum ${MAX_CURRICULUM_FILES} files allowed.` };
+  }
+
+  // Validate all files before uploading any
+  for (const file of files) {
+    if (file.size > MAX_CURRICULUM_FILE_SIZE) {
+      return { error: `File "${file.name}" exceeds 50MB limit.` };
+    }
+    if (!ALLOWED_CURRICULUM_TYPES[file.type]) {
+      return { error: `File "${file.name}" is not an allowed type. Use PDF, DOCX, PPTX, or TXT.` };
+    }
+  }
+
+  const admin = createAdminClient();
+  const uploadIds: string[] = [];
+
+  for (const file of files) {
+    const fileType = ALLOWED_CURRICULUM_TYPES[file.type];
+    const storagePath = `${orgId}/${file.name}`;
+
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from("curriculum-files")
+      .upload(storagePath, file, {
+        contentType: file.type,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("[start/actions] curriculum file upload failed:", uploadError);
+      return { error: `Failed to upload "${file.name}". Please try again.` };
+    }
+
+    // Insert curriculum_uploads row
+    const { data: row, error: insertError } = await admin
+      .from("curriculum_uploads")
+      .insert({
+        org_id: orgId,
+        uploaded_by: user.id,
+        file_name: file.name,
+        file_path: storagePath,
+        file_size_bytes: file.size,
+        file_type: fileType,
+        ip_consent_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      console.error("[start/actions] curriculum_uploads insert failed:", insertError);
+      return { error: `Failed to record upload for "${file.name}".` };
+    }
+
+    uploadIds.push(row.id);
+  }
+
+  return { success: true, uploadIds };
+}
+
+// ─── Action 7: Approve draft lessons ───
+
+export async function approveDraftLessons(
+  orgId: string,
+  approvedIds: string[],
+  edits: Record<string, { title?: string; objective?: string }>
+): Promise<{ success: true } | { error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  // Verify user is org_admin of this org
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("org_id, role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") {
+    return { error: "Unauthorized: you are not the admin of this organization." };
+  }
+
+  const admin = createAdminClient();
+
+  // Fetch all approved drafts
+  const { data: drafts, error: fetchError } = await admin
+    .from("curriculum_draft_lessons")
+    .select("*")
+    .eq("org_id", orgId)
+    .in("id", approvedIds);
+
+  if (fetchError || !drafts?.length) {
+    return { error: "No draft lessons found to approve." };
+  }
+
+  for (const draft of drafts) {
+    const draftEdits = edits[draft.id];
+    const title = draftEdits?.title ?? draft.title;
+    const objective = draftEdits?.objective ?? draft.objective;
+
+    // Mark draft as approved (apply edits if any)
+    await admin
+      .from("curriculum_draft_lessons")
+      .update({
+        status: "approved",
+        title,
+        objective,
+      })
+      .eq("id", draft.id);
+
+    // Insert into lessons table
+    await admin.from("lessons").insert({
+      org_id: orgId,
+      title,
+      objective,
+      module_name: draft.module_name,
+      module_sequence: draft.module_sequence,
+      lesson_sequence: draft.lesson_sequence,
+      content_template: (draft.ai_generated_plan as Record<string, unknown>) ?? {},
+    });
+
+    // Insert/update knowledge_base lesson_tags for this lesson
+    // Link the source chunks to knowledge base via lesson tags if applicable
+    if (draft.source_chunk_ids?.length) {
+      const { data: chunks } = await admin
+        .from("curriculum_chunks")
+        .select("id")
+        .eq("org_id", orgId)
+        .in("id", draft.source_chunk_ids);
+
+      if (chunks?.length) {
+        for (const chunk of chunks) {
+          await admin.from("knowledge_base").upsert(
+            {
+              org_id: orgId,
+              title: `Curriculum: ${title}`,
+              lesson_tags: [title],
+              student_friendly_summary: objective ?? "",
+              verified: false,
+            },
+            { onConflict: "org_id,title" }
+          ).select("id");
+        }
+      }
+    }
+  }
+
+  // Update organization curriculum_source
+  await admin
+    .from("organizations")
+    .update({ curriculum_source: "custom" })
+    .eq("id", orgId);
+
+  // Advance onboarding step
+  await admin
+    .from("profiles")
+    .update({ onboarding_step: ONBOARDING_STEP.CURRICULUM })
+    .eq("id", user.id);
+
+  return { success: true };
+}
+
+// ─── Action 8: Skip curriculum (use defaults) ───
+
+export async function skipCurriculum(
+  orgId: string
+): Promise<{ success: true } | { error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
+
+  // Verify user is org_admin of this org
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("org_id, role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") {
+    return { error: "Unauthorized: you are not the admin of this organization." };
+  }
+
+  const admin = createAdminClient();
+
+  // Set curriculum source to default
+  await admin
+    .from("organizations")
+    .update({ curriculum_source: "default" })
+    .eq("id", orgId);
+
+  // Advance onboarding step
+  await admin
+    .from("profiles")
+    .update({ onboarding_step: ONBOARDING_STEP.CURRICULUM })
+    .eq("id", user.id);
+
+  return { success: true };
+}
+
+// ─── Action 9: Get draft lessons ───
+
+export type DraftLesson = {
+  id: string;
+  title: string;
+  objective: string | null;
+  module_name: string | null;
+  module_sequence: number | null;
+  lesson_sequence: number | null;
+  ai_generated_plan: Record<string, unknown> | null;
+  status: string;
+  created_at: string;
+};
+
+export async function getDraftLessons(
+  orgId: string
+): Promise<DraftLesson[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // Verify user is org_admin of this org
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("org_id, role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") {
+    return [];
+  }
+
+  const admin = createAdminClient();
+
+  const { data: drafts } = await admin
+    .from("curriculum_draft_lessons")
+    .select("id, title, objective, module_name, module_sequence, lesson_sequence, ai_generated_plan, status, created_at")
+    .eq("org_id", orgId)
+    .in("status", ["proposed", "edited"])
+    .order("module_sequence", { ascending: true })
+    .order("lesson_sequence", { ascending: true });
+
+  return (drafts ?? []) as DraftLesson[];
+}
+
+// ─── Action 10: Launch program (final step) ───
 
 export async function launchProgram(
   orgId: string
@@ -513,6 +789,27 @@ export async function launchProgram(
   }
 
   const admin = createAdminClient();
+
+  // Verify curriculum readiness
+  const { data: org } = await admin
+    .from("organizations")
+    .select("curriculum_source")
+    .eq("id", orgId)
+    .single();
+
+  if (org?.curriculum_source === "custom") {
+    // Must have at least 1 approved lesson
+    const { count } = await admin
+      .from("lessons")
+      .select("id", { count: "exact", head: true })
+      .eq("org_id", orgId);
+
+    if (!count || count < 1) {
+      return { error: "Upload curriculum or choose the default before launching." };
+    }
+  } else if (org?.curriculum_source !== "default") {
+    return { error: "Upload curriculum or choose the default before launching." };
+  }
 
   // Activate the organization
   await admin

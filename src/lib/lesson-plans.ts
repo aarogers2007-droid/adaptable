@@ -716,6 +716,54 @@ export const LESSON_PLANS: LessonPlan[] = [
 /**
  * Find a lesson plan by module and lesson sequence.
  */
+/**
+ * Get lesson plans scoped to an org.
+ * If the org uses custom curriculum (curriculum_source = 'custom'),
+ * returns lesson plans from the database for that org.
+ * Otherwise returns the default hardcoded LESSON_PLANS array.
+ */
+export async function getOrgLessonPlans(orgId: string): Promise<LessonPlan[]> {
+  const { createClient } = await import("@/lib/supabase/server");
+  const supabase = await createClient();
+
+  // Check organization's curriculum_source
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("curriculum_source")
+    .eq("id", orgId)
+    .single();
+
+  if (!org || org.curriculum_source !== "custom") {
+    return LESSON_PLANS;
+  }
+
+  // Fetch custom lesson plans from lessons table for this org
+  const { data: lessons } = await supabase
+    .from("lessons")
+    .select("*")
+    .eq("org_id", orgId)
+    .order("module_sequence")
+    .order("lesson_sequence");
+
+  if (!lessons || lessons.length === 0) {
+    // Fallback to defaults if org has no custom lessons yet
+    return LESSON_PLANS;
+  }
+
+  // Map DB lesson rows to LessonPlan shape
+  return lessons.map((lesson: Record<string, unknown>) => ({
+    lesson_id: lesson.lesson_sequence as number,
+    module_id: lesson.module_sequence as number,
+    title: lesson.title as string,
+    objective: (lesson.objective as string) ?? "",
+    opener: (lesson.opener as string) ?? "",
+    checkpoints: (lesson.checkpoints as LessonCheckpoint[]) ?? [],
+    completion_criteria: (lesson.completion_criteria as string) ?? "",
+    personalization_hooks: (lesson.personalization_hooks as string[]) ?? [],
+    lesson_tags: (lesson.lesson_tags as string[]) ?? [],
+  }));
+}
+
 export function getLessonPlan(
   moduleSequence: number,
   lessonSequence: number
