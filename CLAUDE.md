@@ -1,6 +1,8 @@
 # Adaptable
 
-AI-native venture studio where students design, plan, and prepare to launch real businesses. Built for VentureLab.
+White-label AI curriculum platform for organizations and nonprofits. Each org uploads
+their branding and curriculum, students see the org's name on everything, never Adaptable's.
+First customer: VentureLab (10,000 students, founding partner at $4.99/student).
 
 ## The Adaptable Factual Floor
 
@@ -122,6 +124,125 @@ Views: `lesson_effectiveness` (avg completion, tokens, ratings per lesson), `at_
 ### Streaming UX
 All chat interfaces (lesson, scenario, guide) throttle state updates to `requestAnimationFrame` to prevent choppy re-renders during SSE streaming. Buffer pattern: accumulate text in a ref, flush to state on rAF callback.
 
+## Language Rules
+
+This is an org platform, not a classroom tool. Enforce these everywhere: code,
+comments, copy, error messages, documentation.
+
+- **Say "organizations" and "org admins."** Never "teachers" or "classroom."
+  Teacher/instructor features are P3 optional.
+- **Say "students" or "participants."** Never "users" in student-facing copy.
+- **Say "program" or "curriculum."** Never "course" or "class" in org-facing copy.
+- **No specific lesson counts.** Never say "22 lessons" or any fixed number. Orgs
+  have their own curriculum with their own lesson count.
+- **No "Adaptable" in student-facing UI.** Students see the org's name. Only the
+  landing page (adaptable.one) and admin-facing settings show "Adaptable."
+
+## Target Hardware
+
+Students use school Chromebooks (2GB RAM, 1366x768, spotty WiFi). Every technical
+choice must be validated against this baseline first.
+
+- **No WebGL, canvas, or heavy JS animations.** CSS/DOM/SVG only.
+- **Bundle size matters.** Don't add large client-side libraries without justification.
+- **Test at 375px (iPhone SE) and 1366px (Chromebook).** Every user-facing change
+  must work at both widths.
+
+## Mobile-First Verification
+
+**Every time user-facing UI is created or modified**, verify it works on mobile
+before considering the task complete:
+
+1. Check all elements at 375px width (no horizontal overflow, no clipped text)
+2. All buttons minimum 44px touch target
+3. All text minimum 14px (no 12px labels on mobile)
+4. No layout that requires horizontal scrolling
+5. Inputs are full-width on mobile
+6. Modals/overlays are scrollable if content exceeds viewport height
+
+If generating an HTML preview, include a mobile viewport toggle so the user can
+verify both desktop and mobile in one view.
+
+## Build and Commit Discipline
+
+1. **Always verify `npx next build` passes before committing.** No exceptions.
+   A broken build that reaches main is a deployment failure.
+2. **Run `/cso` after any security-sensitive change** (auth, payments, API routes,
+   RLS policies, CSRF, rate limiting).
+3. **Run `/checkpoint` at natural session boundaries** (end of a feature, before
+   switching contexts, before the user leaves).
+4. **Stage specific files.** Never `git add -A`. Name the files being committed.
+
+## Data Integrity Rules
+
+The engagement data IS the product. Nonprofits use it for sponsor reports and grant
+applications. One wrong number discovered by a sponsor destroys the value proposition.
+
+1. **Every ai_usage_log insert must include org_id.** No exceptions. Cross-tenant
+   data leakage is a product-killing bug.
+2. **Every ai_usage_log insert must use real token counts** from finalMessage().usage,
+   not estimates. Include cache_read and cache_creation tokens where applicable.
+3. **Every fire-and-forget DB write must have .catch() with console.error.** Silent
+   write failures mean invisible data loss.
+4. **Use DISTINCT/Set when counting unique entities.** No double-counting students,
+   lessons, or sessions.
+5. **Cost formulas must match the actual model being called.** Sonnet, Haiku, and
+   Mini have different rates. Cache reads cost 10% of base. Don't hardcode $0.
+6. **Dashboard numbers and CSV exports must use the same data source.** If the
+   dashboard shows 247 completions, the CSV must show 247.
+
+## API Route Checklist
+
+When creating or modifying any API route in `src/app/api/`, verify ALL of these:
+
+- [ ] Auth check (supabase.auth.getUser, return 401 if missing)
+- [ ] Profile query includes org_id
+- [ ] org_id is not null (return 403 "Account not configured" if missing)
+- [ ] CSRF validation (validateOrigin) on non-webhook routes
+- [ ] Rate limiting via reserve_ai_usage RPC (unless admin bypass)
+- [ ] Content moderation on user input (moderateContent + moderateContentML)
+- [ ] ai_usage_log insert includes org_id and real token counts
+- [ ] Streaming routes have output moderation (moderateOutput + createStreamScrubber)
+- [ ] Crisis detection runs on student messages (detectCrisisUniversal)
+- [ ] Error responses are student-friendly, not raw error messages
+
+## Security Posture
+
+Standing rules from two CSO audits. Do not regress on these.
+
+- **CSRF must fail closed.** If NEXT_PUBLIC_SITE_URL is not set, block the request.
+  If no Origin and no Referer header, block the request.
+- **Rate limiters must fail closed.** If the RPC errors, deny the request. Never
+  fail open and allow unlimited access.
+- **Never hardcode emails or user IDs for admin checks.** Use `is_platform_owner`
+  flag on the profiles table.
+- **Tenant cache has a hard cap** (100 entries). Force-evict oldest after lazy pass.
+- **Crisis alert emails never include the matched trigger phrase.** Keep raw text in
+  the DB audit log, send only the crisis type to instructors.
+- **Webhook handlers must null-check subscription.items.data[0]** before accessing.
+
+## Pricing Reference
+
+Volume pricing (single Stripe price ID with tiers):
+- 1-500 students: $14.99/student/year + $2,500 implementation fee
+- 501-2,500: $12.99 + $2,500
+- 2,501-10,000: $9.99 + $2,500
+- 10,001-50,000: $7.99 + $2,500
+- 50,000+: negotiable
+
+Founding Partner (VentureLab): $4.99/student, no implementation fee, lookup key: founding-partner
+
+All features at every level. No gating. Prices only go up.
+
+## Terminal Safety
+
+- **Never run `npm run dev`, `npm start`, or any blocking server command** in the
+  Claude Code terminal. These lock the session. Use `run_in_background` if needed.
+- **Always warn before destructive operations** (rm -rf, git reset --hard,
+  DROP TABLE, etc.).
+- **List all steps before executing a multi-step operation** so the user can
+  intervene if something looks wrong.
+
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
 All font choices, colors, spacing, and aesthetic direction are defined there.
@@ -145,3 +266,11 @@ Key routing rules:
 - Design system, brand → invoke design-consultation
 - Visual audit, design polish → invoke design-review
 - Architecture review → invoke plan-eng-review
+- Save progress, checkpoint, resume → invoke checkpoint
+- Code quality, health check → invoke health
+- Security audit, "is this secure" → invoke cso
+
+Automatic triggers (run without being asked):
+- After security-sensitive changes (auth, payments, API routes) → run /cso
+- At end of major features or before user leaves → run /checkpoint
+- Before committing → verify build passes
