@@ -110,6 +110,14 @@ const ANIMATION_STYLES = `
 .step-enter > *:nth-child(3) { animation-delay: 180ms; }
 .step-enter > *:nth-child(4) { animation-delay: 240ms; }
 .step-enter > *:nth-child(5) { animation-delay: 300ms; }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
 .summary-enter {
   animation: summaryReveal 500ms ease-out both;
   animation-delay: 150ms;
@@ -237,6 +245,9 @@ function StartPageInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Welcome modal
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // Auth
   const [user, setUser] = useState<{ id: string; email: string; fullName: string } | null>(null);
@@ -412,7 +423,7 @@ function StartPageInner() {
             const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 6);
             goToStep(nextStep);
           } else {
-            goToStep(2);
+            setShowWelcome(true);
           }
         }
       }
@@ -791,6 +802,55 @@ function StartPageInner() {
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_STYLES }} />
       <div className="w-full max-w-2xl">
         <ProgressBar step={step} onStepClick={goToStep} />
+
+        {/* ═══════════════════════════════════ */}
+        {/* Welcome Modal                       */}
+        {/* ═══════════════════════════════════ */}
+        {showWelcome && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" style={{ animation: "fadeIn 300ms ease" }}>
+            <div
+              className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl"
+              style={{ animation: "scaleIn 350ms cubic-bezier(0.16, 1, 0.3, 1)" }}
+            >
+              <div className="text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)]/10">
+                  <svg className="h-7 w-7 text-[var(--primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                  </svg>
+                </div>
+                <h2 className="mt-5 font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+                  Welcome to Adaptable
+                </h2>
+                <p className="mt-4 text-sm leading-relaxed text-[var(--text-secondary)]">
+                  You upload your curriculum. We turn it into AI-guided lessons your students interact with one-on-one. Every student gets a personalized experience with your content, your branding, your name on it.
+                </p>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <div className="flex items-start gap-3 rounded-lg bg-[var(--bg-subtle)] p-3">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">1</span>
+                  <p className="text-sm text-[var(--text-secondary)]"><span className="font-medium text-[var(--text-primary)]">You bring the content.</span> Upload your existing curriculum files.</p>
+                </div>
+                <div className="flex items-start gap-3 rounded-lg bg-[var(--bg-subtle)] p-3">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">2</span>
+                  <p className="text-sm text-[var(--text-secondary)]"><span className="font-medium text-[var(--text-primary)]">We build the lessons.</span> AI creates interactive lessons from your materials.</p>
+                </div>
+                <div className="flex items-start gap-3 rounded-lg bg-[var(--bg-subtle)] p-3">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-xs font-bold text-white">3</span>
+                  <p className="text-sm text-[var(--text-secondary)]"><span className="font-medium text-[var(--text-primary)]">Students learn by doing.</span> Each student gets a 1-on-1 AI mentor guided by your curriculum.</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => { setShowWelcome(false); goToStep(2); }}
+                className="mt-8 w-full rounded-lg bg-[var(--primary)] px-4 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[var(--primary-dark)]"
+                style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1)" }}
+              >
+                Let&apos;s get started
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ═══════════════════════════════════ */}
         {/* STEP 1: Create Account              */}
