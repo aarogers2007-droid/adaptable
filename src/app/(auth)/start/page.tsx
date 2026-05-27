@@ -164,7 +164,45 @@ function StartPageInner() {
       }
     }
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    return () => { if (logo) URL.revokeObjectURL(logo.url); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (subdomain.length < 3) { setSubdomainAvailable(null); setSubdomainError(null); return; }
+    setSubdomainChecking(true); setSubdomainAvailable(null); setSubdomainError(null);
+    const timer = setTimeout(async () => {
+      const result = await checkSubdomainAvailability(subdomain);
+      setSubdomainAvailable(result.available);
+      setSubdomainError(result.error ?? null);
+      setSubdomainChecking(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [subdomain]);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN" && session?.user && !user) {
+          const u = session.user;
+          setEmail(""); setPassword("");
+          setUser({ id: u.id, email: u.email ?? "", fullName: u.user_metadata?.full_name ?? "" });
+          const ctx = await getOnboardingContext();
+          if (ctx.org) {
+            setOrgId(ctx.org.id); setOrgName(ctx.org.name); setSubdomain(ctx.org.subdomain); setSubdomainAvailable(true);
+            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
+            goToStep(nextStep);
+          } else { goToStep(2); }
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // ─── Handlers ───
 
