@@ -8,6 +8,7 @@ import { ONBOARDING_STEP } from "./constants";
 import { useAuthListener } from "./use-auth-listener";
 import Step1Auth from "./Step1Auth";
 import Step2Program from "./Step2Program";
+import Step3Brand from "./Step3Brand";
 
 const STEP_LABELS = ["Account", "Program", "Brand", "Pricing", "Launch"];
 
@@ -186,7 +187,16 @@ function StartPageInner() {
           />
         )}
 
-        {step === 3 && <div className="text-center"><h1 className="text-2xl font-bold">Step 3: Brand</h1></div>}
+        {step === 3 && orgId && (
+          <Step3Brand
+            orgId={orgId}
+            orgName={orgName}
+            error={error}
+            setError={setError}
+            onComplete={() => goToStep(4)}
+            onBack={() => goToStep(2)}
+          />
+        )}
         {step === 4 && <div className="text-center"><h1 className="text-2xl font-bold">Step 4: Pricing</h1></div>}
         {step === 5 && <div className="text-center"><h1 className="text-2xl font-bold">Step 5: Launch</h1></div>}
       </div>
