@@ -186,11 +186,14 @@ function StartPageInner() {
     return () => clearTimeout(timer);
   }, [subdomain]);
 
-  // Effect 3: auth state listener
+  // Effect 3: auth state listener (no user dependency — use ref to avoid re-render loop)
+  const userRef = useRef(user);
+  userRef.current = user;
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === "SIGNED_IN" && session?.user && !user) {
+        if (event === "SIGNED_IN" && session?.user && !userRef.current) {
           const u = session.user;
           setEmail(""); setPassword("");
           setUser({ id: u.id, email: u.email ?? "", fullName: u.user_metadata?.full_name ?? "" });
@@ -205,7 +208,7 @@ function StartPageInner() {
     );
     return () => subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, []);
 
   // ─── Handlers ───
 
@@ -304,7 +307,7 @@ function StartPageInner() {
             <p className="mt-2 text-sm text-center text-gray-500">Setup takes about 3 minutes</p>
             {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
             <p className="mt-8 text-sm text-gray-400 text-center">
-              Layer 6c: All 3 effects (logo + subdomain + auth listener). User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
+              Layer 6d: Auth listener with ref (no user dependency). User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
             </p>
           </div>
         )}
