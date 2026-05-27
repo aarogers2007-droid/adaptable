@@ -173,7 +173,20 @@ function StartPageInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Effects 2 and 3 disabled for layer testing
+  // Effect 2: subdomain debounce
+  useEffect(() => {
+    if (subdomain.length < 3) { setSubdomainAvailable(null); setSubdomainError(null); return; }
+    setSubdomainChecking(true); setSubdomainAvailable(null); setSubdomainError(null);
+    const timer = setTimeout(async () => {
+      const result = await checkSubdomainAvailability(subdomain);
+      setSubdomainAvailable(result.available);
+      setSubdomainError(result.error ?? null);
+      setSubdomainChecking(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [subdomain]);
+
+  // Effect 3 (auth listener) disabled for layer testing
 
   // ─── Handlers ───
 
@@ -272,7 +285,7 @@ function StartPageInner() {
             <p className="mt-2 text-sm text-center text-gray-500">Setup takes about 3 minutes</p>
             {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
             <p className="mt-8 text-sm text-gray-400 text-center">
-              Layer 4c: State declarations only. User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
+              Layer 6b: Effects 1+2 (logo cleanup + subdomain debounce). User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
             </p>
           </div>
         )}
