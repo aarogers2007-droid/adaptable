@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -238,7 +238,7 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
 function StartPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = useMemo(() => createClient(), []);
+  const [supabase] = useState(() => createClient());
 
   // ─── State ───
   const [step, setStep] = useState(1);
@@ -785,7 +785,7 @@ function StartPageInner() {
   // Stripe handles volume pricing natively — single price ID, tiers configured in Stripe Dashboard.
   // getPriceForCount() mirrors the same tiers for display purposes only.
 
-  // ─── Loading ───
+  // ─── Render ───
 
   if (loading) {
     return (
@@ -794,8 +794,6 @@ function StartPageInner() {
       </main>
     );
   }
-
-  // ─── Render ───
 
   return (
     <main className="flex min-h-screen items-start justify-center px-4 py-12 sm:py-20">
