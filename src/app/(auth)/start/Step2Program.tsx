@@ -62,7 +62,7 @@ export default function Step2Program({ onComplete, error, setError }: Step2Props
             onChange={(e) => setOrgName(e.target.value.slice(0, 100))}
             maxLength={100}
             className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-            placeholder="e.g., VentureLab"
+            placeholder="e.g., Riverside Academy"
             autoFocus
           />
         </div>

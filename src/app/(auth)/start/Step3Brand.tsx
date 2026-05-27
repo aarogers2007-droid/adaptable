@@ -91,7 +91,7 @@ export default function Step3Brand({ orgId, orgName, onComplete, onBack, error, 
           <div>
             <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Primary Color</label>
             <div className="flex items-center gap-3">
-              <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="h-11 w-11 cursor-pointer rounded-xl border border-[var(--border)] p-0 overflow-hidden" />
+              <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="h-11 w-11 cursor-pointer rounded-lg border border-[var(--border)] p-1" />
               <input type="text" value={primaryColor} onChange={(e) => { if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) setPrimaryColor(e.target.value); }} maxLength={7} className="w-24 font-mono text-sm rounded-lg border border-[var(--border-strong)] px-3 py-2 outline-none focus:border-[var(--primary)]" />
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function Step3Brand({ orgId, orgName, onComplete, onBack, error, 
           <div>
             <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Secondary Color</label>
             <div className="flex items-center gap-3">
-              <input type="color" value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} className="h-11 w-11 cursor-pointer rounded-xl border border-[var(--border)] p-0 overflow-hidden" />
+              <input type="color" value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} className="h-11 w-11 cursor-pointer rounded-lg border border-[var(--border)] p-1" />
               <input type="text" value={secondaryColor} onChange={(e) => { if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) setSecondaryColor(e.target.value); }} maxLength={7} className="w-24 font-mono text-sm rounded-lg border border-[var(--border-strong)] px-3 py-2 outline-none focus:border-[var(--primary)]" />
             </div>
           </div>
