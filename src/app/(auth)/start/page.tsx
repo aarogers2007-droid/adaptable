@@ -186,7 +186,26 @@ function StartPageInner() {
     return () => clearTimeout(timer);
   }, [subdomain]);
 
-  // Effect 3 (auth listener) disabled for layer testing
+  // Effect 3: auth state listener
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN" && session?.user && !user) {
+          const u = session.user;
+          setEmail(""); setPassword("");
+          setUser({ id: u.id, email: u.email ?? "", fullName: u.user_metadata?.full_name ?? "" });
+          const ctx = await getOnboardingContext();
+          if (ctx.org) {
+            setOrgId(ctx.org.id); setOrgName(ctx.org.name); setSubdomain(ctx.org.subdomain); setSubdomainAvailable(true);
+            const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
+            goToStep(nextStep);
+          } else { goToStep(2); }
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // ─── Handlers ───
 
@@ -285,7 +304,7 @@ function StartPageInner() {
             <p className="mt-2 text-sm text-center text-gray-500">Setup takes about 3 minutes</p>
             {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
             <p className="mt-8 text-sm text-gray-400 text-center">
-              Layer 6b: Effects 1+2 (logo cleanup + subdomain debounce). User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
+              Layer 6c: All 3 effects (logo + subdomain + auth listener). User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
             </p>
           </div>
         )}
