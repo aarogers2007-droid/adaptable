@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { stripe } from "@/lib/stripe";
 import type Stripe from "stripe";
-import { ONBOARDING_STEP } from "./constants";
+import { ONBOARDING_STEP, type DraftLesson } from "./constants";
 
 // ─── Reserved subdomains ───
 
@@ -724,18 +724,6 @@ export async function skipCurriculum(
 }
 
 // ─── Action 9: Get draft lessons ───
-
-export type DraftLesson = {
-  id: string;
-  title: string;
-  objective: string | null;
-  module_name: string | null;
-  module_sequence: number | null;
-  lesson_sequence: number | null;
-  ai_generated_plan: Record<string, unknown> | null;
-  status: string;
-  created_at: string;
-};
 
 export async function getDraftLessons(
   orgId: string
