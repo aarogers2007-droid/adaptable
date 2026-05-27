@@ -149,53 +149,13 @@ function StartPageInner() {
     setStep(n);
   }
 
-  // ─── Init ───
   useEffect(() => {
     async function init() {
       try {
         const ctx = await getOnboardingContext();
-
-        const urlStep = searchParams?.get("step") ?? null;
-        const sessionId = searchParams?.get("session_id") ?? null;
-
-        if (ctx.user) {
-          setUser(ctx.user);
-          setFullName(ctx.user.fullName);
-          setEmail(ctx.user.email);
-        }
-
-        if (ctx.org) {
-          setOrgId(ctx.org.id);
-          setOrgName(ctx.org.name);
-          setSubdomain(ctx.org.subdomain);
-          setSubdomainAvailable(true);
-          const bc = ctx.org.brandingConfig;
-          if (bc.primary_color) setPrimaryColor(bc.primary_color as string);
-          if (bc.secondary_color) setSecondaryColor(bc.secondary_color as string);
-        }
-
         if (ctx.user && ctx.onboardingStep >= ONBOARDING_STEP.COMPLETE) {
           router.push("/instructor/dashboard");
           return;
-        }
-
-        if (sessionId && ctx.user) {
-          setStep(5);
-          setLoading(false);
-          handleStripeReturn(sessionId);
-          return;
-        }
-
-        if (urlStep) {
-          const parsed = parseInt(urlStep, 10);
-          if (parsed >= 1 && parsed <= 6) {
-            if (ctx.user && parsed <= (ctx.onboardingStep ?? 0) + 1) {
-              setStep(parsed);
-            }
-          }
-        } else if (ctx.user) {
-          const nextStep = Math.min((ctx.onboardingStep ?? 0) + 1, 5);
-          setStep(nextStep);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong");
@@ -204,86 +164,9 @@ function StartPageInner() {
       }
     }
     init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Effects disabled for layer testing
-
-  // ─── Handlers ───
-  const handleFileSelect = useCallback((file: File) => {
-    const err = validateFileUpload(file);
-    if (err) { setError(err); return; }
-    setError(null);
-    const url = URL.createObjectURL(file);
-    if (logo) URL.revokeObjectURL(logo.url);
-    setLogo({ file, url });
-  }, [logo]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileSelect(file);
-  }, [handleFileSelect]);
-
-  async function handleGoogleSignIn() {
-    setError(null); setAuthMode("google");
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=/start" } });
-    if (error) { setError(error.message); setAuthMode("idle"); }
-  }
-
-  async function handleEmailSignUp(e: React.FormEvent) {
-    e.preventDefault(); setError(null);
-    const trimmedName = fullName.trim();
-    if (!trimmedName) { setError("Please enter your name."); return; }
-    setSubmitting(true);
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password, options: { data: { full_name: trimmedName } } });
-    if (signUpError) { setError(signUpError.message); setSubmitting(false); return; }
-    if (data.user) { setUser({ id: data.user.id, email: data.user.email ?? "", fullName: trimmedName }); goToStep(2); }
-    setSubmitting(false);
-  }
-
-  async function handleCreateOrg() {
-    setError(null); setSubmitting(true);
-    const result = await createOrgStub(orgName.trim(), subdomain);
-    if ("error" in result) { setError(result.error); setSubmitting(false); return; }
-    setOrgId(result.orgId); goToStep(3);
-  }
-
-  async function handleSaveBranding() {
-    if (!orgId) return; setError(null); setSubmitting(true);
-    const formData = new FormData();
-    formData.set("primaryColor", primaryColor); formData.set("secondaryColor", secondaryColor);
-    if (logo) formData.set("logo", logo.file);
-    const result = await saveBranding(orgId, formData);
-    if ("error" in result) { setError(result.error); setSubmitting(false); return; }
-    goToStep(4);
-  }
-
-  async function handleContinueToPayment() {
-    if (!orgId) return; setError(null); setSubmitting(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ quantity: studentCount, orgId }) });
-      const data = await res.json();
-      if (!res.ok || data.error) { setError(data.error || "Failed to create checkout session."); setSubmitting(false); return; }
-      window.location.href = data.url;
-    } catch { setError("Failed to connect to payment service."); setSubmitting(false); }
-  }
-
-  async function handleStripeReturn(sessionId: string) {
-    setSubmitting(true);
-    const result = await activateSubscription(sessionId);
-    if ("error" in result) { setError(result.error); setSubscriptionStatus("incomplete"); } else { setSubscriptionStatus(result.status); }
-    setSubmitting(false);
-  }
-
-  async function handleLaunch() {
-    if (!orgId) return; setError(null); setSubmitting(true);
-    const result = await launchProgram(orgId);
-    if ("error" in result) { setError(result.error); setSubmitting(false); return; }
-    try { router.push("/instructor/dashboard"); } catch { setSubmitting(false); }
-  }
-
-  const step2Valid = orgName.trim().length >= 2 && subdomain.length >= 3 && subdomainAvailable === true;
+  // Handlers and effects stripped for layer testing
 
   if (loading) {
     return (
@@ -305,7 +188,7 @@ function StartPageInner() {
             <p className="mt-2 text-sm text-center text-gray-500">Setup takes about 3 minutes</p>
             {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
             <p className="mt-8 text-sm text-gray-400 text-center">
-              Layer 4: Full state + handlers + effects. User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}, Step2Valid: {String(step2Valid)}
+              Layer 4c: State declarations only. User: {user ? "yes" : "no"}, Org: {orgId ?? "none"}
             </p>
           </div>
         )}
