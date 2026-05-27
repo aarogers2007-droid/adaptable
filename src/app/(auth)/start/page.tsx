@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -238,7 +238,7 @@ function ProgressBar({ step, onStepClick }: { step: number; onStepClick?: (s: nu
 function StartPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // ─── State ───
   const [step, setStep] = useState(1);
