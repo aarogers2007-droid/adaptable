@@ -166,7 +166,82 @@ function StartPageInner() {
     init();
   }, []);
 
-  // Handlers and effects stripped for layer testing
+  // ─── Handlers ───
+
+  const handleFileSelect = useCallback((file: File) => {
+    const err = validateFileUpload(file);
+    if (err) { setError(err); return; }
+    setError(null);
+    const url = URL.createObjectURL(file);
+    if (logo) URL.revokeObjectURL(logo.url);
+    setLogo({ file, url });
+  }, [logo]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  }, [handleFileSelect]);
+
+  async function handleGoogleSignIn() {
+    setError(null); setAuthMode("google");
+    const { error: oauthErr } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=/start" } });
+    if (oauthErr) { setError(oauthErr.message); setAuthMode("idle"); }
+  }
+
+  async function handleEmailSignUp(e: React.FormEvent) {
+    e.preventDefault(); setError(null);
+    const trimmedName = fullName.trim();
+    if (!trimmedName) { setError("Please enter your name."); return; }
+    setSubmitting(true);
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password, options: { data: { full_name: trimmedName } } });
+    if (signUpError) { setError(signUpError.message); setSubmitting(false); return; }
+    if (data.user) { setUser({ id: data.user.id, email: data.user.email ?? "", fullName: trimmedName }); goToStep(2); }
+    setSubmitting(false);
+  }
+
+  async function handleCreateOrg() {
+    setError(null); setSubmitting(true);
+    const result = await createOrgStub(orgName.trim(), subdomain);
+    if ("error" in result) { setError(result.error); setSubmitting(false); return; }
+    setOrgId(result.orgId); goToStep(3);
+  }
+
+  async function handleSaveBranding() {
+    if (!orgId) return; setError(null); setSubmitting(true);
+    const formData = new FormData();
+    formData.set("primaryColor", primaryColor); formData.set("secondaryColor", secondaryColor);
+    if (logo) formData.set("logo", logo.file);
+    const result = await saveBranding(orgId, formData);
+    if ("error" in result) { setError(result.error); setSubmitting(false); return; }
+    goToStep(4);
+  }
+
+  async function handleContinueToPayment() {
+    if (!orgId) return; setError(null); setSubmitting(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ quantity: studentCount, orgId }) });
+      const data = await res.json();
+      if (!res.ok || data.error) { setError(data.error || "Failed to create checkout session."); setSubmitting(false); return; }
+      window.location.href = data.url;
+    } catch { setError("Failed to connect to payment service."); setSubmitting(false); }
+  }
+
+  async function handleStripeReturn(sessionId: string) {
+    setSubmitting(true);
+    const result = await activateSubscription(sessionId);
+    if ("error" in result) { setError(result.error); setSubscriptionStatus("incomplete"); } else { setSubscriptionStatus(result.status); }
+    setSubmitting(false);
+  }
+
+  async function handleLaunch() {
+    if (!orgId) return; setError(null); setSubmitting(true);
+    const result = await launchProgram(orgId);
+    if ("error" in result) { setError(result.error); setSubmitting(false); return; }
+    try { router.push("/instructor/dashboard"); } catch { setSubmitting(false); }
+  }
+
+  const step2Valid = orgName.trim().length >= 2 && subdomain.length >= 3 && subdomainAvailable === true;
 
   if (loading) {
     return (
