@@ -68,8 +68,19 @@ export async function updateSession(request: NextRequest) {
     supabaseResponse.headers.append("set-cookie", cookie);
   }
 
+  // Detect branded subdomain (not the main Adaptable domain)
+  const isBrandedSubdomain = tenant.id !== "00000000-0000-0000-0000-000000000001";
+
+  // On branded subdomains, redirect root "/" to "/login" (branded login page)
+  // Students should never see the generic Adaptable marketing homepage
+  if (isBrandedSubdomain && request.nextUrl.pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/dashboard" : "/login";
+    return NextResponse.redirect(url);
+  }
+
   // Redirect unauthenticated users to login (except public routes)
-  const publicPaths = ["/", "/join", "/login", "/signup", "/teacher-signup", "/parent/view", "/auth/callback", "/auth/signout", "/for-schools", "/standards", "/demo", "/venture", "/privacy", "/c", "/go", "/start", "/api/stripe/webhook"];
+  const publicPaths = ["/", "/join", "/login", "/signup", "/teacher-signup", "/parent/view", "/auth/callback", "/auth/signout", "/for-schools", "/standards", "/demo", "/venture", "/privacy", "/c", "/go", "/start", "/api/stripe/webhook", "/terms"];
   const isPublicPath = publicPaths.some(
     (path) =>
       request.nextUrl.pathname === path ||

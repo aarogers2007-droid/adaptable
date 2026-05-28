@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
+import { useBranding } from "@/components/BrandingProvider";
 
 /**
  * Guest join page for live events.
@@ -13,6 +14,7 @@ import { createBrowserClient } from "@supabase/ssr";
  * Authentication → Sign In / Up → Anonymous Sign-Ins → ON
  */
 export default function GuestJoinPage() {
+  const branding = useBranding();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
@@ -123,8 +125,14 @@ export default function GuestJoinPage() {
     <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
+          {branding.logo_url && (
+            <div className="flex justify-center mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={branding.logo_url} alt={branding.platform_name} className="h-12 w-auto object-contain" />
+            </div>
+          )}
           <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
-            Welcome
+            Welcome{branding.platform_name !== "Adaptable" ? ` to ${branding.platform_name}` : ""}
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
             Enter your class code to get started.

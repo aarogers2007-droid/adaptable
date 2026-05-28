@@ -100,6 +100,12 @@ export default function LoginPage() {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="w-full max-w-lg">
+          {branding.logo_url && (
+            <div className="flex justify-center mb-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={branding.logo_url} alt={branding.platform_name} className="h-12 w-auto object-contain" />
+            </div>
+          )}
           <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-center text-[var(--text-primary)]">
             Sign in to {branding.platform_name}
           </h1>

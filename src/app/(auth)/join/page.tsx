@@ -4,9 +4,11 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useBranding } from "@/components/BrandingProvider";
 import { validateInviteCode, completeClassEnrollment } from "./actions";
 
 export default function JoinClassPage() {
+  const branding = useBranding();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -78,11 +80,17 @@ export default function JoinClassPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        {branding.logo_url && (
+          <div className="flex justify-center mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={branding.logo_url} alt={branding.platform_name} className="h-12 w-auto object-contain" />
+          </div>
+        )}
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-center">
-          Join a Class
+          Join {branding.platform_name !== "Adaptable" ? branding.platform_name : "a Program"}
         </h1>
         <p className="mt-2 text-center text-sm text-[var(--text-secondary)]">
-          Enter the invite code your instructor gave you.
+          Enter the invite code your program coordinator gave you.
         </p>
 
         <div className="mt-8">

@@ -151,11 +151,17 @@ export default function SignupPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        {branding.logo_url && (
+          <div className="flex justify-center mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={branding.logo_url} alt={branding.platform_name} className="h-12 w-auto object-contain" />
+          </div>
+        )}
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-center">
-          Create your account
+          {branding.platform_name !== "Adaptable" ? `Join ${branding.platform_name}` : "Create your account"}
         </h1>
         <p className="mt-2 text-center text-sm text-[var(--text-secondary)]">
-          Design your venture. Launch when you&apos;re ready.
+          {branding.platform_name !== "Adaptable" ? "Create your account to get started." : "Design your venture. Launch when you're ready."}
         </p>
 
         <div className="mt-8">
