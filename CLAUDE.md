@@ -4,6 +4,24 @@ White-label AI curriculum platform for organizations and nonprofits. Each org up
 their branding and curriculum, students see the org's name on everything, never Adaptable's.
 First customer: VentureLab (10,000 students, founding partner at $4.99/student).
 
+## Signal Over Noise
+
+Before building anything, ask: does this serve the current user today? Not "could
+this be useful eventually." Not "this would be more professional." Today. Right now.
+For the person in front of us.
+
+- A 1975-line file is noise. Five 100-line files are signal.
+- A self-serve payment portal for customer #1 is noise. A Zoom call is signal.
+- A feature nobody asked for is noise. Fixing the bug a user just hit is signal.
+- Explaining how something works is noise. Making it work is signal.
+
+When choosing between building more and shipping what exists, ship. When choosing
+between automating a process and doing it manually once, do it manually. When
+choosing between perfect and working, working wins every time.
+
+The test: "Would removing this make the experience worse for the person using it
+today?" If the answer is no, it's noise. Cut it.
+
 ## The Adaptable Factual Floor
 
 Adaptable's stated mission is **transformation, not education** — and the founder's
