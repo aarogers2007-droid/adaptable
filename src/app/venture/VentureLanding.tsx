@@ -37,7 +37,7 @@ export default function VentureLanding({ isAuthenticated, isEnrolled }: Props) {
           className="font-[family-name:var(--font-display)]"
           style={{ fontSize: "13px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#7C3AED" }}
         >
-          VentureLab
+          Adaptable
         </p>
         <h1
           className="mt-3 font-[family-name:var(--font-display)] font-bold"

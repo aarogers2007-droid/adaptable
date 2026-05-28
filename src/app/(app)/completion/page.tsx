@@ -216,7 +216,7 @@ export default async function CompletionPage() {
 
         {/* Footer */}
         <p className="mt-12 text-center text-xs text-[var(--text-muted)]">
-          Powered by Adaptable, a VentureLab program
+          Powered by Adaptable
         </p>
       </div>
     </main>

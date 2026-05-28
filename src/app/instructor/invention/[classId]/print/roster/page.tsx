@@ -77,7 +77,7 @@ export default async function PrintRosterPage({
   return (
     <html lang="en">
       <head>
-        <title>Group Roster — VentureLab Invention Mode</title>
+        <title>Group Roster — Invention Mode</title>
         <style dangerouslySetInnerHTML={{ __html: `
           * { margin: 0; padding: 0; box-sizing: border-box; }
           @media print {
@@ -137,9 +137,9 @@ export default async function PrintRosterPage({
       </head>
       <body>
         <div className="header" style={{ textAlign: "center", padding: "24px 0 32px", borderBottom: "2px solid #000", marginBottom: "32px" }}>
-          <h1 style={{ fontSize: "28px", fontWeight: 700, margin: 0 }}>VentureLab Invention Mode</h1>
+          <h1 style={{ fontSize: "28px", fontWeight: 700, margin: 0 }}>Invention Mode</h1>
           <p style={{ fontSize: "14px", color: "#666", marginTop: "4px" }}>
-            May 13, 2026 &middot; {totalGroups} groups
+            {totalGroups} groups
           </p>
         </div>
 

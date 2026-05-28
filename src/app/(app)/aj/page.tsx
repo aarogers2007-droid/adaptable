@@ -107,7 +107,6 @@ export default async function AJDashboard() {
       label: "Public Pages",
       links: [
         { href: "/demo", name: "Demo Page" },
-        { href: "/for-schools", name: "For Schools" },
         { href: "/", name: "Landing Page" },
       ],
     },

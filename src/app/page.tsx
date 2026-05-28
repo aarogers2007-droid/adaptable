@@ -122,10 +122,10 @@ export default function Home() {
               Start Your Program
             </Link>
             <Link
-              href="/for-schools"
+              href="/demo"
               className="rounded-lg border border-[var(--border-strong)] px-8 py-3.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
             >
-              Learn More
+              See the Demo
             </Link>
           </div>
         </div>

@@ -95,7 +95,7 @@ export default async function PrintSlipsPage({
   return (
     <html lang="en">
       <head>
-        <title>Student Slips — VentureLab Invention Mode</title>
+        <title>Student Slips — Invention Mode</title>
         <style dangerouslySetInnerHTML={{ __html: `
           * { margin: 0; padding: 0; box-sizing: border-box; }
           @media print {
@@ -176,7 +176,7 @@ export default async function PrintSlipsPage({
                 Group
               </div>
               <div style={{ fontSize: "10px", color: "#999", marginTop: "8px" }}>
-                VentureLab Invention Mode &middot; May 13, 2026
+                Invention Mode &middot; Adaptable
               </div>
             </div>
           ))}

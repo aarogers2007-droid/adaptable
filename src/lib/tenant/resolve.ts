@@ -28,7 +28,7 @@ const DEFAULT_TENANT: TenantInfo = {
  */
 export async function resolveTenant(hostname: string): Promise<TenantInfo> {
   const parts = hostname.split(".");
-  // Only treat as subdomain if hostname has 3+ parts (e.g., venturelab.adaptable.one)
+  // Only treat as subdomain if hostname has 3+ parts (e.g., org.adaptable.one)
   const subdomain = parts.length >= 3 ? parts[0] : null;
 
   if (!subdomain || subdomain === "www" || subdomain === "adaptable" || subdomain === "adaptable-one") {

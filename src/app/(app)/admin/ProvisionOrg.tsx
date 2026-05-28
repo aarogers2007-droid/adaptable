@@ -65,7 +65,7 @@ export default function ProvisionOrg() {
             value={orgName}
             onChange={(e) => handleNameChange(e.target.value.slice(0, 100))}
             className="w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
-            placeholder="e.g., VentureLab"
+            placeholder="e.g., Riverside Academy"
           />
         </div>
         <div>
@@ -75,7 +75,7 @@ export default function ProvisionOrg() {
             value={slug}
             onChange={(e) => { setSlugAuto(false); setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 32)); }}
             className="w-full rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm font-mono outline-none focus:border-[var(--primary)]"
-            placeholder="venturelab"
+            placeholder="riverside"
           />
         </div>
         <div>
@@ -86,7 +86,7 @@ export default function ProvisionOrg() {
               value={subdomain}
               onChange={(e) => { setSubdomainAuto(false); setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 32)); }}
               className="flex-1 rounded-lg border border-[var(--border-strong)] px-3 py-2 text-sm font-mono outline-none focus:border-[var(--primary)]"
-              placeholder="venturelab"
+              placeholder="riverside"
             />
             <span className="text-xs text-[var(--text-muted)]">.adaptable.one</span>
           </div>

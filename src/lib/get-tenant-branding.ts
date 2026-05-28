@@ -9,7 +9,7 @@ import { type BrandingConfig, DEFAULT_BRANDING, mergeBranding } from "./branding
 export async function getTenantBranding(hostname: string | null): Promise<BrandingConfig> {
   if (!hostname) return DEFAULT_BRANDING;
 
-  // Extract subdomain: "venturelab.adaptable.one" → "venturelab"
+  // Extract subdomain: "org.adaptable.one" → "org"
   const parts = hostname.split(".");
   const subdomain = parts.length >= 3 ? parts[0] : null;
 

@@ -255,7 +255,7 @@ export default function DemoShowcase() {
               ))}
             </div>
             <div className="ml-2 flex shrink-0 items-center gap-2 md:ml-3 md:gap-3">
-              <Link href="/for-schools" className="inline-flex items-center whitespace-nowrap rounded-lg px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors">For Schools</Link>
+              <Link href="/start" className="inline-flex items-center whitespace-nowrap rounded-lg px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors">Get Started</Link>
               <Link href="/login" className="inline-flex items-center whitespace-nowrap rounded-lg bg-[var(--primary)] px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white">Log In</Link>
             </div>
           </div>
@@ -1058,7 +1058,7 @@ export default function DemoShowcase() {
             Find your venture
           </Link>
           <Link
-            href="/for-schools"
+            href="/start"
             className="rounded-lg border border-white/20 px-8 py-4 font-semibold transition-colors hover:bg-white/5 text-center"
             style={{ fontSize: "16px", color: "#F9FAFB" }}
           >
@@ -1066,7 +1066,7 @@ export default function DemoShowcase() {
           </Link>
         </div>
         <p style={{ marginTop: "89px", fontSize: "11px", color: "#9CA3AF" }}>
-          Built for VentureLab&apos;s 155-country network &middot; By AJ Rogers, age 19
+          By AJ Rogers &middot; Adaptable LLC
         </p>
       </section>
       </>

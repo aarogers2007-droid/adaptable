@@ -50,7 +50,7 @@ export default function Step4Pricing({ orgId, userEmail, onBack, error, setError
       return;
     }
     if (!userEmail.endsWith("@venturelab.org")) {
-      setDiscountError("This code is only valid for VentureLab accounts.");
+      setDiscountError("This code is not valid for your account.");
       setDiscountApplied(false);
       return;
     }

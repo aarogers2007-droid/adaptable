@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useBranding } from "@/components/BrandingProvider";
 
 // Pages where the bubble should NOT appear
-const HIDDEN_PATHS = ["/", "/join", "/login", "/signup", "/teacher-signup", "/for-schools", "/standards", "/demo", "/venture", "/privacy"];
+const HIDDEN_PATHS = ["/", "/join", "/login", "/signup", "/teacher-signup", "/standards", "/demo", "/venture", "/privacy"];
 
 export default function SupportBubble() {
   const pathname = usePathname();
