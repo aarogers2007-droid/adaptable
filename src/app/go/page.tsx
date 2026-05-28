@@ -175,6 +175,7 @@ export default function GuestJoinPage() {
               className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-center font-mono text-lg tracking-widest outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 uppercase"
               placeholder="BOGG"
               autoComplete="off"
+              onKeyDown={(e) => { if (e.key === "Enter" && code.trim() && name.trim()) handleJoin(); }}
             />
           </div>
 
@@ -187,6 +188,7 @@ export default function GuestJoinPage() {
           <button
             type="button"
             onClick={handleJoin}
+            onKeyDown={(e) => { if (e.key === "Enter") handleJoin(); }}
             disabled={joining || !code.trim() || !name.trim()}
             className="w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
           >

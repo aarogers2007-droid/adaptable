@@ -44,7 +44,7 @@ export default async function CardPage() {
     const completedCount = progress.filter((p) => p.status === "completed").length;
     const totalLessons = lessons.length;
 
-    const PREVIEW_MODE = false;
+    const PREVIEW_MODE = true; // Unlocked for Mrs Boggans demo — revert after
 
     // Compute unlocks (matches lesson plan: Module 1 has lessons 1-4, Module 2 has lessons 1-4)
     const hasBase = PREVIEW_MODE || !!profile.ikigai_result;
