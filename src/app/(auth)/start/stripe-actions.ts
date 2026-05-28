@@ -73,6 +73,7 @@ export async function activateSubscription(
     stripe_subscription_id: subscription.id,
     stripe_customer_id: (session.customer as string) ?? "",
     plan_tier: planTier,
+    student_quantity: firstItem.quantity ?? 0,
     status: subscription.status,
     current_period_start: new Date(firstItem.current_period_start * 1000).toISOString(),
     current_period_end: new Date(firstItem.current_period_end * 1000).toISOString(),

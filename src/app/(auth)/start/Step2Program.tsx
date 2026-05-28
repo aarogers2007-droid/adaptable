@@ -82,7 +82,7 @@ export default function Step2Program({ onComplete, error, setError }: Step2Props
               placeholder="learn"
             />
             <div className="flex items-center px-4 bg-[var(--bg-muted)] border-l border-[var(--border)] text-sm font-mono text-[var(--text-muted)] select-none whitespace-nowrap">
-              .{toSubdomain(orgName) || "yourorg"}.org
+              .adaptable.one
             </div>
           </div>
 

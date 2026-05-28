@@ -13,10 +13,6 @@ interface Step5Props {
   onBack: () => void;
 }
 
-function toSubdomain(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 32);
-}
-
 export default function Step5Launch({ orgId, orgName, subdomain, error, setError, onBack }: Step5Props) {
   const router = useRouter();
   const [previewExpanded, setPreviewExpanded] = useState(false);
@@ -31,7 +27,7 @@ export default function Step5Launch({ orgId, orgName, subdomain, error, setError
     router.push("/instructor/dashboard");
   }
 
-  const programUrl = `${subdomain}.${toSubdomain(orgName)}.org`;
+  const programUrl = `${subdomain}.adaptable.one`;
 
   return (
     <div className="mx-auto max-w-lg step-enter">

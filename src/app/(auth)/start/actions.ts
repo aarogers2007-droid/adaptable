@@ -191,7 +191,7 @@ export async function createOrgStub(
     favicon_url: "",
     welcome_message: "",
     support_email: "",
-    domain: `${normalizedSubdomain}.${slug}.org`,
+    domain: `${normalizedSubdomain}.adaptable.one`,
   };
 
   // Create the organization
