@@ -16,7 +16,6 @@ import { useBranding } from "@/components/BrandingProvider";
 export default function GuestJoinPage() {
   const branding = useBranding();
   const [code, setCode] = useState("");
-  const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
   const [attempts, setAttempts] = useState(0);
@@ -29,15 +28,9 @@ export default function GuestJoinPage() {
     }
 
     const trimmedCode = code.trim().toUpperCase();
-    const trimmedName = name.trim();
 
     if (!trimmedCode) {
       setError("Enter a class code.");
-      return;
-    }
-
-    if (!trimmedName) {
-      setError("Enter your first name.");
       return;
     }
 
@@ -95,14 +88,13 @@ export default function GuestJoinPage() {
 
       const userId = authData.user.id;
 
-      // 4. Create/update profile with org and name
+      // 4. Create/update profile with org
       await supabase
         .from("profiles")
         .upsert({
           id: userId,
           role: "student",
           org_id: classData.org_id,
-          full_name: trimmedName,
         }, { onConflict: "id" });
 
       // 5. Enroll in the class
@@ -150,21 +142,6 @@ export default function GuestJoinPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-              First Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value.slice(0, 50))}
-              maxLength={50}
-              className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-              placeholder="Your first name"
-              autoFocus
-              autoComplete="given-name"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Class Code
             </label>
             <input
@@ -173,9 +150,10 @@ export default function GuestJoinPage() {
               onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))}
               maxLength={8}
               className="w-full rounded-lg border border-[var(--border-strong)] px-4 py-3 text-center font-mono text-lg tracking-widest outline-none transition-colors focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15 uppercase"
-              placeholder="BOGG"
+              placeholder="CLASS CODE"
+              autoFocus
               autoComplete="off"
-              onKeyDown={(e) => { if (e.key === "Enter" && code.trim() && name.trim()) handleJoin(); }}
+              onKeyDown={(e) => { if (e.key === "Enter" && code.trim()) handleJoin(); }}
             />
           </div>
 
@@ -189,7 +167,7 @@ export default function GuestJoinPage() {
             type="button"
             onClick={handleJoin}
             onKeyDown={(e) => { if (e.key === "Enter") handleJoin(); }}
-            disabled={joining || !code.trim() || !name.trim()}
+            disabled={joining || !code.trim()}
             className="w-full rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
           >
             {joining ? "Joining..." : "Join"}
