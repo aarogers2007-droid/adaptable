@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { categorizeNiche } from "@/lib/niche-categories";
 
 export interface OrgImpactReport {
   studentsActiveLast30Days: number;
@@ -365,4 +366,241 @@ export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string;
   const safeOrg = orgName.replace(/[^a-z0-9]/gi, "-").toLowerCase();
   const date = new Date().toISOString().split("T")[0];
   return { csv: rows.join("\n"), filename: `${safeOrg}-impact-report-${date}.csv` };
+}
+
+// ─── Lesson Health Scores ───
+
+export interface LessonHealth {
+  lessonId: string;
+  title: string;
+  moduleSequence: number;
+  lessonSequence: number;
+  healthScore: number;
+  completionRate: number;
+  dropOffRate: number;
+  avgSessionSeconds: number;
+  studentsStarted: number;
+  studentsCompleted: number;
+  isActive: boolean;
+}
+
+export async function getLessonHealthScores(orgId: string): Promise<LessonHealth[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, org_id, is_platform_owner")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile) return [];
+  if (profile.role !== "org_admin" && !(profile as Record<string, unknown>).is_platform_owner) return [];
+  if (profile.org_id !== orgId && !(profile as Record<string, unknown>).is_platform_owner) return [];
+
+  // Determine which org's lessons to check
+  const { data: org } = await supabase
+    .from("organizations")
+    .select("curriculum_source")
+    .eq("id", orgId)
+    .single();
+
+  const lessonOrgId = org?.curriculum_source === "custom" ? orgId : "00000000-0000-0000-0000-000000000001";
+
+  const { data: lessons } = await supabase
+    .from("lessons")
+    .select("id, title, module_sequence, lesson_sequence, is_active")
+    .eq("org_id", lessonOrgId)
+    .order("module_sequence")
+    .order("lesson_sequence");
+
+  if (!lessons || lessons.length === 0) return [];
+
+  // Get org student IDs
+  const { data: students } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("org_id", orgId)
+    .eq("role", "student");
+
+  const studentIds = (students ?? []).map((s) => s.id);
+  if (studentIds.length === 0) {
+    return lessons.map((l) => ({
+      lessonId: l.id,
+      title: l.title,
+      moduleSequence: l.module_sequence,
+      lessonSequence: l.lesson_sequence,
+      healthScore: 100,
+      completionRate: 0,
+      dropOffRate: 0,
+      avgSessionSeconds: 0,
+      studentsStarted: 0,
+      studentsCompleted: 0,
+      isActive: l.is_active ?? true,
+    }));
+  }
+
+  // Get all progress for these students
+  const { data: progress } = await supabase
+    .from("student_progress")
+    .select("lesson_id, status")
+    .in("student_id", studentIds);
+
+  // Get usage data per lesson
+  const { data: usage } = await supabase
+    .from("ai_usage_log")
+    .select("lesson_id, session_duration_seconds, drop_off_flag")
+    .in("student_id", studentIds)
+    .not("lesson_id", "is", null);
+
+  const progressByLesson = new Map<string, { started: number; completed: number }>();
+  for (const p of progress ?? []) {
+    if (!p.lesson_id) continue;
+    const entry = progressByLesson.get(p.lesson_id) ?? { started: 0, completed: 0 };
+    entry.started++;
+    if (p.status === "completed") entry.completed++;
+    progressByLesson.set(p.lesson_id, entry);
+  }
+
+  const usageByLesson = new Map<string, { totalDuration: number; count: number; dropOffs: number }>();
+  for (const u of usage ?? []) {
+    if (!u.lesson_id) continue;
+    const entry = usageByLesson.get(u.lesson_id) ?? { totalDuration: 0, count: 0, dropOffs: 0 };
+    entry.count++;
+    entry.totalDuration += u.session_duration_seconds ?? 0;
+    if (u.drop_off_flag) entry.dropOffs++;
+    usageByLesson.set(u.lesson_id, entry);
+  }
+
+  return lessons.map((l) => {
+    const prog = progressByLesson.get(l.id) ?? { started: 0, completed: 0 };
+    const use = usageByLesson.get(l.id) ?? { totalDuration: 0, count: 0, dropOffs: 0 };
+
+    const completionRate = prog.started > 0 ? prog.completed / prog.started : 0;
+    const dropOffRate = use.count > 0 ? use.dropOffs / use.count : 0;
+    const avgSessionSeconds = use.count > 0 ? use.totalDuration / use.count : 0;
+
+    // Session duration score: 5-15 min is ideal (300-900s)
+    let sessionScore = 0;
+    if (avgSessionSeconds >= 300 && avgSessionSeconds <= 900) sessionScore = 1;
+    else if (avgSessionSeconds > 0 && avgSessionSeconds < 300) sessionScore = avgSessionSeconds / 300;
+    else if (avgSessionSeconds > 900) sessionScore = Math.max(0, 1 - (avgSessionSeconds - 900) / 1800);
+
+    const healthScore = Math.round(
+      completionRate * 40 +
+      (1 - dropOffRate) * 25 +
+      sessionScore * 20 +
+      // Return rate placeholder (would need multi-day query, skip for now)
+      (prog.started > 0 ? 0.5 : 0) * 15
+    );
+
+    return {
+      lessonId: l.id,
+      title: l.title,
+      moduleSequence: l.module_sequence,
+      lessonSequence: l.lesson_sequence,
+      healthScore: Math.min(100, Math.max(0, healthScore)),
+      completionRate,
+      dropOffRate,
+      avgSessionSeconds,
+      studentsStarted: prog.started,
+      studentsCompleted: prog.completed,
+      isActive: l.is_active ?? true,
+    };
+  }).sort((a, b) => a.healthScore - b.healthScore);
+}
+
+export async function deactivateLesson(orgId: string, lessonId: string, notes?: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { data: profile } = await supabase.from("profiles").select("role, org_id").eq("id", user.id).single();
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") return { success: false, error: "Unauthorized" };
+
+  const admin = createAdminClient();
+  await admin.from("lessons").update({ is_active: false }).eq("id", lessonId);
+  await admin.from("lesson_reviews").insert({ lesson_id: lessonId, org_id: orgId, admin_id: user.id, action: "deactivated", notes: notes ?? null });
+
+  return { success: true };
+}
+
+export async function reactivateLesson(orgId: string, lessonId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { data: profile } = await supabase.from("profiles").select("role, org_id").eq("id", user.id).single();
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") return { success: false, error: "Unauthorized" };
+
+  const admin = createAdminClient();
+  await admin.from("lessons").update({ is_active: true }).eq("id", lessonId);
+  await admin.from("lesson_reviews").insert({ lesson_id: lessonId, org_id: orgId, admin_id: user.id, action: "reactivated" });
+
+  return { success: true };
+}
+
+export async function flagLesson(orgId: string, lessonId: string, notes: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const { data: profile } = await supabase.from("profiles").select("role, org_id").eq("id", user.id).single();
+  if (profile?.org_id !== orgId || profile?.role !== "org_admin") return { success: false, error: "Unauthorized" };
+
+  const admin = createAdminClient();
+  await admin.from("lesson_reviews").insert({ lesson_id: lessonId, org_id: orgId, admin_id: user.id, action: "flagged", notes });
+
+  return { success: true };
+}
+
+// ─── Business Idea Distribution ───
+
+export interface BusinessSegment {
+  category: string;
+  count: number;
+  percentage: number;
+}
+
+export async function getBusinessIdeaDistribution(orgId: string): Promise<BusinessSegment[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, org_id, is_platform_owner")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile) return [];
+  if (profile.role !== "org_admin" && !(profile as Record<string, unknown>).is_platform_owner) return [];
+  if (profile.org_id !== orgId && !(profile as Record<string, unknown>).is_platform_owner) return [];
+
+  const { data: students } = await supabase
+    .from("profiles")
+    .select("business_idea")
+    .eq("org_id", orgId)
+    .eq("role", "student")
+    .not("business_idea", "is", null);
+
+  if (!students || students.length === 0) return [];
+
+  const counts = new Map<string, number>();
+  for (const s of students) {
+    const idea = s.business_idea as { niche?: string } | null;
+    const niche = idea?.niche ?? "";
+    const category = categorizeNiche(niche);
+    counts.set(category, (counts.get(category) ?? 0) + 1);
+  }
+
+  const total = students.length;
+  return [...counts.entries()]
+    .map(([category, count]) => ({
+      category,
+      count,
+      percentage: Math.round((count / total) * 100),
+    }))
+    .sort((a, b) => b.count - a.count);
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { getOrgImpactReport, getAtRiskStudents, exportOrgImpactCSV, type OrgImpactReport, type AtRiskStudent } from "./impact-actions";
+import LessonHealth from "./LessonHealth";
+import StudentSegments from "./StudentSegments";
 
 interface Props {
   orgId: string;
@@ -169,6 +171,17 @@ export default function ImpactTab({ orgId }: Props) {
           )}
         </div>
       )}
+
+      {/* Persistent sections below tabs */}
+      <div className="mt-8 border-t border-[var(--border)] pt-8">
+        <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">Lesson Health</p>
+        <LessonHealth orgId={orgId} />
+      </div>
+
+      <div className="mt-8 border-t border-[var(--border)] pt-8">
+        <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-4">Student Segments</p>
+        <StudentSegments orgId={orgId} />
+      </div>
     </div>
   );
 }

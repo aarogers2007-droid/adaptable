@@ -19,7 +19,7 @@ export default async function LessonsListPage() {
   if (!profile?.business_idea) redirect("/onboarding");
 
   // Determine curriculum source for this org
-  let lessonsQuery = supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence");
+  let lessonsQuery = supabase.from("lessons").select("*").eq("is_active", true).order("module_sequence").order("lesson_sequence");
 
   if (profile.org_id) {
     const { data: org } = await supabase
