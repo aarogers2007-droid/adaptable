@@ -13,8 +13,8 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
 
   const [profileRes, lessonRes, allLessonsRes, allProgressRes, classRes] = await Promise.all([
     supabase.from("profiles").select("*, org_id").eq("id", user.id).single(),
-    supabase.from("lessons").select("*").eq("id", id).single(),
-    supabase.from("lessons").select("*").order("module_sequence").order("lesson_sequence"),
+    supabase.from("lessons").select("*").eq("id", id).eq("is_active", true).single(),
+    supabase.from("lessons").select("*").eq("is_active", true).order("module_sequence").order("lesson_sequence"),
     supabase.from("student_progress").select("*").eq("student_id", user.id),
     // Fetch the student's class voice_enabled setting (if enrolled)
     supabase
