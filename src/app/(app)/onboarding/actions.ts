@@ -49,7 +49,7 @@ export async function generateSuggestions(
       await supabase.from("ai_usage_log").insert({
         student_id: user.id,
         feature: "ikigai",
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-6-20250527",
         input_tokens: result.usage.input_tokens,
         output_tokens: result.usage.output_tokens,
         estimated_cost_usd:
@@ -266,7 +266,7 @@ First, identify the distinct themes in their answers. If their interests span mu
         await supabase.from("ai_usage_log").insert({
           student_id: user.id,
           feature: "ikigai",
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-6-20250527",
           input_tokens: result.usage.input_tokens,
           output_tokens: result.usage.output_tokens,
           estimated_cost_usd:

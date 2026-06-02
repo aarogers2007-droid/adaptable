@@ -163,7 +163,7 @@ export async function POST(request: Request) {
               student_id: user.id,
               org_id: (profileData as Record<string, unknown>)?.org_id ?? null,
               feature: "customer_interview",
-              model: "claude-sonnet-4-20250514",
+              model: "claude-sonnet-4-6-20250527",
               input_tokens: finalMessage.usage.input_tokens,
               output_tokens: finalMessage.usage.output_tokens,
               estimated_cost_usd: (() => {

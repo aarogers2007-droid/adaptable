@@ -70,7 +70,8 @@
       "Bash($B stop:*)",
       "Bash($B url:*)",
       "Bash($B snapshot:*)",
-      "Bash(ls ~/sim-results/all-lessons/*.json)"
+      "Bash(ls ~/sim-results/all-lessons/*.json)",
+      "WebFetch(domain:adaptable-one.vercel.app)"
     ]
   }
 }

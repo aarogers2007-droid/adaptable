@@ -26,12 +26,12 @@ export type AIFeature = "lesson-chat" | "guide" | "ikigai" | "checkin" | "recomm
  * Will be removed after all call sites are migrated.
  */
 export const MODEL_MAP: Record<AIFeature, string> = {
-  "lesson-chat": "claude-sonnet-4-20250514",
-  guide: "claude-sonnet-4-20250514",
-  ikigai: "claude-sonnet-4-20250514",
+  "lesson-chat": "claude-sonnet-4-6-20250527",
+  guide: "claude-sonnet-4-6-20250527",
+  ikigai: "claude-sonnet-4-6-20250527",
   checkin: "claude-haiku-4-5-20251001",
   recommendations: "claude-haiku-4-5-20251001",
-  pitch: "claude-sonnet-4-20250514",
+  pitch: "claude-sonnet-4-6-20250527",
   moderation: "claude-haiku-4-5-20251001",
   card: "claude-haiku-4-5-20251001",
 };
