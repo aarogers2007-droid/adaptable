@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useBranding } from "@/components/BrandingProvider";
 
 // Pages where the bubble should NOT appear
-const HIDDEN_PATHS = ["/", "/join", "/login", "/signup", "/teacher-signup", "/standards", "/demo", "/venture", "/privacy"];
+const HIDDEN_PATHS = ["/", "/join", "/login", "/signup", "/privacy"];
 
 export default function SupportBubble() {
   const pathname = usePathname();
@@ -20,7 +20,7 @@ export default function SupportBubble() {
   const branding = useBranding();
 
   // Hide on public pages and /c/* shareable card URLs
-  const isPublic = HIDDEN_PATHS.includes(pathname) || pathname.startsWith("/c/") || pathname.startsWith("/parent/view") || pathname.startsWith("/auth/");
+  const isPublic = HIDDEN_PATHS.includes(pathname) || pathname.startsWith("/auth/");
   if (isPublic) return null;
 
   // Auto-scroll to bottom

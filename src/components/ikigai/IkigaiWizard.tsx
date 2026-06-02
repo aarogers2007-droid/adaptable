@@ -372,8 +372,7 @@ export default function IkigaiWizard({ initialDraft, initialName, isAdmin: _isAd
       // the demo path still works.
       const isPreview =
         typeof window !== "undefined" &&
-        (window.location.hostname === "localhost" ||
-          window.location.pathname.startsWith("/demo"));
+        window.location.hostname === "localhost";
       if (isPreview) {
         router.push("/onboarding/ready");
         return;

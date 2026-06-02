@@ -34,10 +34,10 @@ export default function Home() {
             Start Your Program
           </Link>
           <Link
-            href="/demo"
+            href="/start"
             className="rounded-lg border border-[var(--border-strong)] px-8 py-3.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
           >
-            Try the Demo
+            Get Started
           </Link>
         </div>
         <p className="mt-4 text-xs text-[var(--text-muted)]">
@@ -122,10 +122,10 @@ export default function Home() {
               Start Your Program
             </Link>
             <Link
-              href="/demo"
+              href="/start"
               className="rounded-lg border border-[var(--border-strong)] px-8 py-3.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
             >
-              See the Demo
+              Get Started
             </Link>
           </div>
         </div>
@@ -135,10 +135,8 @@ export default function Home() {
       <footer className="border-t border-[var(--border)] px-6 py-8">
         <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6 text-sm text-[var(--text-muted)]">
-            <Link href="/go" className="py-2 hover:text-[var(--text-primary)] transition-colors">Join a Program</Link>
+            <Link href="/start" className="py-2 hover:text-[var(--text-primary)] transition-colors">Get Started</Link>
             <Link href="/login" className="py-2 hover:text-[var(--text-primary)] transition-colors">Sign In</Link>
-            <Link href="/demo" className="py-2 hover:text-[var(--text-primary)] transition-colors">Demo</Link>
-            <Link href="/standards" className="py-2 hover:text-[var(--text-primary)] transition-colors">Standards</Link>
             <Link href="/privacy" className="py-2 hover:text-[var(--text-primary)] transition-colors">Privacy</Link>
           </div>
           <div className="text-xs text-[var(--text-muted)]">

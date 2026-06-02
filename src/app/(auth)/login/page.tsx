@@ -72,8 +72,8 @@ export default function LoginPage() {
             return;
           }
 
-          // No classes at all — teacher onboarding
-          router.push("/teacher-onboarding");
+          // No classes at all — instructor dashboard (they can create one)
+          router.push("/instructor/dashboard");
           return;
         }
 

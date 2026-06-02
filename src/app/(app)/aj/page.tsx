@@ -65,14 +65,12 @@ export default async function AJDashboard() {
         { href: "/dashboard/founders-log", name: "Founder's Log" },
         { href: "/dashboard/founders-log/analytics", name: "Founder's Log Analytics" },
         { href: "/privacy", name: "Privacy Settings" },
-        { href: "/standards", name: "Standards Alignment" },
       ],
     },
     {
       label: "Invention Mode",
       links: [
         { href: "/invention", name: "Invention Wizard (Student)" },
-        { href: "/venture", name: "VENTURE Landing Page" },
         { href: `/instructor/invention/${VENTURE_CLASS_ID}`, name: "Invention Admin Dashboard" },
         { href: `/instructor/invention/${VENTURE_CLASS_ID}/print/roster`, name: "Print: Group Roster" },
         { href: `/instructor/invention/${VENTURE_CLASS_ID}/print/slips`, name: "Print: Student Slips" },
@@ -82,15 +80,7 @@ export default async function AJDashboard() {
       label: "Admin & Instructor",
       links: [
         { href: "/admin", name: "Platform Admin (Provision Orgs)" },
-        { href: "/admin/feedback", name: "Tester Feedback" },
         { href: "/instructor/dashboard", name: "Instructor Dashboard" },
-        { href: "/teacher-onboarding", name: "Teacher Onboarding" },
-      ],
-    },
-    {
-      label: "Org Onboarding",
-      links: [
-        { href: "/org/onboarding", name: "Self-Serve Org Onboarding" },
       ],
     },
     {
@@ -98,22 +88,13 @@ export default async function AJDashboard() {
       links: [
         { href: "/login", name: "Login Page" },
         { href: "/signup", name: "Student Signup" },
-        { href: "/teacher-signup", name: "Teacher Signup" },
         { href: "/join", name: "Join a Class (Optional)" },
-        { href: "/parental-consent-pending", name: "Parental Consent Pending" },
       ],
     },
     {
       label: "Public Pages",
       links: [
-        { href: "/demo", name: "Demo Page" },
         { href: "/", name: "Landing Page" },
-      ],
-    },
-    {
-      label: "Parent",
-      links: [
-        { href: "/parent/view", name: "Parent View" },
       ],
     },
   ];

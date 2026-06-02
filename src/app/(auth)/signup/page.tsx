@@ -130,8 +130,13 @@ export default function SignupPage() {
       }
     } catch { /* fall through to default */ }
 
-    // Under-13s land on a "waiting for parent" page; everyone else goes to their flow.
-    router.push(needsConsent ? "/parental-consent-pending" : destination);
+    // Under-13s: show age gate error instead of redirecting to deleted consent page.
+    if (needsConsent) {
+      setError("This program is for students age 13 and older.");
+      setLoading(false);
+      return;
+    }
+    router.push(destination);
   }
 
   async function handleGoogleSignup() {

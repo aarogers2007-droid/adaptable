@@ -80,12 +80,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect unauthenticated users to login (except public routes)
-  const publicPaths = ["/", "/join", "/login", "/signup", "/teacher-signup", "/parent/view", "/auth/callback", "/auth/signout", "/standards", "/demo", "/venture", "/privacy", "/c", "/go", "/start", "/api/stripe/webhook", "/terms"];
+  const publicPaths = ["/", "/join", "/login", "/signup", "/auth/callback", "/auth/signout", "/privacy", "/start", "/api/stripe/webhook", "/terms"];
   const isPublicPath = publicPaths.some(
     (path) =>
-      request.nextUrl.pathname === path ||
-      request.nextUrl.pathname.startsWith("/parent/view") ||
-      request.nextUrl.pathname.startsWith("/c/")
+      request.nextUrl.pathname === path
   );
 
   if (!user && !isPublicPath) {

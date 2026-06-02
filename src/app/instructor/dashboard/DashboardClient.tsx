@@ -157,12 +157,6 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
             Instructor Dashboard
           </span>
           <div className="ml-auto flex items-center gap-4">
-            <a
-              href="/standards"
-              className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              Curriculum Standards
-            </a>
             <button
               onClick={() => {
                 localStorage.removeItem("adaptable_instructor_welcomed");
