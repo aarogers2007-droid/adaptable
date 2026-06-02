@@ -89,6 +89,7 @@ export default function SignupPage() {
         .update({
           date_of_birth: dob,
           consent_status: consentStatus,
+          org_id: "00000000-0000-0000-0000-000000000001",
         })
         .eq("id", authData.user.id);
 

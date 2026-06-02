@@ -33,8 +33,14 @@ export async function GET(request: Request) {
           .eq("id", user.id)
           .maybeSingle();
 
-        // New user with no profile — route based on intent
+        // New user with no profile — set default org_id and route
         if (!profile) {
+          const admin = createAdminClient();
+          await admin.from("profiles").update({
+            org_id: "00000000-0000-0000-0000-000000000001",
+            role: "student",
+          }).eq("id", user.id);
+
           const destination = next.includes("/start") ? "/start" : "/onboarding";
           return NextResponse.redirect(`${origin}${destination}`);
         }
