@@ -194,7 +194,7 @@ export async function POST(request: Request) {
   if (!isAdmin) {
     const { data: reservation, error: rpcError } = await supabase.rpc("reserve_ai_usage", {
       p_student_id: user.id,
-      p_feature: "guide",
+      p_feature: "lesson-chat",
     });
 
     if (rpcError) {
@@ -650,7 +650,7 @@ When discussing customer conversations, explicitly reference the Mom Test princi
     }
     console.log("[lesson-chat] Starting stream, model:", lessonModel, "system prompt length:", systemPrompt.length, "messages:", messages.length);
     const stream = await streamMessage({
-      feature: "guide",
+      feature: "lesson-chat",
       systemPrompt: lessonModel.startsWith("gpt-") ? systemPrompt : systemBlocks,
       messages,
       modelOverride: lessonModel,
@@ -875,7 +875,7 @@ When discussing customer conversations, explicitly reference the Mom Test princi
             await supabase.from("ai_usage_log").insert({
               student_id: user.id,
               org_id: profile.org_id ?? null,
-              feature: "guide",
+              feature: "lesson-chat",
               ...usagePayload,
             });
           }
