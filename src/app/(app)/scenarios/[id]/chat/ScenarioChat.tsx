@@ -6,7 +6,6 @@ import { BadgeDisplay } from "../../ScenariosLibrary";
 import ContextPanel from "./ContextPanel";
 import MCOptions, { parseOptionsBlock } from "./MCOptions";
 import ForceLightMode from "@/components/ui/ForceLightMode";
-import RatingWidget from "@/components/ui/RatingWidget";
 
 interface CriteriaLabel {
   id: string;
@@ -316,7 +315,6 @@ export default function ScenarioChat({
       ) : (
         <div className="border-t border-[var(--border)] bg-[var(--bg)] px-4 py-3 shrink-0">
           <div className="mx-auto max-w-[640px]">
-            <RatingWidget contextType="scenario" contextId={scenarioId} />
           </div>
           <div className="mx-auto flex max-w-[640px] gap-2">
             <textarea

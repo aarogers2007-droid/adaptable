@@ -63,7 +63,6 @@ import Link from "next/link";
 import AppNav from "@/components/ui/AppNav";
 import InterviewSandbox from "@/components/interview/InterviewSandbox";
 import BusinessPitch from "@/components/lessons/BusinessPitch";
-import RatingWidget from "@/components/ui/RatingWidget";
 import { generatePersonas } from "@/lib/customer-personas";
 import { saveInterviewData } from "./interview-actions";
 import VoiceInput from "@/components/ui/VoiceInput";
@@ -797,8 +796,6 @@ export default function LessonConversation({
                 Your thinking is strong — it doesn&apos;t have to be perfect. Send what you have. You can always build on it later.
               </div>
             )}
-
-            <RatingWidget contextType="lesson" contextId={lessonId} />
 
             {/* Suggested responses (appear after 30s idle) */}
             {showSuggestions && suggestions.length > 0 && !nudge && (
