@@ -51,7 +51,6 @@ export default function AppNav({ isAdmin, studentName, previewMode = false }: Ap
     { href: "/dashboard", label: "My Business", icon: "🏠" },
     { href: "/lessons", label: "Lessons", icon: "📖", matchPrefix: true },
     { href: "/scenarios", label: "Scenarios", icon: "🎯", matchPrefix: true },
-    { href: "/chat", label: "AI Guide", icon: "💬" },
     { href: "/leaderboard", label: "Leaderboard", icon: "📊" },
     { href: "/card", label: "Card", icon: "💳" },
   ];

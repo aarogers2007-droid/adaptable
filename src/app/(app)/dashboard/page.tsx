@@ -346,26 +346,11 @@ export default async function DashboardPage() {
 
         {/* Secondary sections — Niche Resources only renders when populated
             (empty state was creating a dead card per Opus UX review). */}
-        <div
-          className={`stagger-enter mt-4 grid grid-cols-1 gap-4 ${profile.niche_recommendations ? "md:grid-cols-2" : ""}`}
-          style={{ animationDelay: "300ms" }}
-        >
-          <Link
-            href="/chat"
-            className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 hover:border-[var(--primary)] transition-colors"
+        {profile.niche_recommendations && (
+          <div
+            className="stagger-enter mt-4"
+            style={{ animationDelay: "300ms" }}
           >
-            <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold">
-              Ask AI Guide
-            </h3>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Get answers about {name}. Try: &ldquo;How do I find my first customers?&rdquo;
-            </p>
-            <span className="mt-3 inline-block text-sm font-semibold text-[var(--primary)]">
-              Start conversation →
-            </span>
-          </Link>
-
-          {profile.niche_recommendations && (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6">
               <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold">
                 Niche Resources
@@ -374,8 +359,8 @@ export default async function DashboardPage() {
                 {(profile.niche_recommendations as unknown[]).length} businesses like yours to study.
               </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Achievements */}
         <div className="mt-4">

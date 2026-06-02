@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   // Validate redirect path to prevent open redirects
   const rawNext = searchParams.get("next") ?? "/dashboard";
-  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/chat", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention", "/aj", "/org", "/start"];
+  const SAFE_PREFIXES = ["/dashboard", "/onboarding", "/join", "/lessons", "/plan", "/card", "/leaderboard", "/achievements", "/completion", "/instructor", "/parent", "/invention", "/aj", "/org", "/start"];
   const next = (rawNext.startsWith("/") && !rawNext.startsWith("//") && SAFE_PREFIXES.some(p => rawNext.startsWith(p)))
     ? rawNext
     : "/dashboard";

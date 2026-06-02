@@ -37,6 +37,14 @@
 ### ~~Upgrade Supabase to Pro plan~~ ✓
 Upgraded 2026-06-02. 200 concurrent connections, 8GB storage, daily backups.
 
+### Add password visibility toggle on login/signup
+Eye icon to show/hide password while typing.
+Effort: S (CC: ~5 min)
+
+### Remove class code suggestion below sign in
+The "Have a class code?" link below the student login is noise. Students sign up on the org's subdomain.
+Effort: S (CC: ~2 min)
+
 ### Toggle anonymous sign-in OFF in Supabase
 Was enabled for DEMO event. Supabase Dashboard → Auth → Providers → Anonymous → OFF.
 Effort: S (human: ~1 min)

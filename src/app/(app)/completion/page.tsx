@@ -201,12 +201,6 @@ export default async function CompletionPage() {
             Business Card
           </Link>
           <Link
-            href="/chat"
-            className="rounded-lg border border-[var(--border)] px-6 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
-          >
-            Talk to AI Guide
-          </Link>
-          <Link
             href="/dashboard"
             className="rounded-lg border border-[var(--border)] px-6 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-muted)] transition-colors"
           >

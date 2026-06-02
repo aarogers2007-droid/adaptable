@@ -56,7 +56,6 @@ export default async function AJDashboard() {
         { href: "/onboarding/ready", name: "Onboarding Complete" },
         { href: "/lessons", name: "Lessons Index" },
         { href: "/scenarios", name: `Scenarios Library (${scenarioCount ?? 0} active)` },
-        { href: "/chat", name: "AI Guide Chat" },
         { href: "/plan", name: "Business Plan" },
         { href: "/card", name: "Business Card Designer" },
         { href: "/achievements", name: "Achievements" },

@@ -36,7 +36,7 @@ export const MODEL_MAP: Record<AIFeature, string> = {
 };
 
 const MAX_TOKENS_MAP: Record<AIFeature, number> = {
-  guide: 1024,
+  guide: 4096,
   ikigai: 1024,
   checkin: 800,
   recommendations: 1200,

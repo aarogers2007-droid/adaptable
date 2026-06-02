@@ -55,7 +55,7 @@ export async function generateReengagementTeaser(studentId: string) {
 
   const ctaLink = currentProgress?.lesson_id
     ? `/lessons/${currentProgress.lesson_id}`
-    : "/chat";
+    : "/lessons";
 
   // Generate teaser message using AI
   const teaserSystemPrompt = `Generate a 1-sentence teaser message from an AI co-founder to a student who hasn't engaged in a while. The student's business is "${businessIdea.name}" — ${businessIdea.niche}. Make it specific and curiosity-driven, like "I had an idea about your pricing" or "I think I know who your first customer should be". Never say "come back" or "we miss you". Sound like a friend with an idea, not a notification. Return ONLY the teaser sentence, nothing else.`;

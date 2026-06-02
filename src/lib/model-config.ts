@@ -17,7 +17,6 @@ export const MODELS = {
 // ── Feature type ──
 
 export type ModelFeature =
-  | "guide"           // AI Guide chat (LOCKED Sonnet)
   | "lesson_chat"     // Lesson conversations (LOCKED Sonnet)
   | "customer_interview" // Customer persona roleplay (Sonnet)
   | "ikigai_synthesis" // Business idea generation (Sonnet)
@@ -42,7 +41,6 @@ export type ModelFeature =
 
 const MODEL_CONFIG: Record<ModelFeature, string> = {
   // LOCKED — do not change
-  guide: MODELS.SONNET,
   lesson_chat: MODELS.SONNET,
 
   // Sonnet — complex reasoning
