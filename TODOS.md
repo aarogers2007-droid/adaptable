@@ -34,9 +34,8 @@
 
 ## P0 — Before VentureLab pilot launches
 
-### Upgrade Supabase to Pro plan
-Free tier limits hit at 10K students. $25/month.
-Effort: S (human: ~5 min)
+### ~~Upgrade Supabase to Pro plan~~ ✓
+Upgraded 2026-06-02. 200 concurrent connections, 8GB storage, daily backups.
 
 ### Toggle anonymous sign-in OFF in Supabase
 Was enabled for DEMO event. Supabase Dashboard → Auth → Providers → Anonymous → OFF.
