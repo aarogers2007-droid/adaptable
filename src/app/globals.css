@@ -354,10 +354,12 @@ button:active:not(:disabled) {
 .lesson-entrance-module {
   font-size: 11px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
   color: rgba(255,255,255,0.4); opacity: 0; transition: opacity 0.8s ease-out;
+  text-align: center; width: 100%;
 }
 .lesson-entrance-title {
   font-size: 28px; font-weight: 700; color: #fff; margin-top: 12px;
   opacity: 0; transition: opacity 0.8s ease-out;
+  text-align: center; width: 100%; padding: 0 24px;
 }
 .lesson-entrance-module.show, .lesson-entrance-title.show { opacity: 1; }
 .lesson-entrance-line {

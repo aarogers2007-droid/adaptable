@@ -142,7 +142,7 @@ export default function VoiceInput({
     <div className={`inline-flex items-center gap-2 ${className}`}>
       {showHint && state === "idle" && (
         <span
-          className="text-xs text-[var(--primary)] font-medium animate-pulse cursor-pointer"
+          className="hidden sm:inline text-xs text-[var(--primary)] font-medium animate-pulse cursor-pointer"
           onClick={() => { setShowHint(false); localStorage.setItem("voice-hint-seen", "true"); }}
         >
           Tap to speak
