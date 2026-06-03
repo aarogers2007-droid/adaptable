@@ -370,6 +370,7 @@ export default function LessonConversation({
     setNudge(null);
 
     setInput("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
     setShowSuggestions(false);
     setShowPacingNudge(false);
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
