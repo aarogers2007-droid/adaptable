@@ -44,7 +44,7 @@ export async function researchTopic(
   webSearchResults: string
 ): Promise<string> {
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6-20250527",
+    model: "claude-sonnet-4-20250514",
     max_tokens: 4096,
     system: `You are an expert business education researcher. Your job is to find and synthesize the BEST thinking on a given business topic from world-class sources: Harvard Business School, Y Combinator, Paul Graham, Reid Hoffman, Guy Kawasaki, How I Built This, Shark Tank, real entrepreneur interviews, academic research, and proven frameworks.
 
