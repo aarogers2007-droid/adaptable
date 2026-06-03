@@ -83,7 +83,7 @@ export default function IkigaiDiagram({
               transition: "all 300ms ease-out",
             }}
           >
-            <span className="font-[family-name:var(--font-display)] font-semibold text-sm text-[var(--text-primary)] select-none pointer-events-none">
+            <span className="font-[family-name:var(--font-display)] font-semibold text-sm sm:text-sm text-xs text-[var(--text-primary)] select-none pointer-events-none text-center leading-tight px-2">
               {isCompleted && <span className="mr-1.5">&#10003;</span>}
               {step.label}
             </span>
