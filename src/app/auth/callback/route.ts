@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
         // ── ADMIN ROUTING — platform owners don't need onboarding ──
         if (profile?.is_platform_owner === true) {
-          return NextResponse.redirect(`${origin}/admin`);
+          return NextResponse.redirect(`${origin}/instructor/dashboard`);
         }
         // Org admin with incomplete onboarding — resume wizard
         if (profile?.role === "org_admin") {

@@ -20,13 +20,15 @@ export default async function InstructorDashboardPage() {
   // Verify instructor role
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, org_id")
+    .select("role, org_id, is_platform_owner")
     .eq("id", user.id)
     .single();
 
+  const isPlatformOwner = (profile as Record<string, unknown>)?.is_platform_owner === true;
+
   if (
     !profile ||
-    (profile.role !== "instructor" && profile.role !== "org_admin")
+    (!isPlatformOwner && profile.role !== "instructor" && profile.role !== "org_admin")
   ) {
     redirect("/dashboard");
   }
@@ -44,7 +46,9 @@ export default async function InstructorDashboardPage() {
     .select("id, name, description, instructor_id, streaks_enabled, voice_enabled, session_type")
     .order("created_at", { ascending: true });
 
-  if (profile.role === "org_admin" && profile.org_id) {
+  if (isPlatformOwner) {
+    // Platform owners see all classes across all orgs
+  } else if (profile.role === "org_admin" && profile.org_id) {
     classQuery = classQuery.eq("org_id", profile.org_id);
   } else {
     classQuery = classQuery.eq("instructor_id", user.id);
@@ -504,7 +508,7 @@ export default async function InstructorDashboardPage() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id} failedNotifications={failedNotifications ?? []} studentLimit={studentLimit} />
+      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id ?? (isPlatformOwner ? "00000000-0000-0000-0000-000000000001" : null)} failedNotifications={failedNotifications ?? []} studentLimit={studentLimit} />
     </main>
   );
 }
