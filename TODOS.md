@@ -222,12 +222,9 @@ Two-layer Founder's Mirror extension: student's own words + AI observations.
 Gate on grade_tier === "high_school".
 Effort: M (CC: ~1 hour)
 
-### Student Journey Summary tab on dashboard
-A tab on the student homepage that shows everything they've built: their Ikigai results,
-business idea, niche, target customer, revenue model, key answers from each lesson
-(pulled from checkpoint artifacts), scenario badges, and a summary of what they've learned.
-The student's own portfolio of progress, all in one place.
-Effort: M (CC: ~1 hour)
+### ~~Student Journey Summary on dashboard~~ ✓
+Collapsible "My Journey" section with Ikigai grid, business details, why-this-fits
+pull quote, and lesson timeline with student's best answers. Done 2026-06-05.
 
 ### Streak visibility improvements
 Larger display on dashboard + "Longest Streak" leaderboard category.
