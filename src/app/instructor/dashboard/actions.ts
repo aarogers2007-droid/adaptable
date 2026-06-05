@@ -258,7 +258,8 @@ export async function resolveAlert(alertId: string, resolution?: string) {
 export async function createClass(
   name: string,
   grades: number[],
-  description?: string
+  description?: string,
+  sessionType?: "curriculum" | "invention"
 ) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -286,6 +287,7 @@ export async function createClass(
       instructor_id: user.id,
       name,
       description: description || null,
+      session_type: sessionType ?? "curriculum",
     })
     .select("id")
     .single();

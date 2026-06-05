@@ -14,6 +14,7 @@ export default function CreateClassModal({ onClose, onCreated }: CreateClassModa
   const [name, setName] = useState("");
   const [selectedGrades, setSelectedGrades] = useState<number[]>([]);
   const [description, setDescription] = useState("");
+  const [sessionType, setSessionType] = useState<"curriculum" | "invention">("curriculum");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +34,8 @@ export default function CreateClassModal({ onClose, onCreated }: CreateClassModa
       const result = await createClass(
         name.trim(),
         selectedGrades,
-        description.trim() || undefined
+        description.trim() || undefined,
+        sessionType
       );
       if (result.error) {
         setError(result.error);
@@ -114,6 +116,39 @@ export default function CreateClassModal({ onClose, onCreated }: CreateClassModa
               rows={2}
               className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
             />
+          </div>
+
+          {/* Session type */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+              Session type
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSessionType("curriculum")}
+                className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                  sessionType === "curriculum"
+                    ? "bg-[var(--primary)] text-white"
+                    : "border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--primary)]"
+                }`}
+              >
+                Curriculum
+                <span className="block text-xs font-normal mt-0.5 opacity-75">Full lesson program</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSessionType("invention")}
+                className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                  sessionType === "invention"
+                    ? "bg-[var(--accent)] text-[var(--text-primary)]"
+                    : "border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--accent)]"
+                }`}
+              >
+                Invention Session
+                <span className="block text-xs font-normal mt-0.5 opacity-75">One-time event</span>
+              </button>
+            </div>
           </div>
         </div>
 
