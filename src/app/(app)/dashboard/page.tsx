@@ -11,6 +11,7 @@ import DashboardAchievements from "./DashboardAchievements";
 import FeedbackBox from "@/components/dashboard/FeedbackBox";
 import DashboardMirror from "@/components/dashboard/DashboardMirror";
 import ScenarioBadges from "@/components/dashboard/ScenarioBadges";
+import MyJourney from "@/components/dashboard/MyJourney";
 import { detectAbsenceGap } from "@/lib/activity";
 import { generateAbsenceMirror, generateWeeklyMirror, hasMirrorFiredToday } from "./mirror-actions";
 
@@ -194,6 +195,49 @@ export default async function DashboardPage() {
     }
   }
 
+  // --- My Journey: build lesson highlights from progress artifacts ---
+  const lessonHighlights = (() => {
+    const sortedLessons = [...lessons].sort((a, b) =>
+      a.module_sequence !== b.module_sequence
+        ? a.module_sequence - b.module_sequence
+        : a.lesson_sequence - b.lesson_sequence
+    );
+
+    const progressMap = new Map(progress.map((p) => [p.lesson_id, p]));
+    let seenIncomplete = false;
+    const highlights: { title: string; status: "completed" | "in_progress" | "locked"; completedAt?: string | null; bestAnswer?: string; sequence: number }[] = [];
+
+    for (let i = 0; i < sortedLessons.length; i++) {
+      const lesson = sortedLessons[i];
+      const prog = progressMap.get(lesson.id);
+      // Clean lesson title: remove "Welcome to Adaptable" → "Welcome"
+      const title = lesson.title.replace(/Welcome to Adaptable/i, "Welcome");
+
+      if (prog?.status === "completed") {
+        // Extract best student answer from conversation artifacts
+        const artifacts = prog.artifacts as Record<string, unknown> | null;
+        const conv = (artifacts?.conversation ?? []) as { role: string; content: string }[];
+        const studentMsgs = conv
+          .filter((m) => m.role === "user" && m.content.length > 20)
+          .sort((a, b) => b.content.length - a.content.length);
+        const bestAnswer = studentMsgs[0]?.content?.slice(0, 200);
+
+        highlights.push({ title, status: "completed", completedAt: prog.completed_at, bestAnswer, sequence: i + 1 });
+      } else if (!seenIncomplete) {
+        highlights.push({ title, status: "in_progress", sequence: i + 1 });
+        seenIncomplete = true;
+      } else if (highlights.length < 5) {
+        // Show a couple locked lessons for context
+        highlights.push({ title, status: "locked", sequence: i + 1 });
+      }
+
+      // Cap at completed + 3 upcoming to keep it compact
+      if (seenIncomplete && highlights.length >= completedCount + 3) break;
+    }
+
+    return highlights;
+  })();
+
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
       <AppNav isAdmin={profile.role === "org_admin"} studentName={profile.full_name || profile.email || undefined} />
@@ -317,6 +361,16 @@ export default async function DashboardPage() {
               {nextLesson.module_name} &middot; Lesson {nextLesson.lesson_sequence}
             </p>
           </Link>
+        )}
+
+        {/* My Journey — Ikigai, business idea, lesson timeline with student quotes */}
+        {profile.ikigai_result && (
+          <MyJourney
+            ikigai={profile.ikigai_result}
+            businessIdea={profile.business_idea}
+            lessonHighlights={lessonHighlights}
+            totalLessons={lessons.length}
+          />
         )}
 
         {/* Check-in banner */}
