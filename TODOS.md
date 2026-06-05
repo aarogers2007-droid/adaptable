@@ -37,21 +37,19 @@
 ### ~~Upgrade Supabase to Pro plan~~ ✓
 Upgraded 2026-06-02. 200 concurrent connections, 8GB storage, daily backups.
 
-### Add password visibility toggle on login/signup
-Eye icon to show/hide password while typing.
-Effort: S (CC: ~5 min)
+### ~~Add password visibility toggle on login/signup~~ ✓
+Eye icon to show/hide password. Done 2026-06-04.
 
-### Remove class code suggestion below sign in
-The "Have a class code?" link below the student login is noise. Students sign up on the org's subdomain.
-Effort: S (CC: ~2 min)
+### ~~Remove class code suggestion below sign in~~ ✓
+Removed "Need to join a class?" link. Admin "Start a program" link preserved. Done 2026-06-04.
 
 ### Toggle anonymous sign-in OFF in Supabase
 Was enabled for DEMO event. Supabase Dashboard → Auth → Providers → Anonymous → OFF.
 Effort: S (human: ~1 min)
 
-### LLC formation + EIN
-Texas LLC filed. Waiting on EIN. Required before Stripe live keys and receiving revenue.
-Effort: M (human: waiting on state)
+### ~~LLC formation~~ ✓ + EIN
+LLC confirmed formed. Waiting on EIN (1-800-829-4933). Required before Stripe live keys.
+Effort: S (human: phone call)
 
 ### Set up Stripe account + add keys to Vercel
 **Blocked by: LLC/EIN.** Code is built and deployed. Just needs keys.
@@ -80,11 +78,6 @@ obligations, documentation requirements. Could be a page in the handbook or a
 dedicated in-app guide accessible from the Alerts tab.
 Source: Linda (rural Texas director) walkthrough.
 Effort: S (CC: ~30 min for in-app guide)
-
-### Calendly setup call integration
-Set up Calendly account with 15-minute "Adaptable Setup Call" event type.
-Add link to onboarding step 5 launchpad and post-signup emails.
-Effort: S (human: ~10 min)
 
 ---
 
@@ -229,9 +222,30 @@ Two-layer Founder's Mirror extension: student's own words + AI observations.
 Gate on grade_tier === "high_school".
 Effort: M (CC: ~1 hour)
 
+### Student Journey Summary tab on dashboard
+A tab on the student homepage that shows everything they've built: their Ikigai results,
+business idea, niche, target customer, revenue model, key answers from each lesson
+(pulled from checkpoint artifacts), scenario badges, and a summary of what they've learned.
+The student's own portfolio of progress, all in one place.
+Effort: M (CC: ~1 hour)
+
 ### Streak visibility improvements
 Larger display on dashboard + "Longest Streak" leaderboard category.
 Effort: S (CC: ~30 min)
+
+### Lesson chat textarea doesn't shrink after send
+The textarea auto-expands when typing long messages but doesn't reset height after
+sending. After a long message, the empty textarea stays tall. Fix: reset
+`inputRef.current.style.height` to initial size in the send handler after clearing input.
+Effort: S (CC: ~5 min)
+
+### Mobile polish — lesson chat UI
+Spotted during visual audit (2026-06-03):
+- AI message bubble padding too generous on 375px (px-6 py-5 → reduce to px-4 py-3 on mobile)
+- Completion card overlay padding tight on mobile (32px 40px → reduce horizontal on small screens)
+- Header lesson title + progress bar: long titles squeeze the progress bar on 375px, consider stacking vertically on mobile
+- Suggestion chips push input area down when wrapping (acceptable, monitor)
+Effort: S (CC: ~20 min)
 
 ### Multimodal RAG
 Images, diagrams, videos in knowledge base. AI surfaces inline during lessons.
