@@ -58,13 +58,14 @@ interface DashboardClientProps {
   orgId?: string | null;
   failedNotifications: NotificationFailure[];
   studentLimit?: number | null;
+  isPlatformOwner?: boolean;
 }
 
 type SubTab = "students" | "feed" | "alerts" | "followups" | "analytics" | "scenarios" | "impact" | "settings";
 
-export default function DashboardClient({ classes, totalLessons, orgId, failedNotifications, studentLimit }: DashboardClientProps) {
+export default function DashboardClient({ classes, totalLessons, orgId, failedNotifications, studentLimit, isPlatformOwner }: DashboardClientProps) {
   const [activeClassIdx, setActiveClassIdx] = useState(0);
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>("students");
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>(isPlatformOwner ? "impact" : "students");
   const [showCreateClass, setShowCreateClass] = useState(false);
   const [welcomeKey, setWelcomeKey] = useState(0); // increment to trigger reopen
   const [failureBannerDismissed, setFailureBannerDismissed] = useState(false);
@@ -154,7 +155,7 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
             Adaptable
           </span>
           <span className="text-sm font-medium text-[var(--text-primary)]">
-            Instructor Dashboard
+            {isPlatformOwner ? "Platform Dashboard" : "Instructor Dashboard"}
           </span>
           <div className="ml-auto flex items-center gap-4">
             <button
@@ -181,11 +182,16 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
         <div className="flex items-start justify-between">
           <div>
             <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
-              Your Classes
+              {isPlatformOwner ? "Platform Overview" : "Your Classes"}
             </h1>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              {totalStudents} student{totalStudents !== 1 ? "s" : ""} across{" "}
-              {classes.length} class{classes.length !== 1 ? "es" : ""}
+              {isPlatformOwner
+                ? `${totalStudents} total student${totalStudents !== 1 ? "s" : ""}`
+                : <>
+                    {totalStudents} student{totalStudents !== 1 ? "s" : ""} across{" "}
+                    {classes.length} class{classes.length !== 1 ? "es" : ""}
+                  </>
+              }
               {totalAlerts > 0 && (
                 <span className="ml-2 text-[var(--warning)]">
                   {totalAlerts} alert{totalAlerts !== 1 ? "s" : ""}
@@ -193,14 +199,23 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
               )}
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateClass(true)}
-            className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-dark)] transition-colors"
-          >
-            + New class
-          </button>
+          {!isPlatformOwner && (
+            <button
+              onClick={() => setShowCreateClass(true)}
+              className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-dark)] transition-colors"
+            >
+              + New class
+            </button>
+          )}
         </div>
 
+        {/* Platform owner: skip classes, show Impact directly */}
+        {isPlatformOwner ? (
+          <div className="mt-6">
+            {orgId && <ImpactTab orgId={orgId} />}
+          </div>
+        ) : (
+        <>
         {/* Class tabs */}
         {classes.length === 0 ? (
           <div className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--bg)] p-12 text-center">
@@ -363,6 +378,8 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
               </div>
             )}
           </>
+        )}
+        </>
         )}
       </div>
 

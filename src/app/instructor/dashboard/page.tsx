@@ -508,7 +508,7 @@ export default async function InstructorDashboardPage() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-subtle)]">
-      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id ?? (isPlatformOwner ? "00000000-0000-0000-0000-000000000001" : null)} failedNotifications={failedNotifications ?? []} studentLimit={studentLimit} />
+      <DashboardClient classes={classDataArray} totalLessons={totalLessons} orgId={profile.org_id ?? (isPlatformOwner ? "00000000-0000-0000-0000-000000000001" : null)} failedNotifications={failedNotifications ?? []} studentLimit={studentLimit} isPlatformOwner={isPlatformOwner} />
     </main>
   );
 }
