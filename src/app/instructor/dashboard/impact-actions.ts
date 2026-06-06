@@ -604,3 +604,90 @@ export async function getBusinessIdeaDistribution(orgId: string): Promise<Busine
     }))
     .sort((a, b) => b.count - a.count);
 }
+
+// ─── Student Roster ───
+
+export interface RosterStudent {
+  id: string;
+  fullName: string;
+  gradeTier: string;
+  businessName: string | null;
+  lessonsCompleted: number;
+  totalLessons: number;
+  lastActive: string | null;
+  status: "active" | "at-risk" | "inactive";
+}
+
+export async function getStudentRoster(orgId: string): Promise<RosterStudent[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, org_id, is_platform_owner")
+    .eq("id", user.id)
+    .single();
+
+  const isPlatformOwner = (profile as Record<string, unknown>)?.is_platform_owner === true;
+  if (!isPlatformOwner && (profile?.role !== "org_admin" || profile?.org_id !== orgId)) return [];
+
+  const admin = createAdminClient();
+
+  const { data: students } = await admin
+    .from("profiles")
+    .select("id, full_name, grade_tier, business_idea")
+    .eq("org_id", orgId)
+    .eq("role", "student")
+    .order("created_at", { ascending: false });
+
+  if (!students || students.length === 0) return [];
+
+  const studentIds = students.map((s) => s.id);
+
+  // Progress and last activity in parallel
+  const [progressRes, lastActivityRes, atRiskRes] = await Promise.all([
+    admin.from("student_progress").select("student_id, status").in("student_id", studentIds),
+    admin.from("ai_usage_log").select("student_id, created_at").in("student_id", studentIds).order("created_at", { ascending: false }),
+    admin.from("at_risk_students").select("student_id").eq("org_id", orgId),
+  ]);
+
+  const completedMap = new Map<string, number>();
+  for (const p of progressRes.data ?? []) {
+    if (p.status === "completed") {
+      completedMap.set(p.student_id, (completedMap.get(p.student_id) ?? 0) + 1);
+    }
+  }
+
+  const lastActiveMap = new Map<string, string>();
+  for (const a of lastActivityRes.data ?? []) {
+    if (!lastActiveMap.has(a.student_id)) {
+      lastActiveMap.set(a.student_id, a.created_at);
+    }
+  }
+
+  const atRiskSet = new Set((atRiskRes.data ?? []).map((r) => r.student_id));
+
+  const { data: allLessons } = await admin.from("lessons").select("id");
+  const totalLessons = allLessons?.length ?? 22;
+
+  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+
+  return students.map((s) => {
+    const lastActive = lastActiveMap.get(s.id) ?? null;
+    const isAtRisk = atRiskSet.has(s.id);
+    const isInactive = !lastActive || lastActive < threeDaysAgo;
+    const biz = s.business_idea as { name?: string } | null;
+
+    return {
+      id: s.id,
+      fullName: s.full_name ?? "Student",
+      gradeTier: s.grade_tier ?? "unknown",
+      businessName: biz?.name ?? null,
+      lessonsCompleted: completedMap.get(s.id) ?? 0,
+      totalLessons,
+      lastActive,
+      status: isAtRisk ? "at-risk" as const : isInactive ? "inactive" as const : "active" as const,
+    };
+  });
+}

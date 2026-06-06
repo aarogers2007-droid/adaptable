@@ -11,6 +11,7 @@ import CreateClassModal from "./CreateClassModal";
 import MessageComposer from "./MessageComposer";
 import WelcomeSlideshow from "./WelcomeSlideshow";
 import ImpactTab from "./ImpactTab";
+import PlatformDashboard from "./PlatformDashboard";
 import ScenariosPanel from "./ScenariosPanel";
 import type { StudentRow } from "./StudentTable";
 import type { FeedItem } from "./LiveFeed";
@@ -209,10 +210,10 @@ export default function DashboardClient({ classes, totalLessons, orgId, failedNo
           )}
         </div>
 
-        {/* Platform owner: skip classes, show Impact directly */}
+        {/* Platform owner: full platform dashboard, no classes */}
         {isPlatformOwner ? (
           <div className="mt-6">
-            {orgId && <ImpactTab orgId={orgId} />}
+            {orgId && <PlatformDashboard orgId={orgId} totalStudents={totalStudents} />}
           </div>
         ) : (
         <>
