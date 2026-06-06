@@ -520,6 +520,11 @@ export async function deactivateLesson(orgId: string, lessonId: string, notes?: 
   if (profile?.org_id !== orgId || profile?.role !== "org_admin") return { success: false, error: "Unauthorized" };
 
   const admin = createAdminClient();
+  // Verify lesson belongs to this org or is a default curriculum lesson
+  const { data: lesson } = await admin.from("lessons").select("org_id").eq("id", lessonId).single();
+  if (!lesson || (lesson.org_id !== orgId && lesson.org_id !== "00000000-0000-0000-0000-000000000001")) {
+    return { success: false, error: "Lesson not found or not accessible" };
+  }
   await admin.from("lessons").update({ is_active: false }).eq("id", lessonId);
   await admin.from("lesson_reviews").insert({ lesson_id: lessonId, org_id: orgId, admin_id: user.id, action: "deactivated", notes: notes ?? null });
 
@@ -535,6 +540,11 @@ export async function reactivateLesson(orgId: string, lessonId: string): Promise
   if (profile?.org_id !== orgId || profile?.role !== "org_admin") return { success: false, error: "Unauthorized" };
 
   const admin = createAdminClient();
+  // Verify lesson belongs to this org or is a default curriculum lesson
+  const { data: lesson } = await admin.from("lessons").select("org_id").eq("id", lessonId).single();
+  if (!lesson || (lesson.org_id !== orgId && lesson.org_id !== "00000000-0000-0000-0000-000000000001")) {
+    return { success: false, error: "Lesson not found or not accessible" };
+  }
   await admin.from("lessons").update({ is_active: true }).eq("id", lessonId);
   await admin.from("lesson_reviews").insert({ lesson_id: lessonId, org_id: orgId, admin_id: user.id, action: "reactivated" });
 

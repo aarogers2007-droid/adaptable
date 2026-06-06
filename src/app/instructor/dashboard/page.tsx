@@ -65,6 +65,15 @@ export default async function InstructorDashboardPage() {
 
   const totalLessons = allLessons?.length ?? 0;
 
+  // Platform owners: skip class-level data loading entirely, render PlatformDashboard
+  if (isPlatformOwner) {
+    return (
+      <main className="min-h-screen bg-[var(--bg-subtle)]">
+        <DashboardClient classes={[]} totalLessons={totalLessons} orgId={profile.org_id ?? "00000000-0000-0000-0000-000000000001"} failedNotifications={failedNotifications ?? []} studentLimit={null} isPlatformOwner={true} />
+      </main>
+    );
+  }
+
   // Check for inactive/stuck students on dashboard load
   for (const cls of classes ?? []) {
     await checkInactiveAndStuck(supabase, cls.id);
