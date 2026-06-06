@@ -208,7 +208,7 @@ export async function getAtRiskStudents(orgId: string): Promise<AtRiskStudent[]>
  * Includes per-student: name, email, grade, business idea, lessons completed,
  * scenarios completed, AI exchanges, and last active date.
  */
-export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string; filename?: string; error?: string }> {
+export async function exportOrgImpactCSV(orgId: string, includeEmails = false): Promise<{ csv?: string; filename?: string; error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Unauthorized" };
@@ -350,9 +350,13 @@ export async function exportOrgImpactCSV(orgId: string): Promise<{ csv?: string;
       ? new Date(lastActive).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
       : "Never";
 
+    const emailValue = includeEmails
+      ? s.email
+      : s.email ? s.email.replace(/^(.{1,2}).*@/, (_, start) => start + "***@") : "";
+
     rows.push([
       escape(s.full_name),
-      escape(s.email),
+      escape(emailValue),
       escape(s.grade_level),
       escape((s.business_idea as { name?: string })?.name),
       escape((s.business_idea as { niche?: string })?.niche),

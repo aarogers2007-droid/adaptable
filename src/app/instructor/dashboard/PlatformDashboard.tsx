@@ -86,8 +86,11 @@ export default function PlatformDashboard({ orgId, totalStudents }: Props) {
   }, [orgId]);
 
   async function handleExportCSV() {
+    const includeEmails = window.confirm(
+      "This export can include student email addresses for verification purposes.\n\nInclude emails? Click OK to include, Cancel to mask them."
+    );
     setExportStatus("Generating...");
-    const result = await exportOrgImpactCSV(orgId);
+    const result = await exportOrgImpactCSV(orgId, includeEmails);
     if (result.error || !result.csv) {
       setExportStatus(result.error ?? "Export failed");
       setTimeout(() => setExportStatus(null), 3000);
