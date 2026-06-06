@@ -40,15 +40,31 @@ export default async function InstructorDashboardPage() {
     .order("created_at", { ascending: false })
     .limit(10);
 
+  // Platform owners: skip class-level data loading entirely, render PlatformDashboard
+  if (isPlatformOwner) {
+    const { data: allLessons } = await supabase
+      .from("lessons")
+      .select("id")
+      .order("module_sequence");
+    return (
+      <main className="min-h-screen bg-[var(--bg-subtle)]">
+        <DashboardClient classes={[]} totalLessons={allLessons?.length ?? 0} orgId={profile.org_id ?? "00000000-0000-0000-0000-000000000001"} failedNotifications={failedNotifications ?? []} studentLimit={null} isPlatformOwner={true} />
+      </main>
+    );
+  }
+
+  // Non-platform-owner with no org — can't load dashboard
+  if (!profile.org_id) {
+    redirect("/dashboard");
+  }
+
   // Get classes: org_admins see all classes in their org, instructors see their own
   let classQuery = supabase
     .from("classes")
     .select("id, name, description, instructor_id, streaks_enabled, voice_enabled, session_type")
     .order("created_at", { ascending: true });
 
-  if (isPlatformOwner) {
-    // Platform owners see all classes across all orgs
-  } else if (profile.role === "org_admin" && profile.org_id) {
+  if (profile.role === "org_admin" && profile.org_id) {
     classQuery = classQuery.eq("org_id", profile.org_id);
   } else {
     classQuery = classQuery.eq("instructor_id", user.id);
@@ -64,15 +80,6 @@ export default async function InstructorDashboardPage() {
     .order("lesson_sequence");
 
   const totalLessons = allLessons?.length ?? 0;
-
-  // Platform owners: skip class-level data loading entirely, render PlatformDashboard
-  if (isPlatformOwner) {
-    return (
-      <main className="min-h-screen bg-[var(--bg-subtle)]">
-        <DashboardClient classes={[]} totalLessons={totalLessons} orgId={profile.org_id ?? "00000000-0000-0000-0000-000000000001"} failedNotifications={failedNotifications ?? []} studentLimit={null} isPlatformOwner={true} />
-      </main>
-    );
-  }
 
   // Check for inactive/stuck students on dashboard load
   for (const cls of classes ?? []) {

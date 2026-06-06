@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { sendMessage } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 import type { BusinessIdea } from "@/lib/types";
 
 export async function validateAndCreateBusinessIdea(
@@ -18,7 +19,7 @@ export async function validateAndCreateBusinessIdea(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, org_id")
     .eq("id", user.id)
     .single();
 
@@ -67,15 +68,20 @@ Be generous with what counts as valid. A nail salon, lawn mowing, tutoring, sell
         .eq("id", user.id);
 
       // Log usage
-      await supabase.from("ai_usage_log").insert({
-        student_id: user.id,
-        feature: "ikigai",
-        model: "claude-sonnet-4-20250514",
-        input_tokens: result.usage.input_tokens,
-        output_tokens: result.usage.output_tokens,
-        estimated_cost_usd:
-          (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) / 1_000_000,
-      });
+      try {
+        await supabase.from("ai_usage_log").insert({
+          student_id: user.id,
+          org_id: profile?.org_id ?? null,
+          feature: "ikigai",
+          model: getModel("ikigai_skip"),
+          input_tokens: result.usage.input_tokens,
+          output_tokens: result.usage.output_tokens,
+          estimated_cost_usd:
+            (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) / 1_000_000,
+        });
+      } catch (e) {
+        console.error("Failed to log ai_usage for ikigai skip:", e);
+      }
 
       return { idea };
     } else {

@@ -85,6 +85,14 @@ export async function submitCheckIn(prompt: string, response: string) {
     }
   }
 
+  // Fetch org_id for usage logging
+  const { data: checkinProfile } = await supabase
+    .from("profiles")
+    .select("org_id")
+    .eq("id", user.id)
+    .single();
+  const checkinOrgId = checkinProfile?.org_id ?? null;
+
   // Get AI reply
   try {
     const aiResult = await sendMessageAuto({
@@ -107,17 +115,22 @@ export async function submitCheckIn(prompt: string, response: string) {
       .eq("id", checkin.id);
 
     // Log AI usage
-    await supabase.from("ai_usage_log").insert({
-      student_id: user.id,
-      feature: "checkin",
-      model: aiResult.model_used,
-      input_tokens: aiResult.usage.input_tokens,
-      output_tokens: aiResult.usage.output_tokens,
-      estimated_cost_usd:
-        (aiResult.usage.input_tokens * 0.25 +
-          aiResult.usage.output_tokens * 1.25) /
-        1_000_000,
-    });
+    try {
+      await supabase.from("ai_usage_log").insert({
+        student_id: user.id,
+        org_id: checkinOrgId,
+        feature: "checkin",
+        model: aiResult.model_used,
+        input_tokens: aiResult.usage.input_tokens,
+        output_tokens: aiResult.usage.output_tokens,
+        estimated_cost_usd:
+          (aiResult.usage.input_tokens * 0.25 +
+            aiResult.usage.output_tokens * 1.25) /
+          1_000_000,
+      });
+    } catch (e) {
+      console.error("Failed to log ai_usage for checkin:", e);
+    }
 
     return { aiReply: aiResult.text };
   } catch (e) {

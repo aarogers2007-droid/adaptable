@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sendMessage } from "@/lib/ai";
 import type { IkigaiDraft, BusinessIdea, GradeTier } from "@/lib/types";
 import { getIkigaiAdaptation } from "@/lib/grade-adaptation";
+import { getModel } from "@/lib/model-config";
 
 const STEP_PROMPTS: Record<number, (draft: IkigaiDraft) => string> = {
   1: () =>
@@ -30,7 +31,6 @@ export async function generateSuggestions(
     if (!promptFn) return { suggestions: [], error: "Invalid step" };
 
     const { sendMessageAuto } = await import("@/lib/ai");
-    const { getModel } = await import("@/lib/model-config");
     const result = await sendMessageAuto({
       model: getModel("ikigai_suggestions"),
       maxTokens: 1024,
@@ -46,16 +46,26 @@ export async function generateSuggestions(
     } = await supabase.auth.getUser();
 
     if (user) {
-      await supabase.from("ai_usage_log").insert({
-        student_id: user.id,
-        feature: "ikigai",
-        model: "claude-sonnet-4-20250514",
-        input_tokens: result.usage.input_tokens,
-        output_tokens: result.usage.output_tokens,
-        estimated_cost_usd:
-          (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) /
-          1_000_000,
-      });
+      try {
+        const { data: sugProfile } = await supabase
+          .from("profiles")
+          .select("org_id")
+          .eq("id", user.id)
+          .single();
+        await supabase.from("ai_usage_log").insert({
+          student_id: user.id,
+          org_id: sugProfile?.org_id ?? null,
+          feature: "ikigai",
+          model: getModel("ikigai_suggestions"),
+          input_tokens: result.usage.input_tokens,
+          output_tokens: result.usage.output_tokens,
+          estimated_cost_usd:
+            (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) /
+            1_000_000,
+        });
+      } catch (e) {
+        console.error("Failed to log ai_usage for ikigai suggestions:", e);
+      }
     }
 
     const parsed = JSON.parse(result.text);
@@ -119,6 +129,7 @@ export async function synthesizeBusinessIdea(
     // "You" if they skipped it. Otherwise look it up from the auth'd profile.
     let studentName = "Student";
     let studentGradeTier: GradeTier = "high_school";
+    let synthOrgId: string | null = null;
     if (demoMode) {
       const safeName = (options?.firstName ?? "")
         .replace(/[^a-zA-Z\s'\-]/g, "")
@@ -180,7 +191,7 @@ export async function synthesizeBusinessIdea(
       if (currentUser) {
         const { data: nameData } = await supabaseForName
           .from("profiles")
-          .select("full_name, grade_tier")
+          .select("full_name, grade_tier, org_id")
           .eq("id", currentUser.id)
           .single();
         if (nameData?.full_name) {
@@ -188,6 +199,9 @@ export async function synthesizeBusinessIdea(
         }
         if (nameData?.grade_tier) {
           studentGradeTier = nameData.grade_tier as GradeTier;
+        }
+        if (nameData?.org_id) {
+          synthOrgId = nameData.org_id as string;
         }
       }
     }
@@ -263,16 +277,21 @@ First, identify the distinct themes in their answers. If their interests span mu
       } = await supabase.auth.getUser();
 
       if (user) {
-        await supabase.from("ai_usage_log").insert({
-          student_id: user.id,
-          feature: "ikigai",
-          model: "claude-sonnet-4-20250514",
-          input_tokens: result.usage.input_tokens,
-          output_tokens: result.usage.output_tokens,
-          estimated_cost_usd:
-            (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) /
-            1_000_000,
-        });
+        try {
+          await supabase.from("ai_usage_log").insert({
+            student_id: user.id,
+            org_id: synthOrgId,
+            feature: "ikigai",
+            model: getModel("ikigai_synthesis"),
+            input_tokens: result.usage.input_tokens,
+            output_tokens: result.usage.output_tokens,
+            estimated_cost_usd:
+              (result.usage.input_tokens * 3 + result.usage.output_tokens * 15) /
+              1_000_000,
+          });
+        } catch (e) {
+          console.error("Failed to log ai_usage for ikigai synthesis:", e);
+        }
       }
     }
 

@@ -69,6 +69,7 @@ export default function PlatformDashboard({ orgId, totalStudents }: Props) {
   const [atRisk, setAtRisk] = useState<AtRiskStudent[]>([]);
   const [roster, setRoster] = useState<RosterStudent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [exportStatus, setExportStatus] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -82,7 +83,11 @@ export default function PlatformDashboard({ orgId, totalStudents }: Props) {
       setAtRisk(a);
       setRoster(s);
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch((err) => {
+      console.error("[PlatformDashboard] failed to load:", err);
+      setError("Failed to load dashboard data. Please refresh the page.");
+      setLoading(false);
+    });
   }, [orgId]);
 
   async function handleExportCSV() {
@@ -114,6 +119,17 @@ export default function PlatformDashboard({ orgId, totalStudents }: Props) {
         {[...Array(4)].map((_, i) => (
           <div key={i} className="h-24 rounded-xl bg-[var(--bg-muted)] animate-pulse" />
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-[var(--error)]/20 bg-[var(--error)]/5 p-6 text-center">
+        <p className="text-sm font-medium text-[var(--error)]">{error}</p>
+        <button onClick={() => window.location.reload()} className="mt-3 rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-dark)] transition-colors">
+          Refresh
+        </button>
       </div>
     );
   }

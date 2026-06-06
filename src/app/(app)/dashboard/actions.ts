@@ -31,11 +31,11 @@ export async function generateCheckin() {
 
   // Get profile + progress
   const [profileRes, progressRes] = await Promise.all([
-    supabase.from("profiles").select("business_idea, full_name").eq("id", user.id).single(),
+    supabase.from("profiles").select("business_idea, full_name, org_id").eq("id", user.id).single(),
     supabase.from("student_progress").select("status, lesson_id").eq("student_id", user.id),
   ]);
 
-  const profile = profileRes.data as unknown as Pick<Profile, "business_idea" | "full_name"> | null;
+  const profile = profileRes.data as unknown as Pick<Profile, "business_idea" | "full_name"> & { org_id: string | null } | null;
   if (!profile?.business_idea) return { error: "No business idea" };
 
   const completedCount = (progressRes.data ?? []).filter((p) => p.status === "completed").length;
@@ -58,14 +58,19 @@ export async function generateCheckin() {
   });
 
   // Log usage
-  await supabase.from("ai_usage_log").insert({
-    student_id: user.id,
-    feature: "checkin",
-    model: result.model_used,
-    input_tokens: result.usage.input_tokens,
-    output_tokens: result.usage.output_tokens,
-    estimated_cost_usd: (result.usage.input_tokens * 0.25 + result.usage.output_tokens * 1.25) / 1_000_000,
-  });
+  try {
+    await supabase.from("ai_usage_log").insert({
+      student_id: user.id,
+      org_id: profile.org_id,
+      feature: "checkin",
+      model: result.model_used,
+      input_tokens: result.usage.input_tokens,
+      output_tokens: result.usage.output_tokens,
+      estimated_cost_usd: (result.usage.input_tokens * 0.25 + result.usage.output_tokens * 1.25) / 1_000_000,
+    });
+  } catch (e) {
+    console.error("Failed to log ai_usage for checkin:", e);
+  }
 
   return { content: result.text };
 }
@@ -80,11 +85,11 @@ export async function generateRecommendations() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("business_idea, niche_recommendations")
+    .select("business_idea, niche_recommendations, org_id")
     .eq("id", user.id)
     .single();
 
-  const typedProfile = profile as unknown as Pick<Profile, "business_idea" | "niche_recommendations"> | null;
+  const typedProfile = profile as unknown as Pick<Profile, "business_idea" | "niche_recommendations"> & { org_id: string | null } | null;
 
   // Return cached if exists
   if (typedProfile?.niche_recommendations) {
@@ -119,14 +124,19 @@ export async function generateRecommendations() {
       .eq("id", user.id);
 
     // Log usage
-    await supabase.from("ai_usage_log").insert({
-      student_id: user.id,
-      feature: "recommendations",
-      model: result.model_used,
-      input_tokens: result.usage.input_tokens,
-      output_tokens: result.usage.output_tokens,
-      estimated_cost_usd: (result.usage.input_tokens * 0.25 + result.usage.output_tokens * 1.25) / 1_000_000,
-    });
+    try {
+      await supabase.from("ai_usage_log").insert({
+        student_id: user.id,
+        org_id: typedProfile.org_id,
+        feature: "recommendations",
+        model: result.model_used,
+        input_tokens: result.usage.input_tokens,
+        output_tokens: result.usage.output_tokens,
+        estimated_cost_usd: (result.usage.input_tokens * 0.25 + result.usage.output_tokens * 1.25) / 1_000_000,
+      });
+    } catch (e) {
+      console.error("Failed to log ai_usage for recommendations:", e);
+    }
 
     return { recommendations: recs };
   } catch {

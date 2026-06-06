@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { generateCardContent, type CardContent } from "@/lib/generate-card";
 import { MODEL_MAP } from "@/lib/ai";
+import { getModel } from "@/lib/model-config";
 import { randomBytes } from "crypto";
 
 // ── Semaphore: limit concurrent Claude card generation calls ──
@@ -188,7 +189,7 @@ export async function generateStudentCard(sessionId: string): Promise<GenerateCa
   // 5. Fetch grade_tier
   const { data: profile } = await supabase
     .from("profiles")
-    .select("grade_tier")
+    .select("grade_tier, org_id")
     .eq("id", session.student_id)
     .single();
 
@@ -288,14 +289,19 @@ export async function generateStudentCard(sessionId: string): Promise<GenerateCa
     }
 
     // Log usage
-    await supabase.from("ai_usage_log").insert({
-      student_id: session.student_id,
-      feature: "card",
-      model: "claude-haiku-4-5-20251001",
-      input_tokens: result.usage?.input_tokens ?? 0,
-      output_tokens: result.usage?.output_tokens ?? 0,
-      estimated_cost_usd: 0,
-    });
+    try {
+      await supabase.from("ai_usage_log").insert({
+        student_id: session.student_id,
+        org_id: profile?.org_id ?? null,
+        feature: "card",
+        model: getModel("card_generation"),
+        input_tokens: result.usage?.input_tokens ?? 0,
+        output_tokens: result.usage?.output_tokens ?? 0,
+        estimated_cost_usd: 0,
+      });
+    } catch (e) {
+      console.error("Failed to log ai_usage for card:", e);
+    }
 
     // 13. Send parent email (non-blocking, fire-and-forget)
     sendParentCardEmail(supabase, session.student_id, shareableSlug, sessionId).catch((err) => {
