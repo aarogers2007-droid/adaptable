@@ -28,16 +28,16 @@ export default function Home() {
         </p>
         <div className="mt-10 flex flex-col sm:flex-row gap-3">
           <Link
-            href="/start"
+            href="/login"
             className="rounded-lg bg-[var(--primary)] px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)]"
           >
-            Start Your Program
+            Log In
           </Link>
           <Link
-            href="/start"
+            href="/signup"
             className="rounded-lg border border-[var(--border-strong)] px-8 py-3.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
           >
-            Get Started
+            Sign Up
           </Link>
         </div>
         <p className="mt-4 text-xs text-[var(--text-muted)]">
@@ -116,16 +116,16 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/start"
+              href="/login"
               className="rounded-lg bg-[var(--primary)] px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)]"
             >
-              Start Your Program
+              Log In
             </Link>
             <Link
-              href="/start"
+              href="/signup"
               className="rounded-lg border border-[var(--border-strong)] px-8 py-3.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
             >
-              Get Started
+              Sign Up
             </Link>
           </div>
         </div>
@@ -135,8 +135,8 @@ export default function Home() {
       <footer className="border-t border-[var(--border)] px-6 py-8">
         <div className="mx-auto max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6 text-sm text-[var(--text-muted)]">
-            <Link href="/start" className="py-2 hover:text-[var(--text-primary)] transition-colors">Get Started</Link>
-            <Link href="/login" className="py-2 hover:text-[var(--text-primary)] transition-colors">Sign In</Link>
+            <Link href="/login" className="py-2 hover:text-[var(--text-primary)] transition-colors">Log In</Link>
+            <Link href="/signup" className="py-2 hover:text-[var(--text-primary)] transition-colors">Sign Up</Link>
             <Link href="/privacy" className="py-2 hover:text-[var(--text-primary)] transition-colors">Privacy</Link>
           </div>
           <div className="text-xs text-[var(--text-muted)]">

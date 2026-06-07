@@ -121,10 +121,10 @@ export default function LoginPage() {
               className="rounded-xl border-2 border-[var(--border)] p-6 text-left transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)]/5"
             >
               <p className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--text-primary)]">
-                Admin / Teacher
+                Admin
               </p>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Manage classes, view student progress, run events.
+                Manage your program, view student progress, and track impact.
               </p>
             </button>
 
@@ -137,7 +137,7 @@ export default function LoginPage() {
                 Student
               </p>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Join a class and start building your venture.
+                Build your business, one lesson at a time.
               </p>
             </button>
           </div>
@@ -162,7 +162,7 @@ export default function LoginPage() {
         </button>
 
         <h1 className="font-[family-name:var(--font-display)] text-[32px] font-semibold text-[var(--text-primary)]">
-          {activeSection === "admin" ? "Admin / Teacher Login" : "Student Login"}
+          {activeSection === "admin" ? "Admin Login" : "Student Login"}
         </h1>
 
         <div className="mt-6">
