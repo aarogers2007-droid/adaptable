@@ -138,7 +138,10 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
-    router.push(destination);
+    // Full page navigation (not client-side) ensures the auth cookie is
+    // fully set before the server component reads it. router.push() can
+    // race the cookie, causing React error #310 on /onboarding.
+    window.location.href = destination;
   }
 
   async function handleGoogleSignup() {
