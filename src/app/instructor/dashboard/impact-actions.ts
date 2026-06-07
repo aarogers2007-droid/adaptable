@@ -45,10 +45,8 @@ export async function getOrgImpactReport(orgId: string): Promise<OrgImpactReport
     totalExchangesRes,
     gradeRes,
   ] = await Promise.all([
-    // Active students last 30 days (fetch IDs and deduplicate in JS)
-    // TODO: Replace with a SQL view using COUNT(DISTINCT student_id) for efficiency at scale
-    admin.from("ai_usage_log").select("student_id")
-      .eq("org_id", orgId).gte("created_at", thirtyDaysAgo),
+    // Active students last 30 days (server-side COUNT DISTINCT via RPC)
+    admin.rpc("count_active_students", { p_org_id: orgId, p_since: thirtyDaysAgo }),
 
     // Total lessons completed (from student_progress — one row per student-lesson, no double-counting)
     // Placeholder — resolved below after orgStudentIds are fetched
@@ -69,7 +67,7 @@ export async function getOrgImpactReport(orgId: string): Promise<OrgImpactReport
       .eq("org_id", orgId).eq("role", "student"),
   ]);
 
-  const activeStudents = new Set((activeStudentsRes.data ?? []).map(r => r.student_id)).size;
+  const activeStudents = (activeStudentsRes.data as unknown as number) ?? 0;
   const totalExchanges = totalExchangesRes.count ?? 0;
   void lessonsCompletedTotalRes; // placeholder — resolved below from student_progress
   void lessonsCompleted30Res; // placeholder — resolved below from student_progress
@@ -264,22 +262,17 @@ export async function exportOrgImpactCSV(orgId: string, includeEmails = false): 
       .in("student_id", studentIds)
       .eq("status", "completed"),
 
-    // Total AI exchanges per student
-    admin.from("ai_usage_log")
-      .select("student_id")
-      .in("student_id", studentIds),
+    // Total AI exchanges per student (server-side GROUP BY via RPC)
+    admin.rpc("student_exchange_counts", { p_org_id: orgId }),
 
-    // Last active (most recent ai_usage_log or student_progress timestamp)
-    admin.from("ai_usage_log")
-      .select("student_id, created_at")
-      .in("student_id", studentIds)
-      .order("created_at", { ascending: false }),
+    // Last active per student (server-side MAX via RPC)
+    admin.rpc("student_last_active", { p_org_id: orgId }),
   ]);
 
   const allProgress = progressRes.data ?? [];
   const allScenarios = scenariosRes.data ?? [];
-  const allAiUsage = aiUsageRes.data ?? [];
-  const allActivity = activityRes.data ?? [];
+  const exchangeCounts = (aiUsageRes.data ?? []) as { student_id: string; exchange_count: number }[];
+  const lastActivities = (activityRes.data ?? []) as { student_id: string; last_active: string }[];
 
   // Also get last progress timestamps for last_active fallback
   const { data: progressTimestamps } = await admin
@@ -300,16 +293,16 @@ export async function exportOrgImpactCSV(orgId: string, includeEmails = false): 
     scenariosMap.set(s.student_id, (scenariosMap.get(s.student_id) ?? 0) + 1);
   }
 
+  // Exchange counts from server-side GROUP BY (no 1000-row truncation)
   const aiExchangesMap = new Map<string, number>();
-  for (const a of allAiUsage) {
-    aiExchangesMap.set(a.student_id, (aiExchangesMap.get(a.student_id) ?? 0) + 1);
+  for (const a of exchangeCounts) {
+    aiExchangesMap.set(a.student_id, Number(a.exchange_count));
   }
 
+  // Last active from server-side MAX (no 1000-row truncation)
   const lastActiveMap = new Map<string, string>();
-  for (const log of allActivity) {
-    if (!lastActiveMap.has(log.student_id)) {
-      lastActiveMap.set(log.student_id, log.created_at);
-    }
+  for (const a of lastActivities) {
+    lastActiveMap.set(a.student_id, a.last_active);
   }
   // Merge progress timestamps (take the more recent of the two)
   for (const p of (progressTimestamps ?? [])) {
@@ -659,11 +652,12 @@ export async function getStudentRoster(orgId: string): Promise<RosterStudent[]> 
 
   const studentIds = students.map((s) => s.id);
 
-  // Progress and last activity in parallel
-  const [progressRes, lastActivityRes, atRiskRes] = await Promise.all([
+  // Progress, last activity (via RPC), at-risk, and lesson count in parallel
+  const [progressRes, lastActivityRes, atRiskRes, lessonsRes] = await Promise.all([
     admin.from("student_progress").select("student_id, status").in("student_id", studentIds),
-    admin.from("ai_usage_log").select("student_id, created_at").in("student_id", studentIds).order("created_at", { ascending: false }),
+    admin.rpc("student_last_active", { p_org_id: orgId }),
     admin.from("at_risk_students").select("student_id").eq("org_id", orgId),
+    admin.from("lessons").select("id"),
   ]);
 
   const completedMap = new Map<string, number>();
@@ -674,16 +668,13 @@ export async function getStudentRoster(orgId: string): Promise<RosterStudent[]> 
   }
 
   const lastActiveMap = new Map<string, string>();
-  for (const a of lastActivityRes.data ?? []) {
-    if (!lastActiveMap.has(a.student_id)) {
-      lastActiveMap.set(a.student_id, a.created_at);
-    }
+  for (const a of (lastActivityRes.data ?? []) as { student_id: string; last_active: string }[]) {
+    lastActiveMap.set(a.student_id, a.last_active);
   }
 
   const atRiskSet = new Set((atRiskRes.data ?? []).map((r) => r.student_id));
 
-  const { data: allLessons } = await admin.from("lessons").select("id");
-  const totalLessons = allLessons?.length ?? 22;
+  const totalLessons = lessonsRes.data?.length ?? 22;
 
   const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
