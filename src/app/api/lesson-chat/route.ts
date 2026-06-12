@@ -656,7 +656,7 @@ When discussing customer conversations, explicitly reference the Mom Test princi
       },
     ];
     // Per-lesson model override (14 lessons use gpt-4o-mini, 8 use Sonnet)
-    let lessonModel = "claude-sonnet-4-20250514";
+    let lessonModel = "claude-sonnet-4-6";
     if (lessonId) {
       try {
         lessonModel = await getLessonModel(lessonId);

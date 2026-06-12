@@ -77,7 +77,7 @@ Be conversational. Write 3-4 sentences max. Use language a teenager would relate
     await supabase.from("ai_usage_log").insert({
       student_id: user.id,
       feature: "pitch",
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       input_tokens: aiResult.usage.input_tokens,
       output_tokens: aiResult.usage.output_tokens,
       estimated_cost_usd:

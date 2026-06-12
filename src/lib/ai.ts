@@ -19,21 +19,22 @@ const anthropic = new Anthropic();
 
 // ── Legacy types (deprecated — use model-config.ts instead) ──
 
-export type AIFeature = "lesson-chat" | "guide" | "ikigai" | "checkin" | "recommendations" | "pitch" | "moderation" | "card";
+export type AIFeature = "lesson-chat" | "guide" | "ikigai" | "checkin" | "recommendations" | "pitch" | "moderation" | "card" | "ask";
 
 /**
  * @deprecated Use getModel() from model-config.ts instead.
  * Will be removed after all call sites are migrated.
  */
 export const MODEL_MAP: Record<AIFeature, string> = {
-  "lesson-chat": "claude-sonnet-4-20250514",
-  guide: "claude-sonnet-4-20250514",
-  ikigai: "claude-sonnet-4-20250514",
+  "lesson-chat": "claude-sonnet-4-6",
+  guide: "claude-sonnet-4-6",
+  ikigai: "claude-sonnet-4-6",
   checkin: "claude-haiku-4-5-20251001",
   recommendations: "claude-haiku-4-5-20251001",
-  pitch: "claude-sonnet-4-20250514",
+  pitch: "claude-sonnet-4-6",
   moderation: "claude-haiku-4-5-20251001",
   card: "claude-haiku-4-5-20251001",
+  ask: "claude-sonnet-4-6",
 };
 
 const MAX_TOKENS_MAP: Record<AIFeature, number> = {
@@ -45,6 +46,7 @@ const MAX_TOKENS_MAP: Record<AIFeature, number> = {
   pitch: 1024,
   moderation: 200,
   card: 1024,
+  ask: 1024,
 };
 
 // ── Shared types ──

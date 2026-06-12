@@ -95,7 +95,7 @@ Evaluate this response. Return ONLY a JSON object.`,
     await supabase.from("ai_usage_log").insert({
       student_id: user.id,
       feature: "guide",
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       input_tokens: result.usage.input_tokens,
       output_tokens: result.usage.output_tokens,
       estimated_cost_usd:

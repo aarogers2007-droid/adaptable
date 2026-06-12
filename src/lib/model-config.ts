@@ -11,7 +11,7 @@
 export const MODELS = {
   MINI: "gpt-4o-mini-2024-07-18",
   HAIKU: "claude-haiku-4-5-20251001",
-  SONNET: "claude-sonnet-4-20250514",
+  SONNET: "claude-sonnet-4-6",
 } as const;
 
 // ── Feature type ──
