@@ -182,6 +182,37 @@ Effort: L (CC: ~1 hour)
 
 ## P2 — Post-pilot enhancements (accepted from CEO review)
 
+### /ask hardening before wide promotion (CSO 2026-06-12)
+From the CSO audit of the public `/ask` endpoint. None blocking for launch (global
+750/day fail-closed cap bounds cost), but do these before promoting `/ask` widely or
+linking it publicly:
+- **Bot challenge (finding #1):** add Vercel BotID or Turnstile on `/api/ask-chat`.
+  Per-IP (x-forwarded-for) and per-session caps are spoofable; today only the global
+  cap is a hard ceiling. A challenge makes the per-IP cap real.
+- **Cleanup cron (finding #3):** schedule `cleanup_old_ask_rate_events()` (pg_cron
+  hourly, or a Vercel cron route) — without it `ask_rate_events` grows unbounded
+  (counts still correct, just bloat).
+- (Optional) Set a dedicated `ASK_IP_SALT` env var to decouple the IP-hash salt from
+  the service-role key.
+Effort: S (CC: ~20 min). Depends on: /ask shipped.
+
+### /ask demand-intel layer (self-improving sales brain)
+Deferred from the 2026-06-12 CEO review of `/ask`. Once `/ask` has real conversation
+volume, auto-cluster captured questions into themes so AJ sees "every 3rd prospect asks
+about data privacy," and feed those gaps back into the curated brain. Mirrors the
+self-improving-curriculum thesis, applied to sales. Don't build analytics for traffic
+that doesn't exist yet — wait for volume. v1 only logs raw transcripts + asked-topics.
+Effort: M (CC: ~1 hour). Depends on: /ask shipped + meaningful traffic.
+
+### Spokesperson product line (org-facing public bots)
+Deferred from the 2026-06-12 CEO review. `/ask` is built as "org #0" on the tenant
+rails, so the productization is a config path, not a rewrite. The product: every org
+gets a public AI Spokesperson grounded in their verified knowledge — recruits
+participants, answers donors/funders, captures leads, surfaces demand intel. Build ONLY
+after a paying customer exists and asks. Includes: org-facing self-serve config,
+donor/recruit modes, per-org public-bot intel. Effort: XL. Depends on: first paying
+customer; /ask proven for Adaptable itself.
+
 ### Dashboard data-first redesign
 Lead with charts/graphs, not student lists. Multiple visualization options
 (bar, pie, line). Design for "screenshot this for a board presentation."
@@ -243,6 +274,14 @@ Spotted during visual audit (2026-06-03):
 - Header lesson title + progress bar: long titles squeeze the progress bar on 375px, consider stacking vertically on mobile
 - Suggestion chips push input area down when wrapping (acceptable, monitor)
 Effort: S (CC: ~20 min)
+
+### Evaluate Claude Fable 5 for Ikigai synthesis
+Free through June 22, then $10/$50 per million tokens (2x Opus 4.8).
+Test on Ikigai business idea generation during the free window. If quality
+is meaningfully better than Sonnet, consider using it for synthesis only
+(the magical moment). Keep Haiku for evals/moderation. One line change in
+model-config.ts: `ikigai_synthesis: "claude-fable-5"`.
+Effort: S (CC: ~15 min to test, compare outputs)
 
 ### Multimodal RAG
 Images, diagrams, videos in knowledge base. AI surfaces inline during lessons.
