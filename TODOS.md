@@ -299,6 +299,27 @@ Effort: M (CC: ~30 min)
 > From Amira's walkthrough (23,000 students, 12 countries, London-based NGO).
 > None of these block the VentureLab pilot but all block international adoption.
 
+### GEO / AI-search visibility — off-site push (ON HOLD)
+On-site foundation already shipped (crawlable FAQ + FAQPage schema at /ask, robots.ts,
+sitemap.ts — live, zero ongoing cost). The manual off-site work is deferred: it's a
+compounding INBOUND play that will not net the first client (in-person networking does
+that), and doing it for a free `*.vercel.app` URL is low signal. Revisit when there's a
+reason for inbound — e.g., a custom domain, post-first-customer, or a deliberate marketing
+push. When that day comes, the playbook (grounded in the 2026 deep-research report):
+- **Bing Webmaster Tools + Google Search Console:** verify the site, submit
+  `/sitemap.xml`. Bing's index is a near-prerequisite for ChatGPT-search citations.
+- **Self-list on directories** (~3x citation odds): Capterra/GetApp/Software Advice (one
+  Gartner Digital Markets signup), G2, FitGap. Categories: LMS, nonprofit software, impact
+  measurement.
+- **Pitch independent listicles** that AI engines cite: disco.co, agentiveaiq.com,
+  oasis-lms.com ("best AI curriculum / LMS for nonprofits").
+- **Measure monthly:** fixed prompt set across ChatGPT/Perplexity/Google/Gemini, run each
+  ~5-7x, track whether Adaptable is cited + which domains are (that's the live target list).
+- Skip llms.txt (no demonstrated effect). Set expectations: AI visibility ≠ traffic
+  (low volume, but reportedly ~4-5x conversion).
+Full cited report + neighborhood map captured in the 2026-06-12 session checkpoint/notes.
+Effort: M, mostly manual outreach (not code). Depends on: a reason for inbound (custom domain / first customer).
+
 ### i18n framework (externalized strings)
 Entire UI is English-only. No translation infrastructure. Need externalized strings
 with locale detection. Priority languages: Spanish, French, Portuguese.
