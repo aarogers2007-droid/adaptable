@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 interface SplashScreenProps {
   children: React.ReactNode;
@@ -26,9 +27,16 @@ const LETTERS = [
 ];
 
 export default function SplashScreen({ children, preview, onDone }: SplashScreenProps) {
-  const [phase, setPhase] = useState<"scatter" | "assembled" | "fade" | "done">("scatter");
+  const pathname = usePathname();
+  // Skip the splash on /ask — it's a public leave-behind link; a prospect
+  // shouldn't watch an intro animation before they can ask a question.
+  const skipSplash = !preview && (pathname?.startsWith("/ask") ?? false);
+  const [phase, setPhase] = useState<"scatter" | "assembled" | "fade" | "done">(
+    skipSplash ? "done" : "scatter"
+  );
 
   useEffect(() => {
+    if (skipSplash) return;
     try {
       if (!preview && sessionStorage.getItem("splash-seen")) {
         // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only sync from sessionStorage
@@ -54,7 +62,7 @@ export default function SplashScreen({ children, preview, onDone }: SplashScreen
     }, 4800);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [preview, onDone]);
+  }, [preview, onDone, skipSplash]);
 
   if (phase === "done") return <>{children}</>;
 
