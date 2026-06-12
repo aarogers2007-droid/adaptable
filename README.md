@@ -45,7 +45,8 @@ src/
 │   ├── instructor/      # Teacher dashboard + tools
 │   ├── auth/            # OAuth callback + routing
 │   ├── go/              # Guest join (class codes)
-│   ├── api/             # Route handlers (chat, scenarios, etc.)
+│   ├── ask/             # "Ask Adaptable" — public conversational sales/education
+│   ├── api/             # Route handlers (lesson/scenario/guide + ask-chat, ask-lead)
 │   └── demo/            # Public demo site
 ├── components/          # Shared UI components
 ├── lib/                 # Core logic

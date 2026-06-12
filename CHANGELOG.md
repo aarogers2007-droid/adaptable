@@ -2,6 +2,21 @@
 
 All notable changes to Adaptable will be documented in this file.
 
+## [0.25.0.0] - 2026-06-12
+
+### Added
+- **Ask Adaptable (`/ask`)** — A public, conversational way to learn what Adaptable is. Ask anything (security, how the AI behaves, what your organization gets) and get a straight, on-brand answer that streams in real time. Opens with clickable starter questions so you're never staring at a blank box, and suggests follow-ups as you go. Built for mission-driven leaders who want to understand the platform without a sales call.
+- **Talk-to-the-team capture** — When you're interested, `/ask` offers a low-friction card (just a first name, email optional) so the team can follow up. Always optional, always dismissible, never blocks the conversation.
+
+### Changed
+- **AI model upgrade to Claude Sonnet 4.6** — Migrated every reasoning path (lessons, scenarios, pitch, guide, knowledge ingestion) from Claude Sonnet 4 to Sonnet 4.6 ahead of the older model's retirement. Same pricing, sharper responses, no change to how lessons work.
+
+### For contributors
+- New public route handlers `src/app/api/ask-chat/route.ts` (streaming, secrets-free curated brain in `src/lib/ask-brain.ts`) and `src/app/api/ask-lead/route.ts` (lead capture → `faq_leads`, scoped to Adaptable's own org). Both unauthenticated, fail-closed rate limiting via `reserve_ask_usage` (migration `00059`), salted IP hash, honeypot + validation on capture.
+- Migrations `00059_ask_rate_limit` (rate-limit RPC + `ask_rate_events`) and `00060_faq_leads` (lead + transcript store with 180-day transcript purge).
+- `middleware` `publicPaths` now allows `/ask`, `/api/ask-chat`, `/api/ask-lead`. Model strings centralized in `src/lib/model-config.ts` and `src/lib/ai.ts` now point at `claude-sonnet-4-6`.
+- Deferred hardening tracked in TODOS: bot challenge (Turnstile/BotID), cleanup crons for `ask_rate_events` and `faq_leads` transcripts.
+
 ## [0.24.0.0] - 2026-05-09
 
 ### Added

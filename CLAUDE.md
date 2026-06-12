@@ -323,6 +323,24 @@ Views: `lesson_effectiveness` (avg completion, tokens, ratings per lesson), `at_
 ### Streaming UX
 All chat interfaces (lesson, scenario, guide) throttle state updates to `requestAnimationFrame` to prevent choppy re-renders during SSE streaming. Buffer pattern: accumulate text in a ref, flush to state on rAF callback.
 
+### Ask Adaptable (`/ask`) — public Spokesperson
+`/ask` is a public, unauthenticated conversational sales/education page (the "leave-behind"
+you hand a prospect after meeting them). Mechanically it is the core product pointed at the
+subject "Adaptable": a streaming AI chat grounded in a curated, **secrets-free** brain
+(`src/lib/ask-brain.ts`), with guided starter questions, `[OPTIONS]` follow-up chips, and a
+`[CAPTURE]` lead card.
+- Routes: `src/app/ask/page.tsx` + `AskChat.tsx`, `src/app/api/ask-chat/route.ts` (streaming),
+  `src/app/api/ask-lead/route.ts` (capture → `faq_leads`). All three are in `middleware`
+  `publicPaths` (the page AND its API routes — a public page whose API route isn't allowlisted
+  gets 307'd to /login).
+- Built as **org #0**: usage and leads scope to Adaptable's own `organizations` row
+  (`00000000-0000-0000-0000-000000000001`), so it can become a per-org "Spokesperson" product
+  later as config, not a rewrite.
+- Public unauthenticated endpoints: fail-closed rate limit via `reserve_ask_usage`
+  (migration `00059`, IP+session+global caps), salted IP hash, honeypot + validation on
+  capture, secrets-free brain + `redactSecrets` as defense-in-depth. The brain must never
+  contain model names, pricing, keys, or roadmap.
+
 ## Language Rules
 
 This is an org platform, not a classroom tool. Enforce these everywhere: code,
