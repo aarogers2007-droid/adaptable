@@ -2,15 +2,13 @@
 
 import { useRef, useState } from "react";
 
-// LAYER 3 (structure): guided spectacle. Curated starter questions on the empty
-// state (so a non-technical prospect never faces a blank box), plus suggested
-// follow-up chips parsed from the bot's [OPTIONS] block after each answer.
-// Mirrors the scenario system's [OPTIONS] format (MCOptions.tsx) but renders
-// as clean chips instead of lettered MC cards.
+// LAYER 4 (the close): guided chat + the [CAPTURE] card. The bot emits a
+// [CAPTURE] marker at buying signal; the client renders an inline, dismissible
+// card asking first name (email/note optional) with a consent line. Skipping
+// keeps the conversation going. Lead + transcript POST to /api/ask-lead.
 
 type Turn = { role: "user" | "assistant"; content: string };
 
-// Curated openers: teach the clueless, steer toward value + the founder window.
 const STARTERS = [
   "What is Adaptable, in plain English?",
   "How does it keep what students learn accurate?",
@@ -18,26 +16,29 @@ const STARTERS = [
   "Who's behind this?",
 ];
 
-/**
- * Split an assistant message into visible prose + follow-up options.
- * Handles the mid-stream case where [OPTIONS] has opened but not yet closed
- * (hide the raw markup until the closing tag arrives).
- */
-function splitOptions(content: string): { visible: string; options: string[] } {
-  const full = content.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
+/** Strip [OPTIONS] and [CAPTURE] from an assistant message; surface both. */
+function parseAssistant(content: string): {
+  visible: string;
+  options: string[];
+  capture: boolean;
+} {
+  const capture = content.includes("[CAPTURE]");
+  let text = content.replace(/\[CAPTURE\]/g, "");
+
+  const full = text.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
+  let options: string[] = [];
   if (full) {
-    const visible = content.replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/, "").trim();
-    const options = full[1]
+    options = full[1]
       .trim()
       .split("\n")
       .map((l) => l.trim().match(/^[A-D]\.\s*(.+)$/)?.[1]?.trim())
       .filter((t): t is string => !!t);
-    return { visible, options };
+    text = text.replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/, "");
+  } else {
+    const open = text.indexOf("[OPTIONS]"); // mid-stream, not yet closed
+    if (open !== -1) text = text.slice(0, open);
   }
-  // Streaming: [OPTIONS] opened but not closed yet — hide from here on.
-  const open = content.indexOf("[OPTIONS]");
-  if (open !== -1) return { visible: content.slice(0, open).trim(), options: [] };
-  return { visible: content, options: [] };
+  return { visible: text.trim(), options, capture };
 }
 
 export default function AskChat() {
@@ -45,6 +46,16 @@ export default function AskChat() {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Capture card state
+  const [capResolved, setCapResolved] = useState(false); // submitted or skipped
+  const [capDone, setCapDone] = useState<string | null>(null); // thank-you name
+  const [capSubmitting, setCapSubmitting] = useState(false);
+  const [capError, setCapError] = useState<string | null>(null);
+  const [capName, setCapName] = useState("");
+  const [capEmail, setCapEmail] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+
   const sessionId = useRef<string>(
     typeof crypto !== "undefined" && crypto.randomUUID
       ? crypto.randomUUID()
@@ -75,7 +86,7 @@ export default function AskChat() {
           if (j?.error) msg = j.error;
         } catch {}
         setError(msg);
-        setMessages((m) => m.slice(0, -1)); // drop empty assistant placeholder
+        setMessages((m) => m.slice(0, -1));
         setStreaming(false);
         return;
       }
@@ -83,7 +94,6 @@ export default function AskChat() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
-
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -110,7 +120,7 @@ export default function AskChat() {
               setError(data.error);
             }
           } catch {
-            // ignore partial / non-JSON keepalive lines
+            // ignore
           }
         }
       }
@@ -122,11 +132,52 @@ export default function AskChat() {
     }
   }
 
+  async function submitLead() {
+    if (capSubmitting) return;
+    const name = capName.trim();
+    if (!name) {
+      setCapError("Just your first name to send it.");
+      return;
+    }
+    setCapSubmitting(true);
+    setCapError(null);
+    try {
+      const res = await fetch("/api/ask-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: sessionId.current,
+          name,
+          email: capEmail.trim() || undefined,
+          company_website: honeypot, // honeypot — real users leave empty
+          consent: true,
+          transcript: messages,
+        }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setCapError(j?.error || "Couldn't send that. Try again?");
+        setCapSubmitting(false);
+        return;
+      }
+      setCapDone(name);
+      setCapResolved(true);
+    } catch {
+      setCapError("Couldn't send that. Try again?");
+    } finally {
+      setCapSubmitting(false);
+    }
+  }
+
   const isEmpty = messages.length === 0;
+  const lastAssistant =
+    !streaming && messages.length > 0 && messages[messages.length - 1].role === "assistant"
+      ? parseAssistant(messages[messages.length - 1].content)
+      : null;
+  const showCapture = !!lastAssistant?.capture && !capResolved;
 
   return (
     <div className="mt-8 w-full max-w-xl text-left">
-      {/* Empty state: curated starter chips so nobody faces a blank box */}
       {isEmpty && (
         <div className="flex flex-col gap-2">
           {STARTERS.map((q) => (
@@ -141,14 +192,15 @@ export default function AskChat() {
         </div>
       )}
 
-      {/* Conversation */}
       {!isEmpty && (
         <div className="flex flex-col gap-3">
           {messages.map((m, i) => {
             const isLastAssistant =
               m.role === "assistant" && i === messages.length - 1 && !streaming;
-            const { visible, options } =
-              m.role === "assistant" ? splitOptions(m.content) : { visible: m.content, options: [] };
+            const parsed =
+              m.role === "assistant"
+                ? parseAssistant(m.content)
+                : { visible: m.content, options: [] as string[], capture: false };
 
             if (m.role === "user") {
               return (
@@ -164,11 +216,11 @@ export default function AskChat() {
             return (
               <div key={i} className="flex flex-col gap-2 max-w-[85%]">
                 <div className="self-start rounded-lg bg-[var(--bg-muted)] px-4 py-2.5 text-sm text-[var(--text-primary)] whitespace-pre-wrap">
-                  {visible || (streaming && i === messages.length - 1 ? "…" : "")}
+                  {parsed.visible || (streaming && i === messages.length - 1 ? "…" : "")}
                 </div>
-                {isLastAssistant && options.length > 0 && (
+                {isLastAssistant && !showCapture && parsed.options.length > 0 && (
                   <div className="flex flex-col gap-2">
-                    {options.map((opt) => (
+                    {parsed.options.map((opt) => (
                       <button
                         key={opt}
                         onClick={() => send(opt)}
@@ -182,6 +234,76 @@ export default function AskChat() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Capture confirmation */}
+      {capDone && (
+        <p className="mt-4 rounded-xl border border-[var(--primary)]/30 bg-[var(--primary)]/5 px-4 py-3 text-sm text-[var(--text-primary)]">
+          Thanks, {capDone} — the team will reach out. Keep asking anything in the meantime.
+        </p>
+      )}
+
+      {/* Capture card */}
+      {showCapture && !capDone && (
+        <div className="animate-scale-in mt-4 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-subtle)] p-4">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">
+            Want the team to follow up?
+          </p>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            Just a first name. Skip it and keep chatting if you'd rather.
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            <input
+              value={capName}
+              onChange={(e) => setCapName(e.target.value)}
+              placeholder="First name"
+              maxLength={100}
+              aria-label="First name"
+              className="rounded-lg border border-[var(--border-strong)] px-3 py-2.5 text-base text-[var(--text-primary)] outline-none focus:border-[var(--primary)]"
+            />
+            <input
+              value={capEmail}
+              onChange={(e) => setCapEmail(e.target.value)}
+              placeholder="Email (optional)"
+              type="email"
+              maxLength={200}
+              aria-label="Email (optional)"
+              className="rounded-lg border border-[var(--border-strong)] px-3 py-2.5 text-base text-[var(--text-primary)] outline-none focus:border-[var(--primary)]"
+            />
+            {/* Honeypot — visually hidden, bots fill it */}
+            <input
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute left-[-9999px] h-0 w-0 opacity-0"
+            />
+          </div>
+          {capError && <p className="mt-2 text-sm text-[var(--error)]">{capError}</p>}
+          <div className="mt-3 flex items-center gap-3">
+            <button
+              onClick={submitLead}
+              disabled={capSubmitting}
+              className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+            >
+              {capSubmitting ? "Sending…" : "Send"}
+            </button>
+            <button
+              onClick={() => setCapResolved(true)}
+              className="text-sm text-[var(--text-secondary)] underline-offset-2 hover:underline"
+            >
+              No thanks, keep chatting
+            </button>
+          </div>
+          <p className="mt-3 text-xs text-[var(--text-muted)]">
+            We&apos;ll only use this to reach out.{" "}
+            <a href="/privacy" className="underline" target="_blank" rel="noreferrer">
+              Privacy
+            </a>
+          </p>
         </div>
       )}
 
