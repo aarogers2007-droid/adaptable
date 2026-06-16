@@ -168,6 +168,21 @@ export async function POST(request: Request) {
         controller.close();
       }
 
+      // Persist transcript — fire-and-forget, org #0, keyed by session so it
+      // joins to the form submission. Table from migration 00062; the .catch
+      // no-ops gracefully if the migration hasn't been applied yet.
+      if (fullResponse.trim()) {
+        admin
+          .from("assessment_chats")
+          .insert([
+            { org_id: ADAPTABLE_ORG_ID, session_id: sessionId, role: "user", content: message },
+            { org_id: ADAPTABLE_ORG_ID, session_id: sessionId, role: "assistant", content: fullResponse },
+          ])
+          .then(({ error }) => {
+            if (error) console.error("[aj-chat] transcript insert failed:", error.message);
+          });
+      }
+
       // Usage logging — fire-and-forget, org #0, real token counts + cost.
       try {
         const final = await stream.finalMessage();
