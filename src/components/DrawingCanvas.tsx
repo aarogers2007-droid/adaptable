@@ -43,6 +43,7 @@ export default function DrawingCanvas() {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [liveD, setLiveD] = useState<string>("");
   const [color, setColor] = useState<string>(COLORS[0]);
+  const [name, setName] = useState<string>("");
   const drawing = useRef(false);
 
   const pointFromEvent = useCallback((e: React.PointerEvent): Pt | null => {
@@ -95,10 +96,35 @@ export default function DrawingCanvas() {
     ptsRef.current = [];
   };
 
+  // Export the drawing as a standalone SVG file (no <canvas>, per the hardware
+  // rule). The intern saves it and attaches it to their reply.
+  const save = () => {
+    const svg = svgRef.current;
+    if (!svg || strokes.length === 0) return;
+    const rect = svg.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    const paths = strokes
+      .map(
+        (s) =>
+          `<path d="${s.d}" fill="none" stroke="${s.color}" stroke-width="${s.width}" stroke-linecap="round" stroke-linejoin="round"/>`
+      )
+      .join("");
+    const doc = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/>${paths}</svg>`;
+    const blob = new Blob([doc], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const slug = (name.trim() || "drawing").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+    a.download = `${slug}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="w-full max-w-2xl">
       {/* Toolbar */}
-      <div className="mb-3 flex items-center gap-3">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           {COLORS.map((c) => (
             <button
@@ -113,7 +139,15 @@ export default function DrawingCanvas() {
             />
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            maxLength={60}
+            aria-label="Your name (for the saved file)"
+            className="w-28 rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--primary)]"
+          />
           <button
             onClick={undo}
             className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
@@ -125,6 +159,13 @@ export default function DrawingCanvas() {
             className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
           >
             Clear
+          </button>
+          <button
+            onClick={save}
+            disabled={strokes.length === 0}
+            className="rounded-lg bg-[var(--primary)] px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+          >
+            Save
           </button>
         </div>
       </div>
