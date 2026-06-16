@@ -5,12 +5,22 @@ import DrawingCanvas from "@/components/DrawingCanvas";
 
 // The one-link intern assessment. Intro + drawing + questions, all on one page,
 // one Submit that sends everything to /api/assessment-submit. Voice = AJ's.
+// Covers four dimensions: knowledge, skills, abilities, experience — woven into
+// a playful, self-discovery flow (disarm -> reveal -> demonstrate).
 
 const ARENAS = [
   { key: "Words", label: "Words", blurb: "copy, story, persuasion" },
   { key: "Eye", label: "Eye", blurb: "design, taste, how things look + feel" },
   { key: "Mind", label: "Mind", blurb: "strategy, synthesis, seeing around corners" },
 ];
+
+// Concrete-but-deliberately-open briefs. The open gaps double as the ambiguity probe.
+const BRIEFS: Record<string, string> = {
+  Words:
+    "Write the first 3 lines a 15-year-old sees when they open Adaptable for the first time. Make them stay.",
+  Eye: "Redesign one screen of Adaptable, or design one that should exist. Any fidelity — paste it, link it, or describe it precisely.",
+  Mind: "Pick one and give me a page: how does a broke 19-year-old land his first 3 customers? OR what should Adaptable build next, and what should it refuse to build?",
+};
 
 function Section({
   n,
@@ -38,9 +48,11 @@ const TA =
 export default function AssessmentFlow() {
   const [drawing, setDrawing] = useState("");
   const [kid, setKid] = useState("");
+  const [geniuses, setGeniuses] = useState("");
   const [truth, setTruth] = useState("");
   const [arena, setArena] = useState("");
   const [arenaProof, setArenaProof] = useState("");
+  const [hardest, setHardest] = useState("");
   const [surprise, setSurprise] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -74,7 +86,7 @@ export default function AssessmentFlow() {
           sessionId: sessionId.current,
           company_website: honeypot,
           drawing,
-          answers: { kid, truth, arena, arena_proof: arenaProof, surprise },
+          answers: { kid, geniuses, truth, arena, arena_proof: arenaProof, hardest, surprise },
         }),
       });
       const j = await res.json().catch(() => ({}));
@@ -133,7 +145,16 @@ export default function AssessmentFlow() {
         <textarea className={TA} value={kid} onChange={(e) => setKid(e.target.value)} maxLength={5000} />
       </Section>
 
-      <Section n="03 — Tell me straight" title="Go play in Adaptable.">
+      <Section n="03 — Taste" title="Show me 3 things you think are genius.">
+        <p className="mb-4 text-[var(--text-secondary)]">
+          Anything, any field, a product, a sentence, a design, a person, a play. Three of them,
+          and tell me exactly <em>why</em> each one is genius. What you admire shows me how you
+          see.
+        </p>
+        <textarea className={TA} value={geniuses} onChange={(e) => setGeniuses(e.target.value)} maxLength={5000} />
+      </Section>
+
+      <Section n="04 — Tell me straight" title="Go play in Adaptable.">
         <p className="mb-4 text-[var(--text-secondary)]">
           Spend 20 minutes in{" "}
           <a href="/ask" target="_blank" rel="noreferrer" className="text-[var(--primary)] underline">
@@ -145,7 +166,7 @@ export default function AssessmentFlow() {
         <textarea className={TA} value={truth} onChange={(e) => setTruth(e.target.value)} maxLength={5000} />
       </Section>
 
-      <Section n="04 — Your weapon" title="What are you dangerous at?">
+      <Section n="05 — Your weapon" title="What are you dangerous at?">
         <div className="flex flex-col gap-2 mb-4">
           {ARENAS.map((a) => (
             <button
@@ -163,22 +184,47 @@ export default function AssessmentFlow() {
             </button>
           ))}
         </div>
-        <p className="mb-3 text-[var(--text-secondary)]">
-          Now prove it with one small thing for Adaptable. Describe it, paste it, or link it.
-        </p>
-        <textarea className={TA} value={arenaProof} onChange={(e) => setArenaProof(e.target.value)} maxLength={5000} />
+        {arena && (
+          <div className="mb-3 rounded-lg bg-[var(--bg-muted)] px-4 py-3 text-sm text-[var(--text-primary)]">
+            <strong>Your brief:</strong> {BRIEFS[arena]}
+            <span className="mt-2 block text-[var(--text-secondary)]">
+              I left this open on purpose. Where it&apos;s unclear, make a call and tell me why,
+              that choice is half of what I&apos;m reading.
+            </span>
+          </div>
+        )}
+        <textarea
+          className={TA}
+          value={arenaProof}
+          onChange={(e) => setArenaProof(e.target.value)}
+          maxLength={5000}
+          placeholder={arena ? "Your work (paste, describe, or link it)" : "Pick an arena above first"}
+        />
       </Section>
 
-      <Section n="05 — Surprise me" title="Show me something only you would.">
+      <Section n="06 — The hard part" title="What's the hardest thing you've ever made?">
         <p className="mb-4 text-[var(--text-secondary)]">
-          One thing you&apos;ve made that you&apos;re proud of (link or describe it), and one
-          thing I didn&apos;t ask for. Surprise me.
+          Something you made or finished that was genuinely hard. What was it, what broke along
+          the way, and what did you do about it? I care more about the breaking than the finishing.
+        </p>
+        <textarea className={TA} value={hardest} onChange={(e) => setHardest(e.target.value)} maxLength={5000} />
+      </Section>
+
+      <Section n="07 — Surprise me" title="Show me something only you would.">
+        <p className="mb-4 text-[var(--text-secondary)]">
+          One thing you&apos;ve made that you&apos;re proud of, link or describe it, <em>and tell
+          me the story behind it</em> (the struggle, the decision). Then do one thing I
+          didn&apos;t ask for. Surprise me.
         </p>
         <textarea className={TA} value={surprise} onChange={(e) => setSurprise(e.target.value)} maxLength={5000} />
       </Section>
 
       {/* Identity + submit */}
       <section className="border-t border-[var(--border)] pt-8">
+        <p className="mb-4 text-sm text-[var(--text-secondary)]">
+          One ask running through all of it: show me <em>how you thought</em>, a quick voice note
+          or scribbled logic. I care how your mind moves as much as where it lands.
+        </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <input
             value={name}

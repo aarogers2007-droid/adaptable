@@ -61,9 +61,11 @@ export async function POST(request: Request) {
   const a = (body.answers ?? {}) as Record<string, unknown>;
   const answers = {
     kid: clampStr(a.kid, MAX_ANSWER_CHARS),
+    geniuses: clampStr(a.geniuses, MAX_ANSWER_CHARS),
     truth: clampStr(a.truth, MAX_ANSWER_CHARS),
     arena: clampStr(a.arena, 40),
     arena_proof: clampStr(a.arena_proof, MAX_ANSWER_CHARS),
+    hardest: clampStr(a.hardest, MAX_ANSWER_CHARS),
     surprise: clampStr(a.surprise, MAX_ANSWER_CHARS),
   };
 
