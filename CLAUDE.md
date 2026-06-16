@@ -341,6 +341,24 @@ subject "Adaptable": a streaming AI chat grounded in a curated, **secrets-free**
   capture, secrets-free brain + `redactSecrets` as defense-in-depth. The brain must never
   contain model names, pricing, keys, or roadmap.
 
+### Founder Chat (`/assessment`) — the "talk to AJ" panel
+A disclosed AI stand-in for AJ at the bottom of the intern assessment. Same `/ask`
+architecture (streaming, org #0 usage logging, `reserve_ask_usage` rate limit, CSRF
+fail-closed, salted IP hash, `redactSecrets`), but a two-way candidate conversation, not
+a sales surface. Brain: `src/lib/aj-brain.ts` (disclosed AI, secrets-free). Route:
+`src/app/api/aj-chat/route.ts` (`ajchat` AIFeature, Sonnet 4.6). UI: `src/app/assessment/AjChat.tsx`.
+Transcripts → `assessment_chats` (migration `00062`), keyed by `session_id` to join the form
+submission. Both page and `/api/aj-chat` are in `middleware` `publicPaths`.
+- **PROFANITY ISOLATION INVARIANT (do not break).** This is the ONLY chat allowed casual
+  profanity (fuck/shit/damn/bitch), because it's AJ's real voice. The allowance lives entirely
+  in `src/lib/aj-moderation.ts`, which is self-contained: it imports nothing from shared
+  moderation and is imported by nothing except `/api/aj-chat`. It allows basic profanity but
+  still hard-blocks slurs/hate/explicit/threats (input rejected, output scrubbed to `***`) and
+  prompt injection. Its slur lists are duplicated from the platform blocklists ON PURPOSE.
+  NEVER route any other chat through `aj-moderation`, NEVER remove a slur/hate pattern from it,
+  and NEVER touch `output-moderation.ts`/`content-moderation.ts` to relax profanity — every
+  student-facing chat must keep running `createStreamScrubber` which strips all profanity.
+
 ## Language Rules
 
 This is an org platform, not a classroom tool. Enforce these everywhere: code,
