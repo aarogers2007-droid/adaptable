@@ -1,30 +1,29 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 /*
- * SVG freehand drawing surface — cursor (and touch/pen) drawing for fun
- * challenges and self-expression. SVG, not <canvas>, per the Chromebook
- * hardware rule (CSS/DOM/SVG only). Pointer events unify mouse/touch/pen.
+ * SVG freehand drawing surface — cursor/touch/pen drawing. SVG, not <canvas>,
+ * per the Chromebook hardware rule (CSS/DOM/SVG only).
  *
- * LAYER 1: the working surface — draw, pick a color, undo, clear.
- * Later: persist/submit the drawing, prompts, brush sizes.
+ * - Standalone: has its own Save (download) + name field.
+ * - Embedded: pass `onChange` to receive the current drawing as an SVG string
+ *   (used by the assessment flow so the drawing submits with everything else).
+ *   Pass `embedded` to hide the standalone name/Save controls.
  */
 
 type Pt = { x: number; y: number };
 type Stroke = { d: string; color: string; width: number };
 
-// DESIGN.md palette
 const COLORS = ["#111827", "#0D9488", "#F59E0B", "#DC2626", "#3B82F6"];
 const WIDTH = 3;
-const MIN_DIST = 2; // skip points closer than this (caps point density for perf)
+const MIN_DIST = 2;
 
-/** Build a smooth path through points using quadratic midpoint smoothing. */
 function toPath(points: Pt[]): string {
   if (points.length === 0) return "";
   if (points.length === 1) {
     const p = points[0];
-    return `M ${p.x} ${p.y} l 0.1 0.1`; // a dot
+    return `M ${p.x} ${p.y} l 0.1 0.1`;
   }
   let d = `M ${points[0].x} ${points[0].y}`;
   for (let i = 1; i < points.length - 1; i++) {
@@ -37,7 +36,13 @@ function toPath(points: Pt[]): string {
   return d;
 }
 
-export default function DrawingCanvas() {
+export default function DrawingCanvas({
+  onChange,
+  embedded = false,
+}: {
+  onChange?: (svg: string) => void;
+  embedded?: boolean;
+}) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const ptsRef = useRef<Pt[]>([]);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -45,6 +50,26 @@ export default function DrawingCanvas() {
   const [color, setColor] = useState<string>(COLORS[0]);
   const [name, setName] = useState<string>("");
   const drawing = useRef(false);
+
+  const buildSvgDoc = useCallback((items: Stroke[]): string => {
+    const svg = svgRef.current;
+    if (!svg || items.length === 0) return "";
+    const rect = svg.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    const paths = items
+      .map(
+        (s) =>
+          `<path d="${s.d}" fill="none" stroke="${s.color}" stroke-width="${s.width}" stroke-linecap="round" stroke-linejoin="round"/>`
+      )
+      .join("");
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/>${paths}</svg>`;
+  }, []);
+
+  // Report the current drawing up to a parent (assessment flow).
+  useEffect(() => {
+    if (onChange) onChange(buildSvgDoc(strokes));
+  }, [strokes, onChange, buildSvgDoc]);
 
   const pointFromEvent = useCallback((e: React.PointerEvent): Pt | null => {
     const rect = svgRef.current?.getBoundingClientRect();
@@ -96,21 +121,9 @@ export default function DrawingCanvas() {
     ptsRef.current = [];
   };
 
-  // Export the drawing as a standalone SVG file (no <canvas>, per the hardware
-  // rule). The intern saves it and attaches it to their reply.
   const save = () => {
-    const svg = svgRef.current;
-    if (!svg || strokes.length === 0) return;
-    const rect = svg.getBoundingClientRect();
-    const w = Math.round(rect.width);
-    const h = Math.round(rect.height);
-    const paths = strokes
-      .map(
-        (s) =>
-          `<path d="${s.d}" fill="none" stroke="${s.color}" stroke-width="${s.width}" stroke-linecap="round" stroke-linejoin="round"/>`
-      )
-      .join("");
-    const doc = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect width="100%" height="100%" fill="#ffffff"/>${paths}</svg>`;
+    const doc = buildSvgDoc(strokes);
+    if (!doc) return;
     const blob = new Blob([doc], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -123,12 +136,12 @@ export default function DrawingCanvas() {
 
   return (
     <div className="w-full max-w-2xl">
-      {/* Toolbar */}
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           {COLORS.map((c) => (
             <button
               key={c}
+              type="button"
               onClick={() => setColor(c)}
               aria-label={`Pen color ${c}`}
               className="h-7 w-7 rounded-full border-2 transition-transform active:scale-90"
@@ -140,41 +153,47 @@ export default function DrawingCanvas() {
           ))}
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            maxLength={60}
-            aria-label="Your name (for the saved file)"
-            className="w-28 rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--primary)]"
-          />
+          {!embedded && (
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              maxLength={60}
+              aria-label="Your name (for the saved file)"
+              className="w-28 rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--primary)]"
+            />
+          )}
           <button
+            type="button"
             onClick={undo}
             className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
           >
             Undo
           </button>
           <button
+            type="button"
             onClick={clear}
             className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-muted)]"
           >
             Clear
           </button>
-          <button
-            onClick={save}
-            disabled={strokes.length === 0}
-            className="rounded-lg bg-[var(--primary)] px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
-          >
-            Save
-          </button>
+          {!embedded && (
+            <button
+              type="button"
+              onClick={save}
+              disabled={strokes.length === 0}
+              className="rounded-lg bg-[var(--primary)] px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--primary-dark)] disabled:opacity-50"
+            >
+              Save
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Drawing surface */}
       <svg
         ref={svgRef}
         className="w-full rounded-xl border border-[var(--border-strong)] bg-white"
-        style={{ height: "60vh", minHeight: 360, touchAction: "none", cursor: "crosshair" }}
+        style={{ height: "55vh", minHeight: 320, touchAction: "none", cursor: "crosshair" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={finishStroke}
