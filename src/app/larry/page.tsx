@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import FrameworkCard from "@/components/brain/FrameworkCard";
 import WorryModel from "@/components/brain/diagrams/WorryModel";
+import BrainLessonChat from "@/components/brain/BrainLessonChat";
 
 export const metadata: Metadata = {
   title: "Larry's Brain — preview",
@@ -29,6 +30,7 @@ export default function LarryBrainPreview() {
             "Worry is using your imagination to create something you don't want.",
           ]}
           applyPrompt="Think of something you're carrying right now. Walk it through the model, where does it land, and what does that tell you to do?"
+          chat={<BrainLessonChat lessonTag="brain-m1-l1-worry-model" />}
         >
           <WorryModel />
         </FrameworkCard>

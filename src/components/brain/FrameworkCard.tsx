@@ -9,6 +9,7 @@ export default function FrameworkCard({
   principles,
   applyPrompt,
   children,
+  chat,
 }: {
   module: string;
   title: string;
@@ -16,6 +17,7 @@ export default function FrameworkCard({
   principles: string[];
   applyPrompt: string;
   children: React.ReactNode;
+  chat?: React.ReactNode;
 }) {
   return (
     <article className="w-full max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--bg)] p-6 sm:p-8">
@@ -46,13 +48,15 @@ export default function FrameworkCard({
       {/* Apply it (mentor chat hooks in here later) */}
       <div className="mt-7 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/5 p-4">
         <p className="text-base text-[var(--text-primary)]">{applyPrompt}</p>
-        <button
-          type="button"
-          disabled
-          className="mt-3 rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white opacity-50"
-        >
-          Talk it through (coming soon)
-        </button>
+        {chat ?? (
+          <button
+            type="button"
+            disabled
+            className="mt-3 rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white opacity-50"
+          >
+            Talk it through (coming soon)
+          </button>
+        )}
       </div>
     </article>
   );

@@ -19,7 +19,7 @@ const anthropic = new Anthropic();
 
 // ── Legacy types (deprecated — use model-config.ts instead) ──
 
-export type AIFeature = "lesson-chat" | "guide" | "ikigai" | "checkin" | "recommendations" | "pitch" | "moderation" | "card" | "ask" | "ajchat";
+export type AIFeature = "lesson-chat" | "guide" | "ikigai" | "checkin" | "recommendations" | "pitch" | "moderation" | "card" | "ask" | "ajchat" | "brainchat";
 
 /**
  * @deprecated Use getModel() from model-config.ts instead.
@@ -36,6 +36,7 @@ export const MODEL_MAP: Record<AIFeature, string> = {
   card: "claude-haiku-4-5-20251001",
   ask: "claude-sonnet-4-6",
   ajchat: "claude-sonnet-4-6",
+  brainchat: "claude-sonnet-4-6",
 };
 
 const MAX_TOKENS_MAP: Record<AIFeature, number> = {
@@ -49,6 +50,7 @@ const MAX_TOKENS_MAP: Record<AIFeature, number> = {
   card: 1024,
   ask: 1024,
   ajchat: 700,
+  brainchat: 900,
 };
 
 // ── Shared types ──
