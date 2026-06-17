@@ -18,19 +18,21 @@ const ALLOWED_CURRICULUM_TYPES: Record<string, string> = {
   "text/plain": "txt",
 };
 
-async function requirePlatformOwner() {
+async function requirePlatformOwner(): Promise<
+  { ok: false; error: string } | { ok: true; userId: string }
+> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" as const };
+  if (!user) return { ok: false, error: "Not authenticated" };
   const { data: profile } = await supabase
     .from("profiles")
     .select("is_platform_owner")
     .eq("id", user.id)
     .single();
-  if (!profile?.is_platform_owner) return { error: "Platform owners only." as const };
-  return { user };
+  if (!profile?.is_platform_owner) return { ok: false, error: "Platform owners only." };
+  return { ok: true, userId: user.id };
 }
 
 /** List all orgs for the ingest target dropdown. Platform owner only. */
@@ -38,7 +40,7 @@ export async function listOrgsForIngest(): Promise<
   { orgs: { id: string; name: string; slug: string | null }[] } | { error: string }
 > {
   const gate = await requirePlatformOwner();
-  if ("error" in gate) return { error: gate.error };
+  if (!gate.ok) return { error: gate.error };
 
   const admin = createAdminClient();
   const { data, error } = await admin
@@ -62,7 +64,7 @@ export async function uploadCurriculumForOrg(
   formData: FormData
 ): Promise<{ success: true; uploadIds: string[] } | { error: string }> {
   const gate = await requirePlatformOwner();
-  if ("error" in gate) return { error: gate.error };
+  if (!gate.ok) return { error: gate.error };
 
   if (!orgId || typeof orgId !== "string") return { error: "Pick an organization first." };
 
@@ -101,7 +103,7 @@ export async function uploadCurriculumForOrg(
       .from("curriculum_uploads")
       .insert({
         org_id: orgId,
-        uploaded_by: gate.user.id,
+        uploaded_by: gate.userId,
         file_name: file.name,
         file_path: storagePath,
         file_size_bytes: file.size,
