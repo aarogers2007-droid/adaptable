@@ -3,10 +3,11 @@
 import { useCallback, useRef, useState } from "react";
 import DrawingCanvas from "@/components/DrawingCanvas";
 
-// The one-link intern assessment. Intro + drawing + questions, all on one page,
-// one Submit that sends everything to /api/assessment-submit. Voice = AJ's.
-// Covers four dimensions: knowledge, skills, abilities, experience — woven into
-// a playful, self-discovery flow (disarm -> reveal -> demonstrate).
+// The one-link intern assessment for Josh & Juan. Reframed (2026-06-17) to LEAN
+// INTO POSSIBILITY: kill the fear first, then light up what they could build.
+// They're new to this world (no set path, no résumé to lean on) — that's the
+// gift, not the threat. One grounded strength question (the rush), the rest is
+// imagination + a taste of the deal-making world. Voice = AJ's.
 
 const ARENAS = [
   { key: "Words", label: "Words", blurb: "copy, story, persuasion" },
@@ -49,10 +50,12 @@ export default function AssessmentFlow() {
   const [drawing, setDrawing] = useState("");
   const [kid, setKid] = useState("");
   const [geniuses, setGeniuses] = useState("");
-  const [truth, setTruth] = useState("");
+  const [rush, setRush] = useState("");
+  const [build, setBuild] = useState("");
+  const [deal, setDeal] = useState("");
   const [arena, setArena] = useState("");
   const [arenaProof, setArenaProof] = useState("");
-  const [hardest, setHardest] = useState("");
+  const [truth, setTruth] = useState("");
   const [surprise, setSurprise] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -86,7 +89,7 @@ export default function AssessmentFlow() {
           sessionId: sessionId.current,
           company_website: honeypot,
           drawing,
-          answers: { kid, geniuses, truth, arena, arena_proof: arenaProof, hardest, surprise },
+          answers: { kid, geniuses, rush, build, deal, arena, arena_proof: arenaProof, truth, surprise },
         }),
       });
       const j = await res.json().catch(() => ({}));
@@ -106,10 +109,10 @@ export default function AssessmentFlow() {
     return (
       <div className="w-full max-w-2xl rounded-xl border border-[var(--primary)]/30 bg-[var(--primary)]/5 px-6 py-8 text-center">
         <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
-          Got it, {name.trim().split(" ")[0]}.
+          That&apos;s the start of something, {name.trim().split(" ")[0]}.
         </h2>
         <p className="mt-3 text-[var(--text-secondary)]">
-          That told me more than a résumé ever could. I&apos;ll be in touch about the call.
+          That told me more than a résumé ever could. I&apos;ll be in touch, soon. The fun&apos;s just getting started.
         </p>
       </div>
     );
@@ -117,15 +120,18 @@ export default function AssessmentFlow() {
 
   return (
     <div className="w-full max-w-2xl flex flex-col gap-10">
-      {/* Intro */}
+      {/* Intro — kill the fear, light the possibility */}
       <div>
         <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-5xl font-bold tracking-tight text-[var(--text-primary)]">
           You don&apos;t need a résumé. You need an afternoon.
         </h1>
         <p className="mt-5 text-lg text-[var(--text-secondary)] leading-relaxed">
-          I&apos;m not going to ask where you went to school. I want to see who you are when
-          nobody&apos;s grading you. So we&apos;re going to play, like you&apos;re 8 again,
-          before the world told you who to be. Take an afternoon, no more. There are no wrong
+          I&apos;m not going to ask where you went to school or what you&apos;ve already done.
+          Here&apos;s the truth about where you&apos;re standing right now: there is no map. Most
+          people are terrified of that. The ones I want are the ones who hear &quot;no set path&quot;
+          and feel their chest open up, because it means <em>you</em> get to draw it. You&apos;ve
+          already led people when it got loud and chaotic. That&apos;s the whole skill. So let&apos;s
+          play, and let&apos;s dream a little bigger than feels comfortable. There are no wrong
           answers, only the most honest, most <em>you</em> ones.
         </p>
       </div>
@@ -154,19 +160,35 @@ export default function AssessmentFlow() {
         <textarea className={TA} value={geniuses} onChange={(e) => setGeniuses(e.target.value)} maxLength={5000} />
       </Section>
 
-      <Section n="04 — Tell me straight" title="Go play in Adaptable.">
+      <Section n="04 — The rush" title="Tell me about a time it got loud.">
         <p className="mb-4 text-[var(--text-secondary)]">
-          Spend 20 minutes in{" "}
-          <a href="/ask" target="_blank" rel="noreferrer" className="text-[var(--primary)] underline">
-            Adaptable
-          </a>
-          . What made you smile? What made you cringe? Tell me like you&apos;d tell a friend.
-          If you only flatter me, you&apos;ve already lost.
+          A moment when everything came at once, the line out the door, people looking at you,
+          no time to think, and you held it together. What happened? What did <em>you</em> do?
+          This matters to me more than any line on a résumé.
         </p>
-        <textarea className={TA} value={truth} onChange={(e) => setTruth(e.target.value)} maxLength={5000} />
+        <textarea className={TA} value={rush} onChange={(e) => setRush(e.target.value)} maxLength={5000} />
       </Section>
 
-      <Section n="05 — Your weapon" title="What are you dangerous at?">
+      <Section n="05 — Dream bigger" title="If you could build anything, what would it be?">
+        <p className="mb-4 text-[var(--text-secondary)]">
+          Money&apos;s not the wall. Skill&apos;s not the wall. Nobody&apos;s stopping you and
+          nobody&apos;s grading you. What do you build? Go as big as your imagination lets you.
+          Whatever you&apos;re about to talk yourself out of, that&apos;s the one I want to hear.
+          Don&apos;t be reasonable.
+        </p>
+        <textarea className={TA} value={build} onChange={(e) => setBuild(e.target.value)} maxLength={5000} />
+      </Section>
+
+      <Section n="06 — The 30 seconds" title="You meet the one person who could change everything.">
+        <p className="mb-4 text-[var(--text-secondary)]">
+          You&apos;re at an event. You meet the one person who could change everything for what
+          we&apos;re building. You&apos;ve got 30 seconds before they move on. What do you say?
+          Write it like you&apos;d actually say it.
+        </p>
+        <textarea className={TA} value={deal} onChange={(e) => setDeal(e.target.value)} maxLength={5000} />
+      </Section>
+
+      <Section n="07 — Your weapon" title="What are you dangerous at?">
         <div className="flex flex-col gap-2 mb-4">
           {ARENAS.map((a) => (
             <button
@@ -202,17 +224,21 @@ export default function AssessmentFlow() {
         />
       </Section>
 
-      <Section n="06 — The hard part" title="What's the hardest thing you've ever made?">
+      <Section n="08 — Tell me straight" title="Go play in Adaptable.">
         <p className="mb-4 text-[var(--text-secondary)]">
-          Something you made or finished that was genuinely hard. What was it, what broke along
-          the way, and what did you do about it? I care more about the breaking than the finishing.
+          Spend 20 minutes in{" "}
+          <a href="/ask" target="_blank" rel="noreferrer" className="text-[var(--primary)] underline">
+            Adaptable
+          </a>
+          . What made you smile? What made you cringe? Tell me like you&apos;d tell a friend.
+          If you only flatter me, you&apos;ve already lost.
         </p>
-        <textarea className={TA} value={hardest} onChange={(e) => setHardest(e.target.value)} maxLength={5000} />
+        <textarea className={TA} value={truth} onChange={(e) => setTruth(e.target.value)} maxLength={5000} />
       </Section>
 
-      <Section n="07 — Surprise me" title="Show me something only you would.">
+      <Section n="09 — Surprise me" title="Show me something only you would.">
         <p className="mb-4 text-[var(--text-secondary)]">
-          One thing you&apos;ve made that you&apos;re proud of, link or describe it, <em>and tell
+          One thing you&apos;ve made or done that you&apos;re proud of, link or describe it, <em>and tell
           me the story behind it</em> (the struggle, the decision). Then do one thing I
           didn&apos;t ask for. Surprise me.
         </p>
