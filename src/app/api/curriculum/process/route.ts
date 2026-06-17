@@ -33,11 +33,15 @@ export async function POST(req: NextRequest) {
   // ── Verify user is org_admin of this org ──
   const { data: profile } = await supabase
     .from("profiles")
-    .select("org_id, role")
+    .select("org_id, role, is_platform_owner")
     .eq("id", user.id)
     .single();
 
-  if (profile?.org_id !== orgId || profile?.role !== "org_admin") {
+  // Platform owners can run ingestion for any org they provision (e.g. onboarding
+  // a new customer's curriculum). Everyone else must be an org_admin of THIS org.
+  const isPlatformOwner = profile?.is_platform_owner === true;
+  const isOrgAdmin = profile?.org_id === orgId && profile?.role === "org_admin";
+  if (!isPlatformOwner && !isOrgAdmin) {
     return new Response(
       JSON.stringify({ error: "Not authorized for this organization" }),
       { status: 403, headers: { "Content-Type": "application/json" } }
