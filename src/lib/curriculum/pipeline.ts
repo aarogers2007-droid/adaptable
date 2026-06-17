@@ -33,7 +33,7 @@ export interface PipelineResult {
 
 // ── Storage bucket name ──
 
-const CURRICULUM_BUCKET = "curriculum-uploads";
+const CURRICULUM_BUCKET = "curriculum-files";
 
 // ── Main orchestrator ──
 
@@ -72,7 +72,7 @@ export async function runCurriculumPipeline(
       // Fetch upload metadata
       const { data: upload, error: metaError } = await admin
         .from("curriculum_uploads")
-        .select("file_name, file_type, storage_path")
+        .select("file_name, file_type, file_path")
         .eq("id", uploadId)
         .single();
 
@@ -92,7 +92,7 @@ export async function runCurriculumPipeline(
       const { data: fileData, error: downloadError } = await admin
         .storage
         .from(CURRICULUM_BUCKET)
-        .download(upload.storage_path);
+        .download(upload.file_path);
 
       if (downloadError || !fileData) {
         throw new Error(`Download failed for ${upload.file_name}: ${downloadError?.message ?? "no data"}`);
