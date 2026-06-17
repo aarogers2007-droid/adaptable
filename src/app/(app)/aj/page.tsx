@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import AJAnalytics from "./AJAnalytics";
+import IngestMenu from "./IngestMenu";
 
 export const dynamic = "force-dynamic";
 
@@ -128,6 +129,11 @@ export default async function AJDashboard() {
         {/* Real-time analytics */}
         <div className="mt-6">
           <AJAnalytics />
+        </div>
+
+        {/* Curriculum ingestion (platform owner) */}
+        <div className="mt-6">
+          <IngestMenu />
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
