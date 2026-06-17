@@ -2,12 +2,21 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { runCurriculumPipeline } from "@/lib/curriculum/pipeline";
+import { validateOrigin } from "@/lib/csrf";
 // Admin client used for fetching upload IDs before pipeline runs
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
+  // ── CSRF (fail closed) ──
+  if (!validateOrigin(req)) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   // ── Auth ──
   const supabase = await createClient();
   const {
