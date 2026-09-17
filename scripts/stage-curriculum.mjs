@@ -10,14 +10,18 @@
  * Usage:
  *   node --env-file=.env.local scripts/stage-curriculum.mjs <orgId> <folder>
  *
- * Defaults: Larry org + ./larry-pdfs
+ * Both <orgId> and <folder> arguments are required.
  */
 import { createClient } from "@supabase/supabase-js";
 import { readdirSync, readFileSync, statSync } from "fs";
 import { join, extname, basename } from "path";
 
-const ORG_ID = process.argv[2] || "7857e627-6e92-4a07-b19f-dbf25e9b6ce8"; // Larry
-const FOLDER = process.argv[3] || "larry-pdfs";
+const ORG_ID = process.argv[2];
+const FOLDER = process.argv[3];
+if (!ORG_ID || !FOLDER) {
+  console.error("Usage: node --env-file=.env.local scripts/stage-curriculum.mjs <orgId> <folder>");
+  process.exit(1);
+}
 const BUCKET = "curriculum-files";
 
 const CONTENT_TYPE = {
