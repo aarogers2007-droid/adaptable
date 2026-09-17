@@ -32,7 +32,7 @@
 
 ---
 
-## P0 — Before VentureLab pilot launches
+## P0 — Before pilot launches
 
 ### ~~Upgrade Supabase to Pro plan~~ ✓
 Upgraded 2026-06-02. 200 concurrent connections, 8GB storage, daily backups.
@@ -56,7 +56,7 @@ Effort: S (human: phone call)
 Effort: S (human: ~30 min after EIN)
 
 ### Legal
-- IP carve-out from VentureLab (AJ owns Adaptable IP)
+- IP ownership confirmation (AJ owns Adaptable IP)
 - Licensing agreement for per-student pricing
 - Privacy policy and ToS for the platform
 - COPPA review for under-13 users
@@ -182,6 +182,16 @@ Effort: L (CC: ~1 hour)
 
 ## P2 — Post-pilot enhancements (accepted from CEO review)
 
+### Per-feature rate-limit budget (review 2026-06-17)
+`reserve_ask_usage` (migration 00059) counts a single unfiltered global cap
+(`c_global_cap = 750/day`) across ALL `ask_rate_events`. It is now shared by 5 public
+endpoints: `ask-chat`, `ask-lead`, `assessment-submit`, `aj-chat`, `brain-chat`. One
+busy feature (e.g. a heavy lesson endpoint) can exhaust the shared budget and make `/ask`
+(the prospect-facing sales page) return "taking a breather". Zero impact at current
+traffic; fix before real launch volume. Fix: add a `p_feature` param + per-feature
+global caps (new migration), update the 5 callers to pass their feature. Found by
+`/review`; logged in `.gstack/`.
+
 ### /ask hardening before wide promotion (CSO 2026-06-12)
 From the CSO audit of the public `/ask` endpoint. None blocking for launch (global
 750/day fail-closed cap bounds cost), but do these before promoting `/ask` widely or
@@ -219,7 +229,7 @@ Lead with charts/graphs, not student lists. Multiple visualization options
 Effort: L (CC: ~2 hours)
 
 ### Impact Report generator (branded PDF)
-One-click branded PDF with org logo, key stats, charts. The artifact Cristal
+One-click branded PDF with org logo, key stats, charts. The artifact an org admin
 emails to sponsors and attaches to grant applications.
 Effort: M (CC: ~1 hour)
 
@@ -297,7 +307,7 @@ Effort: M (CC: ~30 min)
 ## P3 — International expansion (before non-US orgs)
 
 > From Amira's walkthrough (23,000 students, 12 countries, London-based NGO).
-> None of these block the VentureLab pilot but all block international adoption.
+> None of these block the initial pilot but all block international adoption.
 
 ### GEO / AI-search visibility — off-site push (ON HOLD)
 On-site foundation already shipped (crawlable FAQ + FAQPage schema at /ask, robots.ts,

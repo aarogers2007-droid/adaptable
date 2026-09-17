@@ -2,7 +2,6 @@
 
 White-label AI curriculum platform for organizations and nonprofits. Each org uploads
 their branding and curriculum, students see the org's name on everything, never Adaptable's.
-First customer: VentureLab (300K US students, founding partner at $4.99/student).
 
 ## You Are a Cofounder, Not a Code Generator
 
@@ -291,7 +290,7 @@ Regression test: `scripts/eval-multi-interest-regression.ts`, baseline noHyb ≥
 ## Architecture — Key Patterns
 
 ### Multi-Tenant Subdomain Routing
-Organizations get subdomains (e.g., `learn.venturelab.org`). Resolution flow:
+Organizations get subdomains (e.g., `learn.northwind.org`). Resolution flow:
 1. `src/lib/supabase/middleware.ts` extracts hostname, calls `resolveTenant()`
 2. `src/lib/tenant/resolve.ts` queries `organizations` with 60s TTL in-memory cache (service role key)
 3. Middleware injects `x-tenant-id` and `x-tenant-subdomain` headers
@@ -373,7 +372,7 @@ comments, copy, error messages, documentation.
 - **No "Adaptable" in student-facing UI.** Students see the org's name. Only the
   landing page (adaptable-one.vercel.app) and admin-facing settings show "Adaptable."
 - **Production URL is `adaptable-one.vercel.app`.** Never say `adaptable.one`.
-  Org subdomains use the org's domain (e.g., `learn.venturelab.org`).
+  Org subdomains use the org's domain (e.g., `learn.northwind.org`).
 
 ## Target Hardware
 
@@ -424,6 +423,21 @@ production-only crashes early instead of debugging 1500 lines blind.
   in production.
 - If a layer crashes, the diff is small enough to find the bug in minutes.
 - This applies to any page >100 lines of JSX. Simple pages can ship in one go.
+
+## Design-First Prototyping (Alberto's method)
+
+Default build order: **design first, then map the code to the buttons.** Start from the
+visual, the screens, the layout, the actual elements a user touches, then write code wired
+to each element. Do NOT start code-first. Code-first leaves too much open-ended and tends
+to stray from the signal (the real intended product). Design-first keeps every line anchored
+to something a user actually sees and does.
+
+Flow: (1) design the screens/flow (Claude Design or a clear visual spec), (2) lock the
+layout + the buttons/elements, (3) implement code mapped element-by-element to that design,
+(4) then the layer-by-layer deploy discipline below.
+
+Credit: Alberto Pina's prototyping method (Claude Design + Claude Code). Adopted 2026-06-18.
+This is now the default for new surfaces; the earlier "design last" was situational, not the rule.
 
 ## Build and Commit Discipline
 
@@ -492,7 +506,7 @@ Volume pricing (single Stripe price ID with tiers):
 - 10,001-50,000: $7.99 + $2,500
 - 50,000+: negotiable
 
-Founding Partner (VentureLab): $4.99/student, no implementation fee, lookup key: founding-partner
+Founding Partner: $4.99/student, no implementation fee, lookup key: founding-partner
 
 All features at every level. No gating. Prices only go up.
 
