@@ -2,7 +2,7 @@
 
 ## Product Context
 - **What this is:** AI-native entrepreneurship learning platform where students build real, personalized businesses
-- **Who it's for:** K-12 students (ages 12-18) across 155 countries, via institutional access through VentureLab
+- **Who it's for:** K-12 students (ages 12-18), via institutional access through schools and youth-entrepreneurship programs
 - **Space/industry:** Edtech, entrepreneurship education
 - **Project type:** Web app (educational, student-facing, institutional sales)
 - **Design references:** Notion (personal workspace clarity), Linear (density without clutter), Duolingo (warmth at celebration moments)

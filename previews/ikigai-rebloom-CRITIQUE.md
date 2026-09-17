@@ -1,7 +1,7 @@
 # Ikigai Rebloom — Cinematographer's Critique
 
 **Artifact reviewed:** `/Users/ajrogers/Adaptable/previews/ikigai-rebloom-tweaked.html`
-**Reviewer brief:** AJ, founder. Meeting tomorrow with Cristal. The 20s graduation
+**Reviewer brief:** AJ, founder. Meeting tomorrow with the pilot partner. The 20s graduation
 moment must land at the level of a Pixar opening or a Malick wide.
 **Constraint floor:** sacred colors, sacred skeleton, sacred name pulse, CSS only,
 black background, "tweaked" spirit kept (≈15% faster + per-circle ambient glow).

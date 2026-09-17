@@ -22,7 +22,7 @@ All notable changes to Adaptable will be documented in this file.
 ### Added
 - **Scenario Simulations** — Role-play business challenges with Socratic AI, branching narratives, MC decision points, criteria-based badge earning (bronze/silver/gold), and replay support
 - **Scenario Chat UX** — Two-panel layout (context panel + conversation), `[OPTIONS]` block parsing for clickable MC cards, staggered entrance animations, criteria unlock animations
-- **Multi-tenant Subdomain Routing** — Organizations get subdomains (e.g., `venturelab.adaptable.one`). Middleware resolves tenant from hostname with 60s TTL cache, injects `x-tenant-*` headers
+- **Multi-tenant Subdomain Routing** — Organizations get subdomains (e.g., `northwind.adaptable.one`). Middleware resolves tenant from hostname with 60s TTL cache, injects `x-tenant-*` headers
 - **Self-Serve Org Onboarding** — 3-step wizard (org name, subdomain, class creation) with subdomain availability check and 23505 collision handling
 - **Guest Join Page** (`/go`) — Class code entry, anonymous Supabase sign-in, profile creation, class enrollment, redirect to onboarding. Built for live demo events
 - **Per-Lesson Model Routing** — 14 of 22 lessons use GPT-4o-mini via `lessons.model_override` column. 8 reasoning-heavy lessons stay on Claude Sonnet. OpenAI streaming shim (`streamMessageOpenAI`) matches Anthropic's `AIStream` interface

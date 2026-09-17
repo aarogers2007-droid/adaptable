@@ -1,6 +1,6 @@
 # Adaptable
 
-AI-native entrepreneurship platform where students design, plan, and prepare to launch real businesses. Built for [VentureLab](https://venturelab.org) — reaching 300K+ students across 155 countries.
+AI-native entrepreneurship platform where students design, plan, and prepare to launch real businesses through a 22-lesson curriculum guided by AI mentors.
 
 ## What It Does
 
@@ -57,7 +57,7 @@ src/
 └── ...
 ```
 
-**Multi-tenant:** Organizations get subdomains (e.g., `venturelab.adaptable.one`). Middleware resolves tenant from hostname with 60s TTL cache and injects `x-tenant-*` headers. Server actions read org_id from auth (unforgeable), not headers.
+**Multi-tenant:** Organizations get subdomains (e.g., `northwind.adaptable.one`). Middleware resolves tenant from hostname with 60s TTL cache and injects `x-tenant-*` headers. Server actions read org_id from auth (unforgeable), not headers.
 
 **Per-lesson model routing:** 14 of 22 lessons use GPT-4o-mini for cost efficiency. 8 lessons requiring deeper reasoning use Claude Sonnet. Configured via `lessons.model_override` column.
 
